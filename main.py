@@ -5,6 +5,14 @@ from sentence_transformers import SentenceTransformer, util
 old_products = pd.read_csv('D:/product_checker/cleaned_products.csv')
 new_products = pd.read_csv('D:/bill26668/_ocr_output/merged_receipts.csv')
 old_product_names = old_products['name'].tolist()
+
+# ตรวจสอบและลบรายการสินค้าซ้ำในข้อมูลสินค้าใหม่
+if new_products.duplicated(subset=['รายการ']).any():
+    duplicate_rows = new_products[new_products.duplicated(subset=['รายการ'], keep=False)]
+    duplicate_rows.to_csv('d:/product_checker/duplicate_new_products.csv', index=False, encoding='utf-8-sig')
+    print(f"พบสินค้าซ้ำ {len(duplicate_rows)} รายการ บันทึกที่ duplicate_new_products.csv")
+
+new_products = new_products.drop_duplicates(subset=['รายการ'])
 new_product_names = new_products['รายการ'].tolist()
 
 # โหลดโมเดล pre-trained
