@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Tensor:
     def __init__(self, data):
         self.data = np.array(data, dtype=float)
@@ -72,8 +73,10 @@ class Tensor:
     def __repr__(self):
         return f"Tensor({self.data})"
 
+
 def tensor(data):
     return Tensor(data)
+
 
 def abs(x):
     if isinstance(x, Tensor):
