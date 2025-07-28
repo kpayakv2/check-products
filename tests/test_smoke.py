@@ -57,3 +57,15 @@ def test_filter_matched_products(tmp_path):
 
     assert (tmp_path / "matched_products_check.csv").exists()
     assert (tmp_path / "matched_products_unique.csv").exists()
+
+
+def test_prompt_csv_path(monkeypatch, tmp_path):
+    csv = tmp_path / "example.csv"
+    csv.write_text("a,b\n1,2")
+    monkeypatch.chdir(tmp_path)
+
+    responses = iter(["missing.csv", "example.csv"])
+    monkeypatch.setattr("builtins.input", lambda _: next(responses))
+
+    result = main.prompt_csv_path("Enter: ")
+    assert result == csv

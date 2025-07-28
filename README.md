@@ -26,7 +26,7 @@ python main.py
 ```
 
 By default the script looks for `old_products.csv` and `new_products.csv` in the current directory and writes outputs under an `output` directory.
-You can override these using command line arguments or environment variables.
+You can override these using command line arguments or environment variables. If neither a command line argument nor an environment variable is supplied for a CSV path, `main.py` will prompt you to enter the file interactively.
 
 ### Supplying Custom Paths
 
