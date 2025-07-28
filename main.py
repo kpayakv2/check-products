@@ -1,3 +1,4 @@
+import argparse
 import os
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -87,20 +88,16 @@ def run(
     """
     # Determine file paths using parameters, environment variables, or defaults
     old_products_csv = (
-        Path(os.getenv("OLD_PRODUCTS_CSV", "D:/product_checker/cleaned_products.csv"))
+        Path(os.getenv("OLD_PRODUCTS_CSV", "old_products.csv"))
         if old_products_csv is None
         else Path(old_products_csv)
     )
     new_products_csv = (
-        Path(os.getenv("NEW_PRODUCTS_CSV", "D:/bill26668/_ocr_output/merged_receipts.csv"))
+        Path(os.getenv("NEW_PRODUCTS_CSV", "new_products.csv"))
         if new_products_csv is None
         else Path(new_products_csv)
     )
-    output_dir = (
-        Path(os.getenv("OUTPUT_DIR", "D:/product_checker"))
-        if output_dir is None
-        else Path(output_dir)
-    )
+    output_dir = Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir)
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
     # Load datasets
@@ -142,4 +139,9 @@ def run(
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="Match new products to existing catalog")
+    parser.add_argument("--old-products-csv", help="CSV of existing products")
+    parser.add_argument("--new-products-csv", help="CSV of new products to check")
+    parser.add_argument("--output-dir", help="Directory for output files")
+    args = parser.parse_args()
+    run(args.old_products_csv, args.new_products_csv, args.output_dir)

@@ -25,20 +25,24 @@ Run with the default locations (defined in `main.py`):
 python main.py
 ```
 
-Default paths are:
-- `OLD_PRODUCTS_CSV` → `D:/product_checker/cleaned_products.csv`
-- `NEW_PRODUCTS_CSV` → `D:/bill26668/_ocr_output/merged_receipts.csv`
-- `OUTPUT_DIR` → `D:/product_checker`
+By default the script looks for `old_products.csv` and `new_products.csv` in the current directory and writes outputs under an `output` directory.
+You can override these using command line arguments or environment variables.
 
 ### Supplying Custom Paths
 
-You can override the defaults by setting environment variables before running:
+Use environment variables:
 
 ```bash
 export OLD_PRODUCTS_CSV=/path/to/old_products.csv
 export NEW_PRODUCTS_CSV=/path/to/new_products.csv
 export OUTPUT_DIR=/path/to/output
 python main.py
+```
+
+Or provide command line arguments:
+
+```bash
+python main.py --old-products-csv old.csv --new-products-csv new.csv --output-dir out
 ```
 
 Alternatively, call the `run` function directly from the command line with your own paths:
