@@ -1,2 +1,5 @@
 outputs/
 __pycache__/
+
+*.pyc
+*.csv
