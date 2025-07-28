@@ -8,6 +8,19 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 
 
+def prompt_csv_path(prompt_text: str) -> Path:
+    """Interactively prompt for a CSV file path until it exists."""
+    while True:
+        available = [p.name for p in Path(".").glob("*.csv")]
+        if available:
+            print("Available CSV files: " + ", ".join(available))
+        path_str = input(prompt_text).strip()
+        path = Path(path_str).expanduser()
+        if path.is_file():
+            return path.resolve()
+        print(f"{path} is not a valid file. Please try again.")
+
+
 def check_product_similarity(
     new_product: str,
     old_product_names: List[str],
@@ -145,4 +158,13 @@ if __name__ == "__main__":
     parser.add_argument("--new-products-csv", help="CSV of new products to check")
     parser.add_argument("--output-dir", help="Directory for output files")
     args = parser.parse_args()
-    run(args.old_products_csv, args.new_products_csv, args.output_dir)
+
+    old_csv = args.old_products_csv or os.getenv("OLD_PRODUCTS_CSV")
+    new_csv = args.new_products_csv or os.getenv("NEW_PRODUCTS_CSV")
+
+    if old_csv is None:
+        old_csv = prompt_csv_path("Path to old products CSV: ")
+    if new_csv is None:
+        new_csv = prompt_csv_path("Path to new products CSV: ")
+
+    run(old_csv, new_csv, args.output_dir)
