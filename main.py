@@ -1,5 +1,6 @@
 import argparse
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -42,8 +43,18 @@ def check_product_similarity(
     """
     # Encode the new product name into the same embedding space as old_product_names
     new_embedding = model.encode([new_product], convert_to_tensor=True)
-    # Convert tensor to list for display
-    new_vector_str = str(new_embedding[0].tolist()[:10]) + "..."  # Show first 10 values
+    # Convert tensor to list for display - get complete vector for manual calculation
+    try:
+        # Get the complete vector for new product
+        if hasattr(new_embedding, 'shape') and len(new_embedding.shape) > 1:
+            new_vector_list = new_embedding[0].tolist()
+        else:
+            new_vector_list = new_embedding.tolist()
+        # Format as comma-separated values for easy copying
+        new_vector_str = ",".join([f"{x:.6f}" for x in new_vector_list])
+    except Exception as e:
+        new_vector_str = f"Vector conversion error: {str(e)}"
+    
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
     # Get the top_k highest similarity scores and their indices
@@ -51,7 +62,23 @@ def check_product_similarity(
     result: List[Tuple[str, float, str, str]] = []
     # Pair each top score with the corresponding old product name and vectors
     for score, idx in zip(top_results[0], top_results[1]):
-        old_vector_str = str(old_embeddings[int(idx)].tolist()[:10]) + "..."  # Show first 10 values
+        try:
+            # Get the complete vector for old product - handle different tensor shapes
+            idx_int = int(idx)
+            old_tensor = old_embeddings[idx_int]
+            
+            # Check if it's a tensor or scalar
+            if hasattr(old_tensor, 'tolist'):
+                old_vector_list = old_tensor.tolist()
+            elif hasattr(old_tensor, 'item'):
+                old_vector_list = [old_tensor.item()]
+            else:
+                old_vector_list = [float(old_tensor)]
+                
+            # Format as comma-separated values for easy copying
+            old_vector_str = ",".join([f"{x:.6f}" for x in old_vector_list])
+        except Exception as e:
+            old_vector_str = f"Vector conversion error: {str(e)}"
         result.append((old_product_names[int(idx)], float(score), new_vector_str, old_vector_str))
     return result
 
@@ -155,9 +182,10 @@ def run(
                     "calculation_method": "1) แปลงชื่อสินค้าเป็น embedding vectors 2) คำนวณ cosine similarity 3) หาค่าความคล้ายคลึงสูงสุด"
                 }
             )
-    # Save the matching results to CSV
+    # Save the matching results to CSV with timestamp to avoid permission issues
     output_df = pd.DataFrame(output_rows)
-    matched_path = output_dir / "matched_products.csv"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    matched_path = output_dir / f"matched_products_{timestamp}.csv"
     output_df.to_csv(matched_path, index=False, encoding="utf-8-sig")
     print(f"บันทึกผลลัพธ์ที่ {matched_path} เรียบร้อยแล้ว (encoding utf-8-sig สำหรับ Excel)")
 
