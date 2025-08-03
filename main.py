@@ -27,10 +27,10 @@ def check_product_similarity(
     old_embeddings,
     model: SentenceTransformer,
     top_k: int = 3,
-) -> List[Tuple[str, float]]:
+) -> List[Tuple[str, float, str, str]]:
     """
     Compute the similarity between a new product name and a list of old product names using embeddings.
-    Returns the top_k most similar old product names with their cosine similarity scores.
+    Returns the top_k most similar old product names with their cosine similarity scores and vector information.
     Parameters:
         new_product (str): The name of the new product to compare.
         old_product_names (List[str]): List of old product names corresponding to old_embeddings.
@@ -38,18 +38,21 @@ def check_product_similarity(
         model (SentenceTransformer): The sentence transformer model to use for encoding the new product.
         top_k (int): The number of top similar results to return (default 3).
     Returns:
-        List[Tuple[str, float]]: A list of tuples (old_product_name, similarity_score) for the top_k similar old products.
+        List[Tuple[str, float, str, str]]: A list of tuples (old_product_name, similarity_score, new_vector, old_vector) for the top_k similar old products.
     """
     # Encode the new product name into the same embedding space as old_product_names
     new_embedding = model.encode([new_product], convert_to_tensor=True)
+    # Convert tensor to list for display
+    new_vector_str = str(new_embedding[0].tolist()[:10]) + "..."  # Show first 10 values
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
     # Get the top_k highest similarity scores and their indices
     top_results = cos_scores.topk(k=top_k)
-    result: List[Tuple[str, float]] = []
-    # Pair each top score with the corresponding old product name
+    result: List[Tuple[str, float, str, str]] = []
+    # Pair each top score with the corresponding old product name and vectors
     for score, idx in zip(top_results[0], top_results[1]):
-        result.append((old_product_names[int(idx)], float(score)))
+        old_vector_str = str(old_embeddings[int(idx)].tolist()[:10]) + "..."  # Show first 10 values
+        result.append((old_product_names[int(idx)], float(score), new_vector_str, old_vector_str))
     return result
 
 
@@ -141,13 +144,15 @@ def run(
         top_matches = check_product_similarity(
             new_product, old_product_names, old_embeddings, model, top_k=3
         )
-        for old_name, score in top_matches:
+        for old_name, score, new_vector, old_vector in top_matches:
             output_rows.append(
                 {
                     "new_product": new_product, 
                     "matched_old_product": old_name, 
                     "score": score,
-                    "calculation_method": "Cosine Similarity (SentenceTransformer)"
+                    "new_product_vector": new_vector,
+                    "old_product_vector": old_vector,
+                    "calculation_method": "1) แปลงชื่อสินค้าเป็น embedding vectors 2) คำนวณ cosine similarity 3) หาค่าความคล้ายคลึงสูงสุด"
                 }
             )
     # Save the matching results to CSV
