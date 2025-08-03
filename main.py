@@ -143,7 +143,12 @@ def run(
         )
         for old_name, score in top_matches:
             output_rows.append(
-                {"new_product": new_product, "matched_old_product": old_name, "score": score}
+                {
+                    "new_product": new_product, 
+                    "matched_old_product": old_name, 
+                    "score": score,
+                    "calculation_method": "Cosine Similarity (SentenceTransformer)"
+                }
             )
     # Save the matching results to CSV
     output_df = pd.DataFrame(output_rows)
