@@ -46,7 +46,7 @@ def check_product_similarity(
     # Convert tensor to list for display - get complete vector for manual calculation
     try:
         # Get the complete vector for new product
-        if hasattr(new_embedding, 'shape') and len(new_embedding.shape) > 1:
+        if hasattr(new_embedding, "shape") and len(new_embedding.shape) > 1:
             new_vector_list = new_embedding[0].tolist()
         else:
             new_vector_list = new_embedding.tolist()
@@ -54,7 +54,7 @@ def check_product_similarity(
         new_vector_str = ",".join([f"{x:.6f}" for x in new_vector_list])
     except Exception as e:
         new_vector_str = f"Vector conversion error: {str(e)}"
-    
+
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
     # Get the top_k highest similarity scores and their indices
@@ -66,15 +66,15 @@ def check_product_similarity(
             # Get the complete vector for old product - handle different tensor shapes
             idx_int = int(idx)
             old_tensor = old_embeddings[idx_int]
-            
+
             # Check if it's a tensor or scalar
-            if hasattr(old_tensor, 'tolist'):
+            if hasattr(old_tensor, "tolist"):
                 old_vector_list = old_tensor.tolist()
-            elif hasattr(old_tensor, 'item'):
+            elif hasattr(old_tensor, "item"):
                 old_vector_list = [old_tensor.item()]
             else:
                 old_vector_list = [float(old_tensor)]
-                
+
             # Format as comma-separated values for easy copying
             old_vector_str = ",".join([f"{x:.6f}" for x in old_vector_list])
         except Exception as e:
@@ -174,12 +174,12 @@ def run(
         for old_name, score, new_vector, old_vector in top_matches:
             output_rows.append(
                 {
-                    "new_product": new_product, 
-                    "matched_old_product": old_name, 
+                    "new_product": new_product,
+                    "matched_old_product": old_name,
                     "score": score,
                     "new_product_vector": new_vector,
                     "old_product_vector": old_vector,
-                    "calculation_method": "1) แปลงชื่อสินค้าเป็น embedding vectors 2) คำนวณ cosine similarity 3) หาค่าความคล้ายคลึงสูงสุด"
+                    "calculation_method": "1) แปลงชื่อสินค้าเป็น embedding vectors 2) คำนวณ cosine similarity 3) หาค่าความคล้ายคลึงสูงสุด",
                 }
             )
     # Save the matching results to CSV with timestamp to avoid permission issues
