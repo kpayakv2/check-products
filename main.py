@@ -1,6 +1,5 @@
 import argparse
 import os
-from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -28,59 +27,35 @@ def check_product_similarity(
     old_embeddings,
     model: SentenceTransformer,
     top_k: int = 3,
-) -> List[Tuple[str, float, str, str]]:
+) -> List[Tuple[str, float]]:
     """
-    Compute the similarity between a new product name and a list of old product names using embeddings.
-    Returns the top_k most similar old product names with their cosine similarity scores and vector information.
+    Compute the similarity between a new product name and a list of old product names.
+    Returns the top_k most similar old product names with their cosine similarity scores.
+
     Parameters:
         new_product (str): The name of the new product to compare.
         old_product_names (List[str]): List of old product names corresponding to old_embeddings.
         old_embeddings: Embeddings for old_product_names (as a PyTorch tensor or NumPy array).
         model (SentenceTransformer): The sentence transformer model to use for encoding the new product.
         top_k (int): The number of top similar results to return (default 3).
+
     Returns:
-        List[Tuple[str, float, str, str]]: A list of tuples (old_product_name, similarity_score, new_vector, old_vector) for the top_k similar old products.
+        List[Tuple[str, float]]: A list of tuples (old_product_name, similarity_score) for the
+            top_k similar old products.
     """
     # Encode the new product name into the same embedding space as old_product_names
     new_embedding = model.encode([new_product], convert_to_tensor=True)
-    # Convert tensor to list for display - get complete vector for manual calculation
-    try:
-        # Get the complete vector for new product
-        if hasattr(new_embedding, "shape") and len(new_embedding.shape) > 1:
-            new_vector_list = new_embedding[0].tolist()
-        else:
-            new_vector_list = new_embedding.tolist()
-        # Format as comma-separated values for easy copying
-        new_vector_str = ",".join([f"{x:.6f}" for x in new_vector_list])
-    except Exception as e:
-        new_vector_str = f"Vector conversion error: {str(e)}"
 
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
     # Get the top_k highest similarity scores and their indices
     top_results = cos_scores.topk(k=top_k)
-    result: List[Tuple[str, float, str, str]] = []
-    # Pair each top score with the corresponding old product name and vectors
-    for score, idx in zip(top_results[0], top_results[1]):
-        try:
-            # Get the complete vector for old product - handle different tensor shapes
-            idx_int = int(idx)
-            old_tensor = old_embeddings[idx_int]
 
-            # Check if it's a tensor or scalar
-            if hasattr(old_tensor, "tolist"):
-                old_vector_list = old_tensor.tolist()
-            elif hasattr(old_tensor, "item"):
-                old_vector_list = [old_tensor.item()]
-            else:
-                old_vector_list = [float(old_tensor)]
-
-            # Format as comma-separated values for easy copying
-            old_vector_str = ",".join([f"{x:.6f}" for x in old_vector_list])
-        except Exception as e:
-            old_vector_str = f"Vector conversion error: {str(e)}"
-        result.append((old_product_names[int(idx)], float(score), new_vector_str, old_vector_str))
-    return result
+    # Pair each top score with the corresponding old product name
+    return [
+        (old_product_names[int(idx)], float(score))
+        for score, idx in zip(top_results[0], top_results[1])
+    ]
 
 
 def remove_duplicates(
@@ -171,21 +146,17 @@ def run(
         top_matches = check_product_similarity(
             new_product, old_product_names, old_embeddings, model, top_k=3
         )
-        for old_name, score, new_vector, old_vector in top_matches:
+        for old_name, score in top_matches:
             output_rows.append(
                 {
                     "new_product": new_product,
                     "matched_old_product": old_name,
                     "score": score,
-                    "new_product_vector": new_vector,
-                    "old_product_vector": old_vector,
-                    "calculation_method": "1) แปลงชื่อสินค้าเป็น embedding vectors 2) คำนวณ cosine similarity 3) หาค่าความคล้ายคลึงสูงสุด",
                 }
             )
-    # Save the matching results to CSV with timestamp to avoid permission issues
+    # Save the matching results to CSV
     output_df = pd.DataFrame(output_rows)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    matched_path = output_dir / f"matched_products_{timestamp}.csv"
+    matched_path = output_dir / "matched_products.csv"
     output_df.to_csv(matched_path, index=False, encoding="utf-8-sig")
     print(f"บันทึกผลลัพธ์ที่ {matched_path} เรียบร้อยแล้ว (encoding utf-8-sig สำหรับ Excel)")
 
