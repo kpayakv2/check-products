@@ -46,15 +46,9 @@ def check_product_similarity(
     new_embedding = model.encode([new_product], convert_to_tensor=True)
     new_vector_str = ""
     if include_vectors:
-        # Convert tensor to list for display - get complete vector for manual calculation
         try:
-            # Get the complete vector for new product
-            if hasattr(new_embedding, 'shape') and len(new_embedding.shape) > 1:
-                converted = new_embedding[0].tolist()
-            else:
-                converted = new_embedding.tolist()
+            converted = new_embedding.squeeze().tolist()
             new_vector_list = converted if isinstance(converted, list) else [converted]
-            # Format as comma-separated values for easy copying
             new_vector_str = ",".join([f"{x:.6f}" for x in new_vector_list])
         except Exception as e:
             new_vector_str = f"Vector conversion error: {str(e)}"
@@ -71,17 +65,8 @@ def check_product_similarity(
                 # Get the complete vector for old product - handle different tensor shapes
                 idx_int = int(idx)
                 old_tensor = old_embeddings[idx_int]
-
-                # Check if it's a tensor or scalar
-                if hasattr(old_tensor, 'tolist'):
-                    converted = old_tensor.tolist()
-                    old_vector_list = converted if isinstance(converted, list) else [converted]
-                elif hasattr(old_tensor, 'item'):
-                    old_vector_list = [old_tensor.item()]
-                else:
-                    old_vector_list = [float(old_tensor)]
-
-                # Format as comma-separated values for easy copying
+                converted = old_tensor.tolist()
+                old_vector_list = converted if isinstance(converted, list) else [converted]
                 old_vector_str = ",".join([f"{x:.6f}" for x in old_vector_list])
             except Exception as e:
                 old_vector_str = f"Vector conversion error: {str(e)}"
