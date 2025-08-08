@@ -43,13 +43,28 @@ def check_product_similarity(
         List[Tuple[str, float]]: A list of tuples (old_product_name, similarity_score) for the
             top_k similar old products.
     """
+    # Verify that each product name has a corresponding embedding
+    embedding_count = (
+        old_embeddings.shape[0]
+        if hasattr(old_embeddings, "shape")
+        else len(old_embeddings)
+    )
+    if len(old_product_names) != embedding_count:
+        raise ValueError(
+            "old_embeddings first dimension must match length of old_product_names"
+        )
+
     # Encode the new product name into the same embedding space as old_product_names
     new_embedding = model.encode([new_product], convert_to_tensor=True)
 
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
-    # Get the top_k highest similarity scores and their indices
-    top_results = cos_scores.topk(k=top_k)
+
+    # Determine the number of results to return without exceeding available products
+    effective_k = min(top_k, len(old_product_names))
+
+    # Get the highest similarity scores and their indices
+    top_results = cos_scores.topk(k=effective_k)
 
     # Pair each top score with the corresponding old product name
     return [
