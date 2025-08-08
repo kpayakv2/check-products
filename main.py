@@ -36,7 +36,8 @@ def check_product_similarity(
         new_product (str): The name of the new product to compare.
         old_product_names (List[str]): List of old product names corresponding to old_embeddings.
         old_embeddings: Embeddings for old_product_names (as a PyTorch tensor or NumPy array).
-        model (SentenceTransformer): The sentence transformer model to use for encoding the new product.
+        model (SentenceTransformer):
+            The sentence transformer model to use for encoding the new product.
         top_k (int): The number of top similar results to return (default 3).
 
     Returns:
@@ -45,14 +46,10 @@ def check_product_similarity(
     """
     # Verify that each product name has a corresponding embedding
     embedding_count = (
-        old_embeddings.shape[0]
-        if hasattr(old_embeddings, "shape")
-        else len(old_embeddings)
+        old_embeddings.shape[0] if hasattr(old_embeddings, "shape") else len(old_embeddings)
     )
     if len(old_product_names) != embedding_count:
-        raise ValueError(
-            "old_embeddings first dimension must match length of old_product_names"
-        )
+        raise ValueError("old_embeddings first dimension must match length of old_product_names")
 
     # Encode the new product name into the same embedding space as old_product_names
     new_embedding = model.encode([new_product], convert_to_tensor=True)
@@ -81,14 +78,20 @@ def remove_duplicates(
     If duplicates are found and duplicates_path is provided, save all duplicate rows to a CSV file.
     Parameters:
         df (pd.DataFrame): The DataFrame to check for duplicates.
-        subset (str): Column name (or list of column names) to consider for finding duplicates. Defaults to 'รายการ'.
-        duplicates_path (Optional[Path]): Path to save duplicate entries CSV if duplicates are found. If None, duplicates are not saved.
+        subset (str):
+            Column name (or list of column names) to consider for finding duplicates.
+            Defaults to 'รายการ'.
+        duplicates_path (Optional[Path]):
+            Path to save duplicate entries CSV if duplicates are found.
+            If None, duplicates are not saved.
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing:
-            - The DataFrame after removing duplicate rows (keeping the first occurrence of each duplicate).
+            - The DataFrame after removing duplicate rows
+              (keeping the first occurrence of each duplicate).
             - A DataFrame of duplicate rows that were found (empty if no duplicates).
     """
-    # Identify all rows that are duplicated in the specified subset (including all occurrences of the duplicates)
+    # Identify all rows that are duplicated in the specified subset
+    # (including all occurrences of the duplicates)
     duplicates_df = df[df.duplicated(subset=[subset], keep=False)]
     # If any duplicates found and an output path is provided, save them
     if not duplicates_df.empty and duplicates_path is not None:
@@ -110,13 +113,20 @@ def run(
      3. Use a SentenceTransformer model to find top 3 similar old products for each new product.
      4. Save the top matches for each new product to an output CSV file.
     Environment Variables:
-        OLD_PRODUCTS_CSV: Override path to the old products CSV file (should contain a column 'name').
-        NEW_PRODUCTS_CSV: Override path to the new products CSV file (should contain a column 'รายการ').
+        OLD_PRODUCTS_CSV:
+            Override path to the old products CSV file (should contain a column 'name').
+        NEW_PRODUCTS_CSV:
+            Override path to the new products CSV file (should contain a column 'รายการ').
         OUTPUT_DIR: Override directory for output files.
     Parameters:
-        old_products_csv (Optional[Path]): Path to the CSV file of old products. If None, uses OLD_PRODUCTS_CSV env var or default path.
-        new_products_csv (Optional[Path]): Path to the CSV file of new products. If None, uses NEW_PRODUCTS_CSV env var or default path.
-        output_dir (Optional[Path]): Directory for output files. If None, uses OUTPUT_DIR env var or default path.
+        old_products_csv (Optional[Path]):
+            Path to the CSV file of old products. If None, uses OLD_PRODUCTS_CSV env var
+            or default path.
+        new_products_csv (Optional[Path]):
+            Path to the CSV file of new products. If None, uses NEW_PRODUCTS_CSV env var
+            or default path.
+        output_dir (Optional[Path]):
+            Directory for output files. If None, uses OUTPUT_DIR env var or default path.
     Returns:
         None. This function writes output files and prints status messages.
     """
@@ -173,7 +183,11 @@ def run(
     output_df = pd.DataFrame(output_rows)
     matched_path = output_dir / "matched_products.csv"
     output_df.to_csv(matched_path, index=False, encoding="utf-8-sig")
-    print(f"บันทึกผลลัพธ์ที่ {matched_path} เรียบร้อยแล้ว (encoding utf-8-sig สำหรับ Excel)")
+    print(
+        f"บันทึกผลลัพธ์ที่ {matched_path}",
+        "เรียบร้อยแล้ว",
+        "(encoding utf-8-sig สำหรับ Excel)",
+    )
 
 
 if __name__ == "__main__":
