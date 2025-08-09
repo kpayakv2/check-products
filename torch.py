@@ -56,7 +56,7 @@ class Tensor:
 
     def __iter__(self):
         for x in self.data.flatten():
-            yield float(x)
+            yield Tensor(x)
 
     def __len__(self):
         return len(self.data.flatten())
@@ -65,6 +65,12 @@ class Tensor:
         return Tensor(self.data[idx])
 
     def __float__(self):
+        return float(self.data)
+
+    def __int__(self):
+        return int(self.data)
+
+    def item(self):
         return float(self.data)
 
     def tolist(self):
