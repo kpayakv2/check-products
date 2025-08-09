@@ -67,7 +67,7 @@ def check_product_similarity(
 
     # Pair each top score with the corresponding old product name
     return [
-        (old_product_names[int(idx)], float(score))
+        (old_product_names[int(idx)], score.item())
         for score, idx in zip(top_results[0], top_results[1])
     ]
 
