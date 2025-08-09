@@ -15,10 +15,10 @@ def prompt_csv_path(prompt_text: str) -> Path:
         if available:
             print("Available CSV files: " + ", ".join(available))
         path_str = input(prompt_text).strip()
-        path = Path(path_str).expanduser()
+        path = Path(path_str.strip("'\"")).expanduser().resolve()
         if path.is_file():
-            return path.resolve()
-        print(f"{path} is not a valid file. Please try again.")
+            return path
+        print(f"{path} is not a valid file. Please try again without quotes.")
 
 
 def check_product_similarity(
