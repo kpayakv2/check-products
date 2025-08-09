@@ -178,21 +178,26 @@ def run(
     model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
     # Compute embeddings for all old product names (for efficiency, do this once)
     old_embeddings = model.encode(old_product_names, convert_to_tensor=True)
+    name_to_index = {name: idx for idx, name in enumerate(old_product_names)}
     # Prepare a list to collect the similarity results
     output_rows: List[dict] = []
     # Compute top 3 similar old products for each new product
     for new_product in new_product_names:
+        new_vec = model.encode([new_product], convert_to_tensor=True)[0]
         top_matches = check_product_similarity(
             new_product, old_product_names, old_embeddings, model, top_k=3
         )
         for old_name, score in top_matches:
-            output_rows.append(
-                {
-                    "new_product": new_product,
-                    "matched_old_product": old_name,
-                    "score": score,
-                }
-            )
+            row = {
+                "new_product": new_product,
+                "new_product_vector": new_vec.tolist(),
+                "matched_old_product": old_name,
+                "score": score,
+            }
+            old_idx = name_to_index.get(old_name)
+            if old_idx is not None:
+                row["matched_old_vector"] = old_embeddings[old_idx].tolist()
+            output_rows.append(row)
     # Save the matching results to CSV
     output_df = pd.DataFrame(output_rows)
     matched_path = output_dir / "matched_products.csv"
