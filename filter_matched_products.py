@@ -11,8 +11,10 @@ def run(matched_csv: Path | None = None, output_dir: Path | None = None) -> None
         Path(os.getenv("MATCHED_CSV", "matched_products.csv"))
         if matched_csv is None
         else Path(matched_csv)
-    )
-    output_dir = Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir)
+    ).expanduser().resolve()
+    output_dir = (
+        Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir)
+    ).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_csv(matched_csv)
