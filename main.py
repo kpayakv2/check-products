@@ -134,16 +134,28 @@ def run(
     """
     # Determine file paths using parameters, environment variables, or defaults
     old_products_csv = (
-        Path(os.getenv("OLD_PRODUCTS_CSV", "old_products.csv"))
-        if old_products_csv is None
-        else Path(old_products_csv)
+        (
+            Path(os.getenv("OLD_PRODUCTS_CSV", "old_products.csv"))
+            if old_products_csv is None
+            else Path(old_products_csv)
+        )
+        .expanduser()
+        .resolve()
     )
     new_products_csv = (
-        Path(os.getenv("NEW_PRODUCTS_CSV", "new_products.csv"))
-        if new_products_csv is None
-        else Path(new_products_csv)
+        (
+            Path(os.getenv("NEW_PRODUCTS_CSV", "new_products.csv"))
+            if new_products_csv is None
+            else Path(new_products_csv)
+        )
+        .expanduser()
+        .resolve()
     )
-    output_dir = Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir)
+    output_dir = (
+        (Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir))
+        .expanduser()
+        .resolve()
+    )
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
     # Load datasets
