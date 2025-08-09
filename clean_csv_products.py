@@ -8,6 +8,7 @@ import pandas as pd
 def run(input_csv: Path | None = None, output_csv: Path | None = None) -> None:
     """Clean a POS CSV file and output a single-column CSV of unique product names."""
     input_csv = (
+
         (Path(os.getenv("POS_CSV", "pos_products.csv")) if input_csv is None else Path(input_csv))
         .expanduser()
         .resolve()
@@ -21,6 +22,15 @@ def run(input_csv: Path | None = None, output_csv: Path | None = None) -> None:
         .expanduser()
         .resolve()
     )
+
+        Path(os.getenv("POS_CSV", "pos_products.csv")) if input_csv is None else Path(input_csv)
+    ).expanduser().resolve()
+    output_csv = (
+        Path(os.getenv("CLEANED_CSV", "cleaned_products.csv"))
+        if output_csv is None
+        else Path(output_csv)
+    ).expanduser().resolve()
+main
 
     df = pd.read_csv(input_csv, header=3)
     df = df.rename(columns={"รายการ": "name"})
