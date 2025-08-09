@@ -58,6 +58,8 @@ def check_product_similarity(
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
 
     # Determine the number of results to return without exceeding available products
+    if top_k < 0:
+        raise ValueError("top_k must be non-negative")
     effective_k = min(top_k, len(old_product_names))
 
     # Get the highest similarity scores and their indices

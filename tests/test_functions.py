@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 import main
 
@@ -43,3 +44,25 @@ def test_check_product_similarity_ranking(monkeypatch):
 
     result = main.check_product_similarity("abcd", old_names, old_emb, model, top_k=2)
     assert result == [("abcd", 1.0), ("abc", 0.5)]
+
+
+def test_check_product_similarity_negative_top_k(monkeypatch):
+    class DummyModel:
+        def encode(self, sentences, convert_to_tensor=True):
+            import torch
+
+            return torch.tensor([float(len(s)) for s in sentences])
+
+    def dummy_cos_sim(a, b):
+        import torch
+
+        return 1 / (1 + torch.abs(b - a.unsqueeze(1)))
+
+    monkeypatch.setattr(main.util, "cos_sim", dummy_cos_sim)
+
+    model = DummyModel()
+    old_names = ["a", "b"]
+    old_emb = model.encode(old_names)
+
+    with pytest.raises(ValueError):
+        main.check_product_similarity("a", old_names, old_emb, model, top_k=-1)
