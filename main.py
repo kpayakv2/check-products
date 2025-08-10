@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple
 import pandas as pd
 
 from sentence_transformers import SentenceTransformer, util
+import torch
 
 
 def prompt_csv_path(prompt_text: str) -> Path:
@@ -27,6 +28,7 @@ def check_product_similarity(
     old_embeddings,
     model: SentenceTransformer,
     top_k: int = 3,
+    new_embedding: Optional[torch.Tensor] = None,
 ) -> List[Tuple[str, float]]:
     """
     Compute the similarity between a new product name and a list of old product names.
@@ -39,6 +41,8 @@ def check_product_similarity(
         model (SentenceTransformer):
             The sentence transformer model to use for encoding the new product.
         top_k (int): The number of top similar results to return (default 3).
+        new_embedding (Optional[torch.Tensor]): Pre-computed embedding for new_product.
+            If None, will be computed using the model.
 
     Returns:
         List[Tuple[str, float]]: A list of tuples (old_product_name, similarity_score) for the
@@ -52,7 +56,12 @@ def check_product_similarity(
         raise ValueError("old_embeddings first dimension must match length of old_product_names")
 
     # Encode the new product name into the same embedding space as old_product_names
-    new_embedding = model.encode([new_product], convert_to_tensor=True)
+    if new_embedding is None:
+        new_embedding = model.encode([new_product], convert_to_tensor=True)
+    else:
+        # Ensure the embedding is a 2D tensor
+        if new_embedding.dim() == 1:
+            new_embedding = new_embedding.unsqueeze(0)
 
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
@@ -183,21 +192,27 @@ def run(
     output_rows: List[dict] = []
     # Compute top 3 similar old products for each new product
     for new_product in new_product_names:
-        new_vec = model.encode([new_product], convert_to_tensor=True)[0]
-        top_matches = check_product_similarity(
-            new_product, old_product_names, old_embeddings, model, top_k=3
-        )
-        for old_name, score in top_matches:
-            row = {
-                "new_product": new_product,
-                "new_product_vector": new_vec.tolist(),
-                "matched_old_product": old_name,
-                "score": score,
-            }
-            old_idx = name_to_index.get(old_name)
-            if old_idx is not None:
-                row["matched_old_vector"] = old_embeddings[old_idx].tolist()
-            output_rows.append(row)
+        try:
+            new_vec = model.encode([new_product], convert_to_tensor=True)
+            top_matches = check_product_similarity(
+                new_product, old_product_names, old_embeddings, model, top_k=3, new_embedding=new_vec
+            )
+            for old_name, score in top_matches:
+                row = {
+                    "new_product": new_product,
+                    "new_product_vector": new_vec[0].tolist(),
+                    "matched_old_product": old_name,
+                    "score": score,
+                }
+                old_idx = name_to_index.get(old_name)
+                if old_idx is not None:
+                    row["matched_old_vector"] = old_embeddings[old_idx].tolist()
+                output_rows.append(row)
+        except Exception as e:
+            print(f"Error processing product '{new_product}': {e}")
+            print(f"  new_vec shape: {new_vec.shape if 'new_vec' in locals() else 'N/A'}")
+            print(f"  old_embeddings shape: {old_embeddings.shape}")
+            raise
     # Save the matching results to CSV
     output_df = pd.DataFrame(output_rows)
     matched_path = output_dir / "matched_products.csv"
