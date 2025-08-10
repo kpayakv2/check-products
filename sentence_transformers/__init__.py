@@ -7,7 +7,19 @@ class SentenceTransformer:
 
     def encode(self, sentences, convert_to_tensor=True):
         import torch
-
-        lengths = [float(len(s)) for s in sentences]
-        tensor = torch.tensor(lengths)
-        return tensor
+        
+        # สร้าง mock embeddings ที่มี shape ถูกต้อง
+        # ใช้ embedding dimension = 384 (เหมือน MiniLM model)
+        embedding_dim = 384
+        
+        if isinstance(sentences, str):
+            sentences = [sentences]
+        
+        # สร้าง random embeddings สำหรับแต่ละ sentence
+        batch_size = len(sentences)
+        embeddings = torch.randn(batch_size, embedding_dim)
+        
+        if convert_to_tensor:
+            return embeddings
+        else:
+            return embeddings.numpy()

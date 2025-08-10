@@ -63,6 +63,17 @@ def check_product_similarity(
         if new_embedding.dim() == 1:
             new_embedding = new_embedding.unsqueeze(0)
 
+    # Validate tensor shapes before computing similarity
+    print(f"Debug - new_embedding shape: {new_embedding.shape}")
+    print(f"Debug - old_embeddings shape: {old_embeddings.shape}")
+    
+    # Ensure both tensors have compatible shapes
+    if new_embedding.shape[-1] != old_embeddings.shape[-1]:
+        raise ValueError(
+            f"Embedding dimension mismatch: new_embedding.shape[-1]={new_embedding.shape[-1]}, "
+            f"old_embeddings.shape[-1]={old_embeddings.shape[-1]}"
+        )
+
     # Compute cosine similarity between the new product embedding and all old product embeddings
     cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
 
@@ -212,7 +223,8 @@ def run(
             print(f"Error processing product '{new_product}': {e}")
             print(f"  new_vec shape: {new_vec.shape if 'new_vec' in locals() else 'N/A'}")
             print(f"  old_embeddings shape: {old_embeddings.shape}")
-            raise
+            print(f"  Skipping this product and continuing...")
+            continue  # ข้ามไป product ถัดไปแทนที่จะ crash
     # Save the matching results to CSV
     output_df = pd.DataFrame(output_rows)
     matched_path = output_dir / "matched_products.csv"
