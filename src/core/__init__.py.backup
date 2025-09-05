@@ -1,0 +1,73 @@
+"""
+Core module exports.
+
+This module provides easy access to all core functionality.
+"""
+
+from .interfaces import (
+    EmbeddingModel,
+    SimilarityCalculator,
+    TextPreprocessor,
+    DataLoader,
+    DataWriter,
+    CacheManager,
+    ProgressReporter,
+    ResultFilter
+)
+
+from .models import (
+    SentenceTransformerModel,
+    MockEmbeddingModel,
+    CachedEmbeddingModel,
+    create_embedding_model
+)
+
+from .similarity import (
+    CosineSimilarityCalculator,
+    DotProductSimilarityCalculator,
+    EuclideanSimilarityCalculator,
+    HybridSimilarityCalculator,
+    create_similarity_calculator
+)
+
+from .preprocessing import (
+    BasicTextPreprocessor,
+    ThaiTextPreprocessor,
+    ProductTextPreprocessor,
+    ChainedTextPreprocessor,
+    create_text_preprocessor,
+    create_default_thai_product_preprocessor
+)
+
+__all__ = [
+    # Interfaces
+    'EmbeddingModel',
+    'SimilarityCalculator', 
+    'TextPreprocessor',
+    'DataLoader',
+    'DataWriter',
+    'CacheManager',
+    'ProgressReporter',
+    'ResultFilter',
+    
+    # Model implementations
+    'SentenceTransformerModel',
+    'MockEmbeddingModel',
+    'CachedEmbeddingModel',
+    'create_embedding_model',
+    
+    # Similarity implementations
+    'CosineSimilarityCalculator',
+    'DotProductSimilarityCalculator',
+    'EuclideanSimilarityCalculator',
+    'HybridSimilarityCalculator',
+    'create_similarity_calculator',
+    
+    # Preprocessing implementations
+    'BasicTextPreprocessor',
+    'ThaiTextPreprocessor',
+    'ProductTextPreprocessor',
+    'ChainedTextPreprocessor',
+    'create_text_preprocessor',
+    'create_default_thai_product_preprocessor'
+]

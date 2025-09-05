@@ -1,3 +1,10 @@
+"""
+Mock utility functions for testing sentence-transformers functionality.
+
+This module provides mock implementations of utility functions from 
+sentence-transformers, particularly cosine similarity computation.
+"""
+
 import torch
 import torch.nn.functional as F
 
@@ -5,6 +12,9 @@ import torch.nn.functional as F
 def cos_sim(a, b):
     """
     Compute cosine similarity between two tensors.
+    
+    This is a real implementation of cosine similarity that works with
+    both real embeddings and mock embeddings from the test framework.
     
     Args:
         a: First tensor of shape [batch_size_a, embedding_dim]

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Similarity Checker - Web Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-search text-2xl"></i>
+                    <h1 class="text-xl font-bold">Product Similarity Checker v5.0</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="connectionStatus" class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm">Connected</span>
+                    </div>
+                    <button id="themeToggle" class="p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Status Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">System Status</p>
+                        <p id="systemStatus" class="text-2xl font-bold text-green-600">Operational</p>
+                    </div>
+                    <i class="fas fa-heartbeat text-3xl text-green-600"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Active Jobs</p>
+                        <p id="activeJobs" class="text-2xl font-bold text-blue-600">0</p>
+                    </div>
+                    <i class="fas fa-tasks text-3xl text-blue-600"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Total Matches</p>
+                        <p id="totalMatches" class="text-2xl font-bold text-purple-600">0</p>
+                    </div>
+                    <i class="fas fa-chart-line text-3xl text-purple-600"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover transition-all">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Avg. Response Time</p>
+                        <p id="avgResponseTime" class="text-2xl font-bold text-orange-600">0ms</p>
+                    </div>
+                    <i class="fas fa-stopwatch text-3xl text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Tab Navigation -->
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6">
+                    <button class="tab-button py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium" data-tab="single-match">
+                        <i class="fas fa-search mr-2"></i>Single Match
+                    </button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="batch-match">
+                        <i class="fas fa-list mr-2"></i>Batch Match
+                    </button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="analytics">
+                        <i class="fas fa-chart-bar mr-2"></i>Analytics
+                    </button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="settings">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Single Match Tab -->
+                <div id="single-match" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Single Product Matching</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Input Form -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Query Product</label>
+                                <input type="text" id="queryProduct" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter product name to match...">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Reference Products (one per line)</label>
+                                <textarea id="referenceProducts" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter reference products, one per line..."></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Threshold</label>
+                                    <input type="number" id="threshold" value="0.6" min="0" max="1" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Top K</label>
+                                    <input type="number" id="topK" value="10" min="1" max="50" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            
+                            <button id="matchButton" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-search mr-2"></i>Find Matches
+                            </button>
+                        </div>
+                        
+                        <!-- Results -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Results</h3>
+                            <div id="singleMatchResults" class="space-y-2 max-h-96 overflow-y-auto">
+                                <div class="text-gray-500 text-center py-8">
+                                    <i class="fas fa-search text-4xl mb-4"></i>
+                                    <p>Enter a product and click "Find Matches" to see results</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch Match Tab -->
+                <div id="batch-match" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Batch Product Matching</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- File Upload -->
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-lg mb-2">Upload CSV File</p>
+                            <p class="text-gray-500 mb-4">Choose a CSV file with product data</p>
+                            <input type="file" id="csvFile" accept=".csv" class="hidden">
+                            <button onclick="document.getElementById('csvFile').click()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-upload mr-2"></i>Choose File
+                            </button>
+                        </div>
+                        
+                        <!-- Job Progress -->
+                        <div id="jobProgress" class="hidden bg-gray-50 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">Processing Job</h3>
+                                <span id="jobStatus" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Running</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <p id="progressText" class="text-sm text-gray-600 mt-2">Initializing...</p>
+                        </div>
+                        
+                        <!-- Active Jobs -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Recent Jobs</h3>
+                            <div id="jobsList" class="space-y-2">
+                                <div class="text-gray-500 text-center py-4">No jobs yet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Analytics Dashboard</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Performance Metrics</h3>
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Match Quality Distribution</h3>
+                            <canvas id="qualityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">API Configuration</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Threshold</label>
+                                <input type="number" id="defaultThreshold" value="0.6" min="0" max="1" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Default Top K</label>
+                                <input type="number" id="defaultTopK" value="10" min="1" max="50" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Max Batch Size</label>
+                                <input type="number" id="maxBatchSize" value="1000" min="1" max="10000" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <button id="saveSettings" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>Save Settings
+                            </button>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">System Information</h3>
+                            <div id="systemInfo" class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>API Version:</span>
+                                    <span class="font-medium">5.0.0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Uptime:</span>
+                                    <span id="uptime" class="font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>WebSocket:</span>
+                                    <span id="wsStatus" class="font-medium text-green-600">Connected</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Pipeline:</span>
+                                    <span id="pipelineStatus" class="font-medium">Ready</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global state
+        let websocket = null;
+        let currentJob = null;
+        let stats = {
+            totalMatches: 0,
+            avgResponseTime: 0,
+            activeJobs: 0
+        };
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTabs();
+            initializeWebSocket();
+            loadSystemHealth();
+            initializeCharts();
+            
+            // Set up event listeners
+            document.getElementById('matchButton').addEventListener('click', performSingleMatch);
+            document.getElementById('csvFile').addEventListener('change', handleFileUpload);
+            document.getElementById('saveSettings').addEventListener('click', saveConfiguration);
+        });
+
+        // Tab Management
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Update tab buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('border-blue-500', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    button.classList.remove('border-transparent', 'text-gray-500');
+                    button.classList.add('border-blue-500', 'text-blue-600');
+                    
+                    // Update tab content
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(targetTab).classList.remove('hidden');
+                });
+            });
+        }
+
+        // WebSocket Connection
+        function initializeWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            websocket = new WebSocket(wsUrl);
+            
+            websocket.onopen = function() {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+            };
+            
+            websocket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            websocket.onclose = function() {
+                console.log('WebSocket disconnected');
+                updateConnectionStatus(false);
+                // Reconnect after 3 seconds
+                setTimeout(initializeWebSocket, 3000);
+            };
+            
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            const indicator = statusEl.querySelector('div');
+            const text = statusEl.querySelector('span');
+            
+            if (connected) {
+                indicator.className = 'w-3 h-3 bg-green-400 rounded-full animate-pulse';
+                text.textContent = 'Connected';
+                document.getElementById('wsStatus').textContent = 'Connected';
+                document.getElementById('wsStatus').className = 'font-medium text-green-600';
+            } else {
+                indicator.className = 'w-3 h-3 bg-red-400 rounded-full';
+                text.textContent = 'Disconnected';
+                document.getElementById('wsStatus').textContent = 'Disconnected';
+                document.getElementById('wsStatus').className = 'font-medium text-red-600';
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            console.log('WebSocket message:', data);
+            
+            switch(data.type) {
+                case 'single_match_completed':
+                    stats.totalMatches += data.matches_found;
+                    updateStats();
+                    break;
+                    
+                case 'batch_job_started':
+                    stats.activeJobs++;
+                    updateStats();
+                    break;
+                    
+                case 'batch_job_progress':
+                    updateJobProgress(data);
+                    break;
+                    
+                case 'batch_job_completed':
+                    stats.activeJobs--;
+                    stats.totalMatches += data.matches_found;
+                    updateStats();
+                    completeJobProgress(data);
+                    break;
+                    
+                case 'batch_job_failed':
+                    stats.activeJobs--;
+                    updateStats();
+                    failJobProgress(data);
+                    break;
+            }
+        }
+
+        // API Functions
+        async function performSingleMatch() {
+            const button = document.getElementById('matchButton');
+            const resultsDiv = document.getElementById('singleMatchResults');
+            
+            const queryProduct = document.getElementById('queryProduct').value.trim();
+            const referenceProducts = document.getElementById('referenceProducts').value
+                .split('\n')
+                .filter(p => p.trim())
+                .map(p => p.trim());
+            
+            if (!queryProduct) {
+                alert('Please enter a query product');
+                return;
+            }
+            
+            if (referenceProducts.length === 0) {
+                alert('Please enter reference products');
+                return;
+            }
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Matching...';
+            resultsDiv.classList.add('loading');
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/v1/match/single', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query_product: queryProduct,
+                        reference_products: referenceProducts,
+                        threshold: parseFloat(document.getElementById('threshold').value),
+                        top_k: parseInt(document.getElementById('topK').value),
+                        include_metadata: true,
+                        include_confidence: true
+                    })
+                });
+                
+                const results = await response.json();
+                const responseTime = Date.now() - startTime;
+                
+                displaySingleMatchResults(results);
+                
+                // Update average response time
+                stats.avgResponseTime = Math.round((stats.avgResponseTime + responseTime) / 2);
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = `<div class="text-red-600 text-center py-4">Error: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-search mr-2"></i>Find Matches';
+                resultsDiv.classList.remove('loading');
+            }
+        }
+
+        function displaySingleMatchResults(results) {
+            const resultsDiv = document.getElementById('singleMatchResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="text-gray-500 text-center py-8">
+                        <i class="fas fa-search text-4xl mb-4"></i>
+                        <p>No matches found above the threshold</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const resultsHtml = results.map((result, index) => {
+                const confidenceColor = result.confidence_level === 'high' ? 'text-green-600' : 
+                                      result.confidence_level === 'medium' ? 'text-yellow-600' : 'text-red-600';
+                
+                return `
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-medium text-gray-900">${result.matched_product}</span>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-blue-600">${(result.similarity_score * 100).toFixed(1)}%</div>
+                                ${result.confidence_score !== null ? 
+                                    `<div class="text-sm ${confidenceColor}">${result.confidence_level}</div>` : 
+                                    ''
+                                }
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${result.similarity_score * 100}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            resultsDiv.innerHTML = resultsHtml;
+        }
+
+        async function loadSystemHealth() {
+            try {
+                const response = await fetch('/api/v1/health');
+                const health = await response.json();
+                
+                document.getElementById('systemStatus').textContent = health.status === 'healthy' ? 'Operational' : 'Issues';
+                document.getElementById('uptime').textContent = formatUptime(health.uptime);
+                document.getElementById('pipelineStatus').textContent = health.components.pipeline;
+                
+            } catch (error) {
+                console.error('Error loading health:', error);
+                document.getElementById('systemStatus').textContent = 'Error';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalMatches').textContent = stats.totalMatches.toLocaleString();
+            document.getElementById('avgResponseTime').textContent = `${stats.avgResponseTime}ms`;
+            document.getElementById('activeJobs').textContent = stats.activeJobs;
+        }
+
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Initialize empty charts
+        function initializeCharts() {
+            // Performance chart placeholder
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1h', '2h', '3h', '4h', '5h', '6h'],
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: [120, 130, 110, 140, 125, 135],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Quality chart placeholder
+            const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+            new Chart(qualityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High (80-100%)', 'Medium (50-80%)', 'Low (<50%)'],
+                    datasets: [{
+                        data: [453, 795, 0],
+                        backgroundColor: [
+                            'rgb(34, 197, 94)',
+                            'rgb(251, 191, 36)',
+                            'rgb(239, 68, 68)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+
+        async function saveConfiguration() {
+            // Implementation for saving configuration
+            alert('Configuration saved successfully!');
+        }
+
+        async function handleFileUpload() {
+            // Implementation for file upload
+            alert('File upload feature coming soon!');
+        }
+
+        function updateJobProgress(data) {
+            // Implementation for job progress updates
+        }
+
+        function completeJobProgress(data) {
+            // Implementation for job completion
+        }
+
+        function failJobProgress(data) {
+            // Implementation for job failure
+        }
+
+        // Auto-refresh system health every 30 seconds
+        setInterval(loadSystemHealth, 30000);
+    </script>
+</body>
+</html>

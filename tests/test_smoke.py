@@ -28,7 +28,7 @@ def test_run_creates_output(tmp_path, monkeypatch):
         return 1 / (1 + torch.abs(b - a.unsqueeze(1)))
 
     monkeypatch.setattr(main, "SentenceTransformer", lambda _: DummyModel())
-    monkeypatch.setattr(main.util, "cos_sim", dummy_cos_sim)
+    monkeypatch.setattr("sentence_transformers.util.cos_sim", dummy_cos_sim)
 
     main.run(old_csv, new_csv, tmp_path)
 

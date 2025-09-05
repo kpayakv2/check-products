@@ -1,6 +1,6 @@
 import torch
 
-from sentence_transformers.util import cos_sim
+from test_mocks.util import cos_sim
 
 
 def test_cos_sim_similarity_properties():

@@ -36,7 +36,7 @@ def test_check_product_similarity_ranking(monkeypatch):
 
         return 1 / (1 + torch.abs(b - a.unsqueeze(1)))
 
-    monkeypatch.setattr(main.util, "cos_sim", dummy_cos_sim)
+    monkeypatch.setattr("sentence_transformers.util.cos_sim", dummy_cos_sim)
 
     model = DummyModel()
     old_names = ["a", "ab", "abc", "abcd"]
@@ -58,7 +58,7 @@ def test_check_product_similarity_negative_top_k(monkeypatch):
 
         return 1 / (1 + torch.abs(b - a.unsqueeze(1)))
 
-    monkeypatch.setattr(main.util, "cos_sim", dummy_cos_sim)
+    monkeypatch.setattr("sentence_transformers.util.cos_sim", dummy_cos_sim)
 
     model = DummyModel()
     old_names = ["a", "b"]
@@ -100,7 +100,7 @@ def test_check_product_similarity_gpu_tensor(monkeypatch):
         # Return predefined scores in descending order
         return [FakeCosScores([1.0, 0.5, 0.2])]
 
-    monkeypatch.setattr(main.util, "cos_sim", dummy_cos_sim)
+    monkeypatch.setattr("sentence_transformers.util.cos_sim", dummy_cos_sim)
 
     model = DummyModel()
     old_names = ["a", "b", "c"]
