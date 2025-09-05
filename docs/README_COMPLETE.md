@@ -330,17 +330,29 @@ ws.onmessage = function(event) {
       "query_product": "iPhone 14",
       "matched_product": "iPhone 14 Pro",
       "similarity_score": 0.87,
-      "confidence": "high"
+      "confidence_score": 0.8750,
+      "confidence_level": "high"
     }
   ],
   "metadata": {
     "processing_time": 0.045,
     "total_matches": 1248,
-    "algorithm": "tfidf",
-    "threshold": 0.6
+    "algorithm": "hybrid",
+    "similarity_weights": {
+      "cosine": 0.7,
+      "euclidean": 0.3
+    },
+    "threshold": 0.6,
+    "score_range": {
+      "min": 0.31,
+      "max": 0.95,
+      "average": 0.764
+    }
   }
 }
 ```
+
+> 📖 **อ่านเพิ่มเติม**: [Shared Scoring System](./shared-scoring.md) สำหรับรายละเอียดเกี่ยวกับสูตรการคำนวณและ confidence levels
 
 ---
 

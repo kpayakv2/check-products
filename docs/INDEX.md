@@ -11,6 +11,7 @@
 
 ### **🔧 Technical References**
 - [`api-reference.md`](api-reference.md) - คู่มือ API และการใช้งานครบถ้วน
+- [`shared-scoring.md`](shared-scoring.md) - ระบบการคำนวณคะแนนและ confidence levels
 - [`capabilities-summary.md`](capabilities-summary.md) - สรุปความสามารถและฟีเจอร์
 
 ### **📈 Legacy Files** 

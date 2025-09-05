@@ -1,5 +1,7 @@
 # 🔌 API Reference & Testing Guide
 
+> 📖 **ดูข้อมูลเพิ่มเติม**: [Shared Scoring System Documentation](./shared-scoring.md) สำหรับรายละเอียดเกี่ยวกับสูตรการคำนวณคะแนน, threshold definitions และ confidence levels
+
 ## 🚀 **API Server Setup**
 
 ### **Starting the Server**
@@ -66,15 +68,25 @@ Content-Type: application/json
       "query_product": "iPhone 14 Pro Max",
       "matched_product": "Samsung Galaxy S23",
       "similarity_score": 0.73,
-      "confidence": "medium",
+      "confidence_score": 0.6250,
+      "confidence_level": "medium",
       "rank": 1
     }
   ],
   "metadata": {
     "processing_time": 0.045,
-    "algorithm": "tfidf",
+    "algorithm": "hybrid",
+    "similarity_weights": {
+      "cosine": 0.7,
+      "euclidean": 0.3
+    },
     "threshold_used": 0.6,
-    "total_comparisons": 2
+    "total_comparisons": 2,
+    "score_range": {
+      "min": 0.31,
+      "max": 0.95,
+      "average": 0.764
+    }
   }
 }
 ```
