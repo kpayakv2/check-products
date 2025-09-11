@@ -10,16 +10,17 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.core.preprocessing import *
+# Use Fresh Architecture instead of src
+from fresh_implementations import ComponentFactory
 
 def main():
     print("🧪 Testing Text Preprocessing Functions")
     print("=" * 60)
     
-    # 1. BasicTextPreprocessor
-    print("1️⃣  BasicTextPreprocessor")
+    # 1. BasicTextProcessor
+    print("1️⃣  BasicTextProcessor")
     print("-" * 30)
-    basic = BasicTextPreprocessor()
+    basic = ComponentFactory.create_text_processor("basic")
     
     test_cases_basic = [
         "iPhone   14   PRO  MAX!!!",
@@ -28,15 +29,15 @@ def main():
     ]
     
     for text in test_cases_basic:
-        result = basic.preprocess(text)
+        result = basic.process(text)
         print(f"Input:  '{text}'")
         print(f"Output: '{result}'")
         print()
     
-    # 2. ThaiTextPreprocessor
-    print("2️⃣  ThaiTextPreprocessor")
+    # 2. ThaiTextProcessor
+    print("2️⃣  ThaiTextProcessor")
     print("-" * 30)
-    thai = ThaiTextPreprocessor()
+    thai = ComponentFactory.create_text_processor("thai")
     
     test_cases_thai = [
         "ไอโฟน ๑๔ โปร แม็กซ์",
@@ -45,64 +46,47 @@ def main():
     ]
     
     for text in test_cases_thai:
-        result = thai.preprocess(text)
+        result = thai.process(text)
         print(f"Input:  '{text}'")
         print(f"Output: '{result}'")
         print()
     
-    # 3. ProductTextPreprocessor
-    print("3️⃣  ProductTextPreprocessor")
+    # 3. Thai Text Processing (Advanced)
+    print("3️⃣  Thai Text Processing (Advanced)")
     print("-" * 30)
-    product = ProductTextPreprocessor()
-    
+    thai_advanced = ComponentFactory.create_text_processor("thai")
+
     test_cases_product = [
         "แบรนด์ iPhone 14 Pro Max สีแดง 256GB ราคาพิเศษ",
         "ยี่ห้อ Samsung Galaxy S23 สีดำ 128GB โปรโมชั่น",
         "brand MacBook Pro M2 16 นิ้ว สีเงิน ลดราคา",
     ]
-    
+
     for text in test_cases_product:
-        result = product.preprocess(text)
+        result = thai_advanced.process(text)
         print(f"Input:  '{text}'")
         print(f"Output: '{result}'")
         print()
-    
-    # 4. ChainedTextPreprocessor (รวมทั้งหมด)
-    print("4️⃣  ChainedTextPreprocessor (รวมทั้งหมด)")
+
+    # 4. Basic vs Thai Comparison
+    print("4️⃣  Basic vs Thai Comparison")
     print("-" * 40)
-    chained = create_default_thai_product_preprocessor()
     
-    test_cases_chained = [
+    test_cases_comparison = [
         "แบรนด์ ไอโฟน ๑๔ โปร แม็กซ์ สีแดง ๒๕๖GB ราคาพิเศษ!!!",
         "ยี่ห้อ แซมซุง แกแลกซี่ เอส๒๓ สีดำ ๑๒๘GB โปรโมชั่น",
         "Brand MACBOOK   PRO   M๒ ๑๖ นิ้ว สีเงิน SALE!!!",
     ]
     
-    for text in test_cases_chained:
-        result = chained.preprocess(text)
+    for text in test_cases_comparison:
+        basic_result = basic.process(text)
+        thai_result = thai.process(text)
         print(f"Input:  '{text}'")
-        print(f"Output: '{result}'")
+        print(f"Basic:  '{basic_result}'")
+        print(f"Thai:   '{thai_result}'")
         print()
     
-    # 5. การเปรียบเทียบผลลัพธ์
-    print("5️⃣  เปรียบเทียบผลลัพธ์")
-    print("-" * 30)
-    sample_text = "แบรนด์ ไอโฟน ๑๔ โปร แม็กซ์ สีแดง ราคาพิเศษ!!!"
-    
-    print(f"Original: '{sample_text}'")
-    print(f"Basic:    '{basic.preprocess(sample_text)}'")
-    print(f"Thai:     '{thai.preprocess(sample_text)}'")
-    print(f"Product:  '{product.preprocess(sample_text)}'")
-    print(f"Chained:  '{chained.preprocess(sample_text)}'")
-    print()
-    
-    # 6. Configuration
-    print("6️⃣  การตั้งค่า (Configuration)")
-    print("-" * 30)
-    print("Basic Config:", basic.get_config())
-    print("Thai Config:", thai.get_config())
-    print("Product Config:", product.get_config())
-    print("Chained Config:", chained.get_config())
+    print("✅ Demo completed successfully!")
 
 if __name__ == "__main__":
     main()

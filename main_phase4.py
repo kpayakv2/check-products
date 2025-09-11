@@ -60,7 +60,7 @@ Examples:
     parser.add_argument('--output', '-o', default='output/matched_products_phase4.csv')
     parser.add_argument('--threshold', '-t', type=float, default=0.6)
     parser.add_argument('--top-k', '-k', type=int, default=10)
-    parser.add_argument('--model', '-m', choices=['mock', 'tfidf'], default='tfidf')
+    parser.add_argument('--model', '-m', choices=['mock', 'tfidf', 'optimized-tfidf', 'sentence-bert', 'sentence-transformer'], default='tfidf')
     parser.add_argument('--similarity', '-s', choices=['cosine', 'dot_product'], default='cosine')
     parser.add_argument('--verbose', '-v', action='store_true')
     

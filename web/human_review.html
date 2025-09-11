@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตรวจสอบสินค้าโดยมนุษย์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .product-comparison {
+            transition: all 0.3s ease;
+        }
+        
+        .product-comparison:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .similarity-bar {
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+        }
+        
+        .confidence-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .confidence-high { background-color: #10b981; }
+        .confidence-medium { background-color: #f59e0b; }
+        .confidence-low { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-robot mr-3"></i>
+                        ระบบตรวจสอบสินค้าโดยมนุษย์
+                    </h1>
+                    <p class="text-blue-100 mt-1">Human-in-the-Loop Product Review System</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-blue-100">ผู้ตรวจสอบ</div>
+                    <div class="font-semibold" id="reviewerName">กรุณาเข้าสู่ระบบ</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Stats Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">รอตรวจสอบ</p>
+                        <p class="text-2xl font-bold text-blue-600" id="pendingCount">0</p>
+                    </div>
+                    <i class="fas fa-clock text-blue-600 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">ตรวจสอบแล้ว</p>
+                        <p class="text-2xl font-bold text-green-600" id="reviewedCount">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">ความแม่นยำ ML</p>
+                        <p class="text-2xl font-bold text-purple-600" id="mlAccuracy">0%</p>
+                    </div>
+                    <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">เซสชันนี้</p>
+                        <p class="text-2xl font-bold text-orange-600" id="sessionCount">0</p>
+                    </div>
+                    <i class="fas fa-user-check text-orange-600 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviewer Login -->
+        <div id="loginSection" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">เข้าสู่ระบบ</h2>
+            <div class="flex gap-4">
+                <input type="text" id="reviewerInput" placeholder="ชื่อผู้ตรวจสอบ" 
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="startSession()" 
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>เริ่มเซสชัน
+                </button>
+            </div>
+        </div>
+
+        <!-- Review Interface -->
+        <div id="reviewInterface" class="hidden">
+            <!-- Current Review Item -->
+            <div id="currentReview" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">รายการตรวจสอบ</h2>
+                    <div class="text-sm text-gray-500">
+                        รายการที่ <span id="currentItem">1</span> จาก <span id="totalItems">10</span>
+                    </div>
+                </div>
+
+                <div class="product-comparison border-2 border-gray-200 rounded-lg p-6">
+                    <!-- Product Pair -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-blue-800 mb-2">สินค้า A</h3>
+                            <p class="text-lg" id="product1">-</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-green-800 mb-2">สินค้า B</h3>
+                            <p class="text-lg" id="product2">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Similarity Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-sm text-gray-500 mb-1">ความคล้าย</div>
+                            <div class="text-2xl font-bold text-blue-600" id="similarityScore">0.000</div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div class="similarity-bar h-2 rounded-full" id="similarityBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-500 mb-1">ความมั่นใจ ML</div>
+                            <div class="text-2xl font-bold text-purple-600" id="confidenceScore">0.000</div>
+                            <div id="confidenceIndicator" class="mt-2">
+                                <span class="confidence-indicator confidence-low"></span>
+                                <span class="text-sm">ต่ำ</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-500 mb-1">ML ทำนาย</div>
+                            <div class="text-lg font-bold" id="mlPrediction">-</div>
+                            <div class="text-xs text-gray-500 mt-1" id="mlPredictionDesc">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Human Feedback Buttons -->
+                    <div class="border-t pt-6">
+                        <h3 class="font-semibold mb-4">คุณคิดว่าสินค้าทั้งสองคู่นี้คือ?</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <button onclick="provideFeedback('duplicate')" 
+                                    class="feedback-btn bg-red-100 hover:bg-red-200 text-red-800 border-2 border-red-300 px-4 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-clone mb-2 block text-xl"></i>
+                                <div class="font-semibold">สินค้าซ้ำ</div>
+                                <div class="text-xs">สินค้าเดียวกัน</div>
+                            </button>
+                            <button onclick="provideFeedback('similar')" 
+                                    class="feedback-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-2 border-yellow-300 px-4 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-arrows-left-right mb-2 block text-xl"></i>
+                                <div class="font-semibold">คล้าย แต่ไม่ซ้ำ</div>
+                                <div class="text-xs">สินค้าคล้ายกัน</div>
+                            </button>
+                            <button onclick="provideFeedback('different')" 
+                                    class="feedback-btn bg-green-100 hover:bg-green-200 text-green-800 border-2 border-green-300 px-4 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-not-equal mb-2 block text-xl"></i>
+                                <div class="font-semibold">ต่างกัน</div>
+                                <div class="text-xs">สินค้าต่างกัน</div>
+                            </button>
+                            <button onclick="provideFeedback('uncertain')" 
+                                    class="feedback-btn bg-gray-100 hover:bg-gray-200 text-gray-800 border-2 border-gray-300 px-4 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-question mb-2 block text-xl"></i>
+                                <div class="font-semibold">ไม่แน่ใจ</div>
+                                <div class="text-xs">ต้องตรวจสอบเพิ่ม</div>
+                            </button>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ความคิดเห็นเพิ่มเติม (ไม่บังคับ)</label>
+                            <textarea id="comments" rows="2" 
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="เช่น เหตุผลในการตัดสินใจ หรือข้อสังเกตอื่นๆ"></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-between">
+                            <button onclick="skipReview()" 
+                                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-forward mr-2"></i>ข้าม
+                            </button>
+                            <button onclick="endSession()" 
+                                    class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                <i class="fas fa-stop mr-2"></i>จบเซสชัน
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>ความคืบหน้า</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Recent Reviews -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-bold mb-4">การตรวจสอบล่าสุด</h3>
+                <div id="recentReviews" class="space-y-3">
+                    <div class="text-gray-500 text-center py-4">ยังไม่มีการตรวจสอบในเซสชันนี้</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <i class="fas fa-check-circle text-green-500 text-4xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">บันทึกสำเร็จ!</h3>
+                <p class="text-gray-600 mb-4">ขอบคุณสำหรับการให้ feedback</p>
+                <button onclick="closeModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    ตกลง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentSession = {
+            reviewerName: '',
+            pendingReviews: [],
+            currentIndex: 0,
+            reviewedCount: 0,
+            isActive: false
+        };
+
+        // Mock data สำหรับการทดสอบ
+        const mockData = [
+            {
+                id: 'comp_1',
+                product1: 'iPhone 14 Pro Max 256GB สีดำ',
+                product2: 'iPhone 14 Pro Max 256GB Black',
+                similarity_score: 0.92,
+                confidence_score: 0.85,
+                ml_prediction: 'duplicate'
+            },
+            {
+                id: 'comp_2',
+                product1: 'Samsung Galaxy S23 Ultra',
+                product2: 'Samsung Galaxy S23 Ultra 256GB',
+                similarity_score: 0.88,
+                confidence_score: 0.72,
+                ml_prediction: 'similar'
+            },
+            {
+                id: 'comp_3',
+                product1: 'MacBook Pro 14 inch M2',
+                product2: 'MacBook Pro 14" M2 Chip',
+                similarity_score: 0.95,
+                confidence_score: 0.90,
+                ml_prediction: 'duplicate'
+            }
+        ];
+
+        function startSession() {
+            const reviewerName = document.getElementById('reviewerInput').value.trim();
+            if (!reviewerName) {
+                alert('กรุณากรอกชื่อผู้ตรวจสอบ');
+                return;
+            }
+
+            currentSession.reviewerName = reviewerName;
+            currentSession.pendingReviews = [...mockData];
+            currentSession.currentIndex = 0;
+            currentSession.reviewedCount = 0;
+            currentSession.isActive = true;
+
+            // Update UI
+            document.getElementById('reviewerName').textContent = reviewerName;
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('reviewInterface').classList.remove('hidden');
+
+            updateStats();
+            loadCurrentReview();
+        }
+
+        function loadCurrentReview() {
+            if (currentSession.currentIndex >= currentSession.pendingReviews.length) {
+                endSession();
+                return;
+            }
+
+            const review = currentSession.pendingReviews[currentSession.currentIndex];
+            
+            // Update product display
+            document.getElementById('product1').textContent = review.product1;
+            document.getElementById('product2').textContent = review.product2;
+            
+            // Update metrics
+            document.getElementById('similarityScore').textContent = review.similarity_score.toFixed(3);
+            document.getElementById('confidenceScore').textContent = review.confidence_score.toFixed(3);
+            
+            // Update similarity bar
+            const similarityPercent = review.similarity_score * 100;
+            document.getElementById('similarityBar').style.width = similarityPercent + '%';
+            
+            // Update confidence indicator
+            updateConfidenceIndicator(review.confidence_score);
+            
+            // Update ML prediction
+            const predictionMap = {
+                'duplicate': { text: 'สินค้าซ้ำ', desc: 'สินค้าเดียวกัน', color: 'text-red-600' },
+                'similar': { text: 'คล้ายกัน', desc: 'สินค้าใกล้เคียง', color: 'text-yellow-600' },
+                'different': { text: 'ต่างกัน', desc: 'สินค้าต่างกัน', color: 'text-green-600' },
+                'uncertain': { text: 'ไม่แน่ใจ', desc: 'ต้องตรวจสอบเพิ่ม', color: 'text-gray-600' }
+            };
+            
+            const prediction = predictionMap[review.ml_prediction];
+            document.getElementById('mlPrediction').textContent = prediction.text;
+            document.getElementById('mlPrediction').className = `text-lg font-bold ${prediction.color}`;
+            document.getElementById('mlPredictionDesc').textContent = prediction.desc;
+            
+            // Update progress
+            updateProgress();
+            
+            // Clear previous feedback
+            document.getElementById('comments').value = '';
+            clearFeedbackSelection();
+        }
+
+        function updateConfidenceIndicator(confidence) {
+            const indicator = document.getElementById('confidenceIndicator');
+            let level, text, colorClass;
+            
+            if (confidence >= 0.8) {
+                level = 'สูง';
+                colorClass = 'confidence-high';
+            } else if (confidence >= 0.6) {
+                level = 'ปานกลาง';
+                colorClass = 'confidence-medium';
+            } else {
+                level = 'ต่ำ';
+                colorClass = 'confidence-low';
+            }
+            
+            indicator.innerHTML = `
+                <span class="confidence-indicator ${colorClass}"></span>
+                <span class="text-sm">${level}</span>
+            `;
+        }
+
+        function updateProgress() {
+            const current = currentSession.currentIndex + 1;
+            const total = currentSession.pendingReviews.length;
+            const percent = (currentSession.currentIndex / total) * 100;
+            
+            document.getElementById('currentItem').textContent = current;
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('progressText').textContent = Math.round(percent) + '%';
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function updateStats() {
+            document.getElementById('pendingCount').textContent = currentSession.pendingReviews.length - currentSession.currentIndex;
+            document.getElementById('reviewedCount').textContent = currentSession.reviewedCount;
+            document.getElementById('sessionCount').textContent = currentSession.reviewedCount;
+            document.getElementById('mlAccuracy').textContent = '87%'; // Mock data
+        }
+
+        function provideFeedback(feedbackType) {
+            const comments = document.getElementById('comments').value.trim();
+            
+            // Highlight selected feedback
+            clearFeedbackSelection();
+            event.target.classList.add('ring-4', 'ring-blue-300');
+            
+            // Save feedback (in real implementation, send to backend)
+            const review = currentSession.pendingReviews[currentSession.currentIndex];
+            review.human_feedback = feedbackType;
+            review.human_comments = comments;
+            review.reviewed_by = currentSession.reviewerName;
+            review.reviewed_at = new Date();
+            
+            // Add to recent reviews
+            addToRecentReviews(review);
+            
+            // Show success modal
+            showSuccessModal();
+            
+            // Move to next review after modal
+            setTimeout(() => {
+                closeModal();
+                nextReview();
+            }, 1500);
+        }
+
+        function clearFeedbackSelection() {
+            document.querySelectorAll('.feedback-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-blue-300');
+            });
+        }
+
+        function addToRecentReviews(review) {
+            const container = document.getElementById('recentReviews');
+            
+            if (currentSession.reviewedCount === 0) {
+                container.innerHTML = '';
+            }
+            
+            const feedbackMap = {
+                'duplicate': { icon: 'fa-clone', color: 'text-red-600', text: 'สินค้าซ้ำ' },
+                'similar': { icon: 'fa-arrows-left-right', color: 'text-yellow-600', text: 'คล้ายกัน' },
+                'different': { icon: 'fa-not-equal', color: 'text-green-600', text: 'ต่างกัน' },
+                'uncertain': { icon: 'fa-question', color: 'text-gray-600', text: 'ไม่แน่ใจ' }
+            };
+            
+            const feedback = feedbackMap[review.human_feedback];
+            
+            const reviewElement = document.createElement('div');
+            reviewElement.className = 'border border-gray-200 rounded-lg p-3 fade-in';
+            reviewElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="text-sm font-medium">${review.product1}</div>
+                        <div class="text-sm text-gray-500">vs ${review.product2}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center ${feedback.color}">
+                            <i class="fas ${feedback.icon} mr-2"></i>
+                            <span class="font-medium">${feedback.text}</span>
+                        </div>
+                        <div class="text-xs text-gray-500">${review.similarity_score.toFixed(3)}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertBefore(reviewElement, container.firstChild);
+            
+            // Keep only latest 5 reviews
+            while (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function nextReview() {
+            currentSession.currentIndex++;
+            currentSession.reviewedCount++;
+            updateStats();
+            loadCurrentReview();
+        }
+
+        function skipReview() {
+            if (confirm('คุณต้องการข้ามรายการนี้หรือไม่?')) {
+                nextReview();
+            }
+        }
+
+        function endSession() {
+            if (currentSession.reviewedCount === 0) {
+                alert('คุณยังไม่ได้ตรวจสอบรายการใดเลย');
+                return;
+            }
+            
+            const message = `จบเซสชันการตรวจสอบ\n\nผลสรุป:\n- ตรวจสอบแล้ว: ${currentSession.reviewedCount} รายการ\n- คงเหลือ: ${currentSession.pendingReviews.length - currentSession.currentIndex} รายการ\n\nขอบคุณสำหรับการให้ feedback!`;
+            
+            alert(message);
+            
+            // Reset session
+            currentSession.isActive = false;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('reviewInterface').classList.add('hidden');
+            document.getElementById('reviewerInput').value = '';
+            document.getElementById('reviewerName').textContent = 'กรุณาเข้าสู่ระบบ';
+        }
+
+        function showSuccessModal() {
+            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById('successModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('flex');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set focus to reviewer input
+            document.getElementById('reviewerInput').focus();
+            
+            // Allow Enter key to start session
+            document.getElementById('reviewerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startSession();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
