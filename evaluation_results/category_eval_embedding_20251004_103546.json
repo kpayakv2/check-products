@@ -1,0 +1,822 @@
+[
+  {
+    "product": "กล่องล็อค 560 หูหิ้ว W",
+    "predictions": [
+      {
+        "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+        "category_name": "อุปกรณ์ประตูและกุญแจ",
+        "method": "embedding",
+        "confidence": 0.517239511013031
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.44132864475250244
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.428396075963974
+      },
+      {
+        "category_id": "82459ab3-45c3-44da-a6c2-cf10ae2946bb",
+        "category_name": "อุปกรณ์เสริมมือถือ",
+        "method": "embedding",
+        "confidence": 0.40625157952308655
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.3850299119949341
+      }
+    ],
+    "top_category": {
+      "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+      "category_name": "อุปกรณ์ประตูและกุญแจ",
+      "method": "embedding",
+      "confidence": 0.517239511013031
+    }
+  },
+  {
+    "product": "กล่องล็อค(39) 561 WW",
+    "predictions": [
+      {
+        "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+        "category_name": "อุปกรณ์ประตูและกุญแจ",
+        "method": "embedding",
+        "confidence": 0.3715156018733978
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.3493615388870239
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.33817383646965027
+      },
+      {
+        "category_id": "33f31e8c-fc4c-446c-90b8-424aadc88876",
+        "category_name": "ปืนฉีดน้ำ",
+        "method": "embedding",
+        "confidence": 0.31325751543045044
+      },
+      {
+        "category_id": "0f277734-222c-4c96-899c-5f8db0c6f67a",
+        "category_name": "กระบอก_หัวฉีด_ขวด",
+        "method": "embedding",
+        "confidence": 0.26880812644958496
+      }
+    ],
+    "top_category": {
+      "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+      "category_name": "อุปกรณ์ประตูและกุญแจ",
+      "method": "embedding",
+      "confidence": 0.3715156018733978
+    }
+  },
+  {
+    "product": "กล่องล็อค 560/1 หูหิ้ว W",
+    "predictions": [
+      {
+        "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+        "category_name": "อุปกรณ์ประตูและกุญแจ",
+        "method": "embedding",
+        "confidence": 0.5188072323799133
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.43890807032585144
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.4238709509372711
+      },
+      {
+        "category_id": "82459ab3-45c3-44da-a6c2-cf10ae2946bb",
+        "category_name": "อุปกรณ์เสริมมือถือ",
+        "method": "embedding",
+        "confidence": 0.41696563363075256
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.38125383853912354
+      }
+    ],
+    "top_category": {
+      "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+      "category_name": "อุปกรณ์ประตูและกุญแจ",
+      "method": "embedding",
+      "confidence": 0.5188072323799133
+    }
+  },
+  {
+    "product": "กล่องล็อค 561/1 W",
+    "predictions": [
+      {
+        "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+        "category_name": "อุปกรณ์ประตูและกุญแจ",
+        "method": "embedding",
+        "confidence": 0.4675242304801941
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.4540138244628906
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.3921527862548828
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.2956311106681824
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.2859870493412018
+      }
+    ],
+    "top_category": {
+      "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+      "category_name": "อุปกรณ์ประตูและกุญแจ",
+      "method": "embedding",
+      "confidence": 0.4675242304801941
+    }
+  },
+  {
+    "product": "เข่ง NO.2 (สี) N",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "method": "embedding",
+        "confidence": 0.4187622666358948
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.3885432779788971
+      },
+      {
+        "category_id": "98c15870-6b86-4632-9aa2-487fac7a46ed",
+        "category_name": "กะละมัง",
+        "method": "embedding",
+        "confidence": 0.362353652715683
+      },
+      {
+        "category_id": "ecc738b3-77ad-48ad-b8a4-fa55098363b1",
+        "category_name": "แก้วน้ำ/ถ้วย",
+        "method": "embedding",
+        "confidence": 0.3482893407344818
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "method": "embedding",
+        "confidence": 0.32757535576820374
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "method": "embedding",
+      "confidence": 0.4187622666358948
+    }
+  },
+  {
+    "product": "เก้าอี้ซักผ้ากลม 9025 สีหวาน AB V-NICE",
+    "predictions": [
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "method": "embedding",
+        "confidence": 0.6950868964195251
+      },
+      {
+        "category_id": "16226bfd-136a-4f10-a6b6-f3a9e3d8a021",
+        "category_name": "ผ้าถูพื้น/ผ้าเอนกประสงค์",
+        "method": "embedding",
+        "confidence": 0.549818217754364
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "method": "embedding",
+        "confidence": 0.5077887773513794
+      },
+      {
+        "category_id": "ea0564ce-437a-4af1-8063-716e14f5be2b",
+        "category_name": "อุปกรณ์ทำความสะอาด",
+        "method": "embedding",
+        "confidence": 0.5046535730361938
+      },
+      {
+        "category_id": "ceb18366-8203-4fa0-b7b4-7cdff905d877",
+        "category_name": "ไม้แขวนเสื้อ_อุปกรณ์ตากผ้า",
+        "method": "embedding",
+        "confidence": 0.5038260817527771
+      }
+    ],
+    "top_category": {
+      "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+      "category_name": "เก้าอี_โต้ะ",
+      "method": "embedding",
+      "confidence": 0.6950868964195251
+    }
+  },
+  {
+    "product": "เก้าอี้เตี้ย สีดำ S-0072B SIP",
+    "predictions": [
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "method": "embedding",
+        "confidence": 0.5549983978271484
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.3450968265533447
+      },
+      {
+        "category_id": "ecc738b3-77ad-48ad-b8a4-fa55098363b1",
+        "category_name": "แก้วน้ำ/ถ้วย",
+        "method": "embedding",
+        "confidence": 0.3444758951663971
+      },
+      {
+        "category_id": "82459ab3-45c3-44da-a6c2-cf10ae2946bb",
+        "category_name": "อุปกรณ์เสริมมือถือ",
+        "method": "embedding",
+        "confidence": 0.30314144492149353
+      },
+      {
+        "category_id": "ceb18366-8203-4fa0-b7b4-7cdff905d877",
+        "category_name": "ไม้แขวนเสื้อ_อุปกรณ์ตากผ้า",
+        "method": "embedding",
+        "confidence": 0.30165642499923706
+      }
+    ],
+    "top_category": {
+      "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+      "category_name": "เก้าอี_โต้ะ",
+      "method": "embedding",
+      "confidence": 0.5549983978271484
+    }
+  },
+  {
+    "product": "เก้าอี้เตี้ย 366 สีหวาน Bl",
+    "predictions": [
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "method": "embedding",
+        "confidence": 0.7022561430931091
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.45613911747932434
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.4475977420806885
+      },
+      {
+        "category_id": "d530023f-1ed2-4e97-8b11-d1fe6b92a474",
+        "category_name": "ที่นอน / ฟูก",
+        "method": "embedding",
+        "confidence": 0.4142332971096039
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "method": "embedding",
+        "confidence": 0.3748961389064789
+      }
+    ],
+    "top_category": {
+      "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+      "category_name": "เก้าอี_โต้ะ",
+      "method": "embedding",
+      "confidence": 0.7022561430931091
+    }
+  },
+  {
+    "product": "ถังน้ำฝาใส (ใหญ่) 728-PO SMT",
+    "predictions": [
+      {
+        "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+        "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+        "method": "embedding",
+        "confidence": 0.6376603841781616
+      },
+      {
+        "category_id": "0db83a1a-84b6-4433-8177-bc92b4bed432",
+        "category_name": "อุปกรณ์ประปา",
+        "method": "embedding",
+        "confidence": 0.5660766363143921
+      },
+      {
+        "category_id": "ceb18366-8203-4fa0-b7b4-7cdff905d877",
+        "category_name": "ไม้แขวนเสื้อ_อุปกรณ์ตากผ้า",
+        "method": "embedding",
+        "confidence": 0.498158723115921
+      },
+      {
+        "category_id": "42e5a296-e955-43da-a0a2-c65f759214e3",
+        "category_name": "ขันน้ำ",
+        "method": "embedding",
+        "confidence": 0.48654451966285706
+      },
+      {
+        "category_id": "d2f97ac5-2f6e-4487-bac0-b005c5bb3ff7",
+        "category_name": "กระติก",
+        "method": "embedding",
+        "confidence": 0.47650662064552307
+      }
+    ],
+    "top_category": {
+      "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+      "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+      "method": "embedding",
+      "confidence": 0.6376603841781616
+    }
+  },
+  {
+    "product": "ตะแกรง 1991 สีใส SRT",
+    "predictions": [
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.4172899127006531
+      },
+      {
+        "category_id": "310d7769-12ba-4ada-8efe-c9913427227e",
+        "category_name": "กระจก",
+        "method": "embedding",
+        "confidence": 0.39248645305633545
+      },
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "method": "embedding",
+        "confidence": 0.3785019516944885
+      },
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.371361643075943
+      },
+      {
+        "category_id": "b6f91c17-dcf6-412b-801d-a582c4f52f62",
+        "category_name": "อุปกรณ์ความงาม",
+        "method": "embedding",
+        "confidence": 0.34224221110343933
+      }
+    ],
+    "top_category": {
+      "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+      "category_name": "ไฟฉาย",
+      "method": "embedding",
+      "confidence": 0.4172899127006531
+    }
+  },
+  {
+    "product": "ตะแกรงเหลี่ยม 818 KT",
+    "predictions": [
+      {
+        "category_id": "98c15870-6b86-4632-9aa2-487fac7a46ed",
+        "category_name": "กะละมัง",
+        "method": "embedding",
+        "confidence": 0.3580065667629242
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.34531569480895996
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.3350578248500824
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "method": "embedding",
+        "confidence": 0.30639445781707764
+      },
+      {
+        "category_id": "310d7769-12ba-4ada-8efe-c9913427227e",
+        "category_name": "กระจก",
+        "method": "embedding",
+        "confidence": 0.29984548687934875
+      }
+    ],
+    "top_category": {
+      "category_id": "98c15870-6b86-4632-9aa2-487fac7a46ed",
+      "category_name": "กะละมัง",
+      "method": "embedding",
+      "confidence": 0.3580065667629242
+    }
+  },
+  {
+    "product": "ตะกร้าเหลี่ยม 5953 หูหิ้ว JCP",
+    "predictions": [
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.38075751066207886
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.3738153278827667
+      },
+      {
+        "category_id": "00470f3c-2841-448b-a803-0727ce6d8b93",
+        "category_name": "เครื่องเขียน_สำนักงาน",
+        "method": "embedding",
+        "confidence": 0.35768693685531616
+      },
+      {
+        "category_id": "82459ab3-45c3-44da-a6c2-cf10ae2946bb",
+        "category_name": "อุปกรณ์เสริมมือถือ",
+        "method": "embedding",
+        "confidence": 0.33650389313697815
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.333342581987381
+      }
+    ],
+    "top_category": {
+      "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+      "category_name": "กล่อง/ที่เก็บของ",
+      "method": "embedding",
+      "confidence": 0.38075751066207886
+    }
+  },
+  {
+    "product": "ตะแกรงเหลี่ยม 410 สีใส LK",
+    "predictions": [
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.4570539891719818
+      },
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "method": "embedding",
+        "confidence": 0.4312519133090973
+      },
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.419017493724823
+      },
+      {
+        "category_id": "2a7ca074-968a-488a-a783-3b44ed806752",
+        "category_name": "กรวย",
+        "method": "embedding",
+        "confidence": 0.4127243459224701
+      },
+      {
+        "category_id": "310d7769-12ba-4ada-8efe-c9913427227e",
+        "category_name": "กระจก",
+        "method": "embedding",
+        "confidence": 0.3992510437965393
+      }
+    ],
+    "top_category": {
+      "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+      "category_name": "วัสดุขัดผิว",
+      "method": "embedding",
+      "confidence": 0.4570539891719818
+    }
+  },
+  {
+    "product": "ตะแกรง 409 สีใส LK",
+    "predictions": [
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.3996601402759552
+      },
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.395597368478775
+      },
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "method": "embedding",
+        "confidence": 0.3845627009868622
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.38186031579971313
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "method": "embedding",
+        "confidence": 0.3572438061237335
+      }
+    ],
+    "top_category": {
+      "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+      "category_name": "เบ็ดเตล็ด",
+      "method": "embedding",
+      "confidence": 0.3996601402759552
+    }
+  },
+  {
+    "product": "นส.8 สี SP",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "method": "embedding",
+        "confidence": 0.3576257526874542
+      },
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.3240502178668976
+      },
+      {
+        "category_id": "89dfa6e6-a771-4f9d-bb5f-a29d20260cc3",
+        "category_name": "ไฟฉาย",
+        "method": "embedding",
+        "confidence": 0.32351016998291016
+      },
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.3196893036365509
+      },
+      {
+        "category_id": "b6f91c17-dcf6-412b-801d-a582c4f52f62",
+        "category_name": "อุปกรณ์ความงาม",
+        "method": "embedding",
+        "confidence": 0.3190314471721649
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "method": "embedding",
+      "confidence": 0.3576257526874542
+    }
+  },
+  {
+    "product": "ตะกร้าฝาปิด(จัมโบ้)321/4 สีใส/หวาน V",
+    "predictions": [
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.5603402256965637
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "method": "embedding",
+        "confidence": 0.5146809816360474
+      },
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.5007060766220093
+      },
+      {
+        "category_id": "9ac60460-ed89-4b0b-be66-e47acdac5b3e",
+        "category_name": "ภาชนะใส่เครื่องปรุง / ขวดซอส",
+        "method": "embedding",
+        "confidence": 0.4994801878929138
+      },
+      {
+        "category_id": "67a273af-5d94-427e-ab72-439bd58ab3cc",
+        "category_name": "ริบบิ้น/วัสดุตกแต่ง",
+        "method": "embedding",
+        "confidence": 0.48473912477493286
+      }
+    ],
+    "top_category": {
+      "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+      "category_name": "วัสดุขัดผิว",
+      "method": "embedding",
+      "confidence": 0.5603402256965637
+    }
+  },
+  {
+    "product": "เก้าอี้ หน้ากลม 250-B สีเข้ม (ปักกิ่ง) SH",
+    "predictions": [
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "method": "embedding",
+        "confidence": 0.6255067586898804
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.4779699742794037
+      },
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "category_name": "กล่อง/ที่เก็บของ",
+        "method": "embedding",
+        "confidence": 0.42830342054367065
+      },
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.3923749625682831
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "method": "embedding",
+        "confidence": 0.39148178696632385
+      }
+    ],
+    "top_category": {
+      "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+      "category_name": "เก้าอี_โต้ะ",
+      "method": "embedding",
+      "confidence": 0.6255067586898804
+    }
+  },
+  {
+    "product": "ถังฝา KF-008 สีดำ RTH",
+    "predictions": [
+      {
+        "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+        "category_name": "อุปกรณ์ประตูและกุญแจ",
+        "method": "embedding",
+        "confidence": 0.35022494196891785
+      },
+      {
+        "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+        "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+        "method": "embedding",
+        "confidence": 0.3431999683380127
+      },
+      {
+        "category_id": "3ca84679-3a47-41db-b0b8-1e944809d0b5",
+        "category_name": "กระชอน/ที่กรอง",
+        "method": "embedding",
+        "confidence": 0.3165166974067688
+      },
+      {
+        "category_id": "0db83a1a-84b6-4433-8177-bc92b4bed432",
+        "category_name": "อุปกรณ์ประปา",
+        "method": "embedding",
+        "confidence": 0.30705776810646057
+      },
+      {
+        "category_id": "a302ff13-68b5-4124-b470-869287c2bfbf",
+        "category_name": "อุปกรณ์ตวง",
+        "method": "embedding",
+        "confidence": 0.3024657964706421
+      }
+    ],
+    "top_category": {
+      "category_id": "69b1c629-2939-4608-b33f-94ae458bf41e",
+      "category_name": "อุปกรณ์ประตูและกุญแจ",
+      "method": "embedding",
+      "confidence": 0.35022494196891785
+    }
+  },
+  {
+    "product": "ตะหลิวไม้ 12 แผงกระดาษ #9890 IMM",
+    "predictions": [
+      {
+        "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+        "category_name": "สมุด/กระดาษ",
+        "method": "embedding",
+        "confidence": 0.5664181113243103
+      },
+      {
+        "category_id": "3114d46b-c1e8-4e3d-9a59-6d0ffd8d7a85",
+        "category_name": "เบ็ดเตล็ด",
+        "method": "embedding",
+        "confidence": 0.537604808807373
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "method": "embedding",
+        "confidence": 0.525743305683136
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "category_name": "ตะกร้า/กระจาด",
+        "method": "embedding",
+        "confidence": 0.5205736756324768
+      },
+      {
+        "category_id": "cf000f4a-995f-4ef6-bac2-f6a718a1a999",
+        "category_name": "วัสดุขัดผิว",
+        "method": "embedding",
+        "confidence": 0.5142791867256165
+      }
+    ],
+    "top_category": {
+      "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+      "category_name": "สมุด/กระดาษ",
+      "method": "embedding",
+      "confidence": 0.5664181113243103
+    }
+  },
+  {
+    "product": "ทัพพีตักข้าวใส 10611 ใส แผงกระดาษ IMM",
+    "predictions": [
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "method": "embedding",
+        "confidence": 0.5332281589508057
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "method": "embedding",
+        "confidence": 0.5002861022949219
+      },
+      {
+        "category_id": "ceb18366-8203-4fa0-b7b4-7cdff905d877",
+        "category_name": "ไม้แขวนเสื้อ_อุปกรณ์ตากผ้า",
+        "method": "embedding",
+        "confidence": 0.49497857689857483
+      },
+      {
+        "category_id": "ea0564ce-437a-4af1-8063-716e14f5be2b",
+        "category_name": "อุปกรณ์ทำความสะอาด",
+        "method": "embedding",
+        "confidence": 0.48412618041038513
+      },
+      {
+        "category_id": "00470f3c-2841-448b-a803-0727ce6d8b93",
+        "category_name": "เครื่องเขียน_สำนักงาน",
+        "method": "embedding",
+        "confidence": 0.4771236181259155
+      }
+    ],
+    "top_category": {
+      "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+      "category_name": "ตะแกรง/ชั้นวางของ",
+      "method": "embedding",
+      "confidence": 0.5332281589508057
+    }
+  }
+]

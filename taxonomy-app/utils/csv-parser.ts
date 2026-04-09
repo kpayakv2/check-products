@@ -28,11 +28,10 @@ export function parseCSV(
 ): ParsedCSV {
   const {
     maxRows,
-    skipEmptyLines = true,
-    delimiter = ','
+    skipEmptyLines = true
   } = options
 
-  const lines = text.split('\n').filter(line => 
+  const lines = text.split(/\r?\n/).filter(line => 
     skipEmptyLines ? line.trim() !== '' : true
   )
 
@@ -40,10 +39,17 @@ export function parseCSV(
     return { headers: [], rows: [], totalCount: 0 }
   }
 
-  // Parse headers
-  const headers = lines[0]
-    .split(delimiter)
-    .map(h => h.trim().replace(/^"|"$/g, '')) // Remove quotes
+  // Auto-detect delimiter
+  let delimiter = options.delimiter
+  if (!delimiter) {
+    const firstLine = lines[0]
+    if (firstLine.includes(';')) delimiter = ';'
+    else if (firstLine.includes('\t')) delimiter = '\t'
+    else delimiter = ','
+  }
+
+  // Parse headers using the robust line parser
+  const headers = parseCSVLine(lines[0], delimiter)
 
   // Parse rows
   const dataLines = lines.slice(1)
@@ -104,22 +110,34 @@ function parseCSVLine(line: string, delimiter: string = ','): string[] {
 }
 
 /**
- * Read file as text
+ * Read file as text with encoding detection
  */
 export async function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     
     reader.onload = (event) => {
-      const text = event.target?.result as string
-      resolve(text)
+      const buffer = event.target?.result as ArrayBuffer
+      
+      try {
+        // Try UTF-8 first
+        const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
+        const text = utf8Decoder.decode(buffer)
+        resolve(text)
+      } catch (e) {
+        // Fallback to Thai Windows-874
+        console.log('UTF-8 decoding failed in UI, falling back to windows-874')
+        const thaiDecoder = new TextDecoder('windows-874')
+        const text = thaiDecoder.decode(buffer)
+        resolve(text)
+      }
     }
     
     reader.onerror = () => {
       reject(new Error('Failed to read file'))
     }
     
-    reader.readAsText(file, 'UTF-8')
+    reader.readAsArrayBuffer(file)
   })
 }
 

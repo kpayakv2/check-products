@@ -1,6 +1,26 @@
-# 🎯 Product Similarity Checker
+#  Product Similarity Checker + Thai Product Taxonomy Manager
 
-**Advanced AI-powered product matching system** ระบบจับคู่สินค้าด้วย Machine Learning ที่รองรับภาษาไทย
+**AI-Powered Product Management System**
+
+System for managing products using AI, comprising of two main components:
+
+1. **Product Similarity Checker** - AI-powered product matching system
+2. **Thai Product Taxonomy Manager** - Thai product category management system using Supabasen
+
+### **📂 Quick Access by Category**
+- **🚀 [User Guides](docs/guides/)** - Quick start, human feedback, model guides
+- **🔧 [API Documentation](docs/api/)** - Complete API reference and capabilities  
+- **👩‍💻 [Development](docs/development/)** - Contributing, architecture, testing
+- **📊 [Reports & Analysis](docs/reports/)** - Performance reports and project analysis
+
+### **🎯 Quick Navigation**
+| Need | Go To | Description |
+|------|-------|-------------|
+| **Getting Started** | [Quick Start Guide](docs/guides/quick-start.md) | Step-by-step setup |
+| **API Usage** | [API Reference](docs/api/api-reference.md) | Complete API docs |
+| **Human Interface** | [Human Feedback Guide](docs/guides/human-feedback.md) | Web UI usage |
+| **Contributing** | [Development Guide](docs/development/contributing.md) | How to contribute |
+| **Architecture** | [System Architecture](docs/development/architecture.md) | Technical overview |ย
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.68+-green.svg)](https://fastapi.tiangolo.com/)
@@ -117,23 +137,23 @@ Ranked Results with Confidence Scores
 
 ---
 
-## � **Complete Documentation**
+## 📚 **Documentation Hub**
 
 ### **📋 Navigation Guide**
 | Document | Purpose | Target Audience |
 |----------|---------|-----------------|
-| **[📖 Complete Guide](docs/README_COMPLETE.md)** | Comprehensive documentation | All users |
-| **[🗂️ Quick Navigation](docs/INDEX.md)** | Documentation index | New users |
-| **[🏗️ Architecture](docs/architecture.md)** | System design details | Developers |
-| **[🔧 Text Processing](docs/text-preprocessing.md)** | Advanced preprocessing | ML Engineers |
-| **[� API Reference](docs/api-reference.md)** | Complete API docs | API Users |
-| **[⚡ Quick Summary](docs/capabilities-summary.md)** | Feature overview | Decision makers |
+| **[🗂️ Documentation Index](docs/INDEX.md)** | Overview of all docs | All users |
+| **[🚀 Quick Start Guide](docs/guides/quick-start.md)** | Step-by-step setup | Implementers |
+| **[🏗️ Architecture](docs/development/architecture.md)** | System design details | Developers |
+| **[🔧 Text Processing](docs/development/text-preprocessing.md)** | Thai preprocessing pipeline | ML Engineers |
+| **[🔌 API Reference](docs/api/api-reference.md)** | REST & WebSocket endpoints | API Consumers |
+| **[⚡ Capabilities Summary](docs/reports/capabilities-summary.md)** | Feature overview | Stakeholders |
 
 ### **🎯 Choose Your Path**
-- **New User?** → Start with [Quick Navigation](docs/INDEX.md)
-- **Developer?** → Check [Architecture Guide](docs/architecture.md)  
-- **API User?** → Go to [API Reference](docs/api-reference.md)
-- **Need Overview?** → Read [Capabilities Summary](docs/capabilities-summary.md)
+- **New User?** → Start with [Documentation Index](docs/INDEX.md)
+- **Developer?** → Check [Architecture Guide](docs/development/architecture.md)  
+- **API User?** → Go to [API Reference](docs/api/api-reference.md)
+- **Need Overview?** → Read [Capabilities Summary](docs/reports/capabilities-summary.md)
 
 ---
 
@@ -264,10 +284,10 @@ check-products/
 - **📚 Docs**: Comprehensive documentation in `/docs`
 
 ### **Quick Links**
-- **[📖 Full Documentation](docs/README_COMPLETE.md)** - Everything you need to know
-- **[🔌 API Docs](docs/api-reference.md)** - Complete API reference
-- **[⚡ Capabilities](docs/capabilities-summary.md)** - Feature overview
-- **[🏗️ Architecture](docs/architecture.md)** - Technical details
+- **[📖 Documentation Index](docs/INDEX.md)** - Everything you need to know
+- **[🔌 API Docs](docs/api/api-reference.md)** - Complete API reference
+- **[⚡ Capabilities](docs/reports/capabilities-summary.md)** - Feature overview
+- **[🏗️ Architecture](docs/development/architecture.md)** - Technical details
 
 ---
 
@@ -277,7 +297,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🎯 Ready to transform your product data? Start with the [Complete Documentation](docs/README_COMPLETE.md) or try the [Quick Start](#-quick-start) above!**
+**🎯 Ready to transform your product data? Start with the [Documentation Index](docs/INDEX.md) or try the [Quick Start](#-quick-start) above!**
 
 ## 🚀 การติดตั้ง
 

@@ -4,90 +4,61 @@
 ## 📋 Project Overview (ภาพรวมโปรเจกต์)
 This project is an AI-powered system designed to manage Thai product taxonomies and perform product similarity matching (deduplication). It consists of a Python-based AI backend and a Next.js frontend integrated with Supabase.
 
-โปรเจกต์นี้เป็นระบบ AI สำหรับจัดการโครงสร้างหมวดหมู่สินค้าไทย (Taxonomy) และตรวจสอบการซ้ำซ้อนของสินค้า (Deduplication) โดยประกอบด้วย Backend ภาษา Python สำหรับงาน AI และ Frontend ด้วย Next.js ที่เชื่อมต่อกับ Supabase
+---
 
-### Key Technologies (เทคโนโลยีหลัก)
-- **Backend (AI & API):** Python 3.8+, FastAPI, PyTorch, Sentence Transformers (`paraphrase-multilingual-MiniLM-L12-v2`), Pandas
-- **Frontend:** Next.js (TypeScript), Tailwind CSS, Framer Motion, Lucide React
-- **Database & Auth:** Supabase (PostgreSQL with `pgvector`), Supabase Edge Functions
-- **Testing:** Pytest (Python), Jest & Playwright (Frontend)
+## 🏛️ Project Constitution (รัฐธรรมนูญของโปรเจกต์)
+*กฎเหล็กที่เอเจนต์ทุกตัวต้องปฏิบัติตามอย่างเคร่งครัด*
+
+### 1. 🛠️ Tech Stack Mandates
+- **Thai Text Processing:** ต้องใช้คลาส `ThaiTextProcessor` (จาก `fresh_implementations.py`) ทุกครั้งที่มีการประมวลผลหรือทำความสะอาดชื่อสินค้าภาษาไทย เพื่อรักษาความแม่นยำและมาตรฐานเดียวกัน
+- **Edge Function First:** Logic สำหรับการ Classification หรือการประมวลผล AI ใหม่ๆ **ต้องถูกเขียนใน Supabase Edge Functions เท่านั้น** (เว้นแต่จะเป็นงาน Heavy-lifting ที่ต้องการ GPU) เพื่อรักษาแนวทาง Data-Centric Architecture
+- **Vector Standard:** ต้องใช้ `pgvector` ใน PostgreSQL และกำหนดขนาด Embedding เป็น **384 dimensions** (โมเดล `paraphrase-multilingual-MiniLM-L12-v2`) เท่านั้น
+- **Styling:** ห้ามใช้ Tailwind CSS นอกโฟลเดอร์ `taxonomy-app/` โดยเด็ดขาด
+
+### 2. 🇹🇭 Thai Language & UI Rules
+- **UI Encoding:** ต้องรองรับการแสดงผลภาษาไทยที่ถูกต้อง (UTF-8) และจัดการสระลอย/สระจมให้สมบูรณ์ในทุกหน้าจอ
+- **Responsiveness:** หน้าจอ Dashboard และการจัดการ Taxonomy ต้องรองรับ Mobile (Responsive) และตัวหนังสือภาษาไทยต้องไม่อ่านยากหรือตัดบรรทัดเพี้ยน
+- **Normalization:** ชื่อสินค้าก่อนเข้าสู่กระบวนการ AI ต้องผ่านการ Normalize (เลขไทยเป็นอารบิก, ลบสระลอย, ล้างคำขยะ) ตามมาตรฐานใน `docs/development/text-preprocessing.md`
+
+### 3. 🧪 Validation & Finality
+- **No Manual Fixes:** ห้ามแก้ไขโค้ดหรือฐานข้อมูลโดยไม่มีการรัน Test (Pytest/Jest) เพื่อยืนยันผล
+- **Benchmark Driven:** การแก้ไข Algorithm การจับคู่ (Similarity) ใดๆ ต้องรักษาค่าความแม่นยำ (F1-score/Accuracy) ให้ไม่ต่ำกว่า 72% (ค่ามาตรฐานปัจจุบัน)
+
+### 4. 🛠️ MCP & Tooling Mandates (ยุทธศาสตร์การใช้เครื่องมือ)
+- **Database First (Postgres MCP):** ต้องใช้ `mcp_postgres_query` เป็นทางเลือกแรกในการตรวจสอบข้อมูล, แก้ไข Schema หรือวิเคราะห์ Data ใน Supabase เสมอ เพื่อความรวดเร็วและประหยัด Context
+- **Visual Integrity (Domscribe & Puppeteer):** ต้องใช้ MCP เหล่านี้ในการตรวจสอบ UI เสมอ โดยเฉพาะการเช็ค Layout ภาษาไทยในหน้าจอต่างๆ ตามกฎ Antigravity
+- **Strategic Delegation:** งานที่เกี่ยวข้องกับการแก้ไขไฟล์จำนวนมาก (>3 ไฟล์) หรือการรันกระบวนการที่ยาวนาน ต้องส่งต่อให้ Sub-agents (`generalist` หรือ `codebase_investigator`) เพื่อรักษาความกระชับของ Main Session Context
+- **Context Management:** ต้องอัปเดตไฟล์ `CURRENT_STATUS.md` ทุกครั้งหลังจบ Task สำคัญ เพื่อรักษา "ความจำระยะสั้น" ของโปรเจกต์ให้แม่นยำที่สุด
+
+### 5. 🥋 Specialized Skills (สารบัญทักษะเฉพาะทาง)
+*เรียกใช้งานผ่าน `activate_skill(name)` เมื่อเข้าสู่ Workflow ที่เกี่ยวข้อง*
+
+- **`skill-thai-taxonomy-expert`**: ใช้เมื่อต้องการออกแบบลำดับชั้นหมวดหมู่, แก้ไข `taxonomy_nodes` หรือวางแผนโครงสร้างข้อมูลสินค้าไทย
+- **`skill-data-cleaner`**: ใช้เมื่อต้องทำความสะอาดข้อมูลชื่อสินค้า (Normalization), จัดการหน่วยวัด (kg/g/ml) หรือลบข้อความโปรโมชั่นก่อนเข้า AI
+- **`skill-vector-optimizer`**: ใช้เมื่อต้องการวิเคราะห์ประสิทธิภาพ `pgvector`, ปรับจูน Indexing หรือตรวจสอบสินค้าที่มีค่า Similarity ต่ำเพื่อหาจุดอ่อนของโมเดล
 
 ---
 
-## 🚀 Building and Running (การติดตั้งและรันระบบ)
+## 🏗️ Verified System Architecture (Verified Oct 2025)
 
-### Prerequisites (สิ่งที่ต้องเตรียม)
-- Python 3.8+
-- Node.js & npm
-- Docker (สำหรับ Supabase local development)
+### 1. 🧩 Component Roles
+- **FastAPI (`api_server.py`):** Local Embedding Provider (384-dim) via `/api/embed`
+- **Supabase Edge Functions:** Orchestrator (e.g., `hybrid-classification-local`)
+- **PostgreSQL:** Heavy Logic (RPC Functions like `hybrid_category_classification`)
 
-### 1. Backend (Python AI)
-1.  **Setup Virtual Environment (สร้าง Environment):**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
-2.  **Start API Server (เริ่มเซิร์ฟเวอร์):**
-    ```bash
-    python api_server.py
-    ```
-    - API Docs: `http://localhost:8000/docs`
-    - Web Interface (legacy/debug): `http://localhost:8000/web`
-
-### 2. Frontend (Taxonomy App)
-1.  **Install Dependencies (ติดตั้ง Libs):**
-    ```bash
-    cd taxonomy-app
-    npm install
-    ```
-2.  **Start Supabase (Local) (รันฐานข้อมูล):**
-    ```bash
-    npx supabase start
-    ```
-3.  **Run Development Server (เริ่ม Frontend):**
-    ```bash
-    npm run dev
-    ```
-    - URL: `http://localhost:3000`
-
----
-
-## 🧪 Testing (การทดสอบ)
-
-### Automated & Browser-in-the-loop Testing
-- **Backend Tests**: `pytest`
-- **Frontend Tests**: `npm test` (Jest), `npm run test:e2e` (Playwright)
-- **Antigravity Verification**: เอเจนต์ต้องตรวจสอบ UI ผ่านเบราว์เซอร์เสมอตามกฎใน `.agents/rules/rules-antigravity.md` เพื่อเช็คความถูกต้องของภาษาไทยและ Layout
+### 2. ⚖️ Hybrid Classification Logic
+- **Weights:** Keyword 60% + Embedding 40%
+- **Keyword Source:** `keyword_rules`, `taxonomy_nodes.keywords`, และ `name_match`
+- **Embedding:** Cosine Distance (`<=>`) กับ `taxonomy_nodes.embedding`
 
 ---
 
 ## 📂 Key Directory Structure (โครงสร้างโฟลเดอร์สำคัญ)
-- `/` (Root): โค้ด AI หลัก, `api_server.py` และอัลกอริทึมการจับคู่สินค้า
-- `/taxonomy-app`: แอปพลิเคชัน Next.js, การตั้งค่า Supabase และ UI Components
-- `/docs`: เอกสารประกอบโปรเจกต์ทั้งภาษาไทยและอังกฤษ (Architecture, API, Guides)
-- `/supabase`: Supabase Edge Functions, SQL Migrations และ Schema ฐานข้อมูล
-- `/tests`: ชุดทดสอบภาษา Python
-- `/model_cache`: ที่เก็บโมเดล AI (Sentence Transformer) แบบ Local
+- `/` (Root): โค้ด AI หลัก, `api_server.py`
+- `/taxonomy-app`: Next.js App, Supabase Integration, UI Components
+- `/docs`: เอกสารประกอบโปรเจกต์ (Architecture, API, Guides)
+- `/supabase`: Edge Functions, Migrations, Schema
+- `/tests`: ชุดทดสอบ Python (Unit/Integration)
 
 ---
 
-## 🛠️ Development Conventions (แนวทางการพัฒนา)
-- **Thai Text Processing:** ต้องใช้ `TextPreprocessor` เสมอในการทำความสะอาดและจัดรูปแบบชื่อสินค้าไทย
-- **Embeddings:** ใช้โมเดลมาตรฐาน `paraphrase-multilingual-MiniLM-L12-v2` (384 dimensions)
-- **Classification:** แนะนำให้ใช้แนวทาง "Hybrid" (Keyword + Embedding) เพื่อความแม่นยำสูงสุด
-- **Database:** ข้อมูลสินค้าและหมวดหมู่ทั้งหมดเก็บใน Supabase; ใช้ Supabase-js ในการเข้าถึงข้อมูลจาก Frontend
-- **Styling:** เน้นใช้ Tailwind CSS ในส่วนของ `taxonomy-app`
-
-## 🛠️ Installed Extensions & Tools (เครื่องมือที่ติดตั้งเพิ่มเติม)
-- **Postgres (MCP):** ใช้สำหรับ Query และวิเคราะห์ข้อมูลใน Supabase โดยตรง
-- **Domscribe (MCP):** ใช้สำหรับวิเคราะห์และแก้ไข UI ใน Next.js (Pixel-to-code)
-- **Code Review (Extension):** ใช้สำหรับตรวจสอบคุณภาพโค้ด Python และ TypeScript
-- **Skill Creator (Built-in):** ใช้สำหรับสร้าง Custom Skills เฉพาะทางของโปรเจกต์
-
----
-
-## 📝 Important Notes (หมายเหตุสำคัญ)
-- **Architectural Shift:** ส่วนการจัดหมวดหมู่ (Classification) ถูกย้ายจาก FastAPI ไปยัง **Supabase Edge Functions** (`supabase/functions/hybrid-classification-local/`) เพื่อให้การประมวลผลอยู่ใกล้กับข้อมูลมากขึ้น
-- **Embedding Port:** Frontend จะเรียกใช้งาน Service สร้าง Vector ผ่าน `http://localhost:8000/api/embed`
-- **Environment Variables:** ตรวจสอบไฟล์ `.env` ใน `taxonomy-app/` ให้เชื่อมต่อกับ Supabase ได้ถูกต้อง

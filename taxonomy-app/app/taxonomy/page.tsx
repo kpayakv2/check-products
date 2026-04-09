@@ -94,8 +94,12 @@ export default function TaxonomyManager() {
         await DatabaseService.updateTaxonomyNode(editingCategory.id, formData)
         toast.success('แก้ไขหมวดหมู่เรียบร้อยแล้ว')
       } else {
+        // Generate a unique code for the new category
+        const uniqueCode = `CAT-${Date.now().toString().slice(-6)}${Math.random().toString(36).substring(2, 5).toUpperCase()}`
+        
         await DatabaseService.createTaxonomyNode({
           ...formData,
+          code: uniqueCode,
           level: 0,
           sort_order: 0,
           is_active: true

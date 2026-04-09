@@ -24,9 +24,9 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 
 # Import existing components
-from fresh_architecture import ProductSimilarityPipeline
+from fresh_architecture import ProductSimilarityPipeline, ProductMatcher
 from fresh_implementations import ComponentFactory
-from main_phase4 import Phase4Config
+from main import Phase4Config
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -47,6 +47,8 @@ class ProductComparison:
     id: str
     product1: str
     product2: str
+    product1_cleaned: str  # เพิ่มข้อความที่ทำความสะอาดแล้ว
+    product2_cleaned: str  # เพิ่มข้อความที่ทำความสะอาดแล้ว
     similarity_score: float
     confidence_score: float
     ml_prediction: FeedbackType
@@ -80,12 +82,19 @@ class HumanFeedbackDatabase:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
+        # ลบตารางเก่าถ้ามี (เพื่อให้ schema ใหม่ทำงาน)
+        cursor.execute('DROP TABLE IF EXISTS product_comparisons')
+        cursor.execute('DROP TABLE IF EXISTS unique_products')
+        cursor.execute('DROP TABLE IF EXISTS model_training_history')
+        
         # ตารางการเปรียบเทียบสินค้า
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS product_comparisons (
                 id TEXT PRIMARY KEY,
                 product1 TEXT NOT NULL,
                 product2 TEXT NOT NULL,
+                product1_cleaned TEXT NOT NULL,
+                product2_cleaned TEXT NOT NULL,
                 similarity_score REAL NOT NULL,
                 confidence_score REAL NOT NULL,
                 ml_prediction TEXT NOT NULL,
@@ -133,12 +142,13 @@ class HumanFeedbackDatabase:
         
         cursor.execute('''
             INSERT OR REPLACE INTO product_comparisons 
-            (id, product1, product2, similarity_score, confidence_score, 
-             ml_prediction, human_feedback, human_comments, reviewed_by, 
-             reviewed_at, is_training_data)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (id, product1, product2, product1_cleaned, product2_cleaned, 
+             similarity_score, confidence_score, ml_prediction, human_feedback, 
+             human_comments, reviewed_by, reviewed_at, is_training_data)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             comparison.id, comparison.product1, comparison.product2,
+            comparison.product1_cleaned, comparison.product2_cleaned,
             comparison.similarity_score, comparison.confidence_score,
             comparison.ml_prediction.value,
             comparison.human_feedback.value if comparison.human_feedback else None,
@@ -148,6 +158,7 @@ class HumanFeedbackDatabase:
         
         conn.commit()
         conn.close()
+        return True  # คืนค่า True เมื่อบันทึกสำเร็จ
     
     def get_pending_reviews(self, limit: int = 50) -> List[ProductComparison]:
         """ดึงรายการที่รอการตรวจสอบ"""
@@ -155,7 +166,10 @@ class HumanFeedbackDatabase:
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT * FROM product_comparisons 
+            SELECT id, product1, product2, product1_cleaned, product2_cleaned,
+                   similarity_score, confidence_score, ml_prediction, human_feedback, 
+                   human_comments, reviewed_by, reviewed_at, is_training_data
+            FROM product_comparisons 
             WHERE human_feedback IS NULL 
             ORDER BY confidence_score ASC, similarity_score DESC
             LIMIT ?
@@ -168,11 +182,12 @@ class HumanFeedbackDatabase:
         for row in rows:
             comp = ProductComparison(
                 id=row[0], product1=row[1], product2=row[2],
-                similarity_score=row[3], confidence_score=row[4],
-                ml_prediction=FeedbackType(row[5]),
-                human_feedback=FeedbackType(row[6]) if row[6] else None,
-                human_comments=row[7], reviewed_by=row[8],
-                reviewed_at=row[9], is_training_data=row[10]
+                product1_cleaned=row[3], product2_cleaned=row[4],
+                similarity_score=row[5], confidence_score=row[6],
+                ml_prediction=FeedbackType(row[7]),
+                human_feedback=FeedbackType(row[8]) if row[8] else None,
+                human_comments=row[9], reviewed_by=row[10],
+                reviewed_at=row[11], is_training_data=row[12]
             )
             comparisons.append(comp)
         
@@ -184,7 +199,10 @@ class HumanFeedbackDatabase:
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT * FROM product_comparisons 
+            SELECT id, product1, product2, product1_cleaned, product2_cleaned,
+                   similarity_score, confidence_score, ml_prediction, human_feedback,
+                   human_comments, reviewed_by, reviewed_at, is_training_data
+            FROM product_comparisons 
             WHERE human_feedback IS NOT NULL
         ''')
         
@@ -195,11 +213,12 @@ class HumanFeedbackDatabase:
         for row in rows:
             comp = ProductComparison(
                 id=row[0], product1=row[1], product2=row[2],
-                similarity_score=row[3], confidence_score=row[4],
-                ml_prediction=FeedbackType(row[5]),
-                human_feedback=FeedbackType(row[6]),
-                human_comments=row[7], reviewed_by=row[8],
-                reviewed_at=row[9], is_training_data=row[10]
+                product1_cleaned=row[3], product2_cleaned=row[4],
+                similarity_score=row[5], confidence_score=row[6],
+                ml_prediction=FeedbackType(row[7]),
+                human_feedback=FeedbackType(row[8]),
+                human_comments=row[9], reviewed_by=row[10],
+                reviewed_at=row[11], is_training_data=row[12]
             )
             comparisons.append(comp)
         
@@ -209,8 +228,19 @@ class HumanFeedbackDatabase:
 class ProductDeduplicationSystem:
     """ระบบหาสินค้าที่ไม่ซ้ำ"""
     
-    def __init__(self, similarity_threshold: float = 0.8):
+    def __init__(self, similarity_threshold: float = 0.8, embedding_model_type: str = "mock"):
+        """
+        Initialize ProductDeduplicationSystem
+        
+        Args:
+            similarity_threshold: ขีดเกณฑ์ความคล้าย (0.0-1.0)
+            embedding_model_type: ประเภท embedding model
+                - "mock": เร็วมาก เหมาะสำหรับ development/testing
+                - "sentence-bert": แม่นยำสูง เหมาะสำหรับ production 
+                - "optimized-tfidf": สมดุลระหว่างเร็วและแม่นยำ
+        """
         self.similarity_threshold = similarity_threshold
+        self.embedding_model_type = embedding_model_type
         self.pipeline = self._init_pipeline()
         self.db = HumanFeedbackDatabase()
         
@@ -218,32 +248,46 @@ class ProductDeduplicationSystem:
         """สร้าง pipeline สำหรับคำนวณความคล้าย"""
         config = Phase4Config()
         config.similarity_threshold = self.similarity_threshold
+        config.model_name = self.embedding_model_type
+        config.similarity_method = "cosine"
+
         
         # สร้างคอมโพเนนต์
         data_source = ComponentFactory.create_data_source("csv")
         data_sink = ComponentFactory.create_data_sink("csv")
         text_processor = ComponentFactory.create_text_processor("thai")
-        embedding_model = ComponentFactory.create_embedding_model("sentence_transformer")
+        
+        # เลือก embedding model ตาม type ที่กำหนด
+        print(f"ใช้ Embedding Model: {self.embedding_model_type}")
+        if self.embedding_model_type == "sentence-bert":
+            print("   โหลด Sentence-BERT model (อาจใช้เวลาสักครู่...)")
+        
+        embedding_model = ComponentFactory.create_embedding_model(self.embedding_model_type)
         similarity_calculator = ComponentFactory.create_similarity_calculator("cosine")
+        
+        # สร้าง ProductMatcher
+        product_matcher = ProductMatcher(
+            embedding_model=embedding_model,
+            similarity_calculator=similarity_calculator,
+            text_processor=text_processor,
+            config=config
+        )
         
         return ProductSimilarityPipeline(
             data_source=data_source,
             data_sink=data_sink,
-            text_processor=text_processor,
-            embedding_model=embedding_model,
-            similarity_calculator=similarity_calculator,
-            config=config
+            product_matcher=product_matcher
         )
     
     def find_potential_duplicates(self, products: List[str]) -> List[ProductComparison]:
         """หาสินค้าที่อาจซ้ำกัน"""
         logger.info(f"🔍 วิเคราะห์ {len(products)} สินค้าเพื่อหาสินค้าที่ซ้ำ...")
         
-        # สร้าง embeddings
-        embeddings = self.pipeline.embedding_model.create_embeddings(products)
+        # สร้าง embeddings ผ่าน product_matcher
+        embeddings = self.pipeline.product_matcher.get_embeddings(products)
         
         # หาคู่ที่ใกล้เคียง
-        similarity_matrix = self.pipeline.similarity_calculator.compute_similarity(
+        similarity_matrix = self.pipeline.product_matcher.similarity_calculator.calculate_batch(
             embeddings, embeddings
         )
         
@@ -261,10 +305,16 @@ class ProductDeduplicationSystem:
                     ml_prediction = self._predict_relationship(similarity)
                     confidence = self._calculate_confidence(similarity)
                     
+                    # ทำความสะอาดข้อความ
+                    product1_cleaned = self.pipeline.product_matcher.preprocess_text(products[i])
+                    product2_cleaned = self.pipeline.product_matcher.preprocess_text(products[j])
+                    
                     comparison = ProductComparison(
                         id=comparison_id,
                         product1=products[i],
                         product2=products[j],
+                        product1_cleaned=product1_cleaned,
+                        product2_cleaned=product2_cleaned,
                         similarity_score=similarity,
                         confidence_score=confidence,
                         ml_prediction=ml_prediction
@@ -378,6 +428,28 @@ class ProductDeduplicationSystem:
         
         # เลือกสินค้าที่มีชื่อสั้นที่สุด (โดยทั่วไปจะเป็นชื่อหลัก)
         return min(cluster_products, key=len)
+    
+    def record_human_feedback(self, product1: str, product2: str, similarity: float,
+                           human_decision: FeedbackType, reviewer: str = '', comments: str = ''):
+        """บันทึก feedback จากมนุษย์"""
+        # ทำความสะอาดข้อความ
+        product1_cleaned = self.pipeline.product_matcher.preprocess_text(product1)
+        product2_cleaned = self.pipeline.product_matcher.preprocess_text(product2)
+        
+        comparison = ProductComparison(
+            id=f"feedback_{len(self.db.get_training_data())}",
+            product1=product1,
+            product2=product2,
+            product1_cleaned=product1_cleaned,
+            product2_cleaned=product2_cleaned,
+            similarity_score=similarity,
+            confidence_score=0.8,
+            ml_prediction=self._predict_relationship(similarity),
+            human_feedback=human_decision,
+            human_comments=comments,
+            reviewed_by=reviewer
+        )
+        return self.db.save_comparison(comparison)
 
 
 class HumanReviewInterface:
@@ -396,22 +468,25 @@ class HumanReviewInterface:
         if not pending_reviews:
             print("✅ ไม่มีรายการที่ต้องตรวจสอบ")
             return
-        
+
         reviewed_count = 0
         for comparison in pending_reviews:
             print(f"\n📝 รายการที่ {reviewed_count + 1}/{len(pending_reviews)}")
             print("-" * 40)
-            print(f"สินค้า 1: {comparison.product1}")
-            print(f"สินค้า 2: {comparison.product2}")
+            print(f"สินค้า 1 (เดิม): {comparison.product1}")
+            print(f"สินค้า 1 (สะอาด): {comparison.product1_cleaned}")
+            print(f"สินค้า 2 (เดิม): {comparison.product2}")
+            print(f"สินค้า 2 (สะอาด): {comparison.product2_cleaned}")
             print(f"ความคล้าย: {comparison.similarity_score:.3f}")
             print(f"ความมั่นใจ: {comparison.confidence_score:.3f}")
             print(f"ML ทำนาย: {comparison.ml_prediction.value}")
-            
+            print(f"💡 การตัดสินใจจะใช้ข้อความที่ทำความสะอาดแล้ว")
+
             # รับ feedback จากมนุษย์
             feedback = self._get_human_feedback()
             if feedback is None:
                 break  # ออกจากเซสชัน
-            
+
             comments = input("ความคิดเห็นเพิ่มเติม (ไม่บังคับ): ").strip()
             
             # บันทึก feedback

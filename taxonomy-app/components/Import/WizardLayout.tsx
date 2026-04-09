@@ -60,6 +60,7 @@ export default function WizardLayout({
                   <li 
                     key={step.id} 
                     className="relative flex-1"
+                    data-testid={`wizard-step-${step.id}`}
                   >
                     {/* Connector Line */}
                     {index < steps.length - 1 && (
@@ -78,6 +79,7 @@ export default function WizardLayout({
                     <button
                       onClick={() => handleStepClick(index)}
                       disabled={!isClickable}
+                      data-testid={`wizard-step-button-${index}`}
                       className={`relative flex flex-col items-center group ${
                         isClickable ? 'cursor-pointer' : 'cursor-default'
                       }`}

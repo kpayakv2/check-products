@@ -9,6 +9,7 @@ import re
 import unicodedata
 import json
 import csv
+import hashlib
 from typing import List, Dict, Any, Union
 from pathlib import Path
 import numpy as np
@@ -53,11 +54,18 @@ class BasicTextProcessor(TextProcessor):
         if self.lowercase:
             result = result.lower()
         
-        # Remove punctuation
+        # 1. Protect decimal numbers before punctuation removal
+        # (Replace dots in numbers with a temporary placeholder)
+        result = re.sub(r'(\d)\.(\d)', r'\1_DOT_\2', result)
+        
+        # 2. Remove punctuation
         if self.remove_punctuation:
             result = self.punct_pattern.sub(' ', result)
         
-        # Normalize whitespace
+        # 3. Restore decimal dots
+        result = result.replace('_DOT_', '.')
+        
+        # 4. Normalize whitespace
         if self.normalize_whitespace:
             result = self.whitespace_pattern.sub(' ', result)
         
@@ -69,20 +77,75 @@ class BasicTextProcessor(TextProcessor):
 
 
 class ThaiTextProcessor(BasicTextProcessor):
-    """Thai-specific text processing."""
+    """Thai-specific text processing with advanced cleaning."""
     
-    def __init__(self, **kwargs):
+    def __init__(self, 
+                 normalize_thai_chars: bool = True,
+                 remove_tone_marks: bool = False,
+                 standardize_spaces: bool = True,
+                 normalize_numbers: bool = True,
+                 **kwargs):
         super().__init__(**kwargs)
+        self.normalize_thai_chars = normalize_thai_chars
+        self.remove_tone_marks = remove_tone_marks
+        self.standardize_spaces = standardize_spaces
+        self.normalize_numbers = normalize_numbers
+        
+        # Thai character range
         self.thai_pattern = re.compile(r'[\u0e00-\u0e7f]+')
+        
+        # Thai number mapping
+        self.thai_to_arabic = str.maketrans('๐๑๒๓๔๕๖๗๘๙', '0123456789')
+        
+        # Tone marks and floating vowels
+        self.tone_marks = ['\u0E48', '\u0E49', '\u0E4A', '\u0E4B', '\u0E4C', '\u0E4D', '\u0E4E']
     
     def process(self, text: str) -> str:
-        """Process with Thai-specific handling."""
-        result = super().process(text)
+        """Process with comprehensive Thai handling."""
+        if not isinstance(text, str):
+            return str(text)
+            
+        # 1. Unicode Normalization (NFKC is better for compatibility)
+        result = unicodedata.normalize('NFKC', text)
         
-        # Additional Thai processing could go here
-        # e.g., Thai word segmentation, tone mark handling
-        
-        return result
+        # 2. Lowercase
+        if self.lowercase:
+            result = result.lower()
+            
+        # 3. Thai Character Normalization (Fix ordering)
+        if self.normalize_thai_chars:
+            result = result.replace('เ็', 'เ')
+            result = result.replace('แ็', 'แ')
+            # Fix floating vowels without base (simplified)
+            result = re.sub(r'[\u0E31\u0E34-\u0E37\u0E47-\u0E4E]{2,}', lambda m: m.group(0)[0], result)
+            
+        # 4. Thai Number Conversion (DO THIS FIRST)
+        if self.normalize_numbers:
+            result = result.translate(self.thai_to_arabic)
+            
+        # 5. Tone Mark Removal (Optional)
+        if self.remove_tone_marks:
+            for mark in self.tone_marks:
+                result = result.replace(mark, '')
+                
+        # 6. Protect decimal numbers before punctuation removal
+        result = re.sub(r'(\d)\.(\d)', r'\1_DOT_\2', result)
+                
+        # 7. Remove Punctuation
+        if self.remove_punctuation:
+            result = self.punct_pattern.sub(' ', result)
+            
+        # 8. Restore decimal dots
+        result = result.replace('_DOT_', '.')
+            
+        # 9. Aggressive Whitespace Normalization (New logic added)
+        if self.normalize_whitespace or self.standardize_spaces:
+            # Replace various Unicode spaces with standard space
+            result = re.sub(r'[\u00A0\u1680\u2000-\u200B\u202F\u205F\u3000]', ' ', result)
+            # Remove multiple spaces into one
+            result = self.whitespace_pattern.sub(' ', result)
+            
+        return result.strip()
 
 
 # =============================================================================
@@ -94,29 +157,31 @@ class MockEmbeddingModel(EmbeddingModel):
     
     def __init__(self, dimension: int = 384):
         self.dimension = dimension
-        np.random.seed(42)  # For reproducible results
     
     def encode(self, texts: List[str]) -> np.ndarray:
         """Generate mock embeddings based on text length and content."""
         embeddings = []
         
         for text in texts:
-            # Create pseudo-embedding based on text characteristics
-            text_hash = hash(text.lower().strip())
-            np.random.seed(abs(text_hash) % 2**31)
-            
+            processed_text = text.lower().strip()
+            digest = hashlib.sha1(processed_text.encode('utf-8')).digest()
+            seed = int.from_bytes(digest[:8], 'big', signed=False)
+            rng = np.random.default_rng(seed)
+
             # Base embedding from random
-            embedding = np.random.normal(0, 1, self.dimension)
-            
+            embedding = rng.normal(0, 1, self.dimension)
+
             # Add text-specific features
-            embedding[0] = len(text) / 100.0  # Length feature
-            embedding[1] = len(text.split()) / 50.0  # Word count feature
-            embedding[2] = 1.0 if any(c.isdigit() for c in text) else 0.0  # Has numbers
-            
+            embedding[0] = len(processed_text) / 100.0  # Length feature
+            embedding[1] = len(processed_text.split()) / 50.0  # Word count feature
+            embedding[2] = 1.0 if any(c.isdigit() for c in processed_text) else 0.0  # Has numbers
+
             # Normalize
-            embedding = embedding / np.linalg.norm(embedding)
+            norm = np.linalg.norm(embedding)
+            if norm > 0:
+                embedding = embedding / norm
             embeddings.append(embedding)
-        
+
         return np.array(embeddings)
     
     def get_dimension(self) -> int:
@@ -157,7 +222,19 @@ class TFIDFEmbeddingModel(EmbeddingModel):
         total_docs = len(texts)
         for word in self.vocabulary:
             self.idf_weights[word] = np.log(total_docs / (doc_counts.get(word, 1) + 1))
+
+        self.is_fitted = True
     
+    def prepare_corpus(self, texts: List[str]) -> None:
+        """Prepare TF-IDF vocabulary for a corpus of texts."""
+        if not texts:
+            self.vocabulary = {}
+            self.idf_weights = {}
+            self.is_fitted = False
+            return
+
+        self._build_vocabulary(texts)
+
     def _text_to_tfidf(self, text: str) -> np.ndarray:
         """Convert text to TF-IDF vector."""
         words = text.lower().split()
@@ -182,8 +259,7 @@ class TFIDFEmbeddingModel(EmbeddingModel):
     def encode(self, texts: List[str]) -> np.ndarray:
         """Encode texts to TF-IDF embeddings."""
         if not self.is_fitted:
-            self._build_vocabulary(texts)
-            self.is_fitted = True
+            self.prepare_corpus(texts)
         
         embeddings = []
         for text in texts:
@@ -233,6 +309,20 @@ class CosineSimilarityCalculator(SimilarityCalculator):
                        embeddings1: np.ndarray, 
                        embeddings2: np.ndarray) -> np.ndarray:
         """Calculate cosine similarities between batches."""
+        # Input validation
+        if embeddings1.size == 0 or embeddings2.size == 0:
+            return np.array([])
+        
+        # Ensure 2D arrays
+        if len(embeddings1.shape) == 1:
+            embeddings1 = embeddings1.reshape(1, -1)
+        if len(embeddings2.shape) == 1:
+            embeddings2 = embeddings2.reshape(1, -1)
+        
+        # Dimension check
+        if embeddings1.shape[1] != embeddings2.shape[1]:
+            raise ValueError(f"Dimension mismatch: {embeddings1.shape[1]} vs {embeddings2.shape[1]}")
+        
         # Normalize embeddings
         norm1 = np.linalg.norm(embeddings1, axis=1, keepdims=True)
         norm2 = np.linalg.norm(embeddings2, axis=1, keepdims=True)
@@ -259,6 +349,20 @@ class DotProductSimilarityCalculator(SimilarityCalculator):
                        embeddings1: np.ndarray, 
                        embeddings2: np.ndarray) -> np.ndarray:
         """Calculate dot product similarities between batches."""
+        # Input validation
+        if embeddings1.size == 0 or embeddings2.size == 0:
+            return np.array([])
+        
+        # Ensure 2D arrays
+        if len(embeddings1.shape) == 1:
+            embeddings1 = embeddings1.reshape(1, -1)
+        if len(embeddings2.shape) == 1:
+            embeddings2 = embeddings2.reshape(1, -1)
+        
+        # Dimension check
+        if embeddings1.shape[1] != embeddings2.shape[1]:
+            raise ValueError(f"Dimension mismatch: {embeddings1.shape[1]} vs {embeddings2.shape[1]}")
+        
         return np.dot(embeddings1, embeddings2.T)
 
 

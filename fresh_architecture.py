@@ -86,6 +86,7 @@ class Config:
     
     def __init__(self):
         self.model_name = "paraphrase-multilingual-MiniLM-L12-v2"
+        self.similarity_method = "cosine"
         self.similarity_threshold = 0.6
         self.batch_size = 32
         self.top_k = 3
@@ -180,12 +181,43 @@ class ProductMatcher:
         Returns:
             List of match results with scores
         """
+        # Input validation
+        if not query_products or not reference_products:
+            print("⚠️ Empty input: No products to process")
+            return []
+        
+        if not isinstance(query_products, list) or not isinstance(reference_products, list):
+            raise ValueError("Both query_products and reference_products must be lists")
+        
+        # Filter out empty/None products
+        query_products = [p for p in query_products if p and isinstance(p, str) and p.strip()]
+        reference_products = [p for p in reference_products if p and isinstance(p, str) and p.strip()]
+        
+        if not query_products or not reference_products:
+            print("⚠️ No valid products after filtering")
+            return []
+        
+        # Prepare embedding models that require a full corpus
+        if hasattr(self.embedding_model, 'prepare_corpus'):
+            combined_products = query_products + reference_products
+            processed_corpus = [self.preprocess_text(product) for product in combined_products]
+            self.embedding_model.prepare_corpus(processed_corpus)
+            self._embedding_cache.clear()
+
         # Get embeddings
         print(f"🔄 Processing {len(query_products)} query products...")
         query_embeddings = self.get_embeddings(query_products)
         
         print(f"🔄 Processing {len(reference_products)} reference products...")
         reference_embeddings = self.get_embeddings(reference_products)
+        
+        # Validate embeddings shape
+        if query_embeddings.size == 0 or reference_embeddings.size == 0:
+            print("⚠️ Empty embeddings generated")
+            return []
+        
+        if len(query_embeddings.shape) != 2 or len(reference_embeddings.shape) != 2:
+            raise ValueError("Embeddings must be 2D arrays")
         
         # Calculate similarities
         print(f"🔄 Calculating similarities...")

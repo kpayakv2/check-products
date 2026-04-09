@@ -22,11 +22,29 @@ import pandas as pd
 from datetime import datetime
 import tempfile
 import shutil
+from types import SimpleNamespace
 
 # Import our Phase 4 pipeline
 from fresh_architecture import ProductSimilarityPipeline
 from fresh_implementations import ComponentFactory
-from main_phase4 import Phase4Config, enhance_results, generate_performance_report
+from main import Phase4Config, enhance_results, generate_performance_report
+
+# Import embedding model
+from advanced_models import SentenceTransformerModel
+
+# Import Supabase for database access
+try:
+    from supabase import create_client, Client
+except ImportError:
+    print("WARNING: Supabase not installed. Category classification will be unavailable.")
+    Client = None
+
+import numpy as np
+from collections import defaultdict
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(dotenv_path="taxonomy-app/.env.local")
 
 
 # =============================================================================
@@ -96,6 +114,46 @@ class SystemHealth(BaseModel):
     components: Dict[str, str]
 
 
+class CategorySuggestion(BaseModel):
+    """Single category suggestion."""
+    category_id: str
+    category_name: str
+    category_level: Optional[int] = 0
+    confidence: float
+    method: str
+    matched_keyword: Optional[str] = None
+    methods: Optional[List[str]] = None
+
+
+class CategoryRequest(BaseModel):
+    """Category classification request."""
+    product_name: str = Field(..., description="Product name to classify")
+    method: Optional[str] = Field("hybrid", description="Method: keyword, embedding, hybrid")
+    top_k: Optional[int] = Field(3, description="Number of suggestions")
+
+
+class BatchCategoryRequest(BaseModel):
+    """Batch category classification request."""
+    products: List[str] = Field(..., description="List of product names")
+    method: Optional[str] = Field("hybrid", description="Method: keyword, embedding, hybrid")
+    top_k: Optional[int] = Field(3, description="Number of suggestions per product")
+
+
+class CategoryResponse(BaseModel):
+    """Category classification response."""
+    product_name: str
+    suggestions: List[CategorySuggestion]
+    top_suggestion: Optional[CategorySuggestion] = None
+    processing_time: float
+
+
+class BatchCategoryResponse(BaseModel):
+    """Batch category classification response."""
+    total_products: int
+    results: List[CategoryResponse]
+    processing_time: float
+
+
 class APIConfig(BaseModel):
     """API configuration."""
     default_threshold: float = 0.6
@@ -130,20 +188,17 @@ app.add_middleware(
 web_dir = Path(__file__).parent / "web"
 if web_dir.exists():
     app.mount("/web", StaticFiles(directory=web_dir, html=True), name="web")
-
 # Global state management
 app_state = {
     "start_time": time.time(),
     "jobs": {},  # job_id -> JobStatus
     "config": APIConfig(),
-    "pipeline": None,
+    "pipeline": None,  # Lazy initialization
+    "embedding_model": None,  # Lazy initialization for embeddings
+    "category_classifier": None,  # Hybrid AI Classifier
+    "supabase_client": None,  # Lazy initialization for Supabase
     "websocket_connections": set()
 }
-
-
-# =============================================================================
-# WebSocket Connection Manager
-# =============================================================================
 
 class ConnectionManager:
     """Manage WebSocket connections for real-time updates."""
@@ -186,6 +241,8 @@ def initialize_pipeline():
         
         # Create configuration
         config = Phase4Config()
+        config.model_name = "tfidf"
+        config.similarity_method = "cosine"
         config.enable_performance_tracking = True
         config.include_metadata = True
         config.include_confidence_scores = True
@@ -240,23 +297,116 @@ async def startup_event():
     print("🚀 Starting Product Similarity API v5.0.0")
     initialize_pipeline()
     
+    # Initialize Supabase connection
+    initialize_supabase()
+
+    # Initialize Category Classifier
+    try:
+        initialize_category_classifier()
+    except Exception as e:
+        print(f"⚠️ Failed to initialize Category Classifier: {e}")
+
     # Create necessary directories
-    os.makedirs("temp", exist_ok=True)
-    os.makedirs("uploads", exist_ok=True)
-    os.makedirs("results", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
 
 
-@app.get("/", response_class=JSONResponse)
+@app.post("/api/classify/category", response_model=CategoryResponse)
+async def classify_category(request: CategoryRequest):
+    """Classify a single product into a category."""
+    start_time = time.time()
+    
+    classifier = initialize_category_classifier()
+    if not classifier:
+        raise HTTPException(status_code=503, detail="Category classifier not initialized")
+    
+    try:
+        results = classifier.classify(request.product_name, method=request.method)
+        suggestions = []
+        
+        for r in results[:request.top_k]:
+            suggestions.append(CategorySuggestion(
+                category_id=r['category_id'],
+                category_name=r['category_name'],
+                category_level=r.get('category_level', 0),
+                confidence=r['confidence'],
+                method=r['method'],
+                matched_keyword=r.get('matched_keyword'),
+                methods=r.get('methods')
+            ))
+        
+        top_suggestion = suggestions[0] if suggestions else None
+        
+        return CategoryResponse(
+            product_name=request.product_name,
+            suggestions=suggestions,
+            top_suggestion=top_suggestion,
+            processing_time=time.time() - start_time
+        )
+    except Exception as e:
+        print(f"❌ Error in classify_category: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/classify/batch", response_model=BatchCategoryResponse)
+async def classify_category_batch(request: BatchCategoryRequest):
+    """Classify multiple products into categories."""
+    start_time = time.time()
+    
+    classifier = initialize_category_classifier()
+    if not classifier:
+        raise HTTPException(status_code=503, detail="Category classifier not initialized")
+    
+    results = []
+    try:
+        for product_name in request.products:
+            p_start = time.time()
+            res = classifier.classify(product_name, method=request.method)
+            suggestions = []
+            
+            for r in res[:request.top_k]:
+                suggestions.append(CategorySuggestion(
+                    category_id=r['category_id'],
+                    category_name=r['category_name'],
+                    category_level=r.get('category_level', 0),
+                    confidence=r['confidence'],
+                    method=r['method'],
+                    matched_keyword=r.get('matched_keyword'),
+                    methods=r.get('methods')
+                ))
+            
+            results.append(CategoryResponse(
+                product_name=product_name,
+                suggestions=suggestions,
+                top_suggestion=suggestions[0] if suggestions else None,
+                processing_time=time.time() - p_start
+            ))
+            
+        return BatchCategoryResponse(
+            total_products=len(request.products),
+            results=results,
+            processing_time=time.time() - start_time
+        )
+    except Exception as e:
+        print(f"❌ Error in classify_category_batch: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/")
 async def root():
     """API root endpoint."""
     return {
-        "message": "Product Similarity API v5.0.0",
+        "name": "Product Similarity API (Legacy)",
+        "version": "5.0.0",
         "status": "operational",
-        "docs": "/docs",
-        "web_interface": "/web",
-        "version": "5.0.0"
+        "note": "This API is only for web_server.py (Flask). Use Supabase Edge Functions for new features.",
+        "endpoints": {
+            "health": "/api/v1/health",
+            "embeddings": "/api/embed",
+            "batch embeddings": "/api/embed/batch",
+            "docs": "/docs",
+            "web_interface": "/web"
+        }
     }
-
 
 @app.get("/api/v1/health", response_model=SystemHealth)
 async def health_check():
@@ -447,9 +597,12 @@ async def process_batch_job(job_id: str, request: BatchMatchRequest):
         
         # Generate performance report
         end_time = time.time()
+        embedding_name = getattr(pipeline.product_matcher.config, 'model_name', None) or type(pipeline.product_matcher.embedding_model).__name__
+        similarity_name = getattr(pipeline.product_matcher.config, 'similarity_method', None) or type(pipeline.product_matcher.similarity_calculator).__name__
+        report_args = SimpleNamespace(model=embedding_name, similarity=similarity_name)
         performance_report = generate_performance_report(
-            start_time, end_time, all_matches, 
-            pipeline.product_matcher.config, request
+            start_time, end_time, all_matches,
+            pipeline.product_matcher.config, report_args
         )
         
         # Save results
@@ -561,9 +714,399 @@ async def upload_csv_file(background_tasks: BackgroundTasks, file: UploadFile = 
             "sample_products": products[:5],
             "upload_path": upload_path
         }
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+
+# =============================================================================
+# Embedding API Endpoints (for Taxonomy Manager)
+# =============================================================================
+
+class EmbeddingRequest(BaseModel):
+    """Single embedding request."""
+    text: str = Field(..., description="Text to embed")
+
+
+class BatchEmbeddingRequest(BaseModel):
+    """Batch embedding request."""
+    texts: List[str] = Field(..., description="Texts to embed")
+
+
+class EmbeddingResponse(BaseModel):
+    """Embedding response."""
+    embedding: List[float]
+    dimension: int
+    model: str
+    processing_time: float
+
+
+class BatchEmbeddingResponse(BaseModel):
+    """Batch embedding response."""
+    embeddings: List[List[float]]
+    count: int
+    dimension: int
+    model: str
+    processing_time: float
+
+
+# =============================================================================
+# Category Classification Models
+# =============================================================================
+
+class CategorySuggestion(BaseModel):
+    """Single category suggestion."""
+    category_id: str
+    category_name: str
+    category_level: int = 0
+    confidence: float
+    method: str
+    matched_keyword: Optional[str] = None
+    methods: Optional[List[str]] = None
+
+
+class CategoryRequest(BaseModel):
+    """Category classification request."""
+    product_name: str = Field(..., description="Product name to classify")
+    method: str = Field('hybrid', description="Classification method: keyword, embedding, or hybrid")
+    top_k: int = Field(3, description="Number of suggestions to return")
+
+
+class CategoryResponse(BaseModel):
+    """Category classification response."""
+    product_name: str
+    suggestions: List[CategorySuggestion]
+    top_suggestion: Optional[CategorySuggestion] = None
+    processing_time: float
+
+
+class BatchCategoryRequest(BaseModel):
+    """Batch category classification request."""
+    products: List[str] = Field(..., description="List of product names")
+    method: str = Field('hybrid', description="Classification method")
+    top_k: int = Field(3, description="Number of suggestions per product")
+
+
+class BatchCategoryResponse(BaseModel):
+    """Batch category classification response."""
+    total_products: int
+    results: List[CategoryResponse]
+    processing_time: float
+
+
+def initialize_embedding_model():
+    """Initialize the embedding model (same as Product Similarity Checker)."""
+    if app_state["embedding_model"] is None:
+        print("🔧 Loading Sentence Transformer model...")
+        try:
+            model = SentenceTransformerModel(
+                model_name="paraphrase-multilingual-MiniLM-L12-v2"
+            )
+            app_state["embedding_model"] = model
+            print(f"✅ Model loaded! Dimension: {model.get_dimension()}")
+        except Exception as e:
+            print(f"❌ Failed to load model: {e}")
+            raise
+    
+    return app_state["embedding_model"]
+
+
+def initialize_supabase():
+    """Initialize Supabase client."""
+    if app_state["supabase_client"] is None and Client is not None:
+        print("🔧 Connecting to Supabase...")
+        try:
+            supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+            supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+            if not supabase_url or not supabase_key:
+                print("⚠️ Supabase credentials not found in environment variables.")
+                return None
+
+            client = create_client(supabase_url, supabase_key)
+            app_state["supabase_client"] = client
+            print(f"✅ Supabase connected: {supabase_url}")
+        except Exception as e:
+            print(f"⚠️ Failed to connect to Supabase: {e}")
+
+    return app_state["supabase_client"]
+
+class CategoryClassifier:
+    """Category Classification Algorithm (from test_category_algorithm.py)."""
+    
+    def __init__(self, supabase_client: Client, embedding_model: SentenceTransformerModel):
+        self.supabase = supabase_client
+        self.embedding_model = embedding_model
+        from fresh_implementations import ThaiTextProcessor
+        self.processor = ThaiTextProcessor(normalize_numbers=True, normalize_thai_chars=True)
+        self.taxonomy_flat = []
+        self.keyword_rules = []
+        self.synonyms = {}
+        self.category_embeddings = {}
+    
+    def load_taxonomy(self):
+        """โหลด Taxonomy จาก Supabase"""
+        try:
+            response = self.supabase.table("taxonomy_nodes").select("*").execute()
+            nodes = response.data
+            
+            if not nodes:
+                return False
+            
+            self.taxonomy_flat = nodes
+            self._generate_category_embeddings()
+            return True
+        except Exception as e:
+            print(f"❌ Failed to load taxonomy: {e}")
+            return False
+    
+    def _generate_category_embeddings(self):
+        """สร้าง Embeddings สำหรับหมวดหมู่"""
+        category_texts = []
+        category_ids = []
+        
+        for node in self.taxonomy_flat:
+            # Clean category names for embedding
+            text_th = self.processor.process(node['name_th'])
+            text_parts = [text_th]
+            if node.get('name_en'):
+                text_parts.append(node['name_en'].lower())
+            if node.get('keywords'):
+                # Clean each keyword
+                cleaned_kws = [self.processor.process(kw) for kw in node['keywords']]
+                text_parts.extend(cleaned_kws)
+            
+            combined_text = " ".join(text_parts)
+            category_texts.append(combined_text)
+            category_ids.append(node['id'])
+        
+        embeddings = self.embedding_model.encode(category_texts)
+        
+        for cat_id, embedding in zip(category_ids, embeddings):
+            self.category_embeddings[cat_id] = embedding
+    
+    def load_keyword_rules(self):
+        """โหลด Keyword Rules จาก Supabase"""
+        try:
+            response = self.supabase.table("keyword_rules").select("*").eq("is_active", True).execute()
+            self.keyword_rules = response.data
+            return True
+        except Exception as e:
+            print(f"⚠️ Failed to load keyword rules: {e}")
+            return False
+    
+    def load_synonyms(self):
+        """โหลด Synonyms จาก Supabase"""
+        try:
+            response = self.supabase.table("synonym_lemmas")\
+                .select("*, synonym_terms(*)")\
+                .eq("is_verified", True)\
+                .execute()
+            
+            for lemma in response.data:
+                if lemma.get('synonym_terms'):
+                    for term in lemma['synonym_terms']:
+                        self.synonyms[term['term']] = lemma['lemma_id'] # Fix to lemma_id
+            return True
+        except Exception as e:
+            print(f"⚠️ Failed to load synonyms: {e}")
+            return False
+
+    def classify_keyword_based(self, product_name: str, top_k: int = 5) -> List[Dict]:
+        """จัดหมวดหมู่ด้วย Keyword Matching"""
+        # Clean product name before matching
+        clean_name = self.processor.process(product_name)
+        matches = {}
+        
+        for rule in self.keyword_rules:
+            keywords = rule.get('keywords', [])
+            for keyword in keywords:
+                # Clean keyword for match consistency
+                clean_kw = self.processor.process(keyword)
+                if clean_kw in clean_name:
+                    cat_info = next((n for n in self.taxonomy_flat if n['id'] == rule['category_id']), None)
+                    cat_id = rule['category_id']
+                    confidence = rule.get('priority', 1) * 0.1
+                    
+                    if cat_id not in matches or matches[cat_id]['confidence'] < confidence:
+                        match_data = {
+                            'category_id': cat_id,
+                            'method': 'keyword_rule',
+                            'matched_keyword': keyword,
+                            'confidence': confidence
+                        }
+                        if cat_info:
+                            match_data['category_name'] = cat_info['name_th']
+                            match_data['category_level'] = cat_info.get('level', 0)
+                        matches[cat_id] = match_data
+        
+        for node in self.taxonomy_flat:
+            if node.get('keywords'):
+                for keyword in node['keywords']:
+                    clean_kw = self.processor.process(keyword)
+                    if clean_kw in clean_name:
+                        cat_id = node['id']
+                        if cat_id not in matches or matches[cat_id]['confidence'] < 0.7:
+                            matches[cat_id] = {
+                                'category_id': cat_id,
+                                'category_name': node['name_th'],
+                                'category_level': node.get('level', 0),
+                                'method': 'taxonomy_keyword',
+                                'matched_keyword': keyword,
+                                'confidence': 0.7
+                            }
+        
+        results = list(matches.values())
+        results.sort(key=lambda x: (-x['confidence'], x.get('category_level', 0)))
+        return results[:top_k]
+
+    def classify_embedding_based(self, product_name: str, top_k: int = 5) -> List[Dict]:
+        """จัดหมวดหมู่ด้วย Embedding Similarity"""
+        if not self.category_embeddings:
+            return []
+        
+        # Clean product name before embedding
+        clean_name = self.processor.process(product_name)
+        product_embedding = self.embedding_model.encode([clean_name])[0]
+        similarities = []
+        
+        for cat_id, cat_embedding in self.category_embeddings.items():
+            similarity = np.dot(product_embedding, cat_embedding) / (
+                np.linalg.norm(product_embedding) * np.linalg.norm(cat_embedding)
+            )
+            cat_info = next((n for n in self.taxonomy_flat if n['id'] == cat_id), None)
+            if cat_info:
+                similarities.append({
+                    'category_id': cat_id,
+                    'category_name': cat_info['name_th'],
+                    'category_level': cat_info.get('level', 0),
+                    'method': 'embedding',
+                    'confidence': float(similarity)
+                })
+        
+        similarities.sort(key=lambda x: x['confidence'], reverse=True)
+        return similarities[:top_k]
+
+    def classify_hybrid(self, product_name: str, top_k: int = 3) -> List[Dict]:
+        """จัดหมวดหมู่ด้วย Hybrid Approach (Keyword + Embedding)"""
+        # Clean product name once at the start
+        clean_name = self.processor.process(product_name)
+        
+        keyword_matches = self.classify_keyword_based(clean_name)
+        embedding_matches = self.classify_embedding_based(clean_name, top_k=10)
+        
+        combined = {}
+        for match in keyword_matches:
+            cat_id = match['category_id']
+            combined[cat_id] = match.copy()
+            combined[cat_id]['methods'] = [match['method']]
+        
+        for match in embedding_matches:
+            cat_id = match['category_id']
+            if cat_id not in combined:
+                combined[cat_id] = match.copy()
+                combined[cat_id]['methods'] = [match['method']]
+            else:
+                combined[cat_id]['confidence'] = (combined[cat_id]['confidence'] * 0.6 + match['confidence'] * 0.4)
+                if match['method'] not in combined[cat_id]['methods']:
+                    combined[cat_id]['methods'].append(match['method'])
+        
+        results = list(combined.values())
+        results.sort(key=lambda x: x['confidence'], reverse=True)
+        return results[:top_k]
+
+    def classify(self, product_name: str, method: str = 'hybrid') -> List[Dict]:
+        """Main classification method"""
+        # Clean name is handled inside each sub-method
+        if method == 'keyword':
+            return self.classify_keyword_based(product_name)
+        elif method == 'embedding':
+            return self.classify_embedding_based(product_name)
+        else:
+            return self.classify_hybrid(product_name)
+
+
+def initialize_category_classifier():
+    """Initialize the category classifier."""
+    if app_state["category_classifier"] is None:
+        supabase = initialize_supabase()
+        model = initialize_embedding_model()
+        
+        if supabase and model:
+            print("🔧 Initializing Category Classifier...")
+            classifier = CategoryClassifier(supabase, model)
+            if classifier.load_taxonomy():
+                classifier.load_keyword_rules()
+                classifier.load_synonyms()
+                app_state["category_classifier"] = classifier
+                print("✅ Category Classifier initialized!")
+            else:
+                print("⚠️ Failed to initialize Category Classifier (taxonomy empty)")
+    
+    return app_state["category_classifier"]
+
+
+# Category Classifier removed - use Supabase Edge Functions instead
+# See: supabase/functions/hybrid-classification-local/
+
+
+# CategoryClassifier class removed - use Supabase Edge Functions instead
+# See: supabase/functions/hybrid-classification-local/
+
+
+@app.post("/api/embed", response_model=EmbeddingResponse)
+async def embed_single(request: EmbeddingRequest):
+    """
+    Generate embedding for a single text.
+    Uses the same model as Product Similarity Checker for consistency.
+    """
+    try:
+        start_time = time.time()
+        model = initialize_embedding_model()
+        
+        # Generate embedding (SentenceTransformerModel uses 'encode' method)
+        embeddings = model.encode([request.text])
+        embedding = embeddings[0].tolist()
+        
+        processing_time = time.time() - start_time
+        
+        return EmbeddingResponse(
+            embedding=embedding,
+            dimension=len(embedding),
+            model=model.model_name,
+            processing_time=round(processing_time, 3)
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Embedding failed: {str(e)}")
+
+
+@app.post("/api/embed/batch", response_model=BatchEmbeddingResponse)
+async def embed_batch(request: BatchEmbeddingRequest):
+    """Generate embeddings for multiple texts (batch processing)."""
+    try:
+        start_time = time.time()
+        model = initialize_embedding_model()
+        
+        # Generate embeddings (SentenceTransformerModel uses 'encode' method)
+        embeddings = model.encode(request.texts)
+        embeddings_list = [emb.tolist() for emb in embeddings]
+        
+        processing_time = time.time() - start_time
+        
+        return BatchEmbeddingResponse(
+            embeddings=embeddings_list,
+            count=len(embeddings_list),
+            dimension=len(embeddings_list[0]) if embeddings_list else 0,
+            model=model.model_name,
+            processing_time=round(processing_time, 3)
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Batch embedding failed: {str(e)}")
+
+
+# Classification endpoints removed - use Supabase Edge Functions instead
+# See: supabase/functions/hybrid-classification-local/
 
 
 @app.websocket("/ws")

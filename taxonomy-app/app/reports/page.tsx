@@ -30,7 +30,7 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-white">
+      <div data-testid="loading-indicator" className="flex h-screen bg-white">
         <Sidebar />
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-20 h-20 relative flex items-center justify-center">
@@ -63,7 +63,7 @@ export default function ReportsPage() {
                     <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider leading-relaxed">Intelligence Report Portal</span>
                  </div>
-                 <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight uppercase thai-text mb-6">
+                 <h1 data-testid="reports-title" className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight uppercase thai-text mb-6">
                    Analytics Portal
                  </h1>
                  <p className="text-slate-500 font-medium text-lg thai-text leading-relaxed max-w-2xl mb-10">
@@ -82,13 +82,14 @@ export default function ReportsPage() {
             {/* Key KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
               {[
-                { label: 'Overall Accuracy', value: '99.8%', trend: '+0.2%', icon: TargetIcon, color: 'indigo' },
-                { label: 'Process Velocity', value: '1.2k', trend: '+14%', icon: ActivityIcon, color: 'emerald' },
-                { label: 'Backlog Status', value: '23', trend: '-12%', icon: ClockIcon, color: 'amber' },
-                { label: 'Verified Index', value: '8.9k', trend: '+5%', icon: CheckCircleIcon, color: 'sky' }
+                { label: 'Overall Accuracy', value: '99.8%', trend: '+0.2%', icon: TargetIcon, color: 'indigo', testid: 'accuracy-card' },
+                { label: 'Process Velocity', value: '1.2k', trend: '+14%', icon: ActivityIcon, color: 'emerald', testid: 'velocity-card' },
+                { label: 'Backlog Status', value: '23', trend: '-12%', icon: ClockIcon, color: 'amber', testid: 'backlog-card' },
+                { label: 'Verified Index', value: '8.9k', trend: '+5%', icon: CheckCircleIcon, color: 'sky', testid: 'verified-card' }
               ].map((kpi, i) => (
                 <motion.div
                   key={i}
+                  data-testid={kpi.testid}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
@@ -138,13 +139,14 @@ export default function ReportsPage() {
                   </div>
 
                   {/* Mock Chart Visualization */}
-                  <div className="h-[400px] w-full flex items-end justify-between gap-4 px-4 relative z-10 pt-10">
+                  <div data-testid="heatmap-chart" className="h-[400px] w-full flex items-end justify-between gap-4 px-4 relative z-10 pt-10">
                      {[40, 70, 45, 90, 65, 85, 30, 95, 60, 75, 55, 80].map((h, i) => (
                         <div key={i} className="flex-1 flex flex-col items-center group cursor-pointer h-full justify-end">
                            <motion.div
                               initial={{ height: 0 }}
                               animate={{ height: `${h}%` }}
                               transition={{ delay: i * 0.05, duration: 1, ease: 'easeOut' }}
+                              data-testid={`chart-bar-${i}`}
                               className={`w-full max-w-[40px] rounded-t-2xl relative transition-all duration-500 group-hover:brightness-125 ${i % 3 === 0 ? 'bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)]' : 'bg-white/10 group-hover:bg-white/20'}`}
                            >
                               <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-slate-900 px-3 py-1 rounded-lg text-[10px] font-black shadow-xl">
@@ -158,7 +160,7 @@ export default function ReportsPage() {
                </motion.div>
 
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  <div className="premium-card p-12 bg-white/40 border-white shadow-xl">
+                  <div data-testid="activity-log" className="premium-card p-12 bg-white/40 border-white shadow-xl">
                      <div className="flex items-center justify-between mb-10">
                         <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Recent Activity Log</h4>
                         <button className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:underline">Full Audit</button>

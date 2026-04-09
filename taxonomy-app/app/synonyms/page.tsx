@@ -30,7 +30,8 @@ import {
 } from 'lucide-react'
 
 interface SynonymFormData {
-  name: string
+  code: string
+  name_th: string
   description: string
   category_id?: string
   terms: Array<{
@@ -57,7 +58,8 @@ export default function SynonymsPage() {
   
   // Form data
   const [formData, setFormData] = useState<SynonymFormData>({
-    name: '',
+    code: '',
+    name_th: '',
     description: '',
     category_id: '',
     terms: []
@@ -92,7 +94,8 @@ export default function SynonymsPage() {
     let filtered = synonyms
     if (searchTerm) {
       filtered = filtered.filter(synonym => 
-        synonym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        synonym.name_th.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (synonym.code && synonym.code.toLowerCase().includes(searchTerm.toLowerCase())) ||
         synonym.terms?.some(term => term.term.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
@@ -103,14 +106,15 @@ export default function SynonymsPage() {
 
   const handleSynonymAdd = () => {
     setEditingSynonym(null)
-    setFormData({ name: '', description: '', category_id: '', terms: [] })
+    setFormData({ code: '', name_th: '', description: '', category_id: '', terms: [] })
     setShowForm(true)
   }
 
   const handleSynonymEdit = (synonym: Synonym) => {
     setEditingSynonym(synonym)
     setFormData({
-      name: synonym.name,
+      code: synonym.code || '',
+      name_th: synonym.name_th,
       description: synonym.description || '',
       category_id: synonym.category_id || '',
       terms: synonym.terms?.map(term => ({
@@ -140,21 +144,24 @@ export default function SynonymsPage() {
     try {
       if (editingSynonym) {
         await DatabaseService.updateSynonym(editingSynonym.id, {
-          name: formData.name,
+          code: formData.code || `SYN-${Date.now()}`,
+          name_th: formData.name_th,
           description: formData.description,
-          category_id: formData.category_id
+          category_id: formData.category_id || null
         })
         toast.success('อัปเดต synonym เรียบร้อยแล้ว')
       } else {
+        const generatedCode = formData.code || `SYN-${Math.floor(Math.random() * 1000000)}`
         const newSynonym = await DatabaseService.createSynonym({
-          name: formData.name,
+          code: generatedCode,
+          name_th: formData.name_th,
           description: formData.description,
-          category_id: formData.category_id,
+          category_id: formData.category_id || null,
           is_active: true
         })
         for (const termData of formData.terms) {
           await DatabaseService.createSynonymTerm({
-            synonym_id: newSynonym.id,
+            lemma_id: newSynonym.id,
             term: termData.term,
             is_primary: termData.is_primary,
             confidence_score: termData.confidence_score,
@@ -168,6 +175,7 @@ export default function SynonymsPage() {
       setShowForm(false)
       loadData()
     } catch (error) {
+      console.error('Save error:', error)
       toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
     }
   }
@@ -185,7 +193,7 @@ export default function SynonymsPage() {
     }))
   }
 
-  if (isLoading) return <div className="flex items-center justify-center h-screen bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent shadow-xl"></div></div>
+  if (isLoading) return <div data-testid="loading-indicator" className="flex items-center justify-center h-screen bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent shadow-xl"></div></div>
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
@@ -202,14 +210,14 @@ export default function SynonymsPage() {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-6">
               <div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight thai-text uppercase">
-                  Synonym Infrastructure
+                <h1 data-testid="page-title" className="text-3xl font-black text-slate-900 tracking-tight thai-text uppercase">
+                  Synonym Management Infrastructure
                 </h1>
                 <p className="mt-2 text-slate-500 font-medium thai-text">
                   บริหารจัดการคลังคำพ้องความหมายเพื่อเพิ่มความแม่นยำในการค้นหาและจัดหมวดหมู่ด้วย AI
                 </p>
               </div>
-              <button onClick={handleSynonymAdd} className="btn-premium px-10 h-14 group">
+              <button data-testid="add-synonym-btn" onClick={handleSynonymAdd} className="btn-premium px-10 h-14 group">
                 <PlusIcon className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                 <span className="thai-text">Add New Synonym</span>
               </button>
@@ -257,6 +265,7 @@ export default function SynonymsPage() {
                   <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <input
                     type="text"
+                    data-testid="search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search synonym library..."
@@ -267,6 +276,7 @@ export default function SynonymsPage() {
                 <div className="flex gap-4 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0">
                   <select
                     value={selectedCategory}
+                    data-testid="category-filter"
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="select-premium text-xs font-bold tracking-wider uppercase min-w-[180px]"
                   >
@@ -301,11 +311,12 @@ export default function SynonymsPage() {
                       <th className="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Management</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody data-testid="synonym-list" className="divide-y divide-slate-100">
                     <AnimatePresence mode="popLayout">
                       {filteredSynonyms.map((synonym, idx) => (
                         <motion.tr 
                           key={synonym.id}
+                          data-testid={`synonym-item-${synonym.id}`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
@@ -318,8 +329,8 @@ export default function SynonymsPage() {
                                 <LayersIcon className="w-6 h-6" />
                               </div>
                               <div>
-                                <div className="text-base font-black text-slate-800 thai-text tracking-tight">{synonym.name}</div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">ID: {synonym.id.slice(0, 8)}</div>
+                                <div data-testid="synonym-lemma" className="text-base font-black text-slate-800 thai-text tracking-tight">{synonym.name_th}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">CODE: {synonym.code}</div>
                               </div>
                             </div>
                           </td>
@@ -342,7 +353,7 @@ export default function SynonymsPage() {
                               {synonym.category ? (
                                 <>
                                   <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-                                  <span className="text-xs font-black text-slate-600 thai-text">{synonym.category.name_th}</span>
+                                  <span data-testid="synonym-category" className="text-xs font-black text-slate-600 thai-text">{synonym.category.name_th}</span>
                                 </>
                               ) : (
                                 <span className="text-xs font-bold text-slate-300 italic">Unmapped</span>
@@ -358,10 +369,10 @@ export default function SynonymsPage() {
                           </td>
                           <td className="px-10 py-7 text-right">
                             <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                              <button onClick={() => handleSynonymEdit(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-indigo-600 border border-slate-100 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-100/20 transition-all">
+                              <button data-testid={`edit-synonym-${synonym.id}`} onClick={() => handleSynonymEdit(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-indigo-600 border border-slate-100 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-100/20 transition-all">
                                 <EditIcon className="w-4 h-4" />
                               </button>
-                              <button onClick={() => handleSynonymDelete(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-rose-600 border border-slate-100 hover:border-rose-100 hover:shadow-xl hover:shadow-rose-100/20 transition-all">
+                              <button data-testid={`delete-synonym-${synonym.id}`} onClick={() => handleSynonymDelete(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-rose-600 border border-slate-100 hover:border-rose-100 hover:shadow-xl hover:shadow-rose-100/20 transition-all">
                                 <TrashIcon className="w-4 h-4" />
                               </button>
                             </div>
@@ -402,26 +413,40 @@ export default function SynonymsPage() {
               <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Identifier Name *</label>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Infrastructure Code (Unique)</label>
+                    <input
+                      type="text"
+                      data-testid="code-input"
+                      value={formData.code}
+                      onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                      className="input-premium w-full text-base font-black uppercase tracking-widest"
+                      placeholder="e.g. SMARTPHONE_001"
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Identifier Name (TH) *</label>
                     <input
                       type="text" required
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      data-testid="lemma-input"
+                      value={formData.name_th}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name_th: e.target.value }))}
                       className="input-premium w-full text-base font-black thai-text"
                       placeholder="e.g. สมาร์ทโฟน"
                     />
                   </div>
-                  <div className="space-y-4">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Taxonomy Mapping</label>
-                    <select
-                      value={formData.category_id}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
-                      className="select-premium w-full text-base font-black thai-text"
-                    >
-                      <option value="">Select Anchor Category</option>
-                      {categories.map(c => <option key={c.id} value={c.id}>{c.name_th}</option>)}
-                    </select>
-                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Taxonomy Mapping</label>
+                  <select
+                    value={formData.category_id}
+                    data-testid="category-select"
+                    onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
+                    className="select-premium w-full text-base font-black thai-text"
+                  >
+                    <option value="">Select Anchor Category</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name_th}</option>)}
+                  </select>
                 </div>
 
                 <div className="space-y-4">
@@ -437,7 +462,7 @@ export default function SynonymsPage() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between border-b border-slate-50 pb-4">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Expansion Terms (Variations)</label>
-                    <button type="button" onClick={addTerm} className="btn-premium-secondary py-2 px-6">
+                    <button type="button" data-testid="add-term-btn" onClick={addTerm} className="btn-premium-secondary py-2 px-6">
                       <PlusIcon className="w-4 h-4 mr-2" />
                       Add Variant
                     </button>
@@ -451,6 +476,7 @@ export default function SynonymsPage() {
                         </div>
                         <input
                           type="text"
+                          data-testid={`term-input-${index}`}
                           value={term.term}
                           onChange={(e) => {
                              const newTerms = [...formData.terms];
@@ -488,7 +514,7 @@ export default function SynonymsPage() {
 
               <div className="p-10 bg-slate-50/50 border-t border-slate-100 flex gap-6">
                 <button onClick={() => setShowForm(false)} className="btn-premium-secondary flex-1 py-5 h-auto">Discard Config</button>
-                <button onClick={handleFormSubmit} className="btn-premium flex-1 py-5 h-auto justify-center group">
+                <button data-testid="save-synonym-btn" onClick={handleFormSubmit} className="btn-premium flex-1 py-5 h-auto justify-center group">
                   <SaveIcon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
                   <span className="thai-text text-lg">Commit Infrastructure</span>
                 </button>

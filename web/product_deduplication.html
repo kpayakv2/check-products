@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบหาสินค้าใหม่ที่ไม่ซ้ำ - AI-Powered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', Arial, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .card { border: 1px solid #e5e7eb; padding: 20px; margin: 20px 0; border-radius: 12px; background: white; }
+        .button { background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; text-decoration: none; display: inline-block; font-weight: 600; }
+        .button:hover { background: #4338ca; transform: translateY(-1px); }
+        .button:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
+        .upload-box { flex: 1; border: 2px dashed #4f46e5; padding: 20px; text-align: center; border-radius: 8px; margin: 10px; transition: all 0.3s; }
+        .upload-box:hover { border-color: #4338ca; background: #f8fafc; }
+        .upload-box.success { border-color: #10b981; background: #f0fdf4; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+        .warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold flex items-center">
+                <i class="fas fa-bullseye mr-3"></i>
+                ระบบหาสินค้าใหม่ที่ไม่ซ้ำ (AI-Powered)
+            </h1>
+            <p class="mt-2 text-blue-100">จุดประสงค์: หาสินค้าใหม่ที่ไม่ซ้ำกับสินค้าเก่า เพื่อนำไปใช้งานจริง</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-6 max-w-6xl">
+        <!-- Info Banner -->
+        <div class="info mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-info-circle mr-3 text-lg"></i>
+                <div>
+                    <strong>วิธีการ:</strong> ใช้ AI เปรียบเทียบความคล้าย + Human Review ตรวจสอบ<br>
+                    <strong>เทคโนโลยี:</strong> Phase 4 Enhanced Pipeline with Fresh Architecture
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Section -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <i class="fas fa-cloud-upload-alt mr-3 text-blue-600"></i>
+                ขั้นตอนที่ 1: อัปโหลดไฟล์สินค้า
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="upload-box" id="oldBox">
+                    <i class="fas fa-archive text-4xl text-gray-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-3">📦 สินค้าเก่า</h3>
+                    <input type="file" id="oldFile" accept=".csv,.xlsx,.xls" class="mb-4">
+                    <br>
+                    <button class="button" onclick="uploadFile('old')">
+                        <i class="fas fa-upload mr-2"></i>อัปโหลด
+                    </button>
+                    <div id="oldStatus" class="mt-3"></div>
+                </div>
+                <div class="upload-box" id="newBox">
+                    <i class="fas fa-plus-circle text-4xl text-gray-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-3">🆕 สินค้าใหม่</h3>
+                    <input type="file" id="newFile" accept=".csv,.xlsx,.xls" class="mb-4">
+                    <br>
+                    <button class="button" onclick="uploadFile('new')">
+                        <i class="fas fa-upload mr-2"></i>อัปโหลด
+                    </button>
+                    <div id="newStatus" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Section -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <i class="fas fa-brain mr-3 text-purple-600"></i>
+                ขั้นตอนที่ 2: วิเคราะห์ความคล้าย
+            </h2>
+            
+            <!-- Model Configuration -->
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-cogs mr-2"></i>การตั้งค่าโมเดล
+                </h3>
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">🧠 โมเดล:</label>
+                        <select id="modelSelect" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="tfidf">TF-IDF (เร็ว)</option>
+                            <option value="sentence-bert">Sentence BERT (แม่นยำ)</option>
+                            <option value="optimized-tfidf">Optimized TF-IDF</option>
+                            <option value="mock">Mock (ทดสอบ)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">📐 Similarity:</label>
+                        <select id="similaritySelect" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="cosine">Cosine Similarity</option>
+                            <option value="dot_product">Dot Product</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">🎯 Threshold:</label>
+                        <input type="number" id="thresholdInput" min="0" max="1" step="0.1" value="0.6" class="w-full p-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">🔢 Top-K:</label>
+                        <input type="number" id="topKInput" min="1" max="50" value="10" class="w-full p-2 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button class="button" onclick="updateConfig()">
+                        <i class="fas fa-save mr-2"></i>💾 อัปเดตการตั้งค่า
+                    </button>
+                    <div id="configStatus" class="mt-2"></div>
+                </div>
+            </div>
+            
+            <button id="analyzeBtn" class="button text-lg px-8 py-3" onclick="analyze()" disabled>
+                <i class="fas fa-play mr-2"></i>เริ่มวิเคราะห์
+            </button>
+            <div id="analysisResult" class="mt-4"></div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <i class="fas fa-bullseye mr-3 text-green-600"></i>
+                ผลลัพธ์: สินค้าใหม่ที่ไม่ซ้ำ
+            </h2>
+            <div id="uniqueProductsResult" style="display: none;">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="success text-center p-6 rounded-lg">
+                        <i class="fas fa-check-circle text-4xl text-green-600 mb-3"></i>
+                        <h3 class="text-xl font-bold mb-2">✅ สินค้าใหม่ไม่ซ้ำ</h3>
+                        <div id="uniqueCount" class="text-3xl font-bold text-green-600"></div>
+                        <div>รายการ</div>
+                    </div>
+                    <div class="warning text-center p-6 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-4xl text-yellow-600 mb-3"></i>
+                        <h3 class="text-xl font-bold mb-2">⚠️ ต้องตรวจสอบ</h3>
+                        <div id="checkCount" class="text-3xl font-bold text-yellow-600"></div>
+                        <div>รายการ</div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h4 class="text-lg font-semibold mb-2 flex items-center">
+                        <i class="fas fa-chart-pie mr-2"></i>📊 สรุปผลลัพธ์
+                    </h4>
+                    <div id="resultSummary"></div>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <button class="button bg-green-600 hover:bg-green-700 mr-3" onclick="showUniqueProducts()">
+                        <i class="fas fa-list mr-2"></i>📋 ดูรายชื่อสินค้าไม่ซ้ำ
+                    </button>
+                    <button class="button bg-yellow-600 hover:bg-yellow-700" onclick="showCheckNeeded()">
+                        <i class="fas fa-search mr-2"></i>🔍 ดูสินค้าที่ต้องตรวจสอบ
+                    </button>
+                </div>
+                
+                <div id="productLists" style="display: none;" class="space-y-4">
+                    <div id="uniqueList" class="max-h-80 overflow-y-auto border border-green-300 p-4 rounded-lg bg-green-50"></div>
+                    <div id="checkList" class="max-h-80 overflow-y-auto border border-yellow-300 p-4 rounded-lg bg-yellow-50"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Human Review Section -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <i class="fas fa-user-check mr-3 text-indigo-600"></i>
+                ขั้นตอนที่ 3: ตรวจสอบโดยมนุษย์
+            </h2>
+            <div class="mb-4">
+                <input type="text" id="reviewerName" placeholder="ชื่อผู้ตรวจสอบ" class="p-3 border border-gray-300 rounded-lg w-80 mr-4">
+                <button id="startReviewBtn" class="button bg-indigo-600 hover:bg-indigo-700" onclick="startHumanReview()" disabled>
+                    <i class="fas fa-play mr-2"></i>เริ่มตรวจสอบ
+                </button>
+            </div>
+            
+            <!-- Review Interface -->
+            <div id="reviewInterface" style="display: none;" class="border-2 border-indigo-300 p-6 rounded-lg bg-indigo-50">
+                <div class="info mb-4">
+                    <strong id="reviewProgress">รายการที่ 1/20</strong> | 
+                    ผู้ตรวจสอบ: <span id="currentReviewer" class="font-semibold"></span>
+                </div>
+                
+                <div id="reviewItem" class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">📦 สินค้าเก่า</h4>
+                            <div id="oldProductDisplay" class="text-lg font-medium"></div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">🆕 สินค้าใหม่</h4>
+                            <div id="newProductDisplay" class="text-lg font-medium"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6 text-sm">
+                        🤖 <strong>AI ทำนาย:</strong> <span id="mlPrediction"></span> | 
+                        📊 <strong>ความคล้าย:</strong> <span id="similarityScore"></span> | 
+                        🎯 <strong>ความมั่นใจ:</strong> <span id="confidenceScore"></span>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <button class="button bg-red-600 hover:bg-red-700 mr-2" onclick="provideFeedback('duplicate')">
+                            <i class="fas fa-times-circle mr-2"></i>🔴 สินค้าซ้ำ
+                        </button>
+                        <button class="button bg-yellow-600 hover:bg-yellow-700 mr-2" onclick="provideFeedback('similar')">
+                            <i class="fas fa-exclamation-circle mr-2"></i>🟡 คล้าย แต่ไม่ซ้ำ
+                        </button>
+                        <button class="button bg-green-600 hover:bg-green-700 mr-2" onclick="provideFeedback('different')">
+                            <i class="fas fa-check-circle mr-2"></i>🟢 ต่างกัน
+                        </button>
+                        <button class="button bg-gray-600 hover:bg-gray-700" onclick="provideFeedback('uncertain')">
+                            <i class="fas fa-question-circle mr-2"></i>⚪ ไม่แน่ใจ
+                        </button>
+                    </div>
+                    
+                    <textarea id="reviewComments" placeholder="ความคิดเห็นเพิ่มเติม (ไม่บังคับ)" 
+                              class="w-full h-20 p-3 border border-gray-300 rounded-lg resize-none"></textarea>
+                </div>
+            </div>
+            
+            <div id="reviewSummary" class="mt-4"></div>
+        </div>
+        
+        <!-- Export Section -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-download mr-3 text-green-600"></i>
+                📊 ผลลัพธ์และส่งออก
+            </h2>
+            
+            <!-- Step 1: ดูผลลัพธ์ -->
+            <div class="border-2 border-blue-300 p-4 rounded-lg bg-blue-50 mb-6">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
+                    <i class="fas fa-eye mr-2 text-blue-600"></i>
+                    ดูและตรวจสอบผลลัพธ์
+                </h3>
+                <p class="text-blue-700 mb-3">ตรวจสอบข้อมูลสินค้าที่ระบบประมวลผลแล้ว</p>
+                <button class="button bg-blue-600 hover:bg-blue-700" onclick="showResults()">
+                    <i class="fas fa-eye mr-2"></i>📋 ดูผลลัพธ์ระบบ
+                </button>
+                <div id="results" class="mt-4"></div>
+            </div>
+            
+            <!-- Step 2: สรุปการตัดสินใจ -->
+            <div class="border-2 border-indigo-300 p-4 rounded-lg bg-indigo-50 mb-6">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
+                    <i class="fas fa-chart-pie mr-2 text-indigo-600"></i>
+                    สรุปการตัดสินใจของมนุษย์
+                </h3>
+                <p class="text-indigo-700 mb-3">ดูสรุปสถิติและความแม่นยำของการตัดสินใจที่ผ่านมา</p>
+                <button class="button bg-indigo-600 hover:bg-indigo-700" onclick="showReviewSummary()">
+                    <i class="fas fa-chart-pie mr-2"></i>📊 แสดงสรุปการตัดสินใจ
+                </button>
+            </div>
+            
+            <!-- Step 3: ส่งออกไฟล์ -->
+            <div class="border-2 border-green-300 p-4 rounded-lg bg-green-50 mb-6">
+                <h3 class="text-lg font-semibold mb-3 flex items-center">
+                    <span class="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
+                    <i class="fas fa-file-export mr-2 text-green-600"></i>
+                    ส่งออกไฟล์ผลลัพธ์
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-white p-4 rounded-lg border border-green-200">
+                        <h4 class="font-semibold mb-2 text-green-700">📁 ไฟล์หลัก</h4>
+                        <p class="text-sm text-gray-600 mb-3">สินค้าที่อนุมัติให้นำเข้า (รวมสินค้าคล้ายกัน)</p>
+                        <button class="button bg-green-600 hover:bg-green-700 w-full" onclick="exportCSV()">
+                            <i class="fas fa-file-csv mr-2"></i>ส่งออก CSV หลัก
+                        </button>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-purple-200">
+                        <h4 class="font-semibold mb-2 text-purple-700">📋 ไฟล์ทั้งหมด</h4>
+                        <p class="text-sm text-gray-600 mb-3">ไฟล์หลัก + ไฟล์เสริม (ปฏิเสธ, รอตรวจสอบ, สรุป)</p>
+                        <button class="button bg-purple-600 hover:bg-purple-700 w-full" onclick="exportMLData()">
+                            <i class="fas fa-database mr-2"></i>ส่งออกครบชุด
+                        </button>
+                    </div>
+                </div>
+                <div class="info text-sm">
+                    <strong>💡 คำแนะนำ:</strong> ส่งออกไฟล์หลักเพื่อนำเข้าสินค้า หรือส่งออกครบชุดเพื่อเก็บบันทึกทั้งหมด
+                </div>
+            </div>
+            
+            <!-- ผลลัพธ์การส่งออก -->
+            <div id="exportResults"></div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript เหมือนเดิม แต่ปรับปรุงให้ทำงานกับ UI ใหม่
+        let uploadState = { old: false, new: false };
+        let analysisState = { completed: false };
+        let reviewState = { 
+            active: false, 
+            currentIndex: 0, 
+            queue: [],
+            feedback: []
+        };
+        
+        function uploadFile(type) {
+            const fileInput = document.getElementById(type + 'File');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert(`กรุณาเลือกไฟล์สินค้า${type === 'old' ? 'เก่า' : 'ใหม่'}`);
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', type);
+            
+            document.getElementById(type + 'Status').innerHTML = '<div class="warning">⏳ กำลังอัปโหลด...</div>';
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(type + 'Status').innerHTML = `
+                        <div class="success">✅ สำเร็จ!<br>📊 ${data.count} รายการ</div>
+                    `;
+                    document.getElementById(type + 'Box').classList.add('success');
+                    uploadState[type] = true;
+                    checkReadyForAnalysis();
+                } else {
+                    document.getElementById(type + 'Status').innerHTML = `
+                        <div class="error">❌ ${data.message}</div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById(type + 'Status').innerHTML = `
+                    <div class="error">❌ เกิดข้อผิดพลาด</div>
+                `;
+            });
+        }
+        
+        function checkReadyForAnalysis() {
+            if (uploadState.old && uploadState.new) {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('analyzeBtn').classList.remove('opacity-50');
+            }
+        }
+        
+        function updateConfig() {
+            const config = {
+                model_type: document.getElementById('modelSelect').value,
+                similarity_method: document.getElementById('similaritySelect').value,
+                threshold: parseFloat(document.getElementById('thresholdInput').value),
+                top_k: parseInt(document.getElementById('topKInput').value)
+            };
+            
+            document.getElementById('configStatus').innerHTML = '<div class="info">⏳ อัปเดตการตั้งค่า...</div>';
+            
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('configStatus').innerHTML = `
+                        <div class="success">✅ อัปเดตสำเร็จ!</div>
+                    `;
+                } else {
+                    document.getElementById('configStatus').innerHTML = `
+                        <div class="error">❌ ${data.message}</div>
+                    `;
+                }
+            });
+        }
+        
+        function analyze() {
+            document.getElementById('analysisResult').innerHTML = '<div class="info"><i class="fas fa-spinner fa-spin mr-2"></i>⏳ กำลังวิเคราะห์สินค้าใหม่ที่ไม่ซ้ำ...</div>';
+            
+            fetch('/analyze', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('analysisResult').innerHTML = `
+                        <div class="success">
+                            ✅ วิเคราะห์เสร็จสิ้น!<br>
+                            📦 สินค้าเก่า: ${data.old_count} รายการ<br>
+                            🆕 สินค้าใหม่: ${data.new_count} รายการ<br>
+                            <br>
+                            <strong>${data.summary}</strong>
+                        </div>
+                    `;
+                    
+                    // แสดงผลลัพธ์
+                    document.getElementById('uniqueCount').textContent = data.unique_count;
+                    document.getElementById('checkCount').textContent = data.duplicate_check_count;
+                    
+                    const uniquePercentage = Math.round((data.unique_count / data.new_count) * 100);
+                    document.getElementById('resultSummary').innerHTML = `
+                        🎯 <strong>จุดประสงค์หลัก: หาสินค้าใหม่ที่ไม่ซ้ำ</strong><br>
+                        ✅ สินค้าใหม่ที่ไม่ซ้ำ: <strong>${data.unique_count}</strong> รายการ (<strong>${uniquePercentage}%</strong>)<br>
+                        ⚠️ ต้องตรวจสอบเพิ่มเติม: <strong>${data.duplicate_check_count}</strong> รายการ (${100-uniquePercentage}%)<br>
+                        🔍 สามารถดูรายชื่อและส่งออกไฟล์ได้ด้านล่าง
+                    `;
+                    
+                    document.getElementById('uniqueProductsResult').style.display = 'block';
+                    analysisState.completed = true;
+                    
+                    if (data.pending_review > 0) {
+                        document.getElementById('startReviewBtn').disabled = false;
+                    }
+                } else {
+                    document.getElementById('analysisResult').innerHTML = `
+                        <div class="error">❌ ${data.message}</div>
+                    `;
+                }
+            });
+        }
+        
+        // ฟังก์ชันอื่นๆ ตามเดิม...
+        function showUniqueProducts() {
+            fetch('/get-results')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uniqueList').innerHTML = `
+                    <h4 class="text-lg font-bold mb-3 text-green-700">✅ สินค้าใหม่ที่ไม่ซ้ำ (${data.unique_count} รายการ)</h4>
+                    <p class="text-green-600 font-semibold mb-3">สินค้าเหล่านี้ไม่ซ้ำกับสินค้าเก่า สามารถนำไปใช้งานได้เลย</p>
+                    <div class="text-sm text-gray-600">รายการจะแสดงในไฟล์ CSV ที่ส่งออก...</div>
+                `;
+                document.getElementById('productLists').style.display = 'block';
+            });
+        }
+        
+        function showCheckNeeded() {
+            fetch('/get-results')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('checkList').innerHTML = `
+                    <h4 class="text-lg font-bold mb-3 text-yellow-700">⚠️ สินค้าที่ต้องตรวจสอบ (${data.duplicate_check_count} รายการ)</h4>
+                    <p class="text-yellow-600 font-semibold mb-3">สินค้าเหล่านี้อาจซ้ำกับสินค้าเก่า ควรตรวจสอบด้วย Human Review</p>
+                    <div class="text-sm text-gray-600">รายการจะแสดงในไฟล์ CSV ที่ส่งออก...</div>
+                `;
+                document.getElementById('productLists').style.display = 'block';
+            });
+        }
+        
+        function startHumanReview() {
+            const reviewer = document.getElementById('reviewerName').value.trim();
+            if (!reviewer) {
+                alert('กรุณาใส่ชื่อผู้ตรวจสอบ');
+                return;
+            }
+            
+            document.getElementById('currentReviewer').textContent = reviewer;
+            
+            fetch('/get-review-queue')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    reviewState.queue = data.queue;
+                    reviewState.active = true;
+                    reviewState.currentIndex = 0;
+                    
+                    document.getElementById('reviewInterface').style.display = 'block';
+                    loadNextReviewItem();
+                }
+            });
+        }
+        
+        function loadNextReviewItem() {
+            if (reviewState.currentIndex >= reviewState.queue.length) {
+                completeReview();
+                return;
+            }
+            
+            const item = reviewState.queue[reviewState.currentIndex];
+            
+            document.getElementById('reviewProgress').textContent = 
+                `รายการที่ ${reviewState.currentIndex + 1}/${reviewState.queue.length}`;
+            document.getElementById('oldProductDisplay').textContent = item.old_product;
+            document.getElementById('newProductDisplay').textContent = item.new_product;
+            document.getElementById('mlPrediction').textContent = item.ml_prediction;
+            document.getElementById('similarityScore').textContent = (item.similarity * 100).toFixed(1) + '%';
+            document.getElementById('confidenceScore').textContent = (item.confidence * 100).toFixed(1) + '%';
+            
+            document.getElementById('reviewComments').value = '';
+        }
+        
+        function provideFeedback(decision) {
+            const currentItem = reviewState.queue[reviewState.currentIndex];
+            const comments = document.getElementById('reviewComments').value;
+            
+            const feedback = {
+                id: currentItem.id,
+                old_product: currentItem.old_product,
+                new_product: currentItem.new_product,
+                similarity: currentItem.similarity,
+                ml_prediction: currentItem.ml_prediction,
+                human_feedback: decision,
+                comments: comments,
+                reviewer: document.getElementById('currentReviewer').textContent,
+                timestamp: new Date().toISOString()
+            };
+            
+            fetch('/save-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(feedback)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    reviewState.feedback.push(feedback);
+                    reviewState.currentIndex++;
+                    loadNextReviewItem();
+                }
+            });
+        }
+        
+        function completeReview() {
+            const totalReviewed = reviewState.feedback.length;
+            const agreement = reviewState.feedback.filter(f => 
+                f.human_feedback === f.ml_prediction.replace('similar', 'similar')
+            ).length;
+            
+            document.getElementById('reviewSummary').innerHTML = `
+                <div class="success">
+                    🎉 <strong>ตรวจสอบเสร็จสิ้น!</strong><br>
+                    📊 ตรวจสอบทั้งหมด: ${totalReviewed} รายการ<br>
+                    🤝 เห็นด้วยกับ AI: ${agreement}/${totalReviewed} รายการ (${((agreement/totalReviewed)*100).toFixed(1)}%)<br>
+                    🧠 ข้อมูลจะถูกใช้เทรน ML เพื่อปรับปรุงความแม่นยำ
+                </div>
+            `;
+            
+            document.getElementById('reviewInterface').style.display = 'none';
+        }
+        
+        function showResults() {
+            fetch('/get-results')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').innerHTML = `
+                    <div class="info">
+                        🎯 <strong>ผลลัพธ์การหาสินค้าใหม่ที่ไม่ซ้ำ:</strong><br>
+                        📦 สินค้าเก่า: ${data.old_count} รายการ<br>
+                        🆕 สินค้าใหม่: ${data.new_count} รายการ<br>
+                        <br>
+                        ✅ <strong>สินค้าใหม่ไม่ซ้ำ: ${data.unique_count} รายการ (${data.unique_percentage}%)</strong><br>
+                        ⚠️ ต้องตรวจสอบ: ${data.duplicate_check_count} รายการ<br>
+                        👤 Human Feedback: ${data.feedback_count} รายการ<br>
+                        🤖 ความแม่นยำ AI: ${data.accuracy}%<br>
+                        <br>
+                        📋 <strong>ไฟล์หลักที่ต้องการ: สินค้าใหม่ที่ไม่ซ้ำ</strong>
+                    </div>
+                `;
+            });
+        }
+        
+        function exportCSV() {
+            document.getElementById('exportResults').innerHTML = '<div class="info"><i class="fas fa-spinner fa-spin mr-2"></i>⏳ กำลังประมวลผลข้อมูลก่อนส่งออก...</div>';
+            
+            // ขั้นตอนที่ 1: เรียก prepare-export เพื่อประมวลผลข้อมูล
+            fetch('/api/prepare-export', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // แสดงผลการประมวลผล
+                    document.getElementById('exportResults').innerHTML = `
+                        <div class="info">
+                            ✅ <strong>ประมวลผลเสร็จสิ้น!</strong><br>
+                            📊 พร้อมส่งออก ${data.export_statistics.approved_for_import} สินค้า<br>
+                            ❌ ปฏิเสธ ${data.export_statistics.rejected_duplicates} สินค้าซ้ำ<br>
+                            ⏳ ยังรอตรวจสอบ ${data.export_statistics.pending_review_items} รายการ<br>
+                            <br>
+                            <div class="info">⏳ กำลังสร้างไฟล์ CSV...</div>
+                        </div>
+                    `;
+                    
+                    // ขั้นตอนที่ 2: เรียก export-csv เพื่อสร้างไฟล์
+                    return fetch('/export-csv');
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('exportResults').innerHTML = `
+                        <div class="success">
+                            ✅ <strong>ส่งออกสำเร็จ!</strong><br>
+                            <br>
+                            🎯 <strong>ไฟล์หลัก (สินค้าที่อนุมัติ):</strong><br>
+                            📁 ${data.approved_products_file || 'approved_products_for_import.csv'}<br>
+                            <br>
+                            📋 <strong>ไฟล์เสริม:</strong><br>
+                            ❌ ${data.rejected_duplicates_file || 'rejected_duplicates.csv'} - สินค้าที่ปฏิเสธ<br>
+                            ⏳ ${data.pending_review_file || 'pending_review_products.csv'} - สินค้ารอตรวจสอบ<br>
+                            📊 ${data.summary_file || 'classification_summary.csv'} - รายงานสรุป<br>
+                            ${data.human_feedback_file ? `👤 ${data.human_feedback_file} - Human Feedback<br>` : ''}
+                            <br>
+                            💾 <strong>ที่ตั้งไฟล์:</strong> ${data.files_location || 'output/'}<br>
+                            <br>
+                            🎯 <strong>ระบบได้ประมวลผลตาม Human Feedback แล้ว!</strong><br>
+                            📈 อัตราการอนุมัติ: ${data.approval_rate || 'N/A'}%
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('exportResults').innerHTML = `
+                        <div class="error">❌ ${data.message}</div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('exportResults').innerHTML = `
+                    <div class="error">❌ เกิดข้อผิดพลาด: ${error.message}</div>
+                `;
+            });
+        }
+        
+        function showReviewSummary() {
+            document.getElementById('exportResults').innerHTML = '<div class="info"><i class="fas fa-spinner fa-spin mr-2"></i>⏳ กำลังโหลดสรุปการตัดสินใจ...</div>';
+            
+            fetch('/api/review-summary')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const summary = data.review_summary;
+                    const stats = summary.decision_statistics;
+                    
+                    document.getElementById('exportResults').innerHTML = `
+                        <div class="success">
+                            <h3>📊 <strong>สรุปการตัดสินใจของมนุษย์</strong></h3>
+                            <br>
+                            
+                            <div class="mb-4">
+                                <strong>📈 ความคืบหน้า:</strong><br>
+                                ✅ ตรวจสอบแล้ว: <strong>${summary.reviewed_items}</strong>/${summary.total_items} รายการ (${summary.completion_percentage}%)<br>
+                                ⏳ คงเหลือ: <strong>${summary.pending_items}</strong> รายการ
+                            </div>
+                            
+                            <div class="mb-4">
+                                <strong>🎯 การตัดสินใจ:</strong><br>
+                                🟢 แตกต่าง (อนุมัติ): <strong>${stats.different_count}</strong> รายการ (${stats.different_percentage}%)<br>
+                                🟡 คล้ายกัน (อนุมัติ): <strong>${stats.similar_count}</strong> รายการ (${stats.similar_percentage}%)<br>
+                                🔴 ซ้ำแน่นอน (ปฏิเสธ): <strong>${stats.duplicate_count}</strong> รายการ (${stats.duplicate_percentage}%)<br>
+                                ⚪ ไม่แน่ใจ (รอตรวจสอบ): <strong>${stats.uncertain_count}</strong> รายการ (${stats.uncertain_percentage}%)
+                            </div>
+                            
+                            <div class="mb-4">
+                                <strong>🤖 ประสิทธิภาพ AI:</strong><br>
+                                📊 ความแม่นยำ: <strong>${summary.ai_performance.accuracy_percentage}%</strong> (${summary.ai_performance.status})<br>
+                                ✅ ตรงกับมนุษย์: ${summary.ai_performance.correct_predictions}/${summary.ai_performance.total_predictions} ครั้ง
+                            </div>
+                            
+                            <div class="info">
+                                <strong>💡 คำแนะนำ:</strong> ${summary.export_readiness.recommendation}<br>
+                                ${summary.export_readiness.missing_reviews > 0 ? 
+                                  `⚠️ ยังต้องตรวจสอบอีก ${summary.export_readiness.missing_reviews} รายการ` : 
+                                  '✅ พร้อมส่งออกแล้ว!'}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('exportResults').innerHTML = `
+                        <div class="error">❌ ${data.message}</div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('exportResults').innerHTML = `
+                    <div class="error">❌ เกิดข้อผิดพลาด: ${error.message}</div>
+                `;
+            });
+        }
+        
+        function exportMLData() {
+            alert('🎯 ระบบจะส่งออกไฟล์หลักและไฟล์เสริม!\\n\\n📁 ไฟล์หลัก: สินค้าใหม่ที่ไม่ซ้ำ\\n📋 ไฟล์เสริม: สินค้าต้องตรวจสอบ, รายงานสรุป\\n🤖 ไฟล์ ML: Human Feedback (ถ้ามี)');
+            exportCSV();
+        }
+        
+        // Load current config on page load
+        window.onload = function() {
+            fetch('/api/config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('modelSelect').value = data.config.model_type;
+                    document.getElementById('similaritySelect').value = data.config.similarity_method;
+                    document.getElementById('thresholdInput').value = data.config.threshold;
+                    document.getElementById('topKInput').value = data.config.top_k;
+                }
+            });
+        };
+    </script>
+</body>
+</html>

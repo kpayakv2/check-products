@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+.venv
+venv
+env
+.pytest_cache
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# VS Code
+.vscode
+.history
+
+# Project specific
+output/
+data/
+uploads/
+results/
+temp/
+model_cache/
+human_feedback.db
+*.db
+
+# Environment
+.env
+.env.local

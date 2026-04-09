@@ -206,6 +206,7 @@ export default function ImportWizardPage() {
               <div className="flex justify-end mt-6">
                 <button
                   onClick={handleNext}
+                  data-testid="wizard-next-btn"
                   className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
                 >
                   ถัดไป: จับคู่คอลัมน์ →

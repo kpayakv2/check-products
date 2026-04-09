@@ -8,6 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Types สำหรับ Database Schema
 export interface TaxonomyNode {
   id: string
+  code: string
   name_th: string
   name_en?: string
   description?: string
@@ -27,7 +28,9 @@ export interface TaxonomyNode {
 
 export interface Synonym {
   id: string
-  name: string
+  code: string
+  name_th: string
+  name_en?: string
   description?: string
   category_id?: string
   is_active: boolean
@@ -41,7 +44,7 @@ export interface Synonym {
 
 export interface SynonymTerm {
   id: string
-  synonym_id: string
+  lemma_id: string
   term: string
   is_primary: boolean
   confidence_score: number
@@ -54,7 +57,7 @@ export interface SynonymTerm {
 
 export interface SynonymCategoryMap {
   id: string
-  synonym_id: string
+  lemma_id: string
   category_id: string
   weight: number
   created_by?: string
@@ -343,7 +346,8 @@ export class DatabaseService {
       .from('synonym_lemmas')
       .select(`
         *,
-        category:taxonomy_nodes(*)
+        category:taxonomy_nodes(*),
+        terms:synonym_terms(*)
       `)
       .order('name_th', { ascending: true })
 
@@ -352,7 +356,10 @@ export class DatabaseService {
     }
 
     const { data, error } = await query
-    if (error) throw error
+    if (error) {
+      console.error('Supabase getSynonyms error:', error)
+      throw error
+    }
     return data || []
   }
 
@@ -362,11 +369,15 @@ export class DatabaseService {
       .insert(synonym)
       .select(`
         *,
-        category:taxonomy_nodes(*)
+        category:taxonomy_nodes(*),
+        terms:synonym_terms(*)
       `)
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase createSynonym error:', error)
+      throw error
+    }
     return data
   }
 
@@ -377,11 +388,15 @@ export class DatabaseService {
       .eq('id', id)
       .select(`
         *,
-        category:taxonomy_nodes(*)
+        category:taxonomy_nodes(*),
+        terms:synonym_terms(*)
       `)
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase updateSynonym error:', error)
+      throw error
+    }
     return data
   }
 
@@ -391,7 +406,10 @@ export class DatabaseService {
       .delete()
       .eq('id', id)
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase deleteSynonym error:', error)
+      throw error
+    }
   }
 
   // Synonym Terms
@@ -405,7 +423,10 @@ export class DatabaseService {
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase createSynonymTerm error:', error)
+      throw error
+    }
     return data
   }
 
@@ -413,7 +434,7 @@ export class DatabaseService {
     const { data, error } = await supabase
       .from('synonym_terms')
       .select('*')
-      .eq('synonym_id', synonymId)
+      .eq('lemma_id', synonymId)
       .order('is_primary', { ascending: false })
       .order('created_at', { ascending: true })
 

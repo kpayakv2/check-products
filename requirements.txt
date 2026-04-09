@@ -1,4 +1,29 @@
+# 🎯 Core AI/ML Dependencies
 sentence-transformers>=2.2.0
-pandas>=1.3.0
 torch>=1.12.0
 numpy>=1.21.0
+scikit-learn>=1.0.0
+transformers>=4.20.0
+
+# 📊 Data Processing
+pandas>=1.3.0
+
+# 🌐 Web Framework (Flask-based)
+Flask>=2.3.0
+Werkzeug>=2.3.0
+
+# 🚀 API Framework (FastAPI-based)
+fastapi>=0.68.0
+uvicorn>=0.15.0
+pydantic>=1.8.0
+
+# 📁 File Processing
+openpyxl>=3.0.0
+
+# 🛠️ Utilities
+tqdm>=4.62.0
+python-multipart>=0.0.5
+
+# 🗄️ Database (optional for feedback)
+supabase>=2.0.0
+sqlite3  # Built-in with Python

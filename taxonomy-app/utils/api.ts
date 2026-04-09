@@ -59,7 +59,7 @@ export interface SuggestionResponse {
 
 export interface EmbeddingRequest {
   texts: string[]
-  model?: 'text-embedding-ada-002' | 'multilingual-e5-large'
+  model?: 'paraphrase-multilingual-MiniLM-L12-v2' | 'multilingual-e5-large'
 }
 
 export interface EmbeddingResponse {

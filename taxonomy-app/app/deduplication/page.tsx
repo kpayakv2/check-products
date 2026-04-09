@@ -37,7 +37,7 @@ interface DeduplicationResult {
 
 interface ProcessedProduct {
   id: string
-  name: string
+  name_th: string
   category?: string
   categoryId?: string
   confidence?: number
@@ -93,8 +93,8 @@ export default function ProductDeduplication() {
       setResults(data.results || [])
       
       if (data.uniqueProducts?.length > 0) {
-        setUniqueProducts(data.uniqueProducts.map((name: string, i: number) => ({
-          id: `unique_${i + 1}`, name, status: 'unique'
+        setUniqueProducts(data.uniqueProducts.map((name_th: string, i: number) => ({
+          id: `unique_${i + 1}`, name_th, status: 'unique'
         })))
       }
       
@@ -110,12 +110,12 @@ export default function ProductDeduplication() {
     setLoading(true)
     setCurrentStep(4)
     try {
-      const approvedFromReview = results.filter(r => r.status === 'approved').map(r => ({ id: r.id, name: r.newProduct, status: 'unique' as const }))
+      const approvedFromReview = results.filter(r => r.status === 'approved').map(r => ({ id: r.id, name_th: r.newProduct, status: 'unique' as const }))
       const allUniqueProducts = [...uniqueProducts, ...approvedFromReview]
       const categorizedProducts: ProcessedProduct[] = []
       
       for (const product of allUniqueProducts) {
-        const { data } = await supabase.functions.invoke('category-suggestions', { body: { text: product.name } })
+        const { data } = await supabase.functions.invoke('category-suggestions', { body: { text: product.name_th } })
         const sug = data.suggestions?.[0]
         categorizedProducts.push({ ...product, category: sug?.categoryName || 'Unmapped', confidence: sug?.confidence || 0, status: 'categorized' })
       }
@@ -128,8 +128,8 @@ export default function ProductDeduplication() {
 
   const exportToCSV = useCallback(() => {
     const readyProducts = uniqueProducts.filter(p => p.status === 'categorized')
-    const headers = ['ID', 'Name', 'Category', 'Confidence']
-    const csvContent = headers.join(',') + '\n' + readyProducts.map(p => `${p.id},"${p.name}","${p.category}",${p.confidence}`).join('\n')
+    const headers = ['ID', 'Name_TH', 'Category', 'Confidence']
+    const csvContent = headers.join(',') + '\n' + readyProducts.map(p => `${p.id},"${p.name_th}","${p.category}",${p.confidence}`).join('\n')
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -281,8 +281,8 @@ export default function ProductDeduplication() {
                      </div>
 
                      {[
-                       { type: 'Incoming', name: currentResult.newProduct, color: 'indigo', icon: ActivityIcon },
-                       { type: 'Master', name: currentResult.oldProduct, color: 'slate', icon: SearchIcon }
+                       { type: 'Incoming', name_th: currentResult.newProduct, color: 'indigo', icon: ActivityIcon },
+                       { type: 'Master', name_th: currentResult.oldProduct, color: 'slate', icon: SearchIcon }
                      ].map((item, i) => (
                        <div key={i} className={`premium-card p-0 overflow-hidden bg-white/80 border-${i === 0 ? 'indigo-100' : 'slate-100'}`}>
                           <div className={`px-6 py-3 bg-${i === 0 ? 'indigo-600' : 'slate-900'} text-white flex justify-between items-center`}>
@@ -291,7 +291,7 @@ export default function ProductDeduplication() {
                           </div>
                           <div className="p-12">
                              <p className="text-2xl font-black text-slate-900 thai-text leading-relaxed tracking-tight min-h-[6rem]">
-                                {item.name}
+                                {item.name_th}
                              </p>
                           </div>
                        </div>
@@ -368,7 +368,7 @@ export default function ProductDeduplication() {
                               transition={{ delay: idx * 0.05 }}
                               className="group hover:bg-indigo-50/20 transition-colors"
                            >
-                              <td className="px-10 py-6 text-sm font-black text-slate-700 thai-text tracking-tight">{p.name}</td>
+                              <td className="px-10 py-6 text-sm font-black text-slate-700 thai-text tracking-tight">{p.name_th}</td>
                               <td className="px-10 py-6">
                                  <span className="flex items-center gap-2 text-[11px] font-black tracking-widest text-indigo-600 uppercase">
                                     <Tag className="w-3.5 h-3.5" />
@@ -404,4 +404,3 @@ export default function ProductDeduplication() {
     </div>
   )
 }
-

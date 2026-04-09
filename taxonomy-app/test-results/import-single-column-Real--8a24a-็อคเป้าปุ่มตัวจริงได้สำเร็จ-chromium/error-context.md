@@ -1,0 +1,144 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - heading "Neural" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Taxonomy Engine
+        - navigation [ref=e14]:
+          - paragraph [ref=e15]: Core Orchestration
+          - link "System Overview Dashboard (แดชบอร์ด)" [ref=e16] [cursor=pointer]:
+            - /url: /
+            - img [ref=e18] [cursor=pointer]
+            - generic [ref=e21] [cursor=pointer]:
+              - paragraph [ref=e22] [cursor=pointer]: System Overview
+              - generic [ref=e23] [cursor=pointer]:
+                - text: Dashboard
+                - generic [ref=e24] [cursor=pointer]: (แดชบอร์ด)
+          - link "Hierarchical Structure Taxonomy (จัดการ Taxonomy)" [ref=e25] [cursor=pointer]:
+            - /url: /taxonomy
+            - img [ref=e27] [cursor=pointer]
+            - generic [ref=e32] [cursor=pointer]:
+              - paragraph [ref=e33] [cursor=pointer]: Hierarchical Structure
+              - generic [ref=e34] [cursor=pointer]:
+                - text: Taxonomy
+                - generic [ref=e35] [cursor=pointer]: (จัดการ Taxonomy)
+          - link "Semantic Mapping Synonyms (จัดการ Synonym)" [ref=e36] [cursor=pointer]:
+            - /url: /synonyms
+            - img [ref=e38] [cursor=pointer]
+            - generic [ref=e41] [cursor=pointer]:
+              - paragraph [ref=e42] [cursor=pointer]: Semantic Mapping
+              - generic [ref=e43] [cursor=pointer]:
+                - text: Synonyms
+                - generic [ref=e44] [cursor=pointer]: (จัดการ Synonym)
+          - link "Quality Control Product Audit (ตรวจสอบสินค้า)" [ref=e45] [cursor=pointer]:
+            - /url: /products
+            - img [ref=e47] [cursor=pointer]
+            - generic [ref=e50] [cursor=pointer]:
+              - paragraph [ref=e51] [cursor=pointer]: Quality Control
+              - generic [ref=e52] [cursor=pointer]:
+                - text: Product Audit
+                - generic [ref=e53] [cursor=pointer]: (ตรวจสอบสินค้า)
+          - link "Conflict Resolution Deduplication (คัดกรองสินค้าซ้ำ)" [ref=e54] [cursor=pointer]:
+            - /url: /deduplication
+            - img [ref=e56] [cursor=pointer]
+            - generic [ref=e60] [cursor=pointer]:
+              - paragraph [ref=e61] [cursor=pointer]: Conflict Resolution
+              - generic [ref=e62] [cursor=pointer]:
+                - text: Deduplication
+                - generic [ref=e63] [cursor=pointer]: (คัดกรองสินค้าซ้ำ)
+          - link "Bulk Intake Data Import (นำเข้าข้อมูล)" [ref=e64] [cursor=pointer]:
+            - /url: /import
+            - img [ref=e66] [cursor=pointer]
+            - generic [ref=e69] [cursor=pointer]:
+              - paragraph [ref=e70] [cursor=pointer]: Bulk Intake
+              - generic [ref=e71] [cursor=pointer]:
+                - text: Data Import
+                - generic [ref=e72] [cursor=pointer]: (นำเข้าข้อมูล)
+          - link "Performance Analytics Reports (รายงานวิเคราะห์)" [ref=e73] [cursor=pointer]:
+            - /url: /reports
+            - img [ref=e75] [cursor=pointer]
+            - generic [ref=e76] [cursor=pointer]:
+              - paragraph [ref=e77] [cursor=pointer]: Performance Analytics
+              - generic [ref=e78] [cursor=pointer]:
+                - text: Reports
+                - generic [ref=e79] [cursor=pointer]: (รายงานวิเคราะห์)
+          - link "Configuration Settings (ตั้งค่า)" [ref=e80] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e82] [cursor=pointer]
+            - generic [ref=e85] [cursor=pointer]:
+              - paragraph [ref=e86] [cursor=pointer]: Configuration
+              - generic [ref=e87] [cursor=pointer]:
+                - text: Settings
+                - generic [ref=e88] [cursor=pointer]: (ตั้งค่า)
+        - generic [ref=e90]:
+          - generic [ref=e92]:
+            - img [ref=e94]
+            - generic [ref=e96]:
+              - paragraph [ref=e97]: Service Status
+              - paragraph [ref=e98]: All Systems Green
+          - generic [ref=e100]:
+            - generic [ref=e101]: Build Signature
+            - generic [ref=e102]: phayak-nexus-v1.2
+    - generic [ref=e104]:
+      - banner [ref=e105]:
+        - generic [ref=e107]:
+          - heading "แดชบอร์ด" [level=1] [ref=e109]
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - img [ref=e112]
+              - textbox "ค้นหาข้อมูล..." [ref=e115]
+            - button "3" [ref=e117] [cursor=pointer]:
+              - img [ref=e118] [cursor=pointer]
+              - generic [ref=e121] [cursor=pointer]: "3"
+            - button "ผู้ดูแลระบบ Admin" [ref=e123] [cursor=pointer]:
+              - img [ref=e125] [cursor=pointer]
+              - generic [ref=e128] [cursor=pointer]:
+                - paragraph [ref=e129] [cursor=pointer]: ผู้ดูแลระบบ
+                - paragraph [ref=e130] [cursor=pointer]: Admin
+      - main [ref=e131]:
+        - generic [ref=e132]:
+          - generic [ref=e134]:
+            - navigation "Progress" [ref=e135]:
+              - list [ref=e136]:
+                - listitem [ref=e137]:
+                  - button "อัปโหลดไฟล์" [ref=e140] [cursor=pointer]:
+                    - img [ref=e142] [cursor=pointer]
+                    - paragraph [ref=e146] [cursor=pointer]: อัปโหลดไฟล์
+                - listitem [ref=e147]:
+                  - button "เลือกคอลัมน์" [ref=e150] [cursor=pointer]:
+                    - img [ref=e152] [cursor=pointer]
+                    - paragraph [ref=e156] [cursor=pointer]: เลือกคอลัมน์
+                - listitem [ref=e157]:
+                  - button "3 ประมวลผล AI AI วิเคราะห์และแนะนำหมวดหมู่" [ref=e160] [cursor=pointer]:
+                    - generic [ref=e162] [cursor=pointer]: "3"
+                    - generic [ref=e163] [cursor=pointer]:
+                      - paragraph [ref=e164] [cursor=pointer]: ประมวลผล AI
+                      - paragraph [ref=e165] [cursor=pointer]: AI วิเคราะห์และแนะนำหมวดหมู่
+                    - img [ref=e167] [cursor=pointer]
+                - listitem [ref=e169]:
+                  - button "ตรวจสอบ" [disabled] [ref=e172]:
+                    - img [ref=e174]
+                    - paragraph [ref=e177]: ตรวจสอบ
+                - listitem [ref=e178]:
+                  - button "เสร็จสิ้น" [disabled] [ref=e179]:
+                    - img [ref=e181]
+                    - paragraph [ref=e184]: เสร็จสิ้น
+            - generic [ref=e186]:
+              - generic [ref=e187]: ขั้นตอนที่ 3 จาก 5
+              - generic [ref=e188]: 60% เสร็จสมบูรณ์
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - img [ref=e196]
+              - heading "🤖 AI กำลังทำงาน" [level=2] [ref=e205]
+              - paragraph [ref=e206]: กำลังส่งไฟล์ขึ้นคลัง...
+              - paragraph [ref=e208]: 0% (0/405)
+            - button "กำลังประมวลผล..." [disabled] [ref=e210]
+            - generic [ref=e211]: "Invalid key: imports/1775657190448-POS_เพิ่มสินค้า_20250727_063658_จากไฟล์สินค้าใหม่.csv"
+  - alert [ref=e212]
+```

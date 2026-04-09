@@ -99,8 +99,8 @@ export default function SettingsPage() {
       timeoutSeconds: 30
     },
     ai: {
-      embeddingModel: 'text-embedding-ada-002',
-      apiProvider: 'openai',
+      embeddingModel: 'paraphrase-multilingual-MiniLM-L12-v2',
+      apiProvider: 'local',
       maxTokens: 4000,
       temperature: 0.1
     },
@@ -645,7 +645,7 @@ export default function SettingsPage() {
                                   }))}
                                   className="select-premium w-full text-sm font-black"
                                 >
-                                  <option value="text-embedding-ada-002">OpenAI Ada-V2</option>
+                                  <option value="paraphrase-multilingual-MiniLM-L12-v2">OpenAI Ada-V2</option>
                                   <option value="multilingual-e5-large">Multilingual E5 Large</option>
                                 </select>
                               </div>

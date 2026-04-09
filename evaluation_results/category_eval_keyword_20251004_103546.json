@@ -1,0 +1,718 @@
+[
+  {
+    "product": "กล่องล็อค 560 หูหิ้ว W",
+    "predictions": [
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "method": "keyword_rule",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.9,
+        "category_name": "กล่อง/ที่เก็บของ",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+      "method": "keyword_rule",
+      "matched_keyword": "กล่อง",
+      "confidence": 0.9,
+      "category_name": "กล่อง/ที่เก็บของ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "กล่องล็อค(39) 561 WW",
+    "predictions": [
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "method": "keyword_rule",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.9,
+        "category_name": "กล่อง/ที่เก็บของ",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+      "method": "keyword_rule",
+      "matched_keyword": "กล่อง",
+      "confidence": 0.9,
+      "category_name": "กล่อง/ที่เก็บของ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "กล่องล็อค 560/1 หูหิ้ว W",
+    "predictions": [
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "method": "keyword_rule",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.9,
+        "category_name": "กล่อง/ที่เก็บของ",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+      "method": "keyword_rule",
+      "matched_keyword": "กล่อง",
+      "confidence": 0.9,
+      "category_name": "กล่อง/ที่เก็บของ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "กล่องล็อค 561/1 W",
+    "predictions": [
+      {
+        "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+        "method": "keyword_rule",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.9,
+        "category_name": "กล่อง/ที่เก็บของ",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กล่อง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "2aa98730-43b6-412c-a8aa-c9421d9efb72",
+      "method": "keyword_rule",
+      "matched_keyword": "กล่อง",
+      "confidence": 0.9,
+      "category_name": "กล่อง/ที่เก็บของ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "เข่ง NO.2 (สี) N",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "เก้าอี้ซักผ้ากลม 9025 สีหวาน AB V-NICE",
+    "predictions": [
+      {
+        "category_id": "f72829ab-efb2-4b1b-aea9-7379a90f26d9",
+        "method": "keyword_rule",
+        "matched_keyword": "ซักผ้า",
+        "confidence": 0.9,
+        "category_name": "แปรงขัดต่าง ๆ",
+        "category_level": 1
+      },
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "กลม",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "ea0564ce-437a-4af1-8063-716e14f5be2b",
+        "category_name": "อุปกรณ์ทำความสะอาด",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ผ้า",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กลม",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "f72829ab-efb2-4b1b-aea9-7379a90f26d9",
+      "method": "keyword_rule",
+      "matched_keyword": "ซักผ้า",
+      "confidence": 0.9,
+      "category_name": "แปรงขัดต่าง ๆ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "เก้าอี้เตี้ย สีดำ S-0072B SIP",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เก้าอี้",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "เก้าอี้เตี้ย 366 สีหวาน Bl",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เก้าอี้",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ถังน้ำฝาใส (ใหญ่) 728-PO SMT",
+    "predictions": [
+      {
+        "category_id": "42e5a296-e955-43da-a0a2-c65f759214e3",
+        "method": "keyword_rule",
+        "matched_keyword": "น้ำ",
+        "confidence": 1.0,
+        "category_name": "ขันน้ำ",
+        "category_level": 1
+      },
+      {
+        "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+        "method": "keyword_rule",
+        "matched_keyword": "ถัง",
+        "confidence": 0.8,
+        "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+        "category_level": 1
+      },
+      {
+        "category_id": "33f31e8c-fc4c-446c-90b8-424aadc88876",
+        "method": "keyword_rule",
+        "matched_keyword": "น้ำ",
+        "confidence": 0.8,
+        "category_name": "ปืนฉีดน้ำ",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ถัง",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "317658cd-b010-497a-ab86-f9c84a884260",
+        "category_name": "ถุงขยะ/ถังขยะ/เก็บขยะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ฝา",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "42e5a296-e955-43da-a0a2-c65f759214e3",
+      "method": "keyword_rule",
+      "matched_keyword": "น้ำ",
+      "confidence": 1.0,
+      "category_name": "ขันน้ำ",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะแกรง 1991 สีใส SRT",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะแกรง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะแกรงเหลี่ยม 818 KT",
+    "predictions": [
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "d2f97ac5-2f6e-4487-bac0-b005c5bb3ff7",
+        "category_name": "กระติก",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะแกรง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+      "method": "keyword_rule",
+      "matched_keyword": "เหลี่ยม",
+      "confidence": 0.8,
+      "category_name": "ตะกร้า/กระจาด",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะกร้าเหลี่ยม 5953 หูหิ้ว JCP",
+    "predictions": [
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "ตะกร้า",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะกร้า",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "d2f97ac5-2f6e-4487-bac0-b005c5bb3ff7",
+        "category_name": "กระติก",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+      "method": "keyword_rule",
+      "matched_keyword": "ตะกร้า",
+      "confidence": 0.8,
+      "category_name": "ตะกร้า/กระจาด",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะแกรงเหลี่ยม 410 สีใส LK",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "d2f97ac5-2f6e-4487-bac0-b005c5bb3ff7",
+        "category_name": "กระติก",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เหลี่ยม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะแกรง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะแกรง 409 สีใส LK",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "a96a1786-f095-4757-a2b4-d803c2553dd1",
+        "category_name": "ตะแกรง/ชั้นวางของ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะแกรง",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "นส.8 สี SP",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะกร้าฝาปิด(จัมโบ้)321/4 สีใส/หวาน V",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "ตะกร้า",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+        "method": "keyword_rule",
+        "matched_keyword": "ฝา",
+        "confidence": 0.8,
+        "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ตะกร้า",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "317658cd-b010-497a-ab86-f9c84a884260",
+        "category_name": "ถุงขยะ/ถังขยะ/เก็บขยะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ฝา",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "เก้าอี้ หน้ากลม 250-B สีเข้ม (ปักกิ่ง) SH",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "c8b08751-0af8-4c80-8a27-ae4da478d1aa",
+        "method": "keyword_rule",
+        "matched_keyword": "กลม",
+        "confidence": 0.8,
+        "category_name": "ตะกร้า/กระจาด",
+        "category_level": 1
+      },
+      {
+        "category_id": "2dc31263-535c-4244-a0e0-afa44de2240e",
+        "category_name": "เขียง",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กลม",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "64b671b4-3b84-4b17-aeaa-8b2060e018ce",
+        "category_name": "เก้าอี_โต้ะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "เก้าอี้",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "4da48a0f-d482-48a1-9672-aba00a3ca7f7",
+        "category_name": "ถาดรองอาหาร",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กลม",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ถังฝา KF-008 สีดำ RTH",
+    "predictions": [
+      {
+        "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+        "method": "keyword_rule",
+        "matched_keyword": "สี",
+        "confidence": 0.8,
+        "category_name": "สีและอุปกรณ์ทาสี",
+        "category_level": 1
+      },
+      {
+        "category_id": "9c6dbfe6-3b22-43f7-b556-f21e8491d902",
+        "method": "keyword_rule",
+        "matched_keyword": "ถัง",
+        "confidence": 0.8,
+        "category_name": "ถังน้ำ/ถังเอนกประสงค์",
+        "category_level": 1
+      },
+      {
+        "category_id": "7fb4192b-70c0-43fb-a783-d4bc2e571c0e",
+        "category_name": "ของใช้ในบ้าน",
+        "category_level": 0,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ถัง",
+        "confidence": 0.7
+      },
+      {
+        "category_id": "317658cd-b010-497a-ab86-f9c84a884260",
+        "category_name": "ถุงขยะ/ถังขยะ/เก็บขยะ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "ฝา",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "c2b4c3e3-2145-4bb2-8f0d-b8dcce391bf4",
+      "method": "keyword_rule",
+      "matched_keyword": "สี",
+      "confidence": 0.8,
+      "category_name": "สีและอุปกรณ์ทาสี",
+      "category_level": 1
+    }
+  },
+  {
+    "product": "ตะหลิวไม้ 12 แผงกระดาษ #9890 IMM",
+    "predictions": [
+      {
+        "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+        "category_name": "สมุด/กระดาษ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กระดาษ",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+      "category_name": "สมุด/กระดาษ",
+      "category_level": 1,
+      "method": "taxonomy_keyword",
+      "matched_keyword": "กระดาษ",
+      "confidence": 0.7
+    }
+  },
+  {
+    "product": "ทัพพีตักข้าวใส 10611 ใส แผงกระดาษ IMM",
+    "predictions": [
+      {
+        "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+        "category_name": "สมุด/กระดาษ",
+        "category_level": 1,
+        "method": "taxonomy_keyword",
+        "matched_keyword": "กระดาษ",
+        "confidence": 0.7
+      }
+    ],
+    "top_category": {
+      "category_id": "076af3ff-31fc-46f1-b80b-19e807899585",
+      "category_name": "สมุด/กระดาษ",
+      "category_level": 1,
+      "method": "taxonomy_keyword",
+      "matched_keyword": "กระดาษ",
+      "confidence": 0.7
+    }
+  }
+]

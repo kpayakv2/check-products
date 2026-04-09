@@ -1,43 +1,54 @@
-# 📚 Documentation Index
+# Product Similarity Checker - Documentation
 
-## 📋 **Available Documentation**
+Welcome to the comprehensive documentation for the Product Similarity Checker project. This system provides advanced product deduplication using machine learning and human-in-the-loop feedback.
 
-### **🚀 Main Documentation**
-- [`README_COMPLETE.md`](README_COMPLETE.md) - **เริ่มต้นที่นี่!** เอกสารหลักครบถ้วน
+## 📚 Documentation Structure
 
-### **🏗️ Architecture & Design** 
-- [`architecture.md`](architecture.md) - โครงสร้างระบบและการทำงานของโมดูล
-- [`text-preprocessing.md`](text-preprocessing.md) - การทำความสะอาดข้อความขั้นสูง
+### 🚀 [User Guides](guides/)
+- **[Quick Start Guide](guides/quick-start.md)** - Get up and running quickly
+- **[Human Feedback System](guides/human-feedback.md)** - How to use the human-in-the-loop interface
+- **[Embedding Models Guide](guides/embedding-models.md)** - Understanding and configuring ML models
+- **[Model Download Guide](guides/model-download.md)** - How to download and manage models
 
-### **🔧 Technical References**
-- [`api-reference.md`](api-reference.md) - คู่มือ API และการใช้งานครบถ้วน
-- [`shared-scoring.md`](shared-scoring.md) - ระบบการคำนวณคะแนนและ confidence levels
-- [`capabilities-summary.md`](capabilities-summary.md) - สรุปความสามารถและฟีเจอร์
+### 🔧 [API Documentation](api/)
+- **[API Reference](api/api-reference.md)** - Complete API documentation
+- **[Quick Reference](api/quick-reference.md)** - Essential API endpoints
+- **[Analysis Capabilities](api/analyze-capabilities.md)** - Advanced analysis features
 
-### **📈 Legacy Files** 
-- [`capabilities.md`](capabilities.md) - ความสามารถของระบบ (เก่า)
-- [`testing-guide.md`](testing-guide.md) - วิธีการทดสอบระบบ (หากมี)
+### 👩‍💻 [Development](development/)
+- **[Contributing Guide](development/contributing.md)** - How to contribute to the project
+- **[Architecture Overview](development/architecture.md)** - System architecture and design
+- **[Test Organization](development/test-organization.md)** - Testing framework and structure
+- **[Changelog](development/changelog.md)** - Version history and changes
+- **[Shared Scoring System](development/shared-scoring.md)** - Scoring algorithm details
+- **[Text Preprocessing](development/text-preprocessing.md)** - Text processing pipeline
 
-### **📈 Project Information**
-- [`capabilities.md`](capabilities.md) - ความสามารถและฟีเจอร์ของระบบ
-- [`changelog.md`](changelog.md) - ประวัติการพัฒนาและอัปเดต
+### 📊 [Reports & Analysis](reports/)
+- **[Test Results Summary](reports/test-results-summary.md)** - Latest test execution results
+- **[Cleanup Reports](reports/)** - Project cleanup and optimization reports
+- **[Sentence Transformer Analysis](reports/sentence-transformer-analysis.md)** - ML model performance analysis
+- **[Capabilities Summary](reports/capabilities-summary.md)** - System capabilities overview
+- **[Organization Summary](reports/organization-summary.md)** - Project organization details
+
+### 🗄️ [Archive](archive/)
+- Historical documentation and deprecated guides
 
 ---
 
 ## 🎯 **Quick Navigation**
 
 ### **สำหรับผู้ใช้ใหม่:**
-1. อ่าน [`README_COMPLETE.md`](README_COMPLETE.md) ก่อน
+1. อ่าน [`README.md`](../README.md) ก่อน
 2. ดูตัวอย่างใน Quick Start section
 3. ทดลองใช้ Web Interface หรือ API
 
 ### **สำหรับ Developer:**
-1. ศึกษา [`architecture.md`](architecture.md) เพื่อเข้าใจโครงสร้าง
-2. อ่าน [`text-preprocessing.md`](text-preprocessing.md) สำหรับ text processing
-3. ใช้ [`testing-guide.md`](testing-guide.md) สำหรับการทดสอบ
+1. ศึกษา [`architecture.md`](development/architecture.md) เพื่อเข้าใจโครงสร้าง
+2. อ่าน [`text-preprocessing.md`](development/text-preprocessing.md) สำหรับ text processing
+3. ใช้ [`test organization`](development/test-organization.md) สำหรับการทดสอบ
 
 ### **สำหรับการใช้งาน API:**
-1. ดู [`api-reference.md`](api-reference.md) สำหรับรายละเอียด endpoint
+1. ดู [`api-reference.md`](api/api-reference.md) สำหรับรายละเอียด endpoint
 2. ทดสอบผ่าน Swagger UI: `http://localhost:8000/docs`
 3. ใช้ [`test_api_client.py`](../test_api_client.py) เป็นตัวอย่าง
 
@@ -46,25 +57,24 @@
 ## 🔄 **Document Status**
 
 ### **✅ Consolidated & Organized:**
-- 🎯 เอกสารหลักรวมครบถ้วนใน 6 ไฟล์
-- 🧹 เนื้อหาซ้ำซ้อนถูกจัดระเบียบแล้ว
-- 📋 มีการจัดหมวดหมู่ชัดเจน
-- 🗑️ ไฟล์เก่าที่ไม่จำเป็นถูกลบแล้ว
+- 🎯 เอกสารถูกจัดหมวดหมู่ตามบทบาท (Guides / API / Development / Reports / Archive)
+- 🧹 เนื้อหาซ้ำซ้อนถูกย้ายออกจากเอกสารหลักทั้งหมด
+- 📋 มี `docs/INDEX.md` เป็นศูนย์กลางการนำทาง
+- 🗑️ ไฟล์เก่าที่ไม่จำเป็นถูกย้ายไปไว้ใน `docs/archive/`
 
-### **� Current Documentation Structure:**
+### **📂 ปัจจุบัน `docs/` มีโครงสร้างดังนี้:**
 ```
 docs/
-├── README_COMPLETE.md      # 📖 Main comprehensive guide  
-├── INDEX.md               # 🗂️ This navigation index
-├── architecture.md        # 🏗️ System architecture 
-├── text-preprocessing.md  # 🔧 Text processing details
-├── api-reference.md       # 🔌 Complete API reference
-├── capabilities-summary.md # ⚡ Quick feature overview
-└── ORGANIZATION_SUMMARY.md # 📋 Documentation organization
+├── INDEX.md                  # 🗂️ Navigation index (เอกสารนี้)
+├── api/                      # 🔌 REST & WebSocket documentation
+├── guides/                   # 🚀 Quick start & how-to guides
+├── development/              # 🛠️ Technical references for developers
+├── reports/                  # 📊 Project reports & cleanup history
+└── archive/                  # 🗄️ เอกสารอ้างอิงเก็บถาวร
 ```
 
-**🎯 All legacy and duplicate files have been cleaned up for better organization!**
+**🎯 เริ่มต้นที่นี่ แล้วเลือกหมวดที่เหมาะกับงานของคุณได้ทันที!**
 
 ---
 
-**🎯 เริ่มต้นด้วย [`README_COMPLETE.md`](README_COMPLETE.md) เพื่อการใช้งานที่สมบูรณ์!**
+**🎯 เริ่มต้นด้วย [`README.md`](../README.md) เพื่อการใช้งานที่สมบูรณ์!**

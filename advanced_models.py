@@ -7,7 +7,7 @@ Extended embedding models including Sentence Transformers support.
 """
 
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pathlib import Path
 
 from fresh_architecture import EmbeddingModel
@@ -40,14 +40,69 @@ class SentenceTransformerModel(EmbeddingModel):
         self.cache_dir = cache_dir
         self.device = device
         
+        # Set default local cache directory if not provided
+        if cache_dir is None:
+            project_dir = Path(__file__).parent
+            local_cache = project_dir / "model_cache"
+            if local_cache.exists():
+                cache_dir = str(local_cache)
+                print(f"📁 Using local model cache: {local_cache}")
+        
+        # Check if model exists in cache for offline usage
+        self._check_offline_model_availability(model_name, cache_dir)
+        
         # Initialize model
         print(f"🔄 Loading Sentence Transformer model: {model_name}")
-        if cache_dir:
-            self.model = SentenceTransformer(model_name, cache_folder=cache_dir, device=device)
-        else:
-            self.model = SentenceTransformer(model_name, device=device)
+        try:
+            if cache_dir:
+                self.model = SentenceTransformer(
+                    model_name, 
+                    cache_folder=cache_dir, 
+                    device=device,
+                    local_files_only=self._is_model_cached(model_name, cache_dir)  # Force offline if cached
+                )
+            else:
+                self.model = SentenceTransformer(model_name, device=device)
+        except Exception as e:
+            print(f"❌ Error loading model: {e}")
+            print(f"💡 Tip: Run 'python download_models.py' to cache model locally")
+            if "local_files_only" in str(e):
+                print(f"🔌 Model not available offline. Run download_models.py first.")
+            raise
         
         print(f"✅ Model loaded successfully! Dimension: {self.get_dimension()}")
+    
+    def _check_offline_model_availability(self, model_name: str, cache_dir: Optional[str]) -> bool:
+        """Check if model is available for offline usage."""
+        if not cache_dir:
+            return False
+            
+        cache_path = Path(cache_dir)
+        # Check for HuggingFace cache structure
+        model_cache_patterns = [
+            f"models--sentence-transformers--{model_name.replace('/', '--')}",
+            f"models--{model_name.replace('/', '--')}",
+            model_name.replace('/', '--')
+        ]
+        
+        for pattern in model_cache_patterns:
+            if (cache_path / pattern).exists():
+                print(f"✅ Model found in offline cache: {pattern}")
+                return True
+                
+        print(f"⚠️ Model not found in offline cache: {model_name}")
+        return False
+    
+    def _is_model_cached(self, model_name: str, cache_dir: Optional[str]) -> bool:
+        """Check if model is fully cached and ready for offline use."""
+        return self._check_offline_model_availability(model_name, cache_dir)
+    
+    def enable_offline_mode(self, force_offline: bool = True):
+        """Enable or disable offline-only mode."""
+        self.force_offline = force_offline
+        if hasattr(self.model, 'local_files_only'):
+            self.model.local_files_only = force_offline
+        print(f"🔌 Offline mode: {'enabled' if force_offline else 'disabled'}")
     
     def encode(self, texts: List[str]) -> np.ndarray:
         """Encode texts using Sentence Transformer."""
@@ -199,3 +254,102 @@ def create_sentence_transformer(model_name: str = None, **kwargs) -> SentenceTra
 def create_optimized_tfidf(**kwargs) -> OptimizedTFIDFModel:
     """Create optimized TF-IDF model with recommended defaults."""
     return OptimizedTFIDFModel(**kwargs)
+
+
+def check_offline_models(cache_dir: Optional[str] = None) -> Dict[str, bool]:
+    """
+    Check which models are available for offline usage.
+    
+    Returns:
+        Dict mapping model names to availability status
+    """
+    if cache_dir is None:
+        cache_dir = str(Path(__file__).parent / "model_cache")
+    
+    cache_path = Path(cache_dir)
+    available_models = {}
+    
+    if not cache_path.exists():
+        print(f"❌ Cache directory not found: {cache_dir}")
+        return {}
+    
+    print(f"🔍 Checking offline models in: {cache_dir}")
+    
+    # Check recommended models
+    for name, model_path in RECOMMENDED_MODELS.items():
+        model_cache_patterns = [
+            f"models--sentence-transformers--{model_path.replace('/', '--')}",
+            f"models--{model_path.replace('/', '--')}",
+            model_path.replace('/', '--')
+        ]
+        
+        is_available = False
+        for pattern in model_cache_patterns:
+            if (cache_path / pattern).exists():
+                available_models[name] = True
+                is_available = True
+                print(f"✅ {name}: Available offline ({pattern})")
+                break
+        
+        if not is_available:
+            available_models[name] = False
+            print(f"❌ {name}: Not available offline")
+    
+    return available_models
+
+
+def get_offline_ready_model(preferred_model: str = "multilingual") -> Optional[SentenceTransformerModel]:
+    """
+    Get an offline-ready SentenceTransformer model.
+    
+    Args:
+        preferred_model: Preferred model name or alias
+        
+    Returns:
+        Model instance if available offline, None otherwise
+    """
+    available_models = check_offline_models()
+    
+    # Try preferred model first
+    if preferred_model in available_models and available_models[preferred_model]:
+        try:
+            model = create_sentence_transformer(preferred_model)
+            model.enable_offline_mode(True)
+            return model
+        except Exception as e:
+            print(f"⚠️ Failed to load preferred model {preferred_model}: {e}")
+    
+    # Try fallback models
+    fallback_order = ["multilingual", "multilingual_mpnet", "distiluse"]
+    for model_name in fallback_order:
+        if model_name in available_models and available_models[model_name]:
+            try:
+                model = create_sentence_transformer(model_name)
+                model.enable_offline_mode(True)
+                print(f"📱 Using offline fallback model: {model_name}")
+                return model
+            except Exception as e:
+                print(f"⚠️ Failed to load fallback model {model_name}: {e}")
+                continue
+    
+    print(f"❌ No offline models available. Run 'python download_models.py' to cache models.")
+    return None
+
+
+def ensure_offline_capability() -> bool:
+    """
+    Ensure at least one model is available for offline usage.
+    
+    Returns:
+        True if offline capability is ready, False otherwise
+    """
+    available_models = check_offline_models()
+    offline_ready = any(available_models.values())
+    
+    if offline_ready:
+        print(f"✅ Offline capability ready! Available models: {[k for k, v in available_models.items() if v]}")
+    else:
+        print(f"❌ No offline models available!")
+        print(f"💡 Run 'python download_models.py' to cache models for offline use")
+        
+    return offline_ready

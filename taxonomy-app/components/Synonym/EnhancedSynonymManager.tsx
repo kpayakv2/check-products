@@ -35,7 +35,7 @@ interface EnhancedSynonymManagerProps {
 }
 
 interface SynonymFormData {
-  name: string
+  name_th: string
   description: string
   category_id?: string
 }
@@ -52,7 +52,7 @@ interface TermFormData {
 const exportToCSV = (synonyms: Synonym[]): string => {
   const headers = [
     'Lemma ID',
-    'Lemma Name', 
+    'Lemma Name (TH)', 
     'Description',
     'Category',
     'Term',
@@ -66,7 +66,7 @@ const exportToCSV = (synonyms: Synonym[]): string => {
   const rows = synonyms.flatMap(synonym => 
     synonym.terms?.map(term => [
       synonym.id,
-      synonym.name,
+      synonym.name_th,
       synonym.description || '',
       synonym.category?.name_th || '',
       term.term,
@@ -95,7 +95,7 @@ const parseCSV = (csvText: string): Array<{
   verified: boolean
 }> => {
   const lines = csvText.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.replace(/"/g, ''))
+  if (lines.length <= 1) return []
   
   return lines.slice(1).map(line => {
     const values = line.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, '')) || []
@@ -134,12 +134,12 @@ export default function EnhancedSynonymManager({
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('')
   const [filterSource, setFilterSource] = useState<string>('')
-  const [sortBy, setSortBy] = useState<'name' | 'terms' | 'category'>('name')
+  const [sortBy, setSortBy] = useState<'name_th' | 'terms' | 'category'>('name_th')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [importCsv, setImportCsv] = useState('')
 
   const [synonymForm, setSynonymForm] = useState<SynonymFormData>({
-    name: '',
+    name_th: '',
     description: '',
     category_id: ''
   })
@@ -156,7 +156,7 @@ export default function EnhancedSynonymManager({
   const filteredSynonyms = synonyms
     .filter(synonym => {
       const matchesSearch = !searchTerm || 
-        synonym.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        synonym.name_th.toLowerCase().includes(searchTerm.toLowerCase()) ||
         synonym.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         synonym.terms?.some(term => term.term.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -171,9 +171,9 @@ export default function EnhancedSynonymManager({
       let aValue: any, bValue: any
 
       switch (sortBy) {
-        case 'name':
-          aValue = a.name
-          bValue = b.name
+        case 'name_th':
+          aValue = a.name_th
+          bValue = b.name_th
           break
         case 'terms':
           aValue = a.terms?.length || 0
@@ -204,7 +204,7 @@ export default function EnhancedSynonymManager({
     }
     
     setShowSynonymForm(false)
-    setSynonymForm({ name: '', description: '', category_id: '' })
+    setSynonymForm({ name_th: '', description: '', category_id: '' })
     setSelectedSynonym(null)
   }
 
@@ -271,7 +271,7 @@ export default function EnhancedSynonymManager({
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowImportModal(true)}
-              className="btn-secondary"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center"
             >
               <UploadIcon className="w-4 h-4 mr-2" />
               นำเข้า CSV
@@ -279,98 +279,103 @@ export default function EnhancedSynonymManager({
             
             <button
               onClick={handleExport}
-              className="btn-secondary"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center"
             >
               <DownloadIcon className="w-4 h-4 mr-2" />
               ส่งออก CSV
             </button>
-            
+
             <button
               onClick={() => {
                 setSelectedSynonym(null)
-                setSynonymForm({ name: '', description: '', category_id: '' })
+                setSynonymForm({ name_th: '', description: '', category_id: '' })
                 setShowSynonymForm(true)
               }}
-              className="btn-premium"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center shadow-sm"
             >
               <PlusIcon className="w-4 h-4 mr-2" />
-              เพิ่ม Lemma
+              เพิ่ม Lemma ใหม่
             </button>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        {/* Search and Filters */}
+        <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="ค้นหา lemma หรือ terms..."
+              placeholder="ค้นหา Lemma หรือ Term..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-premium pl-10"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             />
           </div>
 
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="input-premium"
-          >
-            <option value="">ทุกหมวดหมู่</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name_th}</option>
-            ))}
-          </select>
-
-          <select
-            value={filterSource}
-            onChange={(e) => setFilterSource(e.target.value)}
-            className="input-premium"
-          >
-            <option value="">ทุกแหล่งที่มา</option>
-            <option value="manual">Manual</option>
-            <option value="auto">Auto</option>
-            <option value="imported">Imported</option>
-            <option value="ml">ML</option>
-          </select>
-
           <div className="flex items-center space-x-2">
-            <FilterIcon className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600">
-              {filteredSynonyms.length} รายการ
-            </span>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="">ทุกหมวดหมู่</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name_th}</option>
+              ))}
+            </select>
+
+            <select
+              value={filterSource}
+              onChange={(e) => setFilterSource(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="">ทุกแหล่งที่มา</option>
+              <option value="manual">Manual</option>
+              <option value="auto">Auto</option>
+              <option value="ml">ML</option>
+            </select>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex h-96">
-        {/* Synonym List */}
-        <div className="w-1/2 border-r border-gray-200">
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-gray-900">Lemma Groups</h3>
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={() => toggleSort('name')}
-                  className={`p-1 rounded ${sortBy === 'name' ? 'bg-blue-100 text-blue-600' : 'text-gray-400'}`}
-                >
-                  {sortOrder === 'asc' ? <SortAscIcon className="w-4 h-4" /> : <SortDescIcon className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+      <div className="flex h-[600px]">
+        {/* Lemma List */}
+        <div className="w-1/2 border-r border-gray-200 overflow-y-auto p-4">
+          <div className="flex items-center space-x-4 mb-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <button 
+              onClick={() => toggleSort('name_th')}
+              className={`flex items-center hover:text-blue-600 ${sortBy === 'name_th' ? 'text-blue-600' : ''}`}
+            >
+              ชื่อ Lemma
+              {sortBy === 'name_th' && (sortOrder === 'asc' ? <SortAscIcon className="w-3 h-3 ml-1" /> : <SortDescIcon className="w-3 h-3 ml-1" />)}
+            </button>
+            <button 
+              onClick={() => toggleSort('terms')}
+              className={`flex items-center hover:text-blue-600 ${sortBy === 'terms' ? 'text-blue-600' : ''}`}
+            >
+              Terms
+              {sortBy === 'terms' && (sortOrder === 'asc' ? <SortAscIcon className="w-3 h-3 ml-1" /> : <SortDescIcon className="w-3 h-3 ml-1" />)}
+            </button>
+            <button 
+              onClick={() => toggleSort('category')}
+              className={`flex items-center hover:text-blue-600 ${sortBy === 'category' ? 'text-blue-600' : ''}`}
+            >
+              หมวดหมู่
+              {sortBy === 'category' && (sortOrder === 'asc' ? <SortAscIcon className="w-3 h-3 ml-1" /> : <SortDescIcon className="w-3 h-3 ml-1" />)}
+            </button>
           </div>
 
-          <div className="overflow-y-auto h-full">
+          <div className="space-y-2">
             {filteredSynonyms.map((synonym) => (
               <motion.div
                 key={synonym.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className={`
-                  p-4 border-b border-gray-100 cursor-pointer transition-colors
-                  ${selectedSynonym?.id === synonym.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}
+                  p-3 rounded-lg border transition-all cursor-pointer
+                  ${selectedSynonym?.id === synonym.id 
+                    ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                    : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'}
                 `}
                 onClick={() => setSelectedSynonym(synonym)}
               >
@@ -379,7 +384,7 @@ export default function EnhancedSynonymManager({
                     <div className="flex items-center space-x-2">
                       <TagIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
                       <h4 className="font-medium text-gray-900 truncate">
-                        {synonym.name}
+                        {synonym.name_th}
                       </h4>
                     </div>
                     
@@ -408,7 +413,7 @@ export default function EnhancedSynonymManager({
                         e.stopPropagation()
                         setSelectedSynonym(synonym)
                         setSynonymForm({
-                          name: synonym.name,
+                          name_th: synonym.name_th,
                           description: synonym.description || '',
                           category_id: synonym.category_id || ''
                         })
@@ -442,13 +447,13 @@ export default function EnhancedSynonymManager({
               <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-gray-900">
-                    Terms for "{selectedSynonym.name}"
+                    Terms for "{selectedSynonym.name_th}"
                   </h3>
                   <button
                     onClick={() => setShowTermForm(true)}
-                    className="btn-premium text-sm"
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center"
                   >
-                    <PlusIcon className="w-4 h-4 mr-1" />
+                    <PlusIcon className="w-3 h-3 mr-1" />
                     เพิ่ม Term
                   </button>
                 </div>
@@ -537,13 +542,13 @@ export default function EnhancedSynonymManager({
             <form onSubmit={handleSynonymSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ชื่อ Lemma
+                  ชื่อ Lemma (ภาษาไทย)
                 </label>
                 <input
                   type="text"
-                  value={synonymForm.name}
-                  onChange={(e) => setSynonymForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="input-premium"
+                  value={synonymForm.name_th}
+                  onChange={(e) => setSynonymForm(prev => ({ ...prev, name_th: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
               </div>
@@ -555,7 +560,7 @@ export default function EnhancedSynonymManager({
                 <textarea
                   value={synonymForm.description}
                   onChange={(e) => setSynonymForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="input-premium"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   rows={3}
                 />
               </div>
@@ -567,7 +572,7 @@ export default function EnhancedSynonymManager({
                 <select
                   value={synonymForm.category_id}
                   onChange={(e) => setSynonymForm(prev => ({ ...prev, category_id: e.target.value }))}
-                  className="input-premium"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="">ไม่ระบุหมวดหมู่</option>
                   {categories.map(cat => (
@@ -580,11 +585,11 @@ export default function EnhancedSynonymManager({
                 <button
                   type="button"
                   onClick={() => setShowSynonymForm(false)}
-                  className="btn-secondary"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   ยกเลิก
                 </button>
-                <button type="submit" className="btn-premium">
+                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm">
                   {selectedSynonym ? 'อัปเดต' : 'สร้าง'}
                 </button>
               </div>
@@ -608,7 +613,7 @@ export default function EnhancedSynonymManager({
                   type="text"
                   value={termForm.term}
                   onChange={(e) => setTermForm(prev => ({ ...prev, term: e.target.value }))}
-                  className="input-premium"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
               </div>
@@ -621,7 +626,7 @@ export default function EnhancedSynonymManager({
                   <select
                     value={termForm.language}
                     onChange={(e) => setTermForm(prev => ({ ...prev, language: e.target.value }))}
-                    className="input-premium"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   >
                     <option value="th">ไทย</option>
                     <option value="en">อังกฤษ</option>
@@ -636,7 +641,7 @@ export default function EnhancedSynonymManager({
                   <select
                     value={termForm.source}
                     onChange={(e) => setTermForm(prev => ({ ...prev, source: e.target.value as any }))}
-                    className="input-premium"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   >
                     <option value="manual">Manual</option>
                     <option value="auto">Auto</option>
@@ -670,7 +675,7 @@ export default function EnhancedSynonymManager({
                   id="is_primary"
                   checked={termForm.is_primary}
                   onChange={(e) => setTermForm(prev => ({ ...prev, is_primary: e.target.checked }))}
-                  className="rounded"
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="is_primary" className="ml-2 text-sm text-gray-700">
                   เป็น Primary Term
@@ -681,11 +686,11 @@ export default function EnhancedSynonymManager({
                 <button
                   type="button"
                   onClick={() => setShowTermForm(false)}
-                  className="btn-secondary"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   ยกเลิก
                 </button>
-                <button type="submit" className="btn-premium">
+                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm">
                   เพิ่ม Term
                 </button>
               </div>
@@ -708,19 +713,19 @@ export default function EnhancedSynonymManager({
               value={importCsv}
               onChange={(e) => setImportCsv(e.target.value)}
               placeholder="วางข้อมูล CSV ที่นี่..."
-              className="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm"
+              className="w-full h-64 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             />
             
             <div className="flex justify-end space-x-2 mt-4">
               <button
                 onClick={() => setShowImportModal(false)}
-                className="btn-secondary"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 ยกเลิก
               </button>
               <button
                 onClick={handleImport}
-                className="btn-premium"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm"
               >
                 นำเข้าข้อมูล
               </button>

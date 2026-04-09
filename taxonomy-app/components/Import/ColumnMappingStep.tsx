@@ -11,15 +11,23 @@ import {
 import { parseCSV, validateCSV, getColumnStats, type ParsedCSV } from '@/utils/csv-parser'
 
 export interface ColumnMapping {
-  product_name: string      // Required
-  description?: string      // Optional
-  brand?: string           // Optional
-  model?: string           // Optional
-  price?: string           // Optional
-  sku?: string            // Optional
-  category?: string        // Optional (from similarity checker)
-  confidence?: string      // Optional
-  ignore: string[]         // Columns to ignore
+  product_name: string
+  product_name_index?: number
+  description?: string
+  description_index?: number
+  brand?: string
+  brand_index?: number
+  model?: string
+  model_index?: number
+  price?: string
+  price_index?: number
+  sku?: string
+  sku_index?: number
+  category?: string
+  category_index?: number
+  confidence?: string
+  confidence_index?: number
+  ignore: string[]
 }
 
 interface ColumnMappingStepProps {
@@ -132,16 +140,45 @@ export default function ColumnMappingStep({
       ignore: []
     }
 
-    // Build mapping
+    // Helper to find index
+    const findIdx = (header: string) => preview.headers.indexOf(header)
+
+    // Build mapping with indices
     Object.entries(columnMapping).forEach(([header, field]) => {
-      if (field === 'product_name') mapping.product_name = header
-      else if (field === 'description') mapping.description = header
-      else if (field === 'brand') mapping.brand = header
-      else if (field === 'model') mapping.model = header
-      else if (field === 'price') mapping.price = header
-      else if (field === 'sku') mapping.sku = header
-      else if (field === 'category') mapping.category = header
-      else if (field === 'confidence') mapping.confidence = header
+      const idx = findIdx(header)
+      
+      if (field === 'product_name') {
+        mapping.product_name = header
+        mapping.product_name_index = idx
+      }
+      else if (field === 'description') {
+        mapping.description = header
+        mapping.description_index = idx
+      }
+      else if (field === 'brand') {
+        mapping.brand = header
+        mapping.brand_index = idx
+      }
+      else if (field === 'model') {
+        mapping.model = header
+        mapping.model_index = idx
+      }
+      else if (field === 'price') {
+        mapping.price = header
+        mapping.price_index = idx
+      }
+      else if (field === 'sku') {
+        mapping.sku = header
+        mapping.sku_index = idx
+      }
+      else if (field === 'category') {
+        mapping.category = header
+        mapping.category_index = idx
+      }
+      else if (field === 'confidence') {
+        mapping.confidence = header
+        mapping.confidence_index = idx
+      }
     })
 
     // Add ignored columns
@@ -185,7 +222,7 @@ export default function ColumnMappingStep({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="premium-card p-6">
+      <div className="premium-card p-6" data-testid="column-mapping-header">
         <h2 className="text-2xl font-bold mb-2 font-noto-sans-thai">
           📊 กำหนดการจับคู่คอลัมน์
         </h2>
@@ -234,6 +271,7 @@ export default function ColumnMappingStep({
                         {/* Column Selector */}
                         <select
                           value={columnMapping[header] || ''}
+                          data-testid={`column-select-${header}`}
                           onChange={(e) => handleMappingChange(header, e.target.value)}
                           className={`
                             w-full text-sm rounded border px-2 py-1.5
@@ -356,6 +394,7 @@ export default function ColumnMappingStep({
         <button
           onClick={handleComplete}
           disabled={!canProceed}
+          data-testid="mapping-complete-btn"
           className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
         >
           ถัดไป: เริ่มประมวลผล AI →

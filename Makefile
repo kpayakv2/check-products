@@ -28,10 +28,25 @@ install-dev:
 
 # Testing
 test:
-	pytest
+	pytest tests/
+
+test-unit:
+	pytest tests/unit/ -v
+
+test-integration:
+	pytest tests/integration/ -v
+
+test-performance:
+	pytest tests/performance/ -v
+
+test-ui:
+	pytest tests/ui/ -v
 
 test-cov:
-	pytest --cov=main --cov-report=html --cov-report=term
+	pytest --cov=main --cov-report=html --cov-report=term tests/
+
+test-report:
+	pytest --html=test-report.html --self-contained-html tests/
 
 # Code formatting and linting
 format:

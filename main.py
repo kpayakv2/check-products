@@ -1,254 +1,377 @@
+#!/usr/bin/env python3
+"""
+Phase 4 Performance Optimization - Updated Main Production
+=========================================================
+
+Enhanced main.py with Phase 4 advanced features that actually work.
+"""
+
+import sys
 import argparse
-import os
+import time
+import json
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Optional, Dict, Any, List
 
-import pandas as pd
-
-from sentence_transformers import SentenceTransformer, util
-import torch
-
-
-def prompt_csv_path(prompt_text: str) -> Path:
-    """Interactively prompt for a CSV file path until it exists."""
-    while True:
-        available = [p.name for p in Path(".").glob("*.csv")]
-        if available:
-            print("Available CSV files: " + ", ".join(available))
-        path_str = input(prompt_text).strip()
-        path = Path(path_str.strip("'\"")).expanduser().resolve()
-        if path.is_file():
-            return path
-        print(f"{path} is not a valid file. Please try again without quotes.")
+# Import fresh architecture
+from fresh_architecture import ProductMatcher, ProductSimilarityPipeline, Config
+from fresh_implementations import ComponentFactory
 
 
-def check_product_similarity(
-    new_product: str,
-    old_product_names: List[str],
-    old_embeddings,
-    model: SentenceTransformer,
-    top_k: int = 3,
-    new_embedding: Optional[torch.Tensor] = None,
-) -> List[Tuple[str, float]]:
-    """
-    Compute the similarity between a new product name and a list of old product names.
-    Returns the top_k most similar old product names with their cosine similarity scores.
-
-    Parameters:
-        new_product (str): The name of the new product to compare.
-        old_product_names (List[str]): List of old product names corresponding to old_embeddings.
-        old_embeddings: Embeddings for old_product_names (as a PyTorch tensor or NumPy array).
-        model (SentenceTransformer):
-            The sentence transformer model to use for encoding the new product.
-        top_k (int): The number of top similar results to return (default 3).
-        new_embedding (Optional[torch.Tensor]): Pre-computed embedding for new_product.
-            If None, will be computed using the model.
-
-    Returns:
-        List[Tuple[str, float]]: A list of tuples (old_product_name, similarity_score) for the
-            top_k similar old products.
-    """
-    # Verify that each product name has a corresponding embedding
-    embedding_count = (
-        old_embeddings.shape[0] if hasattr(old_embeddings, "shape") else len(old_embeddings)
-    )
-    if len(old_product_names) != embedding_count:
-        raise ValueError("old_embeddings first dimension must match length of old_product_names")
-
-    # Encode the new product name into the same embedding space as old_product_names
-    if new_embedding is None:
-        new_embedding = model.encode([new_product], convert_to_tensor=True)
-    else:
-        # Ensure the embedding is a 2D tensor
-        if new_embedding.dim() == 1:
-            new_embedding = new_embedding.unsqueeze(0)
-
-    # Validate tensor shapes before computing similarity
-    print(f"Debug - new_embedding shape: {new_embedding.shape}")
-    print(f"Debug - old_embeddings shape: {old_embeddings.shape}")
+class Phase4Config(Config):
+    """Enhanced configuration for Phase 4."""
     
-    # Ensure both tensors have compatible shapes
-    if new_embedding.shape[-1] != old_embeddings.shape[-1]:
-        raise ValueError(
-            f"Embedding dimension mismatch: new_embedding.shape[-1]={new_embedding.shape[-1]}, "
-            f"old_embeddings.shape[-1]={old_embeddings.shape[-1]}"
-        )
-
-    # Compute cosine similarity between the new product embedding and all old product embeddings
-    cos_scores = util.cos_sim(new_embedding, old_embeddings)[0]
-
-    # Determine the number of results to return without exceeding available products
-    if top_k < 0:
-        raise ValueError("top_k must be non-negative")
-    effective_k = min(top_k, len(old_product_names))
-
-    # Get the highest similarity scores and their indices
-    top_results = cos_scores.topk(k=effective_k)
-
-    # Pair each top score with the corresponding old product name
-    return [
-        (old_product_names[int(idx)], score.item())
-        for score, idx in zip(top_results[0], top_results[1])
-    ]
+    def __init__(self):
+        super().__init__()
+        # Performance tracking
+        self.enable_performance_tracking = True
+        self.enable_detailed_logging = False
+        
+        # Enhanced output
+        self.include_metadata = True
+        self.include_confidence_scores = True
+        self.export_performance_report = False
+        
+        # Human feedback integration
+        self.include_human_feedback = False
+        self.thai_columns = False
 
 
-def remove_duplicates(
-    df: pd.DataFrame, subset: str = "รายการ", duplicates_path: Optional[Path] = None
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def parse_arguments() -> argparse.Namespace:
+    """Parse command line arguments with Phase 4 enhancements."""
+    parser = argparse.ArgumentParser(
+        description="Product Similarity Checker - Phase 4 Enhanced Version",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Phase 4 Features:
+- Enhanced performance tracking and reporting
+- Detailed confidence scoring
+- Advanced configuration options
+- Production-ready optimizations
+
+Examples:
+    python main_phase4.py old.csv new.csv --enhanced
+    python main_phase4.py old.csv new.csv --track-performance --include-metadata
+    python main_phase4.py old.csv new.csv --confidence-scores --export-report
+        """
+    )
+    
+    # Required arguments
+    parser.add_argument('old_products_file', help='Old/reference products CSV')
+    parser.add_argument('new_products_file', help='New/query products CSV')
+    
+    # Basic options
+    parser.add_argument('--output', '-o', default='output/matched_products_phase4.csv')
+    parser.add_argument('--threshold', '-t', type=float, default=0.6)
+    parser.add_argument('--top-k', '-k', type=int, default=10)
+    parser.add_argument('--model', '-m', choices=['mock', 'tfidf', 'optimized-tfidf', 'sentence-bert', 'sentence-transformer'], default='tfidf')
+    parser.add_argument('--similarity', '-s', choices=['cosine', 'dot_product'], default='cosine')
+    parser.add_argument('--verbose', '-v', action='store_true')
+    
+    # Phase 4 enhancements
+    parser.add_argument('--enhanced', action='store_true', 
+                       help='Enable all Phase 4 enhancements')
+    parser.add_argument('--track-performance', action='store_true',
+                       help='Enable detailed performance tracking')
+    parser.add_argument('--include-metadata', action='store_true',
+                       help='Include processing metadata in results')
+    parser.add_argument('--confidence-scores', action='store_true',
+                       help='Include confidence scores for matches')
+    parser.add_argument('--export-report', action='store_true',
+                       help='Export detailed performance report')
+    parser.add_argument('--report-file', default='output/performance_report.json',
+                       help='Performance report output file')
+    
+    return parser.parse_args()
+
+
+def create_enhanced_pipeline(args: argparse.Namespace) -> ProductSimilarityPipeline:
+    """Create pipeline with Phase 4 enhancements."""
+    
+    # Create configuration
+    config = Phase4Config()
+    config.similarity_threshold = args.threshold
+    config.top_k = args.top_k
+    config.model_name = args.model
+    config.similarity_method = args.similarity
+    
+    # Apply enhancements
+    if args.enhanced or args.track_performance:
+        config.enable_performance_tracking = True
+    if args.enhanced or args.include_metadata:
+        config.include_metadata = True
+    if args.enhanced or args.confidence_scores:
+        config.include_confidence_scores = True
+    if args.enhanced or args.export_report:
+        config.export_performance_report = True
+    
+    # Create components
+    data_source = ComponentFactory.create_data_source("csv")
+    data_sink = ComponentFactory.create_data_sink("csv")
+    text_processor = ComponentFactory.create_text_processor("thai")
+    embedding_model = ComponentFactory.create_embedding_model(args.model)
+    similarity_calculator = ComponentFactory.create_similarity_calculator(args.similarity)
+    
+    # Create matcher
+    matcher = ProductMatcher(
+        embedding_model=embedding_model,
+        similarity_calculator=similarity_calculator,
+        text_processor=text_processor,
+        config=config
+    )
+    
+    # Create pipeline
+    pipeline = ProductSimilarityPipeline(
+        data_source=data_source,
+        data_sink=data_sink,
+        product_matcher=matcher
+    )
+    
+    return pipeline, config
+
+
+def enhance_results(matches: List[Dict], config: Phase4Config, feedback_data: Optional[List[Dict]] = None) -> List[Dict]:
     """
-    Remove duplicate rows from a DataFrame based on a key column or columns.
-    If duplicates are found and duplicates_path is provided, save all duplicate rows to a CSV file.
-    Parameters:
-        df (pd.DataFrame): The DataFrame to check for duplicates.
-        subset (str):
-            Column name (or list of column names) to consider for finding duplicates.
-            Defaults to 'รายการ'.
-        duplicates_path (Optional[Path]):
-            Path to save duplicate entries CSV if duplicates are found.
-            If None, duplicates are not saved.
+    Enhance results with Phase 4 features.
+    
+    Args:
+        matches: List of similarity match results
+        config: Phase4Config with enhancement options
+        feedback_data: Optional human feedback data for ML training
+        
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing:
-            - The DataFrame after removing duplicate rows
-              (keeping the first occurrence of each duplicate).
-            - A DataFrame of duplicate rows that were found (empty if no duplicates).
+        Enhanced matches with confidence scores and metadata
     """
-    # Identify all rows that are duplicated in the specified subset
-    # (including all occurrences of the duplicates)
-    duplicates_df = df[df.duplicated(subset=[subset], keep=False)]
-    # If any duplicates found and an output path is provided, save them
-    if not duplicates_df.empty and duplicates_path is not None:
-        duplicates_df.to_csv(duplicates_path, index=False, encoding="utf-8-sig")
-    # Remove duplicate rows (keeping the first occurrence of each duplicate)
-    deduped_df = df.drop_duplicates(subset=[subset])
-    return deduped_df, duplicates_df
+    enhanced_matches = []
+    
+    # Calculate confidence scores
+    if config.include_confidence_scores and matches:
+        similarity_scores = []
+        for match in matches:
+            score = match.get('similarity_score', match.get('similarity', 0))
+            similarity_scores.append(score)
+        
+        if similarity_scores:
+            max_score = max(similarity_scores)
+            min_score = min(similarity_scores)
+            score_range = max_score - min_score if max_score > min_score else 1.0
+        else:
+            max_score = min_score = score_range = 0
+    
+    for i, match in enumerate(matches):
+        enhanced_match = match.copy()
+        
+        # Add metadata
+        if config.include_metadata:
+            enhanced_match.update({
+                'match_rank': i + 1,
+                'processing_timestamp': time.time(),
+                'processor_version': 'phase4_enhanced'
+            })
+        
+        # Add confidence score
+        if config.include_confidence_scores:
+            similarity_score = match.get('similarity_score', match.get('similarity', 0))
+            if score_range > 0:
+                confidence = (similarity_score - min_score) / score_range
+            else:
+                confidence = 1.0
+            enhanced_match['confidence_score'] = round(confidence, 4)
+            
+            # Add confidence level
+            if confidence >= 0.8:
+                enhanced_match['confidence_level'] = 'high'
+            elif confidence >= 0.5:
+                enhanced_match['confidence_level'] = 'medium'
+            else:
+                enhanced_match['confidence_level'] = 'low'
+        
+        # Integrate human feedback if available
+        if feedback_data and hasattr(config, 'include_human_feedback') and config.include_human_feedback:
+            # Find matching feedback for this product pair
+            query_product = match.get('query_product', match.get('new_product', ''))
+            matched_product = match.get('matched_product', match.get('old_product', ''))
+            
+            for feedback in feedback_data:
+                if (feedback.get('new_product') == query_product and 
+                    feedback.get('old_product') == matched_product):
+                    enhanced_match.update({
+                        'human_feedback': feedback.get('human_feedback'),
+                        'human_comments': feedback.get('comments', ''),
+                        'reviewer': feedback.get('reviewer', 'anonymous'),
+                        'feedback_timestamp': feedback.get('timestamp')
+                    })
+                    break
+        
+        enhanced_matches.append(enhanced_match)
+    
+    return enhanced_matches
 
 
-def run(
-    old_products_csv: Optional[Path] = None,
-    new_products_csv: Optional[Path] = None,
-    output_dir: Optional[Path] = None,
-) -> None:
-    """
-    Run the product name comparison process:
-     1. Load old products and new products from CSV files.
-     2. Remove duplicate product names from the new products list.
-     3. Use a SentenceTransformer model to find top 3 similar old products for each new product.
-     4. Save the top matches for each new product to an output CSV file.
-    Environment Variables:
-        OLD_PRODUCTS_CSV:
-            Override path to the old products CSV file (should contain a column 'name').
-        NEW_PRODUCTS_CSV:
-            Override path to the new products CSV file (should contain a column 'รายการ').
-        OUTPUT_DIR: Override directory for output files.
-    Parameters:
-        old_products_csv (Optional[Path]):
-            Path to the CSV file of old products. If None, uses OLD_PRODUCTS_CSV env var
-            or default path.
-        new_products_csv (Optional[Path]):
-            Path to the CSV file of new products. If None, uses NEW_PRODUCTS_CSV env var
-            or default path.
-        output_dir (Optional[Path]):
-            Directory for output files. If None, uses OUTPUT_DIR env var or default path.
-    Returns:
-        None. This function writes output files and prints status messages.
-    """
-    # Determine file paths using parameters, environment variables, or defaults
-    old_products_csv = (
-        (
-            Path(os.getenv("OLD_PRODUCTS_CSV", "old_products.csv"))
-            if old_products_csv is None
-            else Path(old_products_csv)
+def generate_performance_report(start_time: float, 
+                              end_time: float,
+                              matches: List[Dict],
+                              config: Phase4Config,
+                              args: Optional[argparse.Namespace] = None) -> Dict[str, Any]:
+    """Generate detailed performance report."""
+    
+    total_time = end_time - start_time
+
+    model_type = getattr(args, 'model', getattr(config, 'model_name', 'unknown')) if args is not None else getattr(config, 'model_name', 'unknown')
+    similarity_method = getattr(args, 'similarity', getattr(config, 'similarity_method', 'unknown')) if args is not None else getattr(config, 'similarity_method', 'unknown')
+
+    report = {
+        "execution_summary": {
+            "total_execution_time": round(total_time, 3),
+            "matches_found": len(matches),
+            "processing_rate": round(len(matches) / total_time, 2) if total_time > 0 else 0,
+            "timestamp": time.time()
+        },
+        "configuration": {
+            "similarity_threshold": config.similarity_threshold,
+            "top_k": config.top_k,
+            "model_type": model_type,
+            "similarity_method": similarity_method,
+            "enhancements_enabled": {
+                "performance_tracking": getattr(config, 'enable_performance_tracking', False),
+                "metadata_inclusion": getattr(config, 'include_metadata', False),
+                "confidence_scoring": getattr(config, 'include_confidence_scores', False)
+            }
+        },
+        "results_analysis": {},
+        "recommendations": []
+    }
+    
+    # Analyze results
+    if matches:
+        scores = [m['similarity_score'] for m in matches]
+        report["results_analysis"] = {
+            "average_similarity": round(sum(scores) / len(scores), 4),
+            "max_similarity": round(max(scores), 4),
+            "min_similarity": round(min(scores), 4),
+            "score_distribution": {
+                "high_quality": len([s for s in scores if s >= 0.8]),
+                "medium_quality": len([s for s in scores if 0.5 <= s < 0.8]),
+                "low_quality": len([s for s in scores if s < 0.5])
+            }
+        }
+        
+        # Add recommendations
+        avg_score = report["results_analysis"]["average_similarity"]
+        if avg_score < 0.5:
+            report["recommendations"].append("Consider lowering similarity threshold for more matches")
+        elif avg_score > 0.9:
+            report["recommendations"].append("Consider raising similarity threshold for more precise matches")
+        
+        if total_time > 10:
+            report["recommendations"].append("Consider using batch processing for large datasets")
+    
+    return report
+
+
+def main() -> int:
+    """Enhanced main function with Phase 4 features."""
+    try:
+        # Parse arguments
+        args = parse_arguments()
+        
+        # Print header
+        print("🚀 Product Similarity Checker - Phase 4 Enhanced")
+        print("=" * 60)
+        
+        if args.verbose:
+            print("🔧 Configuration:")
+            print(f"   📁 Old products: {args.old_products_file}")
+            print(f"   📁 New products: {args.new_products_file}")
+            print(f"   🎯 Threshold: {args.threshold}")
+            print(f"   🔢 Top-k: {args.top_k}")
+            print(f"   🧠 Model: {args.model}")
+            print(f"   📐 Similarity: {args.similarity}")
+            
+            enhancements = []
+            if args.enhanced: enhancements.append("full enhancement")
+            if args.track_performance: enhancements.append("performance tracking")
+            if args.include_metadata: enhancements.append("metadata")
+            if args.confidence_scores: enhancements.append("confidence scores")
+            if args.export_report: enhancements.append("performance report")
+            
+            if enhancements:
+                print(f"   ✨ Enhancements: {', '.join(enhancements)}")
+            print()
+        
+        # Create enhanced pipeline
+        print("🔧 Initializing enhanced pipeline...")
+        pipeline, config = create_enhanced_pipeline(args)
+        
+        # Record start time
+        start_time = time.time()
+        
+        # Run pipeline
+        print("🎯 Starting enhanced similarity analysis...")
+        results = pipeline.run(
+            query_data_source=args.new_products_file,
+            reference_data_source=args.old_products_file,
+            output_destination=args.output,
+            query_column="รายการ",
+            reference_column="name"
         )
-        .expanduser()
-        .resolve()
-    )
-    new_products_csv = (
-        (
-            Path(os.getenv("NEW_PRODUCTS_CSV", "new_products.csv"))
-            if new_products_csv is None
-            else Path(new_products_csv)
-        )
-        .expanduser()
-        .resolve()
-    )
-    output_dir = (
-        (Path(os.getenv("OUTPUT_DIR", "output")) if output_dir is None else Path(output_dir))
-        .expanduser()
-        .resolve()
-    )
-    # Ensure the output directory exists
-    output_dir.mkdir(parents=True, exist_ok=True)
-    # Load datasets
-    old_products_df = pd.read_csv(old_products_csv)
-    new_products_df = pd.read_csv(new_products_csv)
-    # Extract product name lists
-    old_product_names: List[str] = old_products_df["name"].tolist()
-    # Remove duplicate new product names
-    duplicates_path = output_dir / "duplicate_new_products.csv"
-    new_products_df_deduped, duplicates_df = remove_duplicates(
-        new_products_df, subset="รายการ", duplicates_path=duplicates_path
-    )
-    # If duplicates were found, inform the user
-    if not duplicates_df.empty:
-        # Print number of duplicate entries (counting all occurrences of duplicates)
-        print(f"พบสินค้าซ้ำ {len(duplicates_df)} รายการ บันทึกที่ {duplicates_path}")
-    # Update new product names list after removing duplicates
-    new_product_names: List[str] = new_products_df_deduped["รายการ"].tolist()
-    # Load pre-trained model for multilingual sentence similarity
-    model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
-    # Compute embeddings for all old product names (for efficiency, do this once)
-    old_embeddings = model.encode(old_product_names, convert_to_tensor=True)
-    name_to_index = {name: idx for idx, name in enumerate(old_product_names)}
-    # Prepare a list to collect the similarity results
-    output_rows: List[dict] = []
-    # Compute top 3 similar old products for each new product
-    for new_product in new_product_names:
-        try:
-            new_vec = model.encode([new_product], convert_to_tensor=True)
-            top_matches = check_product_similarity(
-                new_product, old_product_names, old_embeddings, model, top_k=3, new_embedding=new_vec
-            )
-            for old_name, score in top_matches:
-                row = {
-                    "new_product": new_product,
-                    "new_product_vector": new_vec[0].tolist(),
-                    "matched_old_product": old_name,
-                    "score": score,
-                }
-                old_idx = name_to_index.get(old_name)
-                if old_idx is not None:
-                    row["matched_old_vector"] = old_embeddings[old_idx].tolist()
-                output_rows.append(row)
-        except Exception as e:
-            print(f"Error processing product '{new_product}': {e}")
-            print(f"  new_vec shape: {new_vec.shape if 'new_vec' in locals() else 'N/A'}")
-            print(f"  old_embeddings shape: {old_embeddings.shape}")
-            print(f"  Skipping this product and continuing...")
-            continue  # ข้ามไป product ถัดไปแทนที่จะ crash
-    # Save the matching results to CSV
-    output_df = pd.DataFrame(output_rows)
-    matched_path = output_dir / "matched_products.csv"
-    output_df.to_csv(matched_path, index=False, encoding="utf-8-sig")
-    print(
-        f"บันทึกผลลัพธ์ที่ {matched_path}",
-        "เรียบร้อยแล้ว",
-        "(encoding utf-8-sig สำหรับ Excel)",
-    )
+        
+        # Record end time
+        end_time = time.time()
+        
+        # Enhance results if requested
+        if results and (config.include_metadata or config.include_confidence_scores):
+            print("✨ Enhancing results with Phase 4 features...")
+            enhanced_results = enhance_results(results, config)
+            
+            # Save enhanced results
+            import pandas as pd
+            df = pd.DataFrame(enhanced_results)
+            df.to_csv(args.output, index=False)
+            results = enhanced_results
+        
+        # Generate performance report
+        if args.export_report or config.export_performance_report:
+            print("📊 Generating performance report...")
+            report = generate_performance_report(start_time, end_time, results, config, args)
+            
+            # Save report
+            report_file = Path(args.report_file)
+            report_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(report_file, 'w', encoding='utf-8') as f:
+                json.dump(report, f, indent=2, ensure_ascii=False)
+            
+            print(f"📄 Report saved to: {report_file}")
+        
+        # Display results
+        execution_time = end_time - start_time
+        print("\n✅ Enhanced Analysis Complete!")
+        print("=" * 60)
+        print(f"📊 Results: {len(results) if results else 0} matches found")
+        print(f"⏱️  Execution time: {execution_time:.2f} seconds")
+        print(f"📁 Results saved to: {args.output}")
+        
+        if args.verbose and results:
+            print(f"\n🔍 Top matches:")
+            for i, match in enumerate(results[:3], 1):
+                print(f"   {i}. {match['query_product'][:40]}...")
+                print(f"      → {match['matched_product'][:40]}...")
+                print(f"      📈 Score: {match['similarity_score']:.4f}")
+                if 'confidence_score' in match:
+                    print(f"      🎯 Confidence: {match['confidence_score']:.4f} ({match.get('confidence_level', 'unknown')})")
+                print()
+        
+        print("🎉 Phase 4 enhanced processing completed successfully!")
+        return 0
+        
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        if args.verbose if 'args' in locals() else False:
+            import traceback
+            traceback.print_exc()
+        return 1
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Match new products to existing catalog")
-    parser.add_argument("--old-products-csv", help="CSV of existing products")
-    parser.add_argument("--new-products-csv", help="CSV of new products to check")
-    parser.add_argument("--output-dir", help="Directory for output files")
-    args = parser.parse_args()
-
-    old_csv = args.old_products_csv or os.getenv("OLD_PRODUCTS_CSV")
-    new_csv = args.new_products_csv or os.getenv("NEW_PRODUCTS_CSV")
-
-    if old_csv is None:
-        old_csv = prompt_csv_path("Path to old products CSV: ")
-    if new_csv is None:
-        new_csv = prompt_csv_path("Path to new products CSV: ")
-
-    run(old_csv, new_csv, args.output_dir)
+    sys.exit(main())
