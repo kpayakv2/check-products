@@ -76,6 +76,48 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * PATCH /api/import/pending
+ * อัปเดตหมวดหมู่ที่แนะนำ (Manual Override)
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const { suggestion_id, new_category_id } = await request.json()
+
+    if (!suggestion_id || !new_category_id) {
+      return NextResponse.json(
+        { error: 'Missing suggestion_id or new_category_id' },
+        { status: 400 }
+      )
+    }
+
+    const { error } = await supabase
+      .from('product_category_suggestions')
+      .update({
+        suggested_category_id: new_category_id,
+        confidence_score: 1.0, // การแก้ด้วยคนถือว่าความมั่นใจสูงสุด
+        suggestion_method: 'manual'
+      })
+      .eq('id', suggestion_id)
+
+    if (error) {
+      console.error('Error updating suggestion:', error)
+      return NextResponse.json(
+        { error: 'Failed to update suggestion' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Update suggestion API error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
  * POST /api/import/pending
  * Approve/Reject suggestions แบบ batch
  */

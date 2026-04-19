@@ -331,6 +331,18 @@ export class DatabaseService {
     return data
   }
 
+  static async searchTaxonomyNodes(query: string, limit = 10): Promise<TaxonomyNode[]> {
+    const { data, error } = await supabase
+      .from('taxonomy_nodes')
+      .select('*')
+      .or(`name_th.ilike.%${query}%,code.ilike.%${query}%`)
+      .eq('is_active', true)
+      .limit(limit)
+
+    if (error) throw error
+    return data || []
+  }
+
   static async deleteTaxonomyNode(id: string): Promise<void> {
     const { error } = await supabase
       .from('taxonomy_nodes')
