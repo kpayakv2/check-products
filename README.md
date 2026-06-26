@@ -61,7 +61,7 @@ npm install
 | Service | URL | Description |
 |---------|-----|-------------|
 | **Web UI** | `http://localhost:3000` | หน้าจอหลักสำหรับใช้งานระบบ |
-| **AI Engine** | `http://localhost:8000` | REST API สำหรับ Embeddings |
+| **AI Engine** | `http://127.0.0.1:8000` | REST API สำหรับ Embeddings |
 | **Supabase Studio** | `http://localhost:54323` | จัดการฐานข้อมูลและ Edge Functions |
 
 ---

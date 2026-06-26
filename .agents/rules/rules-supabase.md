@@ -1,15 +1,56 @@
+---
+name: rules-supabase
+description: |
+  กฎมาตรฐานสำหรับการทำงานกับ Supabase และฐานข้อมูล PostgreSQL
+  ครอบคลุม Client Usage, Type Safety, RLS และ Vector Search
+
+triggers:
+  - สร้างหรือแก้ไขตารางใน Supabase
+  - เขียน Supabase Query หรือ RPC Function
+  - สร้างหรือแก้ไข Edge Functions
+  - งานที่เกี่ยวกับ pgvector หรือ Embedding
+  - Migration หรือ Schema changes
+---
+
 # ⚡ Supabase & Database Rules
 
 ## Context
 ใช้เมื่อมีการสร้างหรือแก้ไขตารางฐานข้อมูล, เขียน Query ผ่าน Supabase Client, หรือสร้าง Edge Functions ที่เกี่ยวข้องกับ AI/Vector Search
+
+## Port Configuration (Windows Local Dev)
+- **Supabase API Gateway:** พอร์ต `54331` (เนื่องจาก `54321` ถูก Windows Reserve)
+- **Database Port:** พอร์ต `54325`
+- **Connection:** ใช้ `127.0.0.1` แทน `localhost` ใน Python/FastAPI เสมอ (Win32 quirk)
 
 ## Standards
 - **Client Usage**: ใช้ Supabase Client เสมอ ห้ามเขียน SQL Direct ใน Application Code
 - **Type Safety**: ใช้ TypeScript Generics ในทุก Query
 - **Row Level Security (RLS)**: ต้องเปิดใช้งาน RLS ในทุกตาราง และกำหนด Policy ให้ชัดเจน
 - **Vector Search**: ใช้ค่า Cosine Distance (`<=>`) เป็นหลักสำหรับงาน Similarity
+- **Embedding Dimension**: **384 dims** (`paraphrase-multilingual-MiniLM-L12-v2`) เท่านั้น
+
+## 🔭 Schema-Aware Development (Socraticode)
+
+ก่อนเพิ่มหรือแก้ไข Column/Table ใหม่ ต้องทำขั้นตอนนี้:
+
+1. **ตรวจสอบ schema artifacts ที่มีอยู่:**
+   ```
+   codebase_context { projectPath: "d:\\product_checker\\check-products" }
+   ```
+   → ดูว่า `DATABASE_SCHEMA.md` เป็นเวอร์ชันล่าสุดหรือยัง
+
+2. **ค้นหาว่า Column/Table ที่จะเพิ่มมีการใช้ที่ไหนบ้าง:**
+   ```
+   codebase_search { query: "ชื่อตารางหรือ column ที่จะแก้" }
+   ```
+
+3. **วิเคราะห์ blast radius ของ migration:**
+   ```
+   codebase_impact { target: "ชื่อไฟล์ migration" }
+   ```
 
 ## Examples
+
 
 ### ✅ Good: การ Query พร้อมกำหนด Type
 ```typescript
@@ -28,7 +69,7 @@ const { data } = await supabase
   .select();
 ```
 
-### ✅ Good: การทำ Semantic Search (SQL RPC)
+### ✅ Good: การทำ Semantic Search (SQL RPC) — 384 dim
 ```sql
 -- สร้าง Function สำหรับคำนวณความคล้าย
 CREATE OR REPLACE FUNCTION match_products (

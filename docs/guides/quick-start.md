@@ -1,109 +1,53 @@
-# 🚀 Quick Start Guide (Modern Stack)
+# 🚀 Quick Start Guide (Modern Hybrid Stack v3.0)
 
-ยินดีต้อนรับสู่คู่มือการเริ่มต้นใช้งานระบบ **Thai Product Taxonomy Manager & Similarity Checker** ฉบับปรับปรุงใหม่ที่รองรับสถาปัตยกรรม Next.js และ Supabase
-
----
-
-## ✅ ข้อกำหนดเบื้องต้น (Prerequisites)
-
-- **Node.js 18+** และ npm
-- **Python 3.9+**
-- **Docker Desktop** (สำหรับรัน Supabase Local)
-- **Supabase CLI** (ติดตั้งผ่าน `npm install supabase --save-dev` หรือตาม [คู่มือ](https://supabase.com/docs/guides/cli))
+คู่มือการเริ่มต้นใช้งานระบบ **Thai Product Taxonomy Manager** ฉบับปรับปรุงล่าสุด
 
 ---
 
-## ⚙️ ขั้นตอนการติดตั้ง (Installation)
+## ✅ ลำดับการรันระบบ (Correct Startup Sequence)
 
-### 1. Clone Repository
+เพื่อให้ระบบทำงานได้สมบูรณ์ กรุณารันตามลำดับดังนี้:
+
+### 1. เปิดระบบฐานข้อมูล (Supabase)
+*   เปิดโปรแกรม **Docker Desktop**
+*   ใช้คำสั่ง: `supabase start` ใน Terminal
+
+### 2. รัน AI Engine (FastAPI) - **หัวใจหลัก**
+*   เปิด Terminal ใหม่
+*   เปิด Virtual Env: `venv\Scripts\activate` (Windows)
+*   รัน Server: `python api_server.py`
+*   **ตรวจสอบ**: ต้องเห็นข้อความรันอยู่ที่ `http://127.0.0.1:8000`
+
+### 3. รันหน้าเว็บจัดการข้อมูล (Next.js)
+*   เปิด Terminal ใหม่
+*   ไปที่โฟลเดอร์: `cd taxonomy-app`
+*   รันเว็บ: `npm run dev`
+*   **เข้าใช้งาน**: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 💻 การใช้งานหลัก (Core Workflows)
+
+### **A. การจัดหมวดหมู่สินค้าใหม่**
+1.  เข้าหน้าเว็บ Port 3000
+2.  ไปที่เมนู **Import** หรือ **Classification**
+3.  ระบบจะส่งชื่อสินค้าไปที่ API Port 8000 เพื่อคำนวณ Hybrid Score (60/40)
+4.  ตรวจสอบผลลัพธ์: 🟢 Auto-Approve (>0.9) หรือ 🟡 Needs Review (0.7-0.9)
+
+### **B. การตรวจซ้ำสินค้า (Deduplication)**
+ใช้สคริปต์ Pipeline เพื่อประสิทธิภาพสูงสุด:
 ```bash
-git clone <repository-url>
-cd check-products
-```
-
-### 2. ตั้งค่า AI Engine (FastAPI)
-AI Engine ทำหน้าที่สร้าง Vector Embeddings สำหรับภาษาไทย
-```bash
-# สร้าง virtual environment
-python -m venv venv
-venv\Scripts\activate  # Windows
-
-# ติดตั้ง dependencies
-pip install -r requirements.txt
-
-# รัน AI Engine
-python api_server.py
-# ระบบจะรันที่ http://localhost:8000
-```
-
-### 3. ตั้งค่า Database & Backend (Supabase)
-```bash
-# เริ่มต้น Supabase (ต้องเปิด Docker Desktop ก่อน)
-supabase start
-
-# รัน Migration (ถ้ามี)
-supabase db reset
-```
-
-### 4. ตั้งค่า Frontend (Next.js)
-```bash
-cd taxonomy-app
-npm install
-
-# รัน Frontend
-npm run dev
-# ระบบจะรันที่ http://localhost:3000
+# วิเคราะห์ไฟล์สินค้า
+python complete_deduplication_pipeline.py --input data.csv --mode analyze
 ```
 
 ---
 
-## 💻 การใช้งานระบบ (Usage)
-
-### 1. เข้าใช้งาน Web UI
-เปิดเบราว์เซอร์ไปที่ [http://localhost:3000](http://localhost:3000) เพื่อเข้าสู่ Dashboard หลัก
-
-### 2. นำเข้าข้อมูล (Import Wizard)
-- ไปที่เมนู **"Import"**
-- อัปโหลดไฟล์ CSV (รองรับชื่อไฟล์ภาษาไทย)
-- ระบบจะส่งข้อมูลไปประมวลผลผ่าน AI Engine และแสดงข้อแนะนำหมวดหมู่แบบ Real-time
-
-### 3. ตรวจสอบและยืนยัน (Review Process)
-- ตรวจสอบความถูกต้องของหมวดหมู่ที่ AI แนะนำ (Hybrid Score)
-- กด **"Approve"** เพื่อบันทึกลงฐานข้อมูลหลัก หรือแก้ไขหากไม่ถูกต้อง
-- ระบบจะนำ Feedback ไปปรับปรุงความแม่นยำโดยอัตโนมัติ
+## 🔌 การเชื่อมต่อ (Integration Details)
+*   **API Local**: `http://127.0.0.1:8000/api/classify/category`
+*   **Vector Provider**: `http://127.0.0.1:8000/api/embed`
+*   **Interactive API Docs**: `http://127.0.0.1:8000/docs` (Swagger UI)
 
 ---
 
-## 🔌 API & Integration
-
-### **AI Embedding API**
-- `POST http://localhost:8000/api/embed`
-- ใช้สำหรับสร้าง 384-dim vector จากข้อความภาษาไทย
-
-### **Supabase Edge Functions**
-- `category-suggestions` - แนะนำหมวดหมู่ด้วย Keyword
-- `hybrid-classification-local` - แนะนำหมวดหมู่ด้วย Hybrid Algorithm (Keyword 60% + Embedding 40%)
-
----
-
-## 🧪 การทดสอบ (Testing)
-
-```bash
-# ทดสอบ Python Logic
-pytest
-
-# ทดสอบ Frontend (Next.js)
-cd taxonomy-app
-npm test
-```
-
----
-
-## ⚠️ ข้อควรระวัง
-- ตรวจสอบให้แน่ใจว่า **Docker Desktop** กำลังทำงานอยู่ก่อนรัน `supabase start`
-- **FastAPI** ต้องทำงานอยู่ที่ port 8000 เพื่อให้ Edge Functions สามารถดึง Embeddings ได้
-- ข้อมูลในตาราง `imports` บน Local Dev อาจต้องใช้ `fix_imports_rls.sql` หากพบปัญหา Permission
-
----
-
-**พร้อมใช้งานแล้ว!** หากพบปัญหา สามารถศึกษาเพิ่มเติมได้ที่ [`GEMINI.md`](../../GEMINI.md) หรือสอบถามผ่านทีมพัฒนาครับ 🚀
+**📅 Last Updated**: 16 เมษายน 2569 (Verified for FastAPI)

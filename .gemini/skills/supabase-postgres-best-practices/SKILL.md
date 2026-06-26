@@ -1,28 +1,64 @@
-# Supabase Postgres Best Practices Skill
+---
+name: supabase-postgres-best-practices
+description: Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations.
+license: MIT
+metadata:
+  author: supabase
+  version: "1.1.1"
+  organization: Supabase
+  date: January 2026
+  abstract: Comprehensive Postgres performance optimization guide for developers using Supabase and Postgres. Contains performance rules across 8 categories, prioritized by impact from critical (query performance, connection management) to incremental (advanced features). Each rule includes detailed explanations, incorrect vs. correct SQL examples, query plan analysis, and specific performance metrics to guide automated optimization and code generation.
+---
 
-## Overview
-This skill provides procedural knowledge for optimizing Postgres databases within the Supabase ecosystem, specifically focusing on Thai product taxonomy management.
+# Supabase Postgres Best Practices
 
-## Key Rules (by Priority)
+Comprehensive performance optimization guide for Postgres, maintained by Supabase. Contains rules across 8 categories, prioritized by impact to guide automated query optimization and schema design.
 
-### 1. Query Performance (CRITICAL) - Prefix: `query-`
-- **Missing Indexes:** Always check for missing indexes on frequently filtered columns (e.g., `category_id`, `product_name`).
-- **Partial Indexes:** Use partial indexes for large tables where only a subset of data is frequently queried.
-- **Explain Analysis:** Use `EXPLAIN ANALYZE` to verify query plans before deployment.
+## When to Apply
 
-### 2. Security & RLS (CRITICAL) - Prefix: `security-`
-- **Row-Level Security (RLS):** Ensure all tables have RLS enabled.
-- **Policy Optimization:** Keep RLS policies simple to avoid performance overhead on each row fetch.
+Reference these guidelines when:
+- Writing SQL queries or designing schemas
+- Implementing indexes or query optimization
+- Reviewing database performance issues
+- Configuring connection pooling or scaling
+- Optimizing for Postgres-specific features
+- Working with Row-Level Security (RLS)
 
-### 3. Schema Design (HIGH) - Prefix: `schema-`
-- **Data Normalization:** Balance between normalization and performance for high-read product data.
-- **Constraints:** Use proper foreign key constraints and check constraints (e.g., for `confidence_score` between 0 and 1).
+## Rule Categories by Priority
 
-### 4. Advanced Features (MEDIUM) - Prefix: `advanced-`
-- **Full-Text Search:** Leverage Postgres GIN indexes for Thai text searching if embedding search is overkill.
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Query Performance | CRITICAL | `query-` |
+| 2 | Connection Management | CRITICAL | `conn-` |
+| 3 | Security & RLS | CRITICAL | `security-` |
+| 4 | Schema Design | HIGH | `schema-` |
+| 5 | Concurrency & Locking | MEDIUM-HIGH | `lock-` |
+| 6 | Data Access Patterns | MEDIUM | `data-` |
+| 7 | Monitoring & Diagnostics | LOW-MEDIUM | `monitor-` |
+| 8 | Advanced Features | LOW | `advanced-` |
 
-## How to Apply
-Invoke this skill when:
-- Designing new database schemas for products or taxonomy.
-- Optimizing slow queries in the similarity matching engine.
-- Writing RLS policies for the Next.js frontend.
+## How to Use
+
+Read individual rule files for detailed explanations and SQL examples:
+
+```
+references/query-missing-indexes.md
+references/query-partial-indexes.md
+references/_sections.md
+```
+
+Each rule file contains:
+- Brief explanation of why it matters
+- Incorrect SQL example with explanation
+- Correct SQL example with explanation
+- Optional EXPLAIN output or metrics
+- Additional context and references
+- Supabase-specific notes (when applicable)
+
+## References
+
+- https://www.postgresql.org/docs/current/
+- https://supabase.com/docs
+- https://wiki.postgresql.org/wiki/Performance_Optimization
+- https://supabase.com/docs/guides/database/overview
+- https://supabase.com/docs/guides/auth/row-level-security

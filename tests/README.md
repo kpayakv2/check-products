@@ -41,7 +41,7 @@ tests/
 from tests.config import TestConfig
 
 # Get API URL
-api_url = TestConfig.get_api_url('main')  # http://localhost:5000
+api_url = TestConfig.get_api_url('main')  # http://127.0.0.1:5000
 
 # Get endpoint URL  
 status_url = TestConfig.get_endpoint_url('status', 'main')
@@ -116,7 +116,7 @@ def test_example(sentence_transformer_model, sample_old_products, api_timeout):
 ```python
 # In every test file
 import requests
-base_url = "http://localhost:5000"
+base_url = "http://127.0.0.1:5000"
 response = requests.get(f"{base_url}/api/status", timeout=5)
 
 from sentence_transformers import SentenceTransformer  

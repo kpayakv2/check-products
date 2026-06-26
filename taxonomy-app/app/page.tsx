@@ -129,26 +129,19 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true)
-      const [taxonomyData, synonymData, productData] = await Promise.all([
-        DatabaseService.getTaxonomyTree(),
-        DatabaseService.getSynonyms(),
-        DatabaseService.getProducts()
-      ])
-
-      setStats({
-        totalCategories: taxonomyData?.length || 0,
-        totalSynonyms: synonymData?.length || 0,
-        pendingProducts: productData?.filter(p => p.status === 'pending')?.length || 0,
-        approvedProducts: productData?.filter(p => p.status === 'approved')?.length || 0,
-        duplicateMatches: productData?.filter(p => p.status === 'rejected')?.length || 0,
-        reviewsToday: productData?.filter(p => {
-          const today = new Date().toDateString()
-          return new Date(p.updated_at).toDateString() === today
-        })?.length || 0
-      })
+      const dashboardStats = await DatabaseService.getDashboardStats()
+      setStats(dashboardStats)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
-      // No longer using mock data as per user request
+      // Fallback to zeros on error
+      setStats({
+        totalCategories: 0,
+        totalSynonyms: 0,
+        pendingProducts: 0,
+        approvedProducts: 0,
+        duplicateMatches: 0,
+        reviewsToday: 0
+      })
     } finally {
       setIsLoading(false)
     }

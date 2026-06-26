@@ -159,9 +159,9 @@ export default function ProcessingStep({
         </div>
 
         <h2 className="text-3xl font-black text-slate-900 mb-3 font-noto-sans-thai tracking-tight">
-          {status === 'completed' ? 'AI วิเคราะห์เสร็จสิ้น!' : 
+          {status === 'completed' ? 'วิเคราะห์ข้อมูลเสร็จสิ้น!' : 
            status === 'error' ? 'เกิดข้อผิดพลาด' : 
-           '🤖 พยัคฆ์ AI กำลังประมวลผล'}
+           '🤖 พยัคฆ์อัจฉริยะกำลังประมวลผล'}
         </h2>
         <p className="text-slate-400 font-bold text-sm truncate max-w-lg mx-auto uppercase tracking-widest">{message}</p>
 

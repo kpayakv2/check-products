@@ -10,7 +10,7 @@ import time
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from fresh_implementations import ThaiTextProcessor, ComponentFactory
+from src.core.fresh_implementations import ThaiTextProcessor, ComponentFactory
 
 def run_benchmark():
     print("📊 Starting Similarity Benchmark...")

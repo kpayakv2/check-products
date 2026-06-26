@@ -140,7 +140,7 @@ from tests.utils import APITestHelper, ModelTestHelper, DataTestHelper
 #### **Step 2**: แทนที่ hardcoded values
 ```python
 # เก่า
-base_url = "http://localhost:5000"
+base_url = "http://127.0.0.1:5000"
 
 # ใหม่  
 base_url = TestConfig.get_api_url('main')

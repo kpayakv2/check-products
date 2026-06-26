@@ -1,64 +1,71 @@
-# 📊 Import Wizard - Progress Report (Updated April 2026)
+# 📊 Import Wizard - Progress Report (Updated May 2026)
 
-**Last Updated:** 2026-04-09
-**Status:** 🚀 **Production Ready (95%)**
+**Last Updated:** 2026-05-30
+**Status:** 🚀 **Production Ready (100% UI Complete, API Connected, Pending full E2E)**
 
 ---
 
-## ✅ **Completed Steps (1-5)**
+## ✅ **Completed Steps (The Magic 5-Step Flow)**
 
-### **Step 1: File Selection** ✅
-**Status:** Complete & Enhanced
-- ✅ Drag & Drop file upload
-- ✅ Supports CSV & XLSX
-- ✅ **Storage Import Mode:** ดึงไฟล์โดยตรงจากตาราง `imports` ในฐานข้อมูล
-- ✅ แสดงชื่อไฟล์ภาษาไทยต้นฉบับ พร้อมระบบค้นหา
+### **Step 1: Upload & Mapping** ✅
+**Component:** `UploadAndMappingStep.tsx`
+**Status:** Complete
+- ✅ รวมหน้าอัปโหลดไฟล์และจับคู่คอลัมน์ไว้ในหน้าเดียวเพื่อลดความซ้ำซ้อน
+- ✅ รองรับ CSV & XLSX (Drag & Drop)
+- ✅ Auto-detect คอลัมน์ `product_name` แบบอัตโนมัติ
 
-### **Step 2: Column Mapping** ✅
-**Status:** Complete & Tested
-- ✅ CSV Parser รองรับภาษาไทย (UTF-8/BOM)
-- ✅ Auto-detect คอลัมน์ `product_name`
-- ✅ Preview ข้อมูล 10 แถวแรกก่อนประมวลผล
+### **Step 2: Data Cleaning** ✅
+**Component:** `DataCleaningStep.tsx`
+**Status:** Complete
+- ✅ เรียกใช้ Backend `/api/v1/clean` (FastAPI) แบบ Batch
+- ✅ ใช้ `ThaiTextProcessor` ในการลบหน่วยวัด, คำสแปม, จัดการเลขไทย
+- ✅ แสดง Preview ชื่อสินค้าก่อน-หลังทำความสะอาด
 
-### **Step 3: AI Processing** ✅ **ENHANCED**
-**Status:** Complete & Production Ready
-- ✅ **Thai Filename Support:** ระบบ `sanitizeFileName()` แปลงชื่อไฟล์เป็น ASCII ก่อน Upload ขึ้น Storage (เพื่อเลี่ยง Error 400) แต่ยังคงรักษาชื่อไทยต้นฉบับไว้ในตาราง `imports`
-- ✅ **Streaming API:** แสดงความคืบหน้าแบบ Real-time รายรายการผ่าน Server-Sent Events (SSE)
-- ✅ **Hybrid Algorithm:** เรียกใช้ Edge Functions (`generate-embeddings-local` และ `hybrid-classification-local`) เพื่อประมวลผล 60% Keyword + 40% Vector
-- ✅ **Database Sync:** บันทึกข้อมูลลงตาราง `products` และ `product_category_suggestions` อัตโนมัติ
+### **Step 3: Deduplication Triage** ✅
+**Component:** `DeduplicationStep.tsx`
+**Status:** Complete
+- ✅ คัดกรองสินค้าซ้ำ (Exact Match / Semantic Match)
+- ✅ Dashboard สรุปความเสี่ยง (ซ้ำแน่นอน, อาจจะซ้ำ, ไม่ซ้ำ)
+- ✅ Batch Actions: ข้ามรายการที่ซ้ำ (Skip Duplicates) หรือ ดำเนินการต่อทั้งหมด
+- ✅ *หมายเหตุ: UI เสร็จสมบูรณ์แล้ว เชื่อมต่อ API `/api/v1/match/batch` แล้ว*
 
-### **Step 4: Review & Approve** ✅ **COMPLETED**
-**Status:** Complete & Integrated
-- ✅ แสดงรายการสินค้าที่รอการตรวจสอบ (Status: `pending_review_category`)
-- ✅ ดึงข้อมูล AI Suggestions พร้อมค่าความเชื่อมั่น (Confidence Score)
-- ✅ ระบบ Approve/Reject รายรายการหรือแบบกลุ่ม (Batch Approval)
-- ✅ เชื่อมต่อกับหน้า `/import/pending` เพื่อให้กลับมาทำงานต่อได้ (Resumable)
+### **Step 4: AI Categorization Review** ✅
+**Component:** `CategorizationStep.tsx`
+**Status:** Complete
+- ✅ แสดงหมวดหมู่ที่ AI แนะนำด้วย Hybrid Algorithm (Keyword 60% + Embedding 40%)
+- ✅ แสดง Confidence Score เป็นเปอร์เซ็นต์แบบมีสีสัน (เขียว, เหลือง, แดง)
+- ✅ ระบบ "Review-by-Exception" กดยอมรับหมวดหมู่ที่ AI มั่นใจสูงแบบกลุ่มได้ทันที
+- ✅ *หมายเหตุ: UI เสร็จสมบูรณ์แล้ว เชื่อมต่อ AI API ท้ายสุดแล้ว*
 
 ### **Step 5: Complete & Summary** ✅
+**Component:** `CompleteStep.tsx`
 **Status:** Complete
-- ✅ สรุปสถิติการนำเข้า (สำเร็จ/ล้มเหลว)
-- ✅ แสดงประวัติการนำเข้าล่าสุด (Import History)
-- ✅ ปุ่มทางลัดไปยังหน้าจัดการสินค้า
+- ✅ สรุปสถิติหลังนำเข้า: สินค้าทั้งหมด, นำเข้าสำเร็จ, ข้ามเพราะซ้ำ, หมวดหมู่ยอดฮิต
+- ✅ Confetti Animation ฉลองความสำเร็จ
+- ✅ ปุ่มทางลัดไปยังหน้า Taxonomy และหน้า Products
 
 ---
 
-## 🏗️ **Technical Architecture (Finalized)**
+## 🏗️ **Technical Architecture (New Pipeline)**
 
 ```
-Client (Wizard UI) 
-    ↓ (Uploads to Storage + Creates Record)
-Server (Next.js API Route)
-    ↓ (Streams CSV Lines)
-Edge Functions (Supabase)
-    ↓ (Orchestrates AI)
-FastAPI (AI Engine)
-    ↓ (Embeddings)
+Client (Wizard UI - Next.js) 
+    ↓ (1. Upload)
+Next.js API
+    ↓ (2. Batch Clean)
+FastAPI (ThaiTextProcessor)
+    ↓ (3. Batch Dedup)
+FastAPI (/api/v1/match/batch)
+    ↓ (4. Batch Categorize)
+Supabase Edge Functions / FastAPI (Hybrid 384-dim)
+    ↓ (5. Save)
 Database (PostgreSQL)
 ```
 
-## 🎯 **Next Steps (Optimization)**
-- [ ] **Feedback Loop:** เพิ่มระบบเรียนรู้จากคำสั่ง Approve/Reject เพื่อสร้าง Keyword Rules ใหม่โดยอัตโนมัติ
-- [ ] **Batch Insert:** ปรับปรุงความเร็วในการเขียนข้อมูลลงฐานข้อมูลเมื่อมีรายการจำนวนมาก (>5,000 รายการ)
+## 🎯 **Next Steps (Backend Integration)**
+- [x] **API Connection:** เชื่อมต่อ `DeduplicationStep` เข้ากับ Endpoint `/api/v1/match/batch` จริง
+- [x] **API Connection:** เชื่อมต่อ `CategorizationStep` เข้ากับ Hybrid Algorithm Edge Function
+- [ ] **E2E Testing:** ทดสอบการทำงานตั้งแต่ Step 1 ถึง 5 โดยใช้ข้อมูลจริง ไม่ใช้ข้อมูลจำลอง (No-Mock)
 
 ---
-**Status Summary:** 5/5 steps functional - **Fully integrated with Supabase and FastAPI AI Engine** ✅
+**Status Summary:** UI Frontend Components ทั้ง 5 ขั้นตอนเสร็จสมบูรณ์ 100% พร้อมเชื่อมต่อ Backend ✅

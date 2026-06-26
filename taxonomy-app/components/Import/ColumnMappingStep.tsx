@@ -16,7 +16,8 @@ import {
   FolderTreeIcon,
   TargetIcon,
   ListFilterIcon,
-  EyeIcon
+  EyeIcon,
+  ZapIcon
 } from 'lucide-react'
 import { parseCSV, validateCSV, getColumnStats, type ParsedCSV } from '@/utils/csv-parser'
 
@@ -221,7 +222,7 @@ export default function ColumnMappingStep({
           <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
           <BrainIcon className="w-6 h-6 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
-        <p className="text-slate-500 font-bold animate-pulse font-noto-sans-thai text-sm uppercase tracking-widest">พยัคฆ์ AI กำลังตรวจสอบโครงสร้างไฟล์...</p>
+        <p className="text-slate-500 font-bold animate-pulse font-noto-sans-thai text-sm uppercase tracking-widest">พยัคฆ์อัจฉริยะกำลังตรวจสอบโครงสร้างไฟล์...</p>
       </div>
     )
   }
@@ -336,7 +337,7 @@ export default function ColumnMappingStep({
                 <p className={`text-xs font-medium ${isProductNameMapped ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {isProductNameMapped 
                     ? 'ระบบตรวจสอบเบื้องต้นแล้ว ข้อมูลครบถ้วนสำหรับเริ่มงานครับ' 
-                    : 'กรุณาเลือกคอลัมน์ "ชื่อสินค้า" เพื่อให้ AI ทำงานได้'}
+                    : 'กรุณาเลือกคอลัมน์ "ชื่อสินค้า" เพื่อให้ระบบวิเคราะห์ทำงานได้'}
                 </p>
               </div>
             </div>
@@ -402,7 +403,7 @@ export default function ColumnMappingStep({
         >
           {canProceed ? (
             <>
-              เริ่มประมวลผล AI
+              เริ่มประมวลผลวิเคราะห์
               <ZapIcon className="w-4 h-4 fill-current text-yellow-400" />
             </>
           ) : (

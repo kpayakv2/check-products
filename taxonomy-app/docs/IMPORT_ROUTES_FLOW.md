@@ -1,47 +1,41 @@
-# 🔄 Import System Routes & Flow (Revised April 2026)
+# 🔄 Import System Routes & Flow (Revised May 2026)
 
-เอกสารฉบับนี้อธิบายกระบวนการไหลของข้อมูล (Data Flow) ในระบบนำเข้าสินค้าเวอร์ชันล่าสุด
-
----
-
-## 🏗️ Core Workflow: The Streaming Architecture
-
-ระบบนำเข้าสินค้าใช้สถาปัตยกรรมแบบ **Streaming** เพื่อรองรับข้อมูลจำนวนมากและแสดงความคืบหน้าแก่ผู้ใช้แบบ Real-time
-
-### **Step 1: Upload & Record Registration**
-1.  **Frontend (Wizard):** ผู้ใช้อัปโหลดไฟล์
-2.  **Sanitization:** ระบบรัน `sanitizeFileName()` เพื่อแปลงชื่อไฟล์ไทยเป็น ASCII (เช่น `สินค้า.csv` → `sinka.csv`) เพื่อเลี่ยงข้อจำกัดของ Supabase Storage
-3.  **Registration:** บันทึกข้อมูลไฟล์ลงตาราง `imports` (เก็บชื่อไทยต้นฉบับไว้) และอัปโหลดไฟล์ขึ้น Storage
-
-### **Step 2: Server-Side Stream (Next.js API)**
-1.  **Trigger:** Wizard เรียก `POST /api/import/process` พร้อม `importId` และ `filePath`
-2.  **Streaming:** API รันเป็น ReadableStream เพื่อส่งผลลัพธ์แบบ Chunked กลับไปที่ UI
-3.  **Row Processing:**
-    - ดึงไฟล์จาก Storage มาอ่านทีละบรรทัด (CSV Parsing)
-    - **AI Pipeline (Sequential):**
-        - เรียก `generate-embeddings-local` (Edge Function) → ได้ Vector
-        - เรียก `hybrid-classification-local` (Edge Function) → ได้หมวดหมู่แนะนำ
-    - **Database Save:** บันทึกลงตาราง `products` ทันที พร้อมสถานะ `pending_review_category`
-
-### **Step 3: UI Feedback Loop**
-- Wizard รับข้อมูลจาก Stream และอัปเดต Progress Bar ทีละรายการ
-- แสดงชื่อสินค้าล่าสุดที่ประมวลผลเสร็จ เพื่อให้ผู้ใช้ทราบสถานะ
+เอกสารฉบับนี้อธิบายกระบวนการไหลของข้อมูล (Data Flow) ในระบบนำเข้าสินค้าผ่าน **Magic 5-Step Wizard** ล่าสุด
 
 ---
 
-## 🎯 API Endpoints & Actions
+## 🏗️ Core Workflow: 5-Step Pipeline Architecture
 
-### **1. Processing Engine**
-- `POST /api/import/process`
-    - **Input:** `importId`, `filePath`, `columnMapping`
-    - **Output:** SSE Stream (`type: progress`, `type: completed`, `type: error`)
+ระบบนำเข้าสินค้าปรับเป็นสถาปัตยกรรมแบบ **Pipeline Batching** เพื่อให้ผู้ใช้ (Human-in-the-loop) เข้ามามีส่วนร่วมตัดสินใจในจุดสำคัญ
 
-### **2. Approval & Review**
-- `GET /api/import/pending`
-    - ดึงรายการสินค้าที่รอการตรวจสอบ
-- `POST /api/import/pending`
-    - **Action: `approve`** → ย้ายสถานะเป็น `approved`
-    - **Action: `reject`** → ย้ายสถานะเป็น `rejected`
+### **Step 1: Upload & Mapping (Frontend)**
+1.  ผู้ใช้อัปโหลดไฟล์ CSV/XLSX
+2.  ระบบรัน `sanitizeFileName()` และอ่านข้อมูล CSV
+3.  จัดทำ Mapping คอลัมน์โดยอัตโนมัติ (เช่น ค้นหา `product_name`)
+
+### **Step 2: Data Cleaning (Backend)**
+1.  **Trigger:** ส่งข้อมูลไปทำความสะอาดที่ `POST /api/v1/clean` (FastAPI)
+2.  **Processing:** 
+    - ตัดคำสแปม (เช่น "พร้อมส่ง", "ลดราคา")
+    - ลบ/สกัดหน่วยวัด
+    - แปลงเลขไทยเป็นอารบิก (โดยใช้ `ThaiTextProcessor`)
+3.  **UI Feedback:** แสดงตารางก่อน/หลัง ล้างข้อมูลให้ผู้ใช้รีวิว
+
+### **Step 3: Deduplication Triage (Backend + UI)**
+1.  **Trigger:** ส่งข้อมูลที่ล้างแล้วไปตรวจสอบความซ้ำซ้อนที่ `POST /api/v1/match/batch`
+2.  **Processing:** ค้นหาสินค้าที่มีอยู่ใน Database อยู่แล้ว (ทั้งแบบ Exact Match และ Semantic Match ผ่าน pgvector)
+3.  **UI Feedback:** แสดง Dashboard สรุปความเสี่ยง (ซ้ำแน่นอน, อาจจะซ้ำ, ไม่ซ้ำ) ผู้ใช้สามารถกด Action เพื่อข้ามการนำเข้าสินค้าที่ซ้ำได้
+
+### **Step 4: AI Categorization Review (Backend + UI)**
+1.  **Trigger:** ส่งข้อมูลที่ไม่ซ้ำไปให้ AI วิเคราะห์หาหมวดหมู่ผ่าน Edge Functions (`hybrid-classification-local`)
+2.  **Processing:**
+    - Keyword Matching (60% weight)
+    - Vector Similarity (40% weight - 384 dim)
+3.  **UI Feedback:** แสดง UI สำหรับ Review-by-Exception (ไฮไลท์สีตามค่า Confidence) ผู้ใช้ตรวจสอบเฉพาะรายการที่ AI ไม่มั่นใจ (สีเหลือง/แดง)
+
+### **Step 5: Save & Complete (Database)**
+1.  บันทึกข้อมูลสุดท้ายลงตาราง `products` และเชื่อมโยง `taxonomy_nodes`
+2.  แสดง Confetti และสถิติสรุปการนำเข้า
 
 ---
 
@@ -49,8 +43,7 @@
 
 | Table Name | Role in Import Flow |
 | :--- | :--- |
-| `imports` | เก็บประวัติการนำเข้า, ชื่อไฟล์จริง (ไทย), และ Storage Path |
-| `products` | เก็บข้อมูลสินค้าที่นำเข้า (ทั้งรอตรวจและอนุมัติแล้ว) พร้อมค่า Vector |
+| `products` | เก็บข้อมูลสินค้าที่นำเข้าใหม่ล่าสุด พร้อมค่า Vector |
 | `product_category_suggestions` | เก็บคำแนะนำจาก AI พร้อมเหตุผล (Explanation) และค่า Confidence |
 | `taxonomy_nodes` | แหล่งข้อมูลหมวดหมู่ (Hierarchy) สำหรับการ Match |
 | `keyword_rules` | กฎคำสำคัญ (60% weight) ที่ใช้ตัดสินหมวดหมู่ |
@@ -66,4 +59,4 @@
 
 ---
 
-**อัปเดตล่าสุด:** 9 เมษายน 2569 | **สถานะ:** เสถียรและใช้งานจริง
+**อัปเดตล่าสุด:** พฤษภาคม 2569 | **สถานะ:** เสถียรและใช้งานจริง (5-Step Pipeline)

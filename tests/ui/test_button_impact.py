@@ -20,7 +20,7 @@ def test_api_endpoint():
     print("=" * 50)
     
     # กำหนด URL
-    base_url = "http://localhost:5000"
+    base_url = "http://127.0.0.1:5000"
     endpoint = f"{base_url}/save-feedback"
     
     # ข้อมูลทดสอบ (จำลองการกดปุ่มต่างๆ)
@@ -224,7 +224,7 @@ def check_app_state_impact():
     
     try:
         # ทดสอบการเรียก API status
-        response = requests.get("http://localhost:5000/api/status", timeout=5)
+        response = requests.get("http://127.0.0.1:5000/api/status", timeout=5)
         
         if response.status_code == 200:
             status_data = response.json()
@@ -261,7 +261,7 @@ def test_export_impact():
     
     try:
         # ทดสอบการส่งออก ML Data
-        response = requests.post("http://localhost:5000/export-ml-data", timeout=10)
+        response = requests.post("http://127.0.0.1:5000/export-ml-data", timeout=10)
         
         if response.status_code == 200:
             export_data = response.json()

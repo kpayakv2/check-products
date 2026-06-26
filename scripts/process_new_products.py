@@ -13,12 +13,13 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Import local modules
-sys.path.append(os.getcwd())
-from advanced_models import SentenceTransformerModel
-from fresh_implementations import ThaiTextProcessor
+from src.core.advanced_models import SentenceTransformerModel
+from src.core.fresh_implementations import ThaiTextProcessor, ComponentFactory
+from src.services.taxonomy_service import TaxonomyService
+from src.core.scoring_logic import calculate_hybrid_score
 
 # Configuration
-SUPABASE_URL = "http://localhost:54331"
+SUPABASE_URL = os.getenv("SUPABASE_URL", "http://127.0.0.1:54331")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 INPUT_FILE = r"D:\product_checker\check-products\input\new_product\POS_เพิ่มสินค้า_20250727_063658_จากไฟล์สินค้าใหม่.csv"
 OUTPUT_FILE = f"output/classified_new_products_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
@@ -31,57 +32,23 @@ class NewProductProcessor:
         print("🔧 Initializing New Product Processor...")
         self.processor = ThaiTextProcessor()
         self.model = SentenceTransformerModel(model_name="paraphrase-multilingual-MiniLM-L12-v2")
-        self.db_nodes = {}
-        self.category_embeddings = {}
-        self.keyword_rules = []
-        self.reference_products = [] # The 3,103 lessons
+        self.taxonomy = TaxonomyService(supabase)
+        self.sim_calc = ComponentFactory.create_similarity_calculator("cosine")
         
     def load_metadata(self):
-        print("📚 Loading metadata from Supabase...")
-        # Load taxonomy
-        res = supabase.table("taxonomy_nodes").select("id, name_th, keywords, embedding").execute()
-        self.db_nodes = {node['id']: node['name_th'] for node in res.data}
-        self.taxonomy_full = res.data
-        for node in res.data:
-            if node.get('embedding'):
-                emb = node['embedding']
-                if isinstance(emb, str):
-                    emb = json.loads(emb)
-                self.category_embeddings[node['id']] = np.array(emb)
-        
-        # Load keyword rules
-        res = supabase.table("keyword_rules").select("*").execute()
-        self.keyword_rules = res.data
-        
-        # Load reference products (lessons)
-        print("📖 Loading reference lessons (3,103 products)...")
-        # To avoid massive memory usage, we can limit or process in batches if needed,
-        # but 3,103 is small enough for most systems.
-        res = supabase.table("products").select("id, name_th, category_id, embedding").eq("status", "approved").execute()
-        
-        processed_lessons = []
-        for lesson in res.data:
-            if lesson.get('embedding'):
-                emb = lesson['embedding']
-                if isinstance(emb, str):
-                    emb = json.loads(emb)
-                lesson['embedding_arr'] = np.array(emb)
-                processed_lessons.append(lesson)
-        
-        self.reference_products = processed_lessons
-        print(f"✅ Loaded {len(self.taxonomy_full)} categories and {len(self.reference_products)} lessons.")
+        self.taxonomy.load_all_metadata()
 
     def classify(self, name: str) -> dict:
         clean_name = self.processor.process(name)
         prod_emb = self.model.encode([clean_name])[0]
         
-        # 1. Similarity with Lessons (The "Teacher" products)
+        # 1. Similarity with Lessons
         best_lesson_sim = 0.0
         best_lesson_cat = None
         
-        for lesson in self.reference_products:
+        for lesson in self.taxonomy.reference_lessons:
             lesson_emb = lesson['embedding_arr']
-            sim = np.dot(prod_emb, lesson_emb) / (np.linalg.norm(prod_emb) * np.linalg.norm(lesson_emb))
+            sim = self.sim_calc.calculate(prod_emb, lesson_emb)
             if sim > best_lesson_sim:
                 best_lesson_sim = sim
                 best_lesson_cat = lesson['category_id']
@@ -89,20 +56,19 @@ class NewProductProcessor:
         # 2. Keyword Match
         best_kw_cat = None
         best_kw_conf = 0.0
-        for rule in self.keyword_rules:
+        for rule in self.taxonomy.keyword_rules:
             for kw in rule['keywords']:
-                if kw in clean_name:
+                if self.processor.process(kw) in clean_name:
                     conf = (rule.get('confidence_score', 0.8))
                     if conf > best_kw_conf:
                         best_kw_conf = conf
                         best_kw_cat = rule['category_id']
         
         # 3. Hybrid Calculation
-        # Distance to Category Embeddings
         best_cat_emb_sim = 0.0
         best_cat_emb_id = None
-        for cat_id, cat_emb in self.category_embeddings.items():
-            sim = np.dot(prod_emb, cat_emb) / (np.linalg.norm(prod_emb) * np.linalg.norm(cat_emb))
+        for cat_id, cat_emb in self.taxonomy.category_embeddings.items():
+            sim = self.sim_calc.calculate(prod_emb, cat_emb)
             if sim > best_cat_emb_sim:
                 best_cat_emb_sim = sim
                 best_cat_emb_id = cat_id
@@ -113,15 +79,9 @@ class NewProductProcessor:
             final_conf = best_lesson_sim
             method = "lesson_match"
         else:
-            # Weight: Keyword 60%, Category Vector 40%
             if best_kw_cat:
                 final_cat_id = best_kw_cat
-                # If keyword matches, we combine it with category embedding similarity
-                # but only if it's the SAME category
-                if best_kw_cat == best_cat_emb_id:
-                    final_conf = (best_kw_conf * 0.6 + best_cat_emb_sim * 0.4)
-                else:
-                    final_conf = best_kw_conf * 0.6 + (best_cat_emb_sim * 0.4)
+                final_conf = calculate_hybrid_score(best_kw_conf, best_cat_emb_sim)
                 method = "hybrid"
             else:
                 final_cat_id = best_cat_emb_id
@@ -130,7 +90,7 @@ class NewProductProcessor:
             
         return {
             "category_id": final_cat_id,
-            "category_name": self.db_nodes.get(final_cat_id, "Unknown"),
+            "category_name": self.taxonomy.get_category_name(final_cat_id),
             "confidence": float(final_conf),
             "method": method,
             "lesson_sim": float(best_lesson_sim)

@@ -1,150 +1,90 @@
-# 🚀 **Quick API Reference - /analyze Endpoint**
+# 🚀 **Quick Reference - Thai Product AI (v4.0)**
 
-## 💡 **TL;DR - Quick Start**
+## 💡 **คำสั่งลัดสำหรับการรันระบบ**
 
 ```bash
-# 1. Start server
-python web_server.py
+# วิธีที่ 1: ดับเบิลคลิก (แนะนำ)
+START_PHAYAK.bat   # รัน Backend + Frontend พร้อมกันอัตโนมัติ
 
-# 2. Upload files
-POST http://localhost:5000/upload (old products)
-POST http://localhost:5000/upload (new products)  
+# วิธีที่ 2: รันแยก
+# Backend — FastAPI Port 8000
+.venv\Scripts\python src\api\api_server.py
 
-# 3. Analyze
-POST http://localhost:5000/analyze
-
-# 4. Get results
-GET http://localhost:5000/get-results
+# Frontend — Next.js Port 3000
+cd taxonomy-app && npm run dev
 ```
 
 ---
 
-## 🎯 **Key Capabilities**
+## 🗂️ **โครงสร้าง API (Modular v4.0)**
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| 🤖 **AI Analysis** | ✅ | Multi-model product similarity detection |
-| 🌐 **Offline Mode** | ✅ | Works without internet (models cached) |
-| 🇹🇭 **Multilingual** | ✅ | Thai-English product name support |
-| 👥 **Human Review** | ✅ | Interactive verification workflow |
-| 📊 **Smart Classification** | ✅ | Auto-categorize unique vs duplicate |
-| ⚡ **Performance** | ✅ | Optimized for speed and accuracy |
-
----
-
-## 📈 **Performance Comparison**
-
-| Model | Speed | Accuracy | Memory | Best For |
-|-------|-------|----------|--------|----------|
-| **TF-IDF** | ⚡⚡⚡ | ⭐⭐⭐ | 💾 | Large datasets |
-| **SentenceTransformer** | ⚡ | ⭐⭐⭐⭐⭐ | 💾💾💾 | High accuracy |
-| **Optimized TF-IDF** | ⚡⚡ | ⭐⭐⭐⭐ | 💾💾 | Balanced |
-
----
-
-## 🔧 **Configuration Options**
-
-```json
-{
-  "model_type": "sentence-bert",  // ⭐ Recommended for accuracy
-  "similarity_method": "cosine",
-  "threshold": 0.6,              // Higher = stricter
-  "top_k": 10
-}
 ```
-
-**Change via**: `POST /api/config`
-
----
-
-## 📊 **Response Data**
-
-```json
-{
-  "success": true,
-  "unique_count": 750,           // ✅ Definitely unique
-  "duplicate_check_count": 250,  // 🔍 Need human review  
-  "summary": "จาก 1000 สินค้าใหม่: 750 ไม่ซ้ำ, 250 ต้องตรวจสอบ"
-}
+src/api/
+├── api_server.py       ← Entry Point (รันตัวนี้)
+├── models.py           ← Pydantic Schemas
+├── dependencies.py     ← Pipeline & Model Init
+├── websockets.py       ← Real-time Updates
+├── services/
+│   └── background_jobs.py
+└── routers/
+    ├── embed.py        ← /api/embed/*
+    ├── match.py        ← /api/v1/match/*
+    ├── system.py       ← /api/v1/health, /config, /clean
+    ├── jobs.py         ← /api/v1/jobs, /results
+    └── learn.py        ← /api/v1/learn/verify
 ```
 
 ---
 
-## 🎭 **Use Cases**
+## 🎯 **Endpoints ที่ใช้บ่อย**
 
-### **E-commerce** 📱
-- Prevent duplicate product listings
-- Clean product catalogs  
-- Merge supplier databases
-
-### **Inventory** 📦
-- Deduplicate stock items
-- Consolidate product data
-- Quality assurance checks
-
-### **Data Management** 📊
-- Clean messy datasets
-- Find data inconsistencies
-- Merge multiple sources
+| งานที่ต้องการ | Endpoint | Method | Router |
+|---------------|----------|--------|--------|
+| **สร้าง Embedding (หลัก)** | `/api/embed` | POST | `embed.py` |
+| **สร้าง Embedding (Batch)** | `/api/embed/batch` | POST | `embed.py` |
+| **จับคู่สินค้า (Single)** | `/api/v1/match/single` | POST | `match.py` |
+| **จับคู่สินค้า (Batch)** | `/api/v1/match/batch` | POST | `match.py` |
+| **ล้างชื่อสินค้าภาษาไทย** | `/api/v1/clean` | POST | `system.py` |
+| **เช็คสถานะระบบ** | `/api/v1/health` | GET | `system.py` |
+| **เช็คสถานะ Job** | `/api/v1/jobs/{id}` | GET | `jobs.py` |
+| **สอน AI จากการตรวจ** | `/api/v1/learn/verify` | POST | `learn.py` |
+| **Swagger UI** | `/docs` | GET | — |
 
 ---
 
-## ⚡ **Performance Tips**
+## 🏗️ **การตรวจซ้ำและสอน AI (Deduplication)**
 
-### **For Speed** 🏃‍♂️:
-- Use `"model_type": "tfidf"`
-- Lower `threshold` (0.4-0.6)  
-- Process in smaller batches
+```bash
+# ตรวจสอบไฟล์สินค้าใหม่
+python scripts/complete_deduplication_pipeline.py --input new.csv --mode analyze
 
-### **For Accuracy** 🎯:
-- Use `"model_type": "sentence-bert"`
-- Higher `threshold` (0.7-0.8)
-- Enable human review workflow
+# ตรวจสอบงานที่ค้าง (Human Review)
+python scripts/complete_deduplication_pipeline.py --input new.csv --mode review
 
-### **For Balance** ⚖️:
-- Use `"model_type": "optimized-tfidf"`
-- Medium `threshold` (0.6-0.7)
-- Batch size 100-500 items
+# สั่งให้ AI เรียนรู้จากสิ่งที่คนตรวจ
+python scripts/complete_deduplication_pipeline.py --mode train
+```
 
 ---
 
-## 🔍 **Troubleshooting**
+## 🔍 **การตั้งค่า (Configuration)**
 
-| Issue | Solution |
-|-------|----------|
-| **"Upload both files"** | Upload old & new product files first |
-| **"Pipeline error"** | Check model availability, restart server |
-| **Slow performance** | Switch to TF-IDF model, reduce batch size |
-| **Low accuracy** | Use SentenceTransformer, increase threshold |
-| **Memory error** | Process smaller batches, increase RAM |
+- **Port**: 8000 (Default)
+- **Model**: `paraphrase-multilingual-MiniLM-L12-v2` (384-dim)
+- **Weights**: Keyword 60% / Embedding 40%
+- **Env**: `taxonomy-app/.env.local`
 
 ---
 
-## 📱 **Mobile-Friendly**
+## 🛠️ **Troubleshooting (เช็คเมื่อมีปัญหา)**
 
-✅ Responsive web interface  
-✅ Touch-optimized human review  
-✅ Progress indicators  
-✅ Mobile file upload  
-
----
-
-## 🔐 **Security & Privacy**
-
-✅ Local processing (no data sent to external APIs)  
-✅ Offline capable (no internet required)  
-✅ File upload validation  
-✅ Error handling and logging  
+| ปัญหา | วิธีแก้ |
+|-------|--------|
+| **Error Port 8000** | เช็คว่ารัน `src/api/api_server.py` ซ้อนกันหรือไม่ |
+| **AI ไม่แม่น** | ตรวจสอบว่าได้รันสคริปต์ `download_models.py` หรือยัง |
+| **DB เชื่อมต่อไม่ได้** | ตรวจสอบไฟล์ `.env.local` ของ Supabase ใน `taxonomy-app/` |
 
 ---
 
-## 📞 **Support**
-
-- **API Status**: `GET /api/status`
-- **Live Demo**: http://localhost:5000  
-- **Documentation**: `API_ANALYZE_CAPABILITIES.md`
-- **Test Suite**: `python test_offline_capability.py`
-
----
-
-**⚡ Ready to use!** Start with TF-IDF for speed, upgrade to SentenceTransformer for accuracy!
+**📅 Last Updated**: 24 พฤษภาคม 2569 (v4.0 — Modular Architecture)
+**⚡ พร้อมใช้งาน!** รันผ่าน `START_PHAYAK.bat` ได้เลย

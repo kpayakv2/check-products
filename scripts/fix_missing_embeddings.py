@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv('taxonomy-app/.env.local')
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") # ต้องใช้ Service Role เพื่อ Update
-fastapi_url = "http://localhost:8000/api/embed"
+fastapi_url = "http://127.0.0.1:8000/api/embed"
 
 async def generate_category_embeddings():
     supabase: Client = create_client(url, key)

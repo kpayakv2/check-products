@@ -63,6 +63,20 @@ export async function POST(request: NextRequest) {
             },
             is_accepted: true
           })
+
+          const fastapiUrl = process.env.FASTAPI_URL || 'http://127.0.0.1:8000'
+          // Trigger Auto-learning on Python Backend (Async)
+          // We don't await this to keep the import process fast
+          fetch(`${fastapiUrl}/api/v1/learn/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              product_name: suggestion.name_th,
+              category_id: suggestion.suggested_category.id
+            })
+          }).catch(err => {
+            console.warn('Auto-learn trigger failed (Backend might be offline):', err.message)
+          })
         }
 
         // Create product attributes

@@ -5,7 +5,7 @@ from supabase import create_client
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
-url = 'http://localhost:54331'
+url = 'http://127.0.0.1:54331'
 key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 sql_file = 'taxonomy-app/new_keyword_rules_v4.sql'

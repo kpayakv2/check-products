@@ -4,14 +4,14 @@ Test script for fresh_architecture and fresh_implementations modules
 """
 
 import numpy as np
-from fresh_implementations import (
+from src.core.fresh_implementations import (
     ComponentFactory, 
     MockEmbeddingModel,
     TFIDFEmbeddingModel,
     CosineSimilarityCalculator,
     ThaiTextProcessor
 )
-from fresh_architecture import ProductMatcher, Config
+from src.core.fresh_architecture import ProductMatcher, Config
 
 def test_basic_functionality():
     """Test basic functionality of all components."""
@@ -54,7 +54,7 @@ def test_product_matcher():
     text_processor = ComponentFactory.create_text_processor("thai")
     
     # Create matcher with lower threshold for testing with mock data
-    from fresh_architecture import Config
+    from src.core.fresh_architecture import Config
     config = Config()
     config.similarity_threshold = 0.1  # Lower threshold for mock data
     matcher = ProductMatcher(

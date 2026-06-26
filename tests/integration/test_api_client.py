@@ -15,7 +15,7 @@ def test_health_check():
     """Test API health endpoint."""
     print("🔍 Testing Health Check...")
     try:
-        response = requests.get("http://localhost:8000/api/v1/health")
+        response = requests.get("http://127.0.0.1:8000/api/v1/health")
         if response.status_code == 200:
             data = response.json()
             print(f"✅ Health Check Success!")
@@ -52,7 +52,7 @@ def test_single_match():
     try:
         start_time = time.time()
         response = requests.post(
-            "http://localhost:8000/api/v1/match/single",
+            "http://127.0.0.1:8000/api/v1/match/single",
             json=payload,
             headers={"Content-Type": "application/json"}
         )
@@ -103,7 +103,7 @@ def test_batch_match():
     try:
         # Start batch job
         response = requests.post(
-            "http://localhost:8000/api/v1/match/batch",
+            "http://127.0.0.1:8000/api/v1/match/batch",
             json=payload,
             headers={"Content-Type": "application/json"}
         )
@@ -118,7 +118,7 @@ def test_batch_match():
             # Check job status
             print("   Checking job status...")
             for attempt in range(10):  # Wait up to 10 seconds
-                status_response = requests.get(f"http://localhost:8000/api/v1/jobs/{job_id}")
+                status_response = requests.get(f"http://127.0.0.1:8000/api/v1/jobs/{job_id}")
                 if status_response.status_code == 200:
                     status_data = status_response.json()
                     print(f"   Progress: {status_data['progress']:.1%} - {status_data['message']}")
@@ -152,10 +152,10 @@ def test_api_documentation():
     """Test API documentation endpoint."""
     print("\n🔍 Testing API Documentation...")
     try:
-        response = requests.get("http://localhost:8000/docs")
+        response = requests.get("http://127.0.0.1:8000/docs")
         if response.status_code == 200:
             print(f"✅ API Documentation Available!")
-            print(f"   URL: http://localhost:8000/docs")
+            print(f"   URL: http://127.0.0.1:8000/docs")
             return True
         else:
             print(f"❌ Documentation Failed: {response.status_code}")
@@ -200,9 +200,9 @@ def main():
     if passed == total:
         print(f"🎉 All tests passed! Phase 5 API is working perfectly!")
         print(f"\n🌐 Access Points:")
-        print(f"   - Web Interface: http://localhost:8000/web")
-        print(f"   - API Documentation: http://localhost:8000/docs")
-        print(f"   - Health Check: http://localhost:8000/api/v1/health")
+        print(f"   - Web Interface: http://127.0.0.1:8000/web")
+        print(f"   - API Documentation: http://127.0.0.1:8000/docs")
+        print(f"   - Health Check: http://127.0.0.1:8000/api/v1/health")
     else:
         print(f"⚠️  Some tests failed. Check the API server status.")
     

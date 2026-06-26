@@ -210,3 +210,6 @@ taxonomy-app/out/
 
 # Secrets
 gha-creds-*.json
+
+# Scratch folder (temporary AI agent files)
+scratch/

@@ -15,7 +15,8 @@ import {
   XIcon,
   LayersIcon,
   SparklesIcon,
-  ZapIcon
+  ZapIcon,
+  BrainIcon
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -28,32 +29,32 @@ const navigation = [
     thai: 'แดชบอร์ด'
   },
   {
-    name: 'Taxonomy',
-    href: '/taxonomy',
-    icon: FolderTreeIcon,
-    description: 'Hierarchical Structure',
-    thai: 'จัดการ Taxonomy'
-  },
-  {
-    name: 'Synonyms',
-    href: '/synonyms',
-    icon: BookOpenIcon,
-    description: 'Semantic Mapping',
-    thai: 'จัดการ Synonym'
-  },
-  {
     name: 'Product Audit',
     href: '/products',
     icon: ShoppingBagIcon,
-    description: 'Quality Control',
-    thai: 'ตรวจสอบสินค้า'
+    description: 'Inventory Control',
+    thai: 'จัดการคลังสินค้า'
   },
   {
-    name: 'Deduplication',
-    href: '/deduplication',
-    icon: LayersIcon,
-    description: 'Conflict Resolution',
-    thai: 'คัดกรองสินค้าซ้ำ'
+    name: 'Taxonomy',
+    href: '/taxonomy',
+    icon: FolderTreeIcon,
+    description: 'Categories & Synonyms',
+    thai: 'โครงสร้างหมวดหมู่'
+  },
+  {
+    name: 'Data Quality',
+    href: '/data-quality',
+    icon: SparklesIcon,
+    description: 'AI Processing Hub',
+    thai: 'ศูนย์ตรวจสอบข้อมูล AI'
+  },
+  {
+    name: 'AI Brain',
+    href: '/ai-brain',
+    icon: BrainIcon,
+    description: 'ML Learning Dashboard',
+    thai: 'สมองกล AI'
   },
   {
     name: 'Data Import',

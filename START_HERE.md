@@ -152,7 +152,7 @@ WHERE routine_schema = 'public'
 ### **Test 2: FastAPI**
 
 ```bash
-curl http://localhost:8000/api/v1/health
+curl http://127.0.0.1:8000/api/v1/health
 
 # Should return:
 # {"status":"healthy","version":"5.0.0",...}
@@ -162,13 +162,13 @@ curl http://localhost:8000/api/v1/health
 
 ```bash
 # Test embeddings
-curl -X POST http://localhost:54321/functions/v1/generate-embeddings-local \
+curl -X POST http://127.0.0.1:54331/functions/v1/generate-embeddings-local \
   -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
   -H "Content-Type: application/json" \
   -d '{"texts":["test"],"model":"sentence-transformer"}'
 
 # Test classification
-curl -X POST http://localhost:54321/functions/v1/hybrid-classification-local \
+curl -X POST http://127.0.0.1:54331/functions/v1/hybrid-classification-local \
   -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
   -H "Content-Type: application/json" \
   -d '{"product_name":"กล่องล็อค","method":"hybrid"}'
@@ -248,7 +248,7 @@ Flask workflow ไม่เปลี่ยนแปลง
 FASTAPI_URL=http://host.docker.internal:8000
 
 # Next.js ต้อง set:
-FASTAPI_URL=http://localhost:8000
+FASTAPI_URL=http://127.0.0.1:8000
 ```
 
 ---

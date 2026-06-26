@@ -85,7 +85,7 @@ python api_server.py
 
 **ตรวจสอบ:**
 ```bash
-curl http://localhost:8000/api/v1/health
+curl http://127.0.0.1:8000/api/v1/health
 
 # Should return:
 # {"status":"healthy","version":"5.0.0",...}
@@ -120,7 +120,7 @@ npx supabase secrets set FASTAPI_URL=http://host.docker.internal:8000
 **ตรวจสอบ:**
 ```bash
 # Test generate-embeddings-local
-curl -X POST http://localhost:54321/functions/v1/generate-embeddings-local \
+curl -X POST http://127.0.0.1:54331/functions/v1/generate-embeddings-local \
   -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
   -H "Content-Type: application/json" \
   -d '{"texts":["กล่องล็อค 560 มล"],"model":"sentence-transformer"}'
@@ -149,8 +149,8 @@ npx tsx scripts/generate-category-embeddings.ts
 ```
 🚀 Starting Category Embedding Generation
 ============================================================
-📡 Supabase: http://localhost:54321
-🤖 FastAPI: http://localhost:8000
+📡 Supabase: http://127.0.0.1:54331
+🤖 FastAPI: http://127.0.0.1:8000
 📊 Model: paraphrase-multilingual-MiniLM-L12-v2 (384-dim)
 ============================================================
 
@@ -194,7 +194,7 @@ npx tsx scripts/generate-category-embeddings.ts
 
 ```bash
 # Test classification
-curl -X POST http://localhost:54321/functions/v1/hybrid-classification-local \
+curl -X POST http://127.0.0.1:54331/functions/v1/hybrid-classification-local \
   -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -353,7 +353,7 @@ API Route: /api/import/process-local
 
 ```bash
 # ตรวจสอบ FastAPI running
-curl http://localhost:8000/api/v1/health
+curl http://127.0.0.1:8000/api/v1/health
 
 # ตรวจสอบ Edge Function สามารถเข้าถึง FastAPI
 # ใน Docker ต้องใช้: http://host.docker.internal:8000
@@ -382,7 +382,7 @@ npx supabase db reset
 npx tsx scripts/generate-category-embeddings.ts
 
 # Or manually update one category
-curl -X POST http://localhost:8000/api/embed \
+curl -X POST http://127.0.0.1:8000/api/embed \
   -H "Content-Type: application/json" \
   -d '{"text":"กล่อง ที่เก็บของ พลาสติก"}' \
   | jq -r '.embedding' > embedding.json

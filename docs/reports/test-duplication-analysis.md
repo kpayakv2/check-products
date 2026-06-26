@@ -10,12 +10,12 @@
 
 ### **1. 🔗 API Endpoint Testing** - ซ้ำซ้อนมาก
 #### **URL และ Base URL ซ้ำกัน**:
-- **`http://localhost:5000`** - ใช้ใน 3 ไฟล์:
+- **`http://127.0.0.1:5000`** - ใช้ใน 3 ไฟล์:
   - `test_api_integration.py`
   - `test_button_impact.py` (UI tests)
   - `test_api_endpoints.py` (บางส่วน)
-- **`http://localhost:8000`** - ใช้ใน `test_api_client.py`
-- **`http://localhost:5001`** - ใช้ใน `test_api_endpoints.py`
+- **`http://127.0.0.1:8000`** - ใช้ใน `test_api_client.py`
+- **`http://127.0.0.1:5001`** - ใช้ใน `test_api_endpoints.py`
 
 #### **API Endpoints ซ้ำกัน**:
 - **`/api/status`** - ทดสอบใน 4 ไฟล์:
@@ -105,9 +105,9 @@ except Exception as e:
 # tests/utils/test_helpers.py
 class APITestHelper:
     BASE_URLS = {
-        'main': 'http://localhost:5000',
-        'api': 'http://localhost:8000', 
-        'alt': 'http://localhost:5001'
+        'main': 'http://127.0.0.1:5000',
+        'api': 'http://127.0.0.1:8000', 
+        'alt': 'http://127.0.0.1:5001'
     }
     
     @staticmethod

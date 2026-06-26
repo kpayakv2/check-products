@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { 
   CheckCircle, 
   XCircle, 
@@ -37,6 +37,9 @@ interface InternalPair {
   category_b: string
   category_id_b: string
   similarity: number
+  ml_prediction?: string
+  confidence?: number
+  reason?: string
 }
 
 export default function DeduplicationTab({ onComplete }: { onComplete?: () => void }) {
@@ -48,22 +51,55 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
   // Internal Deduplication states
   const [internalPairs, setInternalPairs] = useState<InternalPair[]>([])
+  const [auditList, setAuditList] = useState<InternalPair[]>([])
+  const [scanTaskId, setScanTaskId] = useState<string | null>(null)
+  const [scanProgress, setScanProgress] = useState<number>(0)
+  const [scanStatusText, setScanStatusText] = useState<string>('')
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [totalScanned, setTotalScanned] = useState(0)
   const [scanThreshold, setScanThreshold] = useState(0.95)
   const [scanLimit, setScanLimit] = useState(100)
   const [internalCurrentIndex, setInternalCurrentIndex] = useState(0)
   const [resolvedCount, setResolvedCount] = useState({ merged: 0, kept: 0 })
 
+  const startAudit = useCallback(() => {
+    const toAudit = internalPairs.filter(pair => {
+      // กรองคู่ออกถ้า ML มั่นใจว่าเป็นคนละชิ้น (different และ confidence > 0.6)
+      const isDifferentAndConfident = pair.ml_prediction === 'different' && (pair.confidence || 0) > 0.6;
+      return !isDifferentAndConfident;
+    });
+    setAuditList(toAudit);
+    setInternalCurrentIndex(0);
+    
+    if (toAudit.length > 0) {
+      setCurrentStep(4);
+      toast.success(`เริ่มต้นสะสางข้อมูลซ้ำจำนวน ${toAudit.length} คู่ (ข้ามคู่ที่ปลอดภัยไปแล้ว)`);
+    } else {
+      toast.success("ยอดเยี่ยม! โมเดล ML ประเมินว่าสินค้าทุกคู่ปลอดภัย ไม่มีความซ้ำซ้อนแฝง");
+      setCurrentStep(5);
+    }
+  }, [internalPairs]);
+
   const workflowSteps = useMemo<WorkflowStep[]>(() => {
     return [
       { id: 1, name: 'System Scan', description: 'Scan Database Baseline', status: currentStep > 1 ? 'completed' : currentStep === 1 ? 'processing' : 'pending' },
       { id: 2, name: 'AI Analyze', description: 'Calculating Similarities', status: currentStep > 2 ? 'completed' : currentStep === 2 ? 'processing' : 'pending' },
-      { id: 3, name: 'Database Audit', description: 'Audit & Resolve Pairs', status: currentStep > 3 ? 'completed' : currentStep === 3 ? 'processing' : 'pending' },
-      { id: 4, name: 'Audit Summary', description: 'Results & Catalog Health', status: currentStep === 4 ? 'processing' : 'pending' }
+      { id: 3, name: 'Scan Preview', description: 'Overview & Report', status: currentStep > 3 ? 'completed' : currentStep === 3 ? 'processing' : 'pending' },
+      { id: 4, name: 'Database Audit', description: 'Audit & Resolve Pairs', status: currentStep > 4 ? 'completed' : currentStep === 4 ? 'processing' : 'pending' },
+      { id: 5, name: 'Audit Summary', description: 'Results & Catalog Health', status: currentStep === 5 ? 'processing' : 'pending' }
     ]
   }, [currentStep])
 
   // --- INTERNAL DEDUPLICATION UTILITIES ---
+  // Cleanup polling interval on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [])
+
   const scanInternalCatalog = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -71,6 +107,13 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
     setInternalCurrentIndex(0)
     setResolvedCount({ merged: 0, kept: 0 })
     setFallbackWarning(null)
+    setScanProgress(0)
+    setScanStatusText('กำลังส่งข้อมูลการสแกนและตรวจสอบคิวงาน...')
+    
+    // Clear any existing polling
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+    }
     
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
@@ -85,32 +128,76 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
       if (!response.ok) {
         const errText = await response.text()
-        throw new Error(`Failed to scan: ${response.status} - ${errText}`)
+        throw new Error(`Failed to start scan: ${response.status} - ${errText}`)
       }
 
-      const data = await response.json()
-      setTotalScanned(data.total_scanned)
-      setInternalPairs(data.results || [])
+      const startData = await response.json()
+      const taskId = startData.task_id
+      setScanTaskId(taskId)
+      setScanStatusText('เริ่มการตรวจสอบในเบื้องหลังเรียบร้อยแล้ว...')
       
-      if (data.fallback_active) {
-        setFallbackWarning({ active: true, messages: data.system_warnings || [] })
-        setCurrentStep(3)
-        return
-      }
+      // Start Polling
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`${apiBase}/api/v1/match/scan-internal/status/${taskId}`)
+          if (!statusRes.ok) {
+            throw new Error(`Failed to fetch status: ${statusRes.status}`)
+          }
+          const statusData = await statusRes.json()
+          setScanProgress(statusData.progress || 0)
+          setScanStatusText(statusData.message || 'กำลังสแกน...')
+          
+          if (statusData.status === 'completed') {
+            if (pollingIntervalRef.current) {
+              clearInterval(pollingIntervalRef.current)
+              pollingIntervalRef.current = null
+            }
+            const data = statusData.result
+            setTotalScanned(data.total_scanned)
+            setInternalPairs(data.results || [])
+            
+            if (data.fallback_active) {
+              setFallbackWarning({ active: true, messages: data.system_warnings || [] })
+              setCurrentStep(3)
+              setLoading(false)
+              return
+            }
+            
+            // If pairs found, go to Scan Preview (step 3), else go straight to summary (step 5)
+            if (data.results && data.results.length > 0) {
+              setCurrentStep(3)
+              toast.success(`สแกนเสร็จสิ้น! พบคู่สินค้าที่น่าสงสัย ${data.pairs_found} คู่`)
+            } else {
+              setCurrentStep(5)
+              toast.success('ยอดเยี่ยมมาก! ไม่พบสินค้าซ้ำเชิงเวกเตอร์ในระบบเดิมเลย!')
+            }
+            setLoading(false)
+          } else if (statusData.status === 'failed') {
+            if (pollingIntervalRef.current) {
+              clearInterval(pollingIntervalRef.current)
+              pollingIntervalRef.current = null
+            }
+            setError(statusData.error || 'การสแกนความซ้ำซ้อนภายในคลังล้มเหลว')
+            setCurrentStep(1)
+            toast.error('การประมวลผลสแกนล้มเหลว')
+            setLoading(false)
+          }
+        } catch (pollErr) {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current)
+            pollingIntervalRef.current = null
+          }
+          setError(pollErr instanceof Error ? pollErr.message : 'เกิดข้อผิดพลาดในการดึงสถานะ')
+          setCurrentStep(1)
+          toast.error('การเชื่อมต่อกับเซิร์ฟเวอร์สแกนถูกตัดขาด')
+          setLoading(false)
+        }
+      }, 2000)
       
-      // If pairs found, go to audit step, else go straight to summary
-      if (data.results && data.results.length > 0) {
-        setCurrentStep(3)
-        toast.success(`ตรวจพบสินค้าซ้ำแฝง ${data.pairs_found} คู่ ดึงข้อมูลเริ่มการตรวจสอบ!`)
-      } else {
-        setCurrentStep(4)
-        toast.success('ยอดเยี่ยมมาก! ไม่พบสินค้าซ้ำเชิงเวกเตอร์ในระบบเดิมเลย!')
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Internal scan failed')
       setCurrentStep(1)
       toast.error('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์สแกน')
-    } finally {
       setLoading(false)
     }
   }, [scanThreshold, scanLimit])
@@ -135,7 +222,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
   }, [])
 
   const resolveInternalPair = useCallback(async (action: 'merge' | 'keep_both', keepSide?: 'a' | 'b') => {
-    const pair = internalPairs[internalCurrentIndex]
+    const pair = auditList[internalCurrentIndex]
     if (!pair) return
 
     setLoading(true)
@@ -172,10 +259,10 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
       }))
 
       // Move forward
-      if (internalCurrentIndex < internalPairs.length - 1) {
+      if (internalCurrentIndex < auditList.length - 1) {
         setInternalCurrentIndex(prev => prev + 1)
       } else {
-        setCurrentStep(4) // Move to summary when complete
+        setCurrentStep(5) // Move to summary (Step 5) when complete
       }
 
     } catch (err) {
@@ -183,11 +270,11 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
     } finally {
       setLoading(false)
     }
-  }, [internalPairs, internalCurrentIndex])
+  }, [auditList, internalCurrentIndex])
 
   // Keyboard shortcuts listener for Internal Catalog Review
   useEffect(() => {
-    if (currentStep !== 3 || !internalPairs[internalCurrentIndex]) return
+    if (currentStep !== 4 || !auditList[internalCurrentIndex]) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Avoid triggering when loading or when user is typing in inputs or textareas
@@ -368,12 +455,27 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
             {currentStep === 2 && (
               <div className="premium-card p-24 text-center flex flex-col items-center justify-center bg-white/40 border-white">
-                <div className="w-20 h-20 relative flex items-center justify-center mb-8">
-                  <div className="absolute inset-0 border-4 border-indigo-100 rounded-full" />
+                <div className="w-24 h-24 relative flex items-center justify-center mb-8">
+                  <div className="absolute inset-0 border-4 border-indigo-100 rounded-full animate-pulse" />
                   <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin" />
+                  <span className="absolute text-base font-black text-indigo-700">{scanProgress}%</span>
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 thai-text uppercase tracking-tight">กำลังตรวจสอบสินค้าซ้ำ 3,103 รายการภายในฐานข้อมูล...</h3>
-                <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Scanning and computing pairwise similarities on GPU/CPU cache...</p>
+                
+                <h3 className="text-2xl font-black text-slate-900 thai-text uppercase tracking-tight mb-6">
+                  {scanStatusText || 'กำลังสแกนคลังสินค้า...'}
+                </h3>
+                
+                {/* Progress Bar Container */}
+                <div className="w-full max-w-md bg-slate-100/80 rounded-full h-4 overflow-hidden p-0.5 border border-slate-200 shadow-inner mb-3">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-500 ease-out shadow-lg"
+                    style={{ width: `${scanProgress}%` }}
+                  />
+                </div>
+                
+                <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">
+                  Scanning and computing pairwise similarities dynamically...
+                </p>
               </div>
             )}
 
@@ -422,7 +524,122 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
               </div>
             )}
 
-            {currentStep === 3 && !fallbackWarning?.active && internalPairs[internalCurrentIndex] && (
+            {/* NEW Step 3: Scan Preview and Report Table */}
+            {currentStep === 3 && !fallbackWarning?.active && internalPairs.length > 0 && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-700">
+                <div className="flex items-center justify-between">
+                   <div>
+                      <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase thai-text">รายงานการสแกนคลังสินค้า (Scanning Report)</h3>
+                      <p className="text-indigo-500 text-xs font-black uppercase tracking-[0.2em] mt-1">ผลลัพธ์การคัดกรองคู่สินค้าซ้ำด้วยอัลกอริทึม</p>
+                   </div>
+                </div>
+
+                {/* Dashboard Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   <div className="premium-card p-6 bg-white border-slate-100 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                         <DatabaseIcon className="w-6 h-6" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">ตรวจสอบคลังสินค้า</p>
+                         <p className="text-2xl font-black text-slate-800 mt-1">{totalScanned.toLocaleString()} รายการ</p>
+                      </div>
+                   </div>
+                   <div className="premium-card p-6 bg-white border-slate-100 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                         <ScaleIcon className="w-6 h-6" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">เกณฑ์ความเหมือนเวกเตอร์</p>
+                         <p className="text-2xl font-black text-slate-800 mt-1">&gt;= {(scanThreshold * 100).toFixed(0)}%</p>
+                      </div>
+                   </div>
+                   <div className="premium-card p-6 bg-white border-slate-100 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                         <AlertCircle className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">ตรวจพบคู่ซ้ำแฝงในระบบ</p>
+                         <p className="text-2xl font-black text-rose-600 mt-1">{internalPairs.length} คู่</p>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Table of Duplicates */}
+                <div className="premium-card p-0 overflow-hidden bg-white border-slate-100 shadow-xl">
+                   <div className="px-8 py-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+                      <span className="text-sm font-black text-white uppercase tracking-wider thai-text">ตารางสรุปคู่ซ้ำจากการตรวจของระบบ (Algorithm Output)</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase">กรองความถูกต้องด้วย ML Classifier</span>
+                   </div>
+                   <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                         <thead>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider w-[35%]">สินค้าฝั่ง A</th>
+                               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider w-[35%]">สินค้าฝั่ง B</th>
+                               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center w-[10%]">ความคล้ายเวกเตอร์</th>
+                               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center w-[10%]">ML ประเมิน</th>
+                            </tr>
+                         </thead>
+                         <tbody className="divide-y divide-slate-100">
+                            {internalPairs.map((pair, idx) => {
+                               const isSimilar = pair.ml_prediction === 'similar';
+                               return (
+                                  <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                                     <td className="px-8 py-4">
+                                        <p className="text-sm font-black text-slate-800 thai-text">{pair.name_a}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">SKU: {pair.sku_a || 'N/A'} • {pair.category_a}</p>
+                                     </td>
+                                     <td className="px-8 py-4">
+                                        <p className="text-sm font-black text-slate-800 thai-text">{pair.name_b}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">SKU: {pair.sku_b || 'N/A'} • {pair.category_b}</p>
+                                     </td>
+                                     <td className="px-6 py-4 text-center">
+                                        <span className="text-sm font-black text-slate-700 font-mono">{(pair.similarity * 100).toFixed(1)}%</span>
+                                     </td>
+                                     <td className="px-6 py-4 text-center">
+                                        <div className="flex flex-col items-center gap-1">
+                                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border ${
+                                              isSimilar 
+                                                ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' 
+                                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                           }`}>
+                                              {isSimilar ? '⚠️ อาจซ้ำกัน' : '💡 อาจแตกต่าง'}
+                                           </span>
+                                           {pair.confidence && (
+                                              <span className="text-[9px] text-slate-400 font-bold">มั่นใจ {(pair.confidence * 100).toFixed(0)}%</span>
+                                           )}
+                                        </div>
+                                     </td>
+                                  </tr>
+                               );
+                            })}
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+
+                {/* Navigation Actions */}
+                <div className="flex justify-end items-center gap-4">
+                   <button 
+                      onClick={() => { setCurrentStep(1); setInternalPairs([]); setAuditList([]); }}
+                      className="px-8 py-4 rounded-2xl font-black text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors thai-text uppercase text-xs tracking-wider"
+                   >
+                      ยกเลิกและตั้งค่าใหม่
+                   </button>
+                   <button 
+                      onClick={startAudit}
+                      className="btn-premium px-10 py-4 text-xs group"
+                   >
+                      <SparklesIcon className="w-4 h-4 mr-2 group-hover:animate-bounce" />
+                      <span className="thai-text uppercase tracking-widest font-black">เริ่มกระบวนการสะสางข้อมูลรายคู่ (Proceed to Audit)</span>
+                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Database Audit Resolution (Manual comparison and merge) */}
+            {currentStep === 4 && !fallbackWarning?.active && auditList[internalCurrentIndex] && (
               <div className="space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-700">
                 <div className="flex items-center justify-between">
                    <div>
@@ -430,7 +647,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                       <p className="text-indigo-500 text-xs font-black uppercase tracking-[0.2em] mt-1">คลังข้อมูลสินค้าซ้ำในฐานข้อมูลหลัก</p>
                    </div>
                    <div className="px-6 py-2 bg-indigo-500 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-100 tracking-tighter italic">
-                      {internalCurrentIndex + 1} / {internalPairs.length} คู่
+                      {internalCurrentIndex + 1} / {auditList.length} คู่
                    </div>
                 </div>
 
@@ -442,17 +659,17 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                    {[
                      { 
                        type: 'สินค้าฝั่ง A (ซ้าย)', 
-                       name_th: internalPairs[internalCurrentIndex].name_a, 
-                       sku: internalPairs[internalCurrentIndex].sku_a,
-                       category: internalPairs[internalCurrentIndex].category_a,
+                       name_th: auditList[internalCurrentIndex].name_a, 
+                       sku: auditList[internalCurrentIndex].sku_a,
+                       category: auditList[internalCurrentIndex].category_a,
                        color: 'indigo', 
                        side: 'a' as const
                      },
                      { 
                        type: 'สินค้าฝั่ง B (ขวา)', 
-                       name_th: internalPairs[internalCurrentIndex].name_b, 
-                       sku: internalPairs[internalCurrentIndex].sku_b,
-                       category: internalPairs[internalCurrentIndex].category_b,
+                       name_th: auditList[internalCurrentIndex].name_b, 
+                       sku: auditList[internalCurrentIndex].sku_b,
+                       category: auditList[internalCurrentIndex].category_b,
                        color: 'emerald', 
                        side: 'b' as const
                      }
@@ -481,9 +698,23 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                 <div className="bg-slate-950 p-10 rounded-[48px] text-center shadow-2xl relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
                    
-                   <div className="inline-flex gap-2 items-center bg-white/5 border border-white/10 px-6 py-2 rounded-full mb-8">
-                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Semantic Match:</span>
-                      <span className="text-sm font-black text-white italic tracking-widest">{(internalPairs[internalCurrentIndex].similarity * 100).toFixed(1)}% Match</span>
+                   <div className="flex flex-col items-center gap-4 mb-8">
+                      <div className="inline-flex gap-2 items-center bg-white/5 border border-white/10 px-6 py-2 rounded-full">
+                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Semantic Match:</span>
+                         <span className="text-sm font-black text-white italic tracking-widest">{(auditList[internalCurrentIndex].similarity * 100).toFixed(1)}% Match</span>
+                      </div>
+
+                      {auditList[internalCurrentIndex].reason && (
+                         <div className="max-w-xl w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left">
+                            <div className="flex items-center gap-2 mb-1">
+                               <span className={`w-2 h-2 rounded-full ${auditList[internalCurrentIndex].ml_prediction === 'similar' ? 'bg-rose-500 animate-ping' : 'bg-amber-500 animate-pulse'}`} />
+                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ผลการประเมินวิเคราะห์โดยระบบ (AI Reason)</span>
+                            </div>
+                            <p className="text-xs font-bold text-slate-200 thai-text leading-relaxed">
+                               {auditList[internalCurrentIndex].reason}
+                            </p>
+                         </div>
+                      )}
                    </div>
 
                    <h4 className="text-lg font-black text-white thai-text mb-2 uppercase tracking-tight">การตัดสินใจสะสางข้อมูลซ้ำซ้อน</h4>
@@ -535,7 +766,8 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
               </div>
             )}
 
-            {currentStep === 4 && (
+            {/* Step 5: Audit Complete Summary */}
+            {currentStep === 5 && (
               <div className="premium-card p-16 bg-white/40 border-white text-center flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
                  <div className="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center mb-8 shadow-xl shadow-emerald-100">
                     <CheckIcon className="w-10 h-10 text-emerald-600" />

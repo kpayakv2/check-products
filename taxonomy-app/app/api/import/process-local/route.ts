@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_URL || 'http://127.0.0.1:54331',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 // Thai text processing utilities (same as before)
@@ -75,7 +75,7 @@ async function generateEmbeddingLocal(text: string): Promise<number[]> {
     
     // Fallback: Call FastAPI directly
     try {
-      const fastapiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+      const fastapiUrl = process.env.FASTAPI_URL || 'http://127.0.0.1:8000'
       const response = await fetch(`${fastapiUrl}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -170,7 +170,12 @@ async function fallbackKeywordMatching(
       }
     }
 
-    let bestMatch = {
+    let bestMatch: {
+      category_id: string | null
+      category_name: string
+      confidence: number
+      matched_keywords: string[]
+    } = {
       category_id: null,
       category_name: 'ไม่ระบุหมวดหมู่',
       confidence: 0,

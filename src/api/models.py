@@ -144,6 +144,9 @@ class InternalDuplicatePair(BaseModel):
     category_b: str
     category_id_b: str
     similarity: float
+    ml_prediction: Optional[str] = None
+    confidence: Optional[float] = None
+    reason: Optional[str] = None
 
 
 class ScanInternalResponse(BaseModel):
@@ -154,3 +157,49 @@ class ScanInternalResponse(BaseModel):
     processing_time: float
     fallback_active: bool = False
     system_warnings: List[str] = Field(default_factory=list)
+
+
+class FileDeduplicationRequest(BaseModel):
+    """Request schema for uploading files deduplication."""
+    old_products_path: str = Field(..., description="Path of existing products CSV in Supabase storage")
+    new_products_path: str = Field(..., description="Path of new products CSV in Supabase storage")
+    threshold: Optional[float] = Field(0.75, description="Similarity threshold for matching")
+
+
+class ProductMatchResult(BaseModel):
+    """Unified file-based product match result."""
+    id: str
+    newProduct: str
+    oldProduct: str
+    similarity: float
+    confidence: float
+    mlPrediction: str  # 'similar' or 'different'
+    status: str = "pending"
+    reason: str
+
+
+class FileDeduplicationStats(BaseModel):
+    """Statistics for file deduplication job."""
+    totalNewProducts: int
+    totalOldProducts: int
+    needsReview: int
+    autoApproved: int
+    excludedDuplicates: int
+    processingTime: float
+
+
+class FileDeduplicationResponse(BaseModel):
+    """Response containing matches, unique products, and job statistics."""
+    success: bool
+    results: List[ProductMatchResult]
+    uniqueProducts: List[str]
+    stats: FileDeduplicationStats
+    summary: str
+
+
+class ImportDeduplicationRequest(BaseModel):
+    """Request schema for batch product deduplication against database."""
+    products: List[str] = Field(..., description="List of product names to deduplicate")
+    threshold: Optional[float] = Field(0.75, description="Similarity threshold")
+
+

@@ -12,12 +12,12 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Import local modules
-sys.path.append(os.getcwd())
-from advanced_models import SentenceTransformerModel
-from fresh_implementations import ThaiTextProcessor
+from src.core.advanced_models import SentenceTransformerModel
+from src.core.fresh_implementations import ThaiTextProcessor
+from src.services.taxonomy_service import TaxonomyService
 
 # Configuration
-SUPABASE_URL = "http://localhost:54331"
+SUPABASE_URL = os.getenv("SUPABASE_URL", "http://127.0.0.1:54331")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 INPUT_FILE = "input/รายการสินค้าพร้อมหมวดหมู่_AI.txt"
 
@@ -29,25 +29,16 @@ class LessonImporter:
         print("🔧 Initializing Lesson Importer...")
         self.processor = ThaiTextProcessor()
         self.model = SentenceTransformerModel(model_name="paraphrase-multilingual-MiniLM-L12-v2")
-        self.db_nodes = {}
+        self.taxonomy = TaxonomyService(supabase)
         
     def load_taxonomy(self):
-        print("📚 Loading taxonomy mapping from Supabase...")
-        res = supabase.table("taxonomy_nodes").select("id, name_th").execute()
-        self.db_nodes = {node['name_th'].strip(): node['id'] for node in res.data}
-        print(f"✅ Loaded {len(self.db_nodes)} categories for mapping.")
+        self.taxonomy.load_taxonomy_nodes()
 
     def run_import(self):
         self.load_taxonomy()
         
         # 1. Read the Reference File
         df = pd.read_csv(INPUT_FILE, sep='\t', encoding='utf-16')
-        
-        # Mapping column indices based on previous analysis:
-        # 1: itemid (sku)
-        # 3: name_th
-        # 4: price
-        # 9: sub_category (lesson)
         
         sku_col = df.columns[1]
         name_col = df.columns[3]
@@ -73,12 +64,17 @@ class LessonImporter:
                 price = float(row[price_col]) if not pd.isna(row[price_col]) else 0.0
                 sub_cat_name = str(row[sub_cat_col]).strip()
                 
-                # Map to Category ID
-                cat_id = self.db_nodes.get(sub_cat_name)
+                # Map to Category ID (Try exact match then fuzzy)
+                cat_id = None
+                for db_id, db_name in self.taxonomy.category_names.items():
+                    if db_name.strip() == sub_cat_name:
+                        cat_id = db_id
+                        break
+                
                 if not cat_id:
                     # Try fuzzy match for slashes
                     fuzzy_name = sub_cat_name.replace(' / ', '/').replace(' /', '/').replace('/ ', '/')
-                    for db_name, db_id in self.db_nodes.items():
+                    for db_id, db_name in self.taxonomy.category_names.items():
                         if db_name.replace(' / ', '/').replace(' /', '/').replace('/ ', '/') == fuzzy_name:
                             cat_id = db_id
                             break

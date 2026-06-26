@@ -11,14 +11,14 @@ from web_server import app
 
 def start_test_server():
     """Start server for testing"""
-    app.run(debug=False, host='localhost', port=5001, use_reloader=False)
+    app.run(debug=False, host='127.0.0.1', port=5001, use_reloader=False)
 
 def test_api_endpoints():
     """Test all API endpoints"""
     print("🧪 Testing API Endpoints")
     print("=" * 50)
     
-    base_url = "http://localhost:5001"
+    base_url = "http://127.0.0.1:5001"
     
     try:
         # Test 1: API Status

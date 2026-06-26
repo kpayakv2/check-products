@@ -397,7 +397,7 @@ npm start
 
 ### **Environment Variables:**
 ```env
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54331
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
@@ -408,8 +408,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 ### **Production Ready:**
 - ✅ Next.js: Running (localhost:3000)
-- ✅ Supabase: Running (localhost:54321)
-- ✅ FastAPI: Running (localhost:8000)
+- ✅ Supabase: Running (127.0.0.1:54331)
+- ✅ FastAPI: Running (127.0.0.1:8000)
 - ✅ Edge Functions: Working
 - ✅ Database: Working (all 25 keyword_rules active)
 - ✅ Storage: Working

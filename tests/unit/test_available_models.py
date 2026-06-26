@@ -55,8 +55,8 @@ def test_with_different_models(new_products, old_products):
     """ทดสอบกับโมเดลต่างๆ"""
     print(f"\n🧪 Testing with different models...")
     
-    from fresh_implementations import ComponentFactory
-    from fresh_architecture import ProductMatcher, Config
+    from src.core.fresh_implementations import ComponentFactory
+    from src.core.fresh_architecture import ProductMatcher, Config
     
     # Test with different model types
     model_types = ['mock', 'tfidf', 'optimized-tfidf']

@@ -1,11 +1,17 @@
 {
+  "context": {
+    "includeDirectories": [
+      "D:\\SocratiCode-main"
+    ]
+  },
   "mcpServers": {
     "filesystem": {
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "D:\\product_checker\\check-products"
+        "D:\\product_checker\\check-products",
+        "D:\\SocratiCode-main"
       ]
     },
     "postgres": {
@@ -42,6 +48,12 @@
       "args": [
         "-y",
         "@domscribe/mcp"
+      ]
+    },
+    "socraticode": {
+      "command": "node",
+      "args": [
+        "D:\\SocratiCode-main\\dist\\index.js"
       ]
     }
   }

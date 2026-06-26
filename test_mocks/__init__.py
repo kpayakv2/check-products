@@ -6,7 +6,7 @@ sentence-transformers without requiring large model downloads or heavy computati
 Used exclusively for testing purposes.
 """
 
-from . import util
+import test_mocks.util as util
 
 
 class SentenceTransformer:

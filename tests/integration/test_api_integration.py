@@ -8,7 +8,7 @@ from io import BytesIO
 
 def test_api_with_sample_data():
     """ทดสอบ API ด้วยข้อมูลตัวอย่าง"""
-    base_url = "http://localhost:5000"
+    base_url = "http://127.0.0.1:5000"
     
     print("🧪 Testing API endpoints...")
     
