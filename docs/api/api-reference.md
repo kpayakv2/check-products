@@ -1,569 +1,138 @@
-# 🔌 API Reference & Testing Guide
+# 🔌 API Reference & Testing Guide (v4.0 — Modular Architecture)
 
-> 📖 **ดูข้อมูลเพิ่มเติม**: [Development Documentation](../development/) สำหรับรายละเอียดเกี่ยวกับสูตรการคำนวณคะแนน, threshold definitions และ confidence levels
+> 📖 **Project Constitution**: ระบบนี้ทำงานบนฐานของ FastAPI และใช้ Hybrid Algorithm (Keyword 60% + Embedding 40%) ตามที่ระบุใน [GEMINI.md](../../GEMINI.md)
 
 ## 🚀 **API Server Setup**
 
 ### **Starting the Server**
 ```bash
-# Start API server
-python api_server.py
+# วิธีแนะนำ: ดับเบิลคลิก
+START_PHAYAK.bat
 
-# Server will run on:
-# - API: http://localhost:8000
-# - Docs: http://localhost:8000/docs  
-# - Web UI: http://localhost:8000/web
-```
+# หรือรันตรง
+.venv\Scripts\python src\api\api_server.py
 
-### **Health Check**
-```bash
-curl http://localhost:8000/api/v1/health
+# Server จะรันที่:
+# - API Home:        http://127.0.0.1:8000
+# - Swagger UI:      http://127.0.0.1:8000/docs
+# - Health Check:    http://127.0.0.1:8000/api/v1/health
 ```
 
 ---
 
-## 📋 **API Endpoints**
+## 📋 **Embedding API** — `src/api/routers/embed.py`
 
-### **1. Health Check**
+### **1. Single Embedding**
+แปลงชื่อสินค้าเป็น Vector 384 มิติ ใช้โดย Supabase Edge Functions
 ```http
-GET /api/v1/health
+POST /api/embed
+Content-Type: application/json
 ```
-
+```json
+{ "text": "กล่องล็อค 560 มล" }
+```
 **Response:**
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2025-09-05T10:30:00Z",
-  "version": "1.0.0",
-  "components": {
-    "ml_model": "ready",
-    "preprocessor": "ready"
-  }
+  "embedding": [0.234, -0.567, ...],
+  "dimension": 384,
+  "model": "paraphrase-multilingual-MiniLM-L12-v2",
+  "processing_time": 0.045
 }
 ```
 
-### **2. Single Product Matching**
+### **2. Batch Embedding**
+```http
+POST /api/embed/batch
+Content-Type: application/json
+```
+```json
+{ "texts": ["สินค้า A", "สินค้า B", "สินค้า C"] }
+```
+
+---
+
+## 📋 **Matching API** — `src/api/routers/match.py`
+
+### **3. Single Match**
 ```http
 POST /api/v1/match/single
 Content-Type: application/json
 ```
-
-**Request Body:**
 ```json
 {
-  "query_product": "iPhone 14 Pro Max",
-  "reference_products": ["Samsung Galaxy S23", "Huawei P50 Pro"],
+  "query_product": "กล่องล็อค 560",
+  "reference_products": ["กล่อง 560 มล", "ถัง 1L", "ขวด 500"],
   "threshold": 0.6,
-  "top_k": 5,
-  "include_metadata": true,
-  "include_confidence": true
+  "top_k": 5
 }
 ```
 
-**Response:**
-```json
-{
-  "matches": [
-    {
-      "query_product": "iPhone 14 Pro Max",
-      "matched_product": "Samsung Galaxy S23",
-      "similarity_score": 0.73,
-      "confidence_score": 0.6250,
-      "confidence_level": "medium",
-      "rank": 1
-    }
-  ],
-  "metadata": {
-    "processing_time": 0.045,
-    "algorithm": "hybrid",
-    "similarity_weights": {
-      "cosine": 0.7,
-      "euclidean": 0.3
-    },
-    "threshold_used": 0.6,
-    "total_comparisons": 2,
-    "score_range": {
-      "min": 0.31,
-      "max": 0.95,
-      "average": 0.764
-    }
-  }
-}
-```
-
-### **3. Batch Processing**
+### **4. Batch Match (Background Job)**
 ```http
 POST /api/v1/match/batch
 Content-Type: application/json
 ```
+ส่งคืน `job_id` สำหรับติดตามสถานะผ่าน `/api/v1/jobs/{job_id}`
 
-**Request Body:**
-```json
-{
-  "query_products": [
-    "iPhone 14 Pro Max",
-    "Samsung Galaxy S23"
-  ],
-  "reference_products": [
-    "iPhone 14 Pro", 
-    "Galaxy S23+",
-    "Pixel 7 Pro"
-  ],
-  "threshold": 0.6,
-  "max_matches_per_query": 3
-}
-```
+---
 
-**Response:**
-```json
-{
-  "job_id": "job_123456789",
-  "status": "processing",
-  "estimated_time": 2.5,
-  "total_queries": 2,
-  "message": "Job started successfully"
-}
-```
+## 📋 **System API** — `src/api/routers/system.py`
 
-### **4. File Upload Processing**
+### **5. ล้างชื่อสินค้าภาษาไทย**
 ```http
-POST /api/v1/match/upload
-Content-Type: multipart/form-data
+POST /api/v1/clean
+Content-Type: application/json
 ```
-
-**Form Data:**
-```
-query_file: products_new.csv
-reference_file: products_old.csv
-threshold: 0.7 (optional)
-top_k: 5 (optional)
-```
-
-**Response:**
 ```json
-{
-  "job_id": "upload_123456789",
-  "status": "uploaded",
-  "query_count": 150,
-  "reference_count": 500,
-  "estimated_processing_time": 12.5
-}
+{ "texts": ["มาม่า(หมู) 60กรัม", "ข้าวสาร ๕ กก"] }
 ```
 
-### **5. Job Status Tracking**
+### **6. Health Check**
+```http
+GET /api/v1/health
+```
+
+---
+
+## 📋 **Jobs API** — `src/api/routers/jobs.py`
+
+### **7. เช็คสถานะ Job**
 ```http
 GET /api/v1/jobs/{job_id}
 ```
 
-**Response:**
-```json
-{
-  "job_id": "job_123456789",
-  "status": "completed",
-  "progress": 100,
-  "started_at": "2025-09-05T10:30:00Z",
-  "completed_at": "2025-09-05T10:32:30Z",
-  "processing_time": 150.5,
-  "total_matches": 1248,
-  "result_available": true
-}
-```
-
-### **6. Results Download**
+### **8. ดึงผลลัพธ์ Job**
 ```http
 GET /api/v1/results/{job_id}
-Accept: application/json  # or text/csv
-```
-
-**JSON Response:**
-```json
-{
-  "job_id": "job_123456789",
-  "results": [
-    {
-      "query_product": "iPhone 14",
-      "matches": [
-        {
-          "product": "iPhone 14 Pro",
-          "similarity": 0.87,
-          "confidence": "high"
-        }
-      ]
-    }
-  ],
-  "summary": {
-    "total_queries": 150,
-    "total_matches": 1248,
-    "avg_similarity": 0.764,
-    "processing_time": 150.5
-  }
-}
 ```
 
 ---
 
-## 🔌 **WebSocket Real-time Updates**
+## 📋 **Learning API** — `src/api/routers/learn.py`
 
-### **Connection**
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws');
-
-ws.onopen = function(event) {
-    console.log('WebSocket connected');
-};
-
-ws.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    handleUpdate(data);
-};
-```
-
-### **Message Types**
-```javascript
-// Connection established
-{
-    "type": "connection_established",
-    "client_id": "client_123",
-    "timestamp": "2025-09-05T10:30:00Z"
-}
-
-// Job progress update
-{
-    "type": "progress",
-    "job_id": "job_123456789",
-    "progress": 75,
-    "current": 112,
-    "total": 150,
-    "estimated_remaining": 45.2
-}
-
-// Job completion
-{
-    "type": "job_completed",
-    "job_id": "job_123456789",
-    "status": "completed",
-    "total_matches": 1248,
-    "processing_time": 150.5,
-    "download_url": "/api/v1/results/job_123456789"
-}
-
-// Error notification
-{
-    "type": "error",
-    "job_id": "job_123456789",
-    "error": "Processing failed",
-    "details": "Memory limit exceeded"
-}
-```
-
----
-
-## 🧪 **Testing Guide**
-
-### **Manual API Testing**
-
-#### **Using cURL**
-```bash
-# Test health endpoint
-curl -X GET http://localhost:8000/api/v1/health
-
-# Test single match
-curl -X POST http://localhost:8000/api/v1/match/single \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query_product": "iPhone 14",
-    "reference_products": ["Samsung Galaxy S23"],
-    "threshold": 0.6
-  }'
-
-# Test batch processing
-curl -X POST http://localhost:8000/api/v1/match/batch \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query_products": ["iPhone 14", "Galaxy S23"],
-    "reference_products": ["iPhone Pro", "Samsung S23+"],
-    "threshold": 0.7
-  }'
-```
-
-#### **Using Python Requests**
-```python
-import requests
-import json
-
-BASE_URL = "http://localhost:8000"
-
-# Health check
-response = requests.get(f"{BASE_URL}/api/v1/health")
-print(f"Health: {response.json()}")
-
-# Single match
-match_request = {
-    "query_product": "iPhone 14 Pro Max",
-    "reference_products": ["Samsung Galaxy S23", "Pixel 7"],
-    "threshold": 0.6,
-    "top_k": 3
-}
-
-response = requests.post(
-    f"{BASE_URL}/api/v1/match/single",
-    json=match_request
-)
-print(f"Matches: {response.json()}")
-
-# File upload
-files = {
-    'query_file': open('new_products.csv', 'rb'),
-    'reference_file': open('old_products.csv', 'rb')
-}
-data = {'threshold': 0.7}
-
-response = requests.post(
-    f"{BASE_URL}/api/v1/match/upload",
-    files=files,
-    data=data
-)
-print(f"Upload: {response.json()}")
-```
-
-### **Automated Testing**
-
-#### **Running Test Suite**
-```bash
-# Run all tests
-pytest tests/
-
-# Run API-specific tests
-python test_api_client.py
-
-# Run with detailed output
-pytest tests/ -v --tb=short
-
-# Run performance tests
-pytest tests/test_performance.py
-```
-
-#### **API Test Client**
-```python
-# test_api_client.py example usage
-from test_api_client import APITestClient
-
-client = APITestClient(base_url="http://localhost:8000")
-
-# Run comprehensive tests
-client.test_health_endpoint()
-client.test_single_match()
-client.test_batch_processing()
-client.test_file_upload()
-client.test_websocket_connection()
-
-print("All API tests passed!")
-```
-
-### **Load Testing**
-```python
-import asyncio
-import aiohttp
-import time
-
-async def load_test_single_match(session, product_id):
-    """Test single match endpoint under load"""
-    payload = {
-        "query_product": f"Test Product {product_id}",
-        "reference_products": ["Reference 1", "Reference 2"],
-        "threshold": 0.6
-    }
-    
-    async with session.post('/api/v1/match/single', json=payload) as response:
-        return await response.json()
-
-async def run_load_test(concurrent_requests=50):
-    """Run load test with multiple concurrent requests"""
-    connector = aiohttp.TCPConnector(limit=100)
-    async with aiohttp.ClientSession(
-        "http://localhost:8000",
-        connector=connector
-    ) as session:
-        
-        start_time = time.time()
-        
-        tasks = [
-            load_test_single_match(session, i) 
-            for i in range(concurrent_requests)
-        ]
-        
-        results = await asyncio.gather(*tasks)
-        
-        end_time = time.time()
-        duration = end_time - start_time
-        
-        print(f"Completed {concurrent_requests} requests in {duration:.2f}s")
-        print(f"Average response time: {duration/concurrent_requests:.3f}s")
-        print(f"Requests per second: {concurrent_requests/duration:.2f}")
-
-# Run load test
-asyncio.run(run_load_test(100))
-```
-
----
-
-## 📊 **Performance Monitoring**
-
-### **Built-in Metrics**
-```python
-# Available in API responses
-{
-  "metadata": {
-    "processing_time": 0.045,        # Total processing time (seconds)
-    "preprocessing_time": 0.012,     # Text preprocessing time
-    "embedding_time": 0.025,         # Embedding generation time
-    "similarity_time": 0.008,        # Similarity calculation time
-    "memory_usage": "45.2MB",        # Peak memory usage
-    "algorithm": "tfidf",            # Algorithm used
-    "model_version": "1.0.0"         # Model version
-  }
-}
-```
-
-### **Health Monitoring**
-```bash
-# Monitor API health
-watch -n 5 'curl -s http://localhost:8000/api/v1/health | jq'
-
-# Monitor system resources
-htop
-
-# Monitor API logs (if running with logging)
-tail -f api_server.log
-```
-
----
-
-## 🔧 **Configuration**
-
-### **Environment Variables**
-```bash
-# API Configuration
-export API_HOST=0.0.0.0
-export API_PORT=8000
-export API_WORKERS=4
-
-# Model Configuration  
-export MODEL_TYPE=tfidf
-export SIMILARITY_THRESHOLD=0.6
-export MAX_BATCH_SIZE=1000
-
-# Performance
-export ENABLE_CACHING=true
-export CACHE_SIZE=1000
-export EMBEDDING_BATCH_SIZE=32
-```
-
-### **API Server Configuration**
-```python
-# Configuration in api_server.py
-class APIConfig:
-    host: str = "localhost"
-    port: int = 8000
-    workers: int = 1
-    
-    # Model settings
-    model_type: str = "tfidf"
-    similarity_threshold: float = 0.6
-    
-    # Performance
-    enable_background_jobs: bool = True
-    max_concurrent_jobs: int = 10
-    job_timeout: int = 3600  # 1 hour
-```
-
----
-
-## 🛠️ **Troubleshooting**
-
-### **Common Issues**
-
-#### **Server Won't Start**
-```bash
-# Check if port is in use
-netstat -an | grep 8000
-
-# Kill existing process
-pkill -f api_server.py
-
-# Check Python environment
-python --version
-pip list | grep fastapi
-```
-
-#### **Slow API Response**
-```python
-# Check model loading
-import time
-start = time.time()
-from fresh_implementations import ComponentFactory
-model = ComponentFactory.create_embedding_model("tfidf")
-print(f"Model loading time: {time.time() - start:.2f}s")
-
-# Monitor memory usage
-import psutil
-process = psutil.Process()
-print(f"Memory usage: {process.memory_info().rss / 1024 / 1024:.1f} MB")
-```
-
-#### **WebSocket Connection Issues**
-```javascript
-// Check WebSocket connection
-const ws = new WebSocket('ws://localhost:8000/ws');
-
-ws.onerror = function(error) {
-    console.error('WebSocket error:', error);
-};
-
-ws.onclose = function(event) {
-    console.log('WebSocket closed:', event.code, event.reason);
-};
-```
-
-### **Error Codes**
+### **9. สอน AI จากการยืนยันหมวดหมู่**
 ```http
-400 Bad Request     - Invalid request format
-422 Validation Error - Invalid input parameters  
-500 Internal Error  - Server processing error
-503 Service Unavailable - Server overloaded
+POST /api/v1/learn/verify
+Content-Type: application/json
 ```
-
----
-
-## 📝 **API Response Schemas**
-
-### **Standard Response Format**
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "metadata": { ... },
-  "timestamp": "2025-09-05T10:30:00Z"
-}
-```
-
-### **Error Response Format**
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid threshold value",
-    "details": {
-      "field": "threshold",
-      "value": -0.5,
-      "expected": "between 0.0 and 1.0"
-    }
-  },
-  "timestamp": "2025-09-05T10:30:00Z"
+  "product_name": "มาม่าหมูสับ 60ก",
+  "category_id": "cat_001"
 }
 ```
 
 ---
 
-**🔌 API นี้พร้อมใช้งานจริงใน production environment และรองรับการใช้งานที่หลากหลาย!**
+## 🏗️ **Deduplication Workflow**
+
+```bash
+python scripts/complete_deduplication_pipeline.py --input data.csv --mode analyze
+python scripts/complete_deduplication_pipeline.py --input data.csv --mode review
+python scripts/complete_deduplication_pipeline.py --mode train
+```
+
+---
+
+**📅 Last Updated**: 24 พฤษภาคม 2569 (v4.0 — แยก Routers, ลบ embed_service.py ที่ไม่มีจริง)

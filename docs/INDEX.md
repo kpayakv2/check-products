@@ -1,80 +1,49 @@
 # Product Similarity Checker - Documentation
 
-Welcome to the comprehensive documentation for the Product Similarity Checker project. This system provides advanced product deduplication using machine learning and human-in-the-loop feedback.
+ยินดีต้อนรับสู่ศูนย์รวมเอกสารของโปรเจกต์ **Thai Product Taxonomy Manager & Similarity Checker** ระบบจำแนกหมวดหมู่สินค้าไทยด้วย AI
 
-## 📚 Documentation Structure
+## 📚 โครงสร้างเอกสาร
 
 ### 🚀 [User Guides](guides/)
-- **[Quick Start Guide](guides/quick-start.md)** - Get up and running quickly
-- **[Human Feedback System](guides/human-feedback.md)** - How to use the human-in-the-loop interface
-- **[Embedding Models Guide](guides/embedding-models.md)** - Understanding and configuring ML models
-- **[Model Download Guide](guides/model-download.md)** - How to download and manage models
+- **[Quick Start Guide](guides/quick-start.md)** - เริ่มต้นติดตั้งและใช้งานระบบ Modern Stack (Next.js + Supabase)
+- **[Human Feedback System](guides/human-feedback.md)** - คู่มือการใช้งานระบบ Review และการให้ Feedback กับ AI
 
 ### 🔧 [API Documentation](api/)
-- **[API Reference](api/api-reference.md)** - Complete API documentation
-- **[Quick Reference](api/quick-reference.md)** - Essential API endpoints
-- **[Analysis Capabilities](api/analyze-capabilities.md)** - Advanced analysis features
+- **[API Reference](api/api-reference.md)** - รายละเอียด API Endpoints ทั้ง FastAPI และ Edge Functions
+- **[API Architecture](../API_ARCHITECTURE.md)** - สถาปัตยกรรมการเชื่อมต่อระหว่าง Service ต่างๆ
 
 ### 👩‍💻 [Development](development/)
-- **[Contributing Guide](development/contributing.md)** - How to contribute to the project
-- **[Architecture Overview](development/architecture.md)** - System architecture and design
-- **[Test Organization](development/test-organization.md)** - Testing framework and structure
-- **[Changelog](development/changelog.md)** - Version history and changes
-- **[Shared Scoring System](development/shared-scoring.md)** - Scoring algorithm details
-- **[Text Preprocessing](development/text-preprocessing.md)** - Text processing pipeline
+- **[Architecture Overview](development/architecture.md)** - รายละเอียดโครงสร้างโมดูลและ Data Pipeline
+- **[Text Preprocessing](development/text-preprocessing.md)** - ขั้นตอนการทำความสะอาดชื่อสินค้าภาษาไทย
+- **[Contributing Guide](development/contributing.md)** - แนวทางการพัฒนาและส่งต่องาน
 
 ### 📊 [Reports & Analysis](reports/)
-- **[Test Results Summary](reports/test-results-summary.md)** - Latest test execution results
-- **[Cleanup Reports](reports/)** - Project cleanup and optimization reports
-- **[Sentence Transformer Analysis](reports/sentence-transformer-analysis.md)** - ML model performance analysis
-- **[Capabilities Summary](reports/capabilities-summary.md)** - System capabilities overview
-- **[Organization Summary](reports/organization-summary.md)** - Project organization details
-
-### 🗄️ [Archive](archive/)
-- Historical documentation and deprecated guides
+- **[Test Results Summary](reports/test-results-summary.md)** - สรุปผลการทดสอบล่าสุด
+- **[Sentence Transformer Analysis](reports/sentence-transformer-analysis.md)** - วิเคราะห์ประสิทธิภาพของโมเดล ML (384-dim)
 
 ---
 
-## 🎯 **Quick Navigation**
+## 🎯 **การนำทางด่วน (Quick Navigation)**
 
-### **สำหรับผู้ใช้ใหม่:**
-1. อ่าน [`README.md`](../README.md) ก่อน
-2. ดูตัวอย่างใน Quick Start section
-3. ทดลองใช้ Web Interface หรือ API
+### **สำหรับผู้ใช้งานทั่วไป:**
+1. เริ่มต้นที่ [`README.md`](../README.md) เพื่อทำความเข้าใจภาพรวม
+2. ทำตามขั้นตอนใน [`Quick Start Guide`](guides/quick-start.md)
+3. เข้าใช้งานระบบผ่านหน้าจอ [http://localhost:3000](http://localhost:3000)
 
-### **สำหรับ Developer:**
-1. ศึกษา [`architecture.md`](development/architecture.md) เพื่อเข้าใจโครงสร้าง
-2. อ่าน [`text-preprocessing.md`](development/text-preprocessing.md) สำหรับ text processing
-3. ใช้ [`test organization`](development/test-organization.md) สำหรับการทดสอบ
-
-### **สำหรับการใช้งาน API:**
-1. ดู [`api-reference.md`](api/api-reference.md) สำหรับรายละเอียด endpoint
-2. ทดสอบผ่าน Swagger UI: `http://localhost:8000/docs`
-3. ใช้ [`test_api_client.py`](../test_api_client.py) เป็นตัวอย่าง
+### **สำหรับนักพัฒนา:**
+1. ศึกษา [`Architecture Overview`](development/architecture.md)
+2. ตรวจสอบกฎเหล็กใน [`GEMINI.md`](../GEMINI.md)
+3. ศึกษาสถาปัตยกรรม Supabase ใน [`SUPABASE_SYSTEM_ARCHITECTURE.md`](../SUPABASE_SYSTEM_ARCHITECTURE.md)
 
 ---
 
 ## 🔄 **Document Status**
 
-### **✅ Consolidated & Organized:**
-- 🎯 เอกสารถูกจัดหมวดหมู่ตามบทบาท (Guides / API / Development / Reports / Archive)
-- 🧹 เนื้อหาซ้ำซ้อนถูกย้ายออกจากเอกสารหลักทั้งหมด
-- 📋 มี `docs/INDEX.md` เป็นศูนย์กลางการนำทาง
-- 🗑️ ไฟล์เก่าที่ไม่จำเป็นถูกย้ายไปไว้ใน `docs/archive/`
-
-### **📂 ปัจจุบัน `docs/` มีโครงสร้างดังนี้:**
-```
-docs/
-├── INDEX.md                  # 🗂️ Navigation index (เอกสารนี้)
-├── api/                      # 🔌 REST & WebSocket documentation
-├── guides/                   # 🚀 Quick start & how-to guides
-├── development/              # 🛠️ Technical references for developers
-├── reports/                  # 📊 Project reports & cleanup history
-└── archive/                  # 🗄️ เอกสารอ้างอิงเก็บถาวร
-```
-
-**🎯 เริ่มต้นที่นี่ แล้วเลือกหมวดที่เหมาะกับงานของคุณได้ทันที!**
+### **✅ ปรับปรุงล่าสุด (เมษายน 2569):**
+- 🎯 เอกสารทุกฉบับถูกปรับปรุงให้รองรับสถาปัตยกรรม **Next.js + Supabase**
+- 🧹 นำเนื้อหาที่ล้าสมัย (Port 5000, 8000/web) ออกจากเอกสารหลัก
+- 📋 อ้างอิงความแม่นยำมาตรฐานที่ **72%** ตามการทดสอบจริง
 
 ---
 
-**🎯 เริ่มต้นด้วย [`README.md`](../README.md) เพื่อการใช้งานที่สมบูรณ์!**
+**🏗️ เอกสารนี้ได้รับการดูแลโดย พยัคฆ์ (Gemini CLI Agent)**

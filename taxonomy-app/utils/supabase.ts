@@ -1,9 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// สร้าง Supabase URL แบบ dynamic เพื่อรองรับ LAN access
+// - บนเครื่อง server: http://localhost:3000/api/supabase
+// - บนเครื่อง LAN:   http://192.168.1.80:3000/api/supabase
+// Next.js proxy (next.config.js) จะส่งต่อ /api/supabase/* → http://127.0.0.1:54331/*
+const getSupabaseUrl = (): string => {
+  // Server-side rendering: ใช้ env variable โดยตรง
+  if (typeof window === 'undefined') {
+    return process.env.SUPABASE_URL || 'http://127.0.0.1:54331'
+  }
+  // Client-side: ใช้ origin ของ browser + proxy path (รองรับ LAN อัตโนมัติ)
+  return `${window.location.origin}/api/supabase`
+}
+
+export const supabase = createClient(getSupabaseUrl(), supabaseAnonKey)
 
 // Types สำหรับ Database Schema
 export interface TaxonomyNode {
@@ -329,6 +341,18 @@ export class DatabaseService {
 
     if (error) throw error
     return data
+  }
+
+  static async searchTaxonomyNodes(query: string, limit = 10): Promise<TaxonomyNode[]> {
+    const { data, error } = await supabase
+      .from('taxonomy_nodes')
+      .select('*')
+      .or(`name_th.ilike.%${query}%,code.ilike.%${query}%`)
+      .eq('is_active', true)
+      .limit(limit)
+
+    if (error) throw error
+    return data || []
   }
 
   static async deleteTaxonomyNode(id: string): Promise<void> {
@@ -701,6 +725,45 @@ export class DatabaseService {
 
     if (error) throw error
     return data
+  }
+
+  // Dashboard Statistics
+  static async getDashboardStats(): Promise<{
+    totalCategories: number
+    totalSynonyms: number
+    pendingProducts: number
+    approvedProducts: number
+    duplicateMatches: number
+    reviewsToday: number
+  }> {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayIso = today.toISOString()
+
+    const [
+      { count: catCount },
+      { count: synCount },
+      { count: pendingCount },
+      { count: approvedCount },
+      { count: rejectedCount },
+      { count: reviewedTodayCount }
+    ] = await Promise.all([
+      supabase.from('taxonomy_nodes').select('*', { count: 'exact', head: true }),
+      supabase.from('synonym_lemmas').select('*', { count: 'exact', head: true }),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).gte('updated_at', todayIso)
+    ])
+
+    return {
+      totalCategories: catCount || 0,
+      totalSynonyms: synCount || 0,
+      pendingProducts: pendingCount || 0,
+      approvedProducts: approvedCount || 0,
+      duplicateMatches: rejectedCount || 0,
+      reviewsToday: reviewedTodayCount || 0
+    }
   }
 
   // Helper method to build taxonomy tree

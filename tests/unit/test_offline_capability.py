@@ -3,7 +3,7 @@
 ทดสอบความสามารถ Offline ของ SentenceTransformer
 """
 
-from advanced_models import (
+from src.core.advanced_models import (
     check_offline_models, 
     get_offline_ready_model, 
     ensure_offline_capability,

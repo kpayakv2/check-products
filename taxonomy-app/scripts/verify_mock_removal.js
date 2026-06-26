@@ -6,10 +6,10 @@
 
 async function generateEmbedding(text) {
     console.log(`Attempting to generate embedding for: "${text}"`);
-    console.log("Target URL: http://localhost:8000/api/embed");
+    console.log("Target URL: http://127.0.0.1:8000/api/embed");
 
     try {
-        const response = await fetch('http://localhost:8000/api/embed', {
+        const response = await fetch('http://127.0.0.1:8000/api/embed', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text }),

@@ -1,116 +1,53 @@
-# 🚀 Quick Start Guide
+# 🚀 Quick Start Guide (Modern Hybrid Stack v3.0)
 
-ยินดีต้อนรับสู่ **Product Similarity Checker** เครื่องมือสำหรับตรวจจับสินค้าซ้ำและคัดกรองสินค้าใหม่ก่อนนำเข้าระบบของคุณ คู่มือนี้สรุปขั้นตอนสำคัญเพื่อให้คุณเริ่มใช้งานได้ภายในไม่กี่นาที
-
----
-
-## ✅ ก่อนเริ่มใช้งาน
-
-- ติดตั้ง **Python 3.9+**
-- ติดตั้งเครื่องมือพื้นฐาน: `git`, `pip`, `virtualenv` (แนะนำ)
-- ดาวน์โหลดโมเดลผ่านคำสั่ง `python download_models.py` (ถ้ายังไม่มีไฟล์ใน `model_cache/`)
+คู่มือการเริ่มต้นใช้งานระบบ **Thai Product Taxonomy Manager** ฉบับปรับปรุงล่าสุด
 
 ---
 
-## ⚙️ การติดตั้ง
+## ✅ ลำดับการรันระบบ (Correct Startup Sequence)
 
+เพื่อให้ระบบทำงานได้สมบูรณ์ กรุณารันตามลำดับดังนี้:
+
+### 1. เปิดระบบฐานข้อมูล (Supabase)
+*   เปิดโปรแกรม **Docker Desktop**
+*   ใช้คำสั่ง: `supabase start` ใน Terminal
+
+### 2. รัน AI Engine (FastAPI) - **หัวใจหลัก**
+*   เปิด Terminal ใหม่
+*   เปิด Virtual Env: `venv\Scripts\activate` (Windows)
+*   รัน Server: `python api_server.py`
+*   **ตรวจสอบ**: ต้องเห็นข้อความรันอยู่ที่ `http://127.0.0.1:8000`
+
+### 3. รันหน้าเว็บจัดการข้อมูล (Next.js)
+*   เปิด Terminal ใหม่
+*   ไปที่โฟลเดอร์: `cd taxonomy-app`
+*   รันเว็บ: `npm run dev`
+*   **เข้าใช้งาน**: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 💻 การใช้งานหลัก (Core Workflows)
+
+### **A. การจัดหมวดหมู่สินค้าใหม่**
+1.  เข้าหน้าเว็บ Port 3000
+2.  ไปที่เมนู **Import** หรือ **Classification**
+3.  ระบบจะส่งชื่อสินค้าไปที่ API Port 8000 เพื่อคำนวณ Hybrid Score (60/40)
+4.  ตรวจสอบผลลัพธ์: 🟢 Auto-Approve (>0.9) หรือ 🟡 Needs Review (0.7-0.9)
+
+### **B. การตรวจซ้ำสินค้า (Deduplication)**
+ใช้สคริปต์ Pipeline เพื่อประสิทธิภาพสูงสุด:
 ```bash
-git clone <repository-url>
-cd check-products
-
-# สร้างและเปิดใช้งาน virtual environment (แนะนำ)
-python -m venv venv
-venv\Scripts\activate  # Windows
-# หรือ
-source venv/bin/activate  # macOS/Linux
-
-# ติดตั้ง dependencies
-pip install -r requirements.txt
+# วิเคราะห์ไฟล์สินค้า
+python complete_deduplication_pipeline.py --input data.csv --mode analyze
 ```
 
 ---
 
-## 💻 การใช้งานผ่านคำสั่ง (CLI)
-
-```bash
-# รันการจับคู่สินค้าแบบ batch
-python main.py input/old_product/products.xlsx input/new_product/products.xlsx \
-    --output output/matched_products.csv --threshold 0.6
-
-# พารามิเตอร์สำคัญ
-# - old_products_file : ไฟล์สินค้าต้นฉบับ (ต้องมีคอลัมน์ `name`)
-# - new_products_file : ไฟล์สินค้าใหม่ (ต้องมีคอลัมน์ `รายการ`)
-# - --threshold       : เกณฑ์ตัดสินความเหมือน (0.0-1.0)
-# - --top-k           : จำนวนสินค้าที่ต้องการให้ระบบแนะนำ (ค่าเริ่มต้น 10)
-```
-
-ผลลัพธ์จะถูกบันทึกไว้ใน `output/` พร้อม metadata เช่น confidence score และอันดับของคู่สินค้า
+## 🔌 การเชื่อมต่อ (Integration Details)
+*   **API Local**: `http://127.0.0.1:8000/api/classify/category`
+*   **Vector Provider**: `http://127.0.0.1:8000/api/embed`
+*   **Interactive API Docs**: `http://127.0.0.1:8000/docs` (Swagger UI)
 
 ---
 
-## 🌐 Web Interface สำหรับ Human Review
-
-```bash
-python web_server.py
-# เปิดเบราว์เซอร์ที่ http://localhost:5000
-```
-
-จุดเด่น:
-
-- อัปโหลดไฟล์สินค้าเก่า/ใหม่ แสดงผลลัพธ์แบบอินเตอร์แอคทีฟ
-- ตรวจสอบสินค้าซ้ำ, ยืนยันหรือปฏิเสธได้แบบเรียลไทม์
-- บันทึก human feedback เพื่อนำไปปรับปรุงโมเดลในอนาคต
-
----
-
-## 🔌 REST API & WebSocket
-
-```bash
-python api_server.py
-# API Docs: http://localhost:8000/docs
-# Web UI (เดียวกับ API server): http://localhost:8000/web
-```
-
-Endpoint สำคัญ:
-
-- `POST /api/v1/match/single` – ตรวจจับสินค้าคล้ายสำหรับ 1 สินค้า
-- `POST /api/v1/match/batch` – ส่งชุดข้อมูลเพื่อตรวจจับสินค้าคล้ายหลายตัว
-- `POST /api/v1/match/upload` – อัปโหลดไฟล์และรอผลลัพธ์แบบ asynchronous
-- WebSocket `/ws` – รับอัปเดตสถานะงานแบบเรียลไทม์
-
----
-
-## 🧪 การทดสอบระบบ
-
-```bash
-# รันการทดสอบทั้งหมด
-pytest
-
-# รันเฉพาะหมวดตัวอย่าง
-pytest tests/examples/test_refactored_example.py
-
-# รันการทดสอบ API integration
-pytest tests/integration/test_api_endpoints.py
-```
-
----
-
-## 📚 เอกสารประกอบที่ควรอ่านต่อ
-
-- `README.md` – ภาพรวมของระบบทั้งหมด
-- `docs/INDEX.md` – จุดเชื่อมไปยังเอกสารทุกหมวด
-- `docs/development/architecture.md` – โครงสร้างระบบและโมดูลที่สำคัญ
-- `docs/development/text-preprocessing.md` – รายละเอียด Thai text pipeline
-- `docs/api/api-reference.md` – รายละเอียด REST API + ตัวอย่างคำสั่ง
-
----
-
-## 🎉 พร้อมใช้งาน
-
-- ระบบรองรับทั้ง **Automation (CLI)**, **Integration (API)** และ **Human-in-the-loop Review (Web)**
-- สามารถประมวลผลสินค้าหลายพันรายการได้อย่างรวดเร็ว พร้อมระบบคะแนนความเชื่อมั่น
-- รองรับภาษาไทยเต็มรูปแบบด้วย Thai Text Preprocessing Pipeline
-
-หากต้องการขยายระบบเพิ่มเติมหรือผนวกกับ Thai Product Taxonomy Manager สามารถดูข้อมูลเพิ่มเติมได้ภายในโฟลเดอร์ `taxonomy-app/` และ `docs/development/`
-
-ขอให้สนุกกับการใช้งาน! 🚀
+**📅 Last Updated**: 16 เมษายน 2569 (Verified for FastAPI)

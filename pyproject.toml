@@ -95,7 +95,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["main"]
+source = ["main", "src"]
 omit = [
     "tests/*",
     "*/__pycache__/*",

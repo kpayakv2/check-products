@@ -140,7 +140,7 @@ python main.py
 
 # Start API server
 python api_server.py
-# Visit: http://localhost:8000/docs
+# Visit: http://127.0.0.1:8000/docs
 ```
 
 ### **Common Usage Patterns**
@@ -156,7 +156,7 @@ result = main(
 # API usage
 import requests
 response = requests.post(
-    "http://localhost:8000/api/v1/match/single",
+    "http://127.0.0.1:8000/api/v1/match/single",
     json={
         "query_product": "iPhone 14",
         "reference_products": ["Samsung Galaxy S23"],

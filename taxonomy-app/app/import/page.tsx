@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
+import WizardTab from '@/components/Import/WizardTab'
+import PendingTab from '@/components/Import/PendingTab'
 import ImportHistory from '@/components/Import/ImportHistory'
 import { 
   UploadIcon,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react'
 
 export default function ImportPage() {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'wizard' | 'pending'>('dashboard')
   const [pendingCount, setPendingCount] = useState<number | null>(null)
 
   // Load pending count
@@ -47,6 +49,19 @@ export default function ImportPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         
+        {activeTab === 'wizard' && (
+          <div className="flex-1 overflow-hidden">
+             <WizardTab />
+          </div>
+        )}
+
+        {activeTab === 'pending' && (
+          <div className="flex-1 overflow-hidden">
+             <PendingTab onBack={() => setActiveTab('dashboard')} />
+          </div>
+        )}
+
+        {activeTab === 'dashboard' && (
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-8 relative">
           {/* Decorative Background Elements */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-50/50 rounded-full blur-[120px] -mr-48 -mt-48 pointer-events-none" />
@@ -66,7 +81,7 @@ export default function ImportPage() {
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <Link href="/import/wizard" data-testid="new-import-card" className="block group">
+                <div onClick={() => setActiveTab('wizard')} data-testid="new-import-card" className="block group">
                   <div className="bg-white/60 backdrop-blur-md rounded-[48px] p-10 border border-white shadow-xl shadow-indigo-100/20 group-hover:bg-white group-hover:border-indigo-100 transition-all cursor-pointer h-full flex flex-col items-start">
                     <div className="w-16 h-16 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/30 mb-8 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                       <UploadIcon className="w-8 h-8" />
@@ -84,7 +99,7 @@ export default function ImportPage() {
                       <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
 
               {/* Pending Approvals Card */}
@@ -92,7 +107,7 @@ export default function ImportPage() {
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <Link href="/import/pending" data-testid="pending-reviews-card" className="block group">
+                <div onClick={() => setActiveTab('pending')} data-testid="pending-reviews-card" className="block group">
                   <div className="bg-white/60 backdrop-blur-md rounded-[48px] p-10 border border-white shadow-xl shadow-amber-100/20 group-hover:bg-white group-hover:border-amber-100 transition-all cursor-pointer h-full flex flex-col items-start">
                     <div className="w-16 h-16 bg-amber-100 rounded-3xl flex items-center justify-center text-amber-600 border border-amber-200/50 mb-8 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                       <InboxIcon className="w-8 h-8" />
@@ -110,7 +125,7 @@ export default function ImportPage() {
                     </div>
                     
                     <p className="text-slate-500 text-base font-medium thai-text leading-relaxed mb-10 flex-1">
-                      ตรวจสอบสินค้าที่ AI ประมวลผลเสร็จสิ้นแล้ว คุณสามารถปรับแก้ชื่อ คุณลักษณะ หรือสถานะได้รายชิ้นหรือแบบกลุ่ม
+                      ตรวจสอบสินค้าที่ระบบวิเคราะห์เสร็จสิ้นแล้ว คุณสามารถปรับแก้ชื่อ คุณลักษณะ หรือสถานะได้รายชิ้นหรือแบบกลุ่ม
                     </p>
                     
                     <div className="flex items-center gap-2 text-amber-600 font-black tracking-widest text-xs uppercase">
@@ -118,7 +133,7 @@ export default function ImportPage() {
                       <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             </div>
 
@@ -191,8 +206,8 @@ export default function ImportPage() {
 
                 {[
                   { icon: UploadIcon, step: 1, title: 'Upload & Parse', color: 'indigo', desc: 'ไฟล์ CSV จะถูกถอดโครงสร้างและตรวจสอบความถูกต้องเบื้องต้น' },
-                  { icon: ZapIcon, step: 2, title: 'AI Classification', color: 'indigo', desc: 'ระบบวิเคราะห์ชื่อเพื่อจัดหมวดหมู่สินค้าตาม Taxonomy (Ph. 2)' },
-                  { icon: ShieldCheckIcon, step: 3, title: 'Human Audit', color: 'indigo', desc: 'ทีมตรวจสอบยืนยันผลลัพธ์จาก AI เพื่อความแม่นยำสูงสุด' },
+                  { icon: ZapIcon, step: 2, title: 'Smart Classification', color: 'indigo', desc: 'ระบบวิเคราะห์ชื่อเพื่อจัดหมวดหมู่สินค้าตาม Taxonomy (Ph. 2)' },
+                  { icon: ShieldCheckIcon, step: 3, title: 'Human Audit', color: 'indigo', desc: 'ทีมตรวจสอบยืนยันผลลัพธ์จากระบบประมวลผลเพื่อความแม่นยำสูงสุด' },
                   { icon: DatabaseIcon, step: 4, title: 'Final Sync', color: 'emerald', desc: 'ข้อมูลที่อนุมัติจะถูกจัดเก็บเข้าสู่ Inventory Database หลัก' }
                 ].map((item, idx) => (
                   <div key={idx} className="relative flex lg:flex-col gap-6 lg:gap-8 items-start lg:items-center">
@@ -210,6 +225,7 @@ export default function ImportPage() {
             </div>
           </div>
         </main>
+        )}
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ import os
 # เพิ่ม path สำหรับ import
 sys.path.append(os.path.dirname(__file__))
 
-from model_cache_manager import (
+from src.core.model_cache_manager import (
     get_global_cache, 
     create_cached_model, 
     get_cache_stats,

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const synonym = await DatabaseService.createSynonym({
-      name,
+      name_th: name,
       description,
       category_id,
       is_active: true

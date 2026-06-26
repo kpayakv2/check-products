@@ -1,120 +1,51 @@
-# 🤖 คู่มือการใช้ Embedding Models
+# 🤖 Embedding Models Guide (v3.0)
 
-## 📋 ตัวเลือก Embedding Models
+คู่มือการจัดการโมเดล AI สำหรับสร้าง Vector ในระบบ Thai Product Taxonomy
 
-### 1. Mock Model (`"mock"`)
-- **ความเร็ว**: ⚡⚡⚡ เร็วมาก
-- **ความแม่นยำ**: ⭐⭐ พื้นฐาน  
-- **เหมาะสำหรับ**: Development, Testing, การทดสอบเร็ว
-- **ขนาด**: เล็กมาก
-- **เวลาโหลด**: ทันที
+---
 
-### 2. Optimized TF-IDF (`"optimized-tfidf"`)
-- **ความเร็ว**: ⚡⚡ เร็ว
-- **ความแม่นยำ**: ⭐⭐⭐ ดี
-- **เหมาะสำหรับ**: Staging, Production ขนาดกลาง
-- **ขนาด**: ปานกลาง
-- **เวลาโหลด**: 2-5 วินาที
+## 📋 โมเดลมาตรฐานที่ใช้งาน
+ระบบคุณกานถูกล็อกให้ใช้โมเดลเดียวเพื่อความแม่นยำและเสถียรภาพ:
 
-### 3. Sentence-BERT (`"sentence-bert"`)
-- **ความเร็ว**: ⚡ ช้า (ครั้งแรก)
-- **ความแม่นยำ**: ⭐⭐⭐⭐⭐ สูงสุด
-- **เหมาะสำหรับ**: Production ที่ต้องการความแม่นยำสูง
-- **ขนาด**: ใหญ่ (~500MB)
-- **เวลาโหลด**: 30-60 วินาที (ครั้งแรก)
+*   **Model**: `paraphrase-multilingual-MiniLM-L12-v2`
+*   **Dimensions**: 384 numbers
+*   **Language**: รองรับ 50+ ภาษา (รวมไทยและอังกฤษ)
+*   **Provider**: FastAPI Server (api_server.py) รันที่ Port 8000
 
-## 🚀 วิธีการเปลี่ยน
+---
 
-### ในโค้ด Python
-```python
-from human_feedback_system import ProductDeduplicationSystem
+## 🚀 การตั้งค่าในระบบ (Configuration)
 
-# สำหรับ Development/Testing (เร็วมาก)
-system = ProductDeduplicationSystem(embedding_model_type="mock")
-
-# สำหรับ Production (สมดุล)  
-system = ProductDeduplicationSystem(embedding_model_type="optimized-tfidf")
-
-# สำหรับ Production (แม่นยำสูงสุด)
-system = ProductDeduplicationSystem(embedding_model_type="sentence-bert")
-```
-
-### ใน Web Server (web_server.py)
-ไปที่บรรทัด ~489 แล้วเปลี่ยน:
+หากต้องการเปลี่ยนพฤติกรรมการประมวลผล ให้ตรวจสอบในไฟล์ **`api_server.py`**:
 
 ```python
-# เปลี่ยนตรงนี้ 👇
-embedding_model_type = "mock"  # เปลี่ยนเป็น "optimized-tfidf" หรือ "sentence-bert"
-
-dedup_system = ProductDeduplicationSystem(
-    similarity_threshold=0.8,
-    embedding_model_type=embedding_model_type
-)
+# ระบบปัจจุบันรองรับ 3 โหมด:
+1. "sentence-bert" (Default/High Accuracy) ✅ แนะนำ
+2. "optimized-tfidf" (Balanced)
+3. "mock" (For Fast Testing only)
 ```
 
-## 🎯 คำแนะนำการใช้งาน
+**⚠️ ข้อควรระวัง**: ห้ามใช้โหมด `mock` ในงานจริง เพราะจะทำให้ค่า Vector เป็นค่าสุ่ม และความแม่นยำจะลดลงต่ำกว่า 10%
 
-### Development Phase
-```python
-embedding_model_type = "mock"
-```
-- เร็วมาก
-- ทดสอบ logic ได้ทันท
-- ไม่ต้องรอ download model
+---
 
-### Staging/Testing Phase  
-```python
-embedding_model_type = "optimized-tfidf"
-```
-- ประสิทธิภาพดี
-- ความแม่นยำยอมรับได้
-- โหลดเร็ว
+## 💾 การใช้งานแบบ Offline
 
-### Production Phase
-```python
-embedding_model_type = "sentence-bert"
-```
-- ความแม่นยำสูงสุด
-- เหมาะสำหรับ business critical
-- ต้องรอ download model ครั้งแรก
+คุณกานสามารถรัน AI ได้โดยไม่ต้องต่ออินเทอร์เน็ต หากดาวน์โหลดโมเดลมาไว้ในเครื่องแล้ว:
 
-## 🔧 Fallback Strategy
+1.  **ดาวน์โหลด**: รัน `python simple_download.py`
+2.  **ตรวจสอบ**: เช็คว่ามีโฟลเดอร์ `model_cache/` ใน Root Directory
+3.  **รัน**: เมื่อรัน `python api_server.py` ระบบจะดึงไฟล์จาก Cache มาใช้งานโดยอัตโนมัติ
 
-สำหรับระบบ Production แนะนำใช้ fallback:
+---
 
-```python
-try:
-    # พยายามใช้ sentence-bert ก่อน
-    system = ProductDeduplicationSystem(embedding_model_type="sentence-bert")
-except Exception:
-    # หากไม่ได้ ใช้ optimized-tfidf แทน
-    system = ProductDeduplicationSystem(embedding_model_type="optimized-tfidf")
-```
+## 📊 ประสิทธิภาพ (Performance)
 
-## 📊 เปรียบเทียบประสิทธิภาพ
+| โหมด | เวลาโหลด | ความเร็ว/สินค้า | ความแม่นยำ |
+|------|----------|----------------|------------|
+| **Sentence-BERT** | ~5-10 วินาที | < 0.05s | ⭐⭐⭐⭐⭐ |
+| **TF-IDF** | ~1-2 วินาที | < 0.01s | ⭐⭐⭐ |
 
-| Model | เวลาโหลด | ความเร็วประมวลผล | ความแม่นยำ | RAM Usage |
-|-------|----------|------------------|-------------|-----------|
-| Mock | < 1s | ⚡⚡⚡ | ⭐⭐ | ~10MB |
-| Optimized TF-IDF | 2-5s | ⚡⚡ | ⭐⭐⭐ | ~100MB |
-| Sentence-BERT | 30-60s* | ⚡ | ⭐⭐⭐⭐⭐ | ~500MB |
+---
 
-*เฉพาะครั้งแรก หลังจากนั้นจะเร็วขึ้น
-
-## ✅ ตัวอย่างการทดสอบ
-
-รันคำสั่งนี้เพื่อทดสอบ models ต่างๆ:
-
-```bash
-cd "d:\product_checker\check-products"
-python quick_model_demo.py
-```
-
-## 🔄 การเปลี่ยนแปลงแบบ Hot Reload
-
-หากต้องการเปลี่ยน model โดยไม่ restart server:
-
-1. แก้ไข `embedding_model_type` ใน web_server.py
-2. Save ไฟล์
-3. Restart Flask server
-4. Model ใหม่จะถูกโหลดอัตโนมัติ
+**📅 Last Updated**: 16 เมษายน 2569 (Verified for FastAPI Implementation)

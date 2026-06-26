@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 import { 
   CheckCircle,
   XCircle,
@@ -14,8 +15,13 @@ import {
   Pause,
   Check,
   X,
-  RefreshCw
+  RefreshCw,
+  Edit2,
+  AlertTriangle,
+  ExternalLink
 } from 'lucide-react'
+import CategorySelector from './CategorySelector'
+import { TaxonomyNode } from '@/utils/supabase'
 
 interface PendingSuggestion {
   id: string
@@ -33,6 +39,14 @@ interface PendingSuggestion {
   explanation: string
   created_at: string
   status: 'pending' | 'approved' | 'rejected'
+  metadata: {
+    is_duplicate_detected?: boolean
+    potential_duplicates?: Array<{
+      id: string
+      name_th: string
+      similarity: number
+    }>
+  }
 }
 
 interface ApprovalStepProps {
@@ -46,6 +60,7 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
   const [processing, setProcessing] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [pagination, setPagination] = useState({
     total: 0,
     limit: 20,
@@ -82,6 +97,45 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
   useEffect(() => {
     loadPendingSuggestions()
   }, [])
+
+  // Handle manual category change
+  const handleCategoryChange = async (suggestionId: string, newCategory: TaxonomyNode) => {
+    try {
+      setProcessing(true)
+      const response = await fetch('/api/import/pending', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          suggestion_id: suggestionId,
+          new_category_id: newCategory.id
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to update category')
+
+      toast.success('อัปเดตหมวดหมู่เรียบร้อยแล้ว')
+      setEditingId(null)
+      
+      // Update local state
+      setSuggestions(prev => prev.map(s => 
+        s.id === suggestionId 
+          ? { 
+              ...s, 
+              suggested_category: { 
+                id: newCategory.id, 
+                name_th: newCategory.name_th, 
+                code: newCategory.code 
+              },
+              confidence_score: 1.0 // Manual override sets high confidence
+            } 
+          : s
+      ))
+    } catch (error) {
+      toast.error('ไม่สามารถเปลี่ยนหมวดหมู่ได้')
+    } finally {
+      setProcessing(false)
+    }
+  }
 
   // Toggle selection
   const toggleSelection = (id: string) => {
@@ -274,7 +328,9 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+              className={`bg-white border rounded-lg shadow-sm overflow-hidden ${
+                suggestion.metadata?.is_duplicate_detected ? 'border-amber-200 ring-1 ring-amber-100' : 'border-gray-200'
+              }`}
             >
               {/* Main Row */}
               <div className="p-4">
@@ -288,27 +344,57 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {suggestion.product_name}
-                      </h3>
+                      <div className="flex items-center space-x-3 truncate">
+                        <h3 className="text-lg font-medium text-gray-900 truncate">
+                          {suggestion.product_name}
+                        </h3>
+                        {suggestion.metadata?.is_duplicate_detected && (
+                          <div className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-md border border-amber-100">
+                            <AlertTriangle className="w-3 h-3" />
+                            DUPLICATE
+                          </div>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-2">
-                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          suggestion.confidence_score >= 0.8 ? 'bg-green-100 text-green-800' :
+                          suggestion.confidence_score >= 0.5 ? 'bg-amber-100 text-amber-800' :
+                          'bg-rose-100 text-rose-800'
+                        }`}>
                           {Math.round(suggestion.confidence_score * 100)}%
                         </span>
                         <Clock className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
                     
-                    <div className="mt-1 flex items-center space-x-4 text-sm text-gray-600">
-                      <span>หมวดหมู่: {suggestion.suggested_category.name_th}</span>
-                      <span>•</span>
-                      <span>Tokens: {suggestion.tokens.length}</span>
-                      {suggestion.units.length > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>Units: {suggestion.units.length}</span>
-                        </>
-                      )}
+                    <div className="mt-1 flex items-center justify-between">
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        {editingId === suggestion.id ? (
+                          <div className="w-full min-w-[300px]">
+                            <CategorySelector 
+                              initialValue={suggestion.suggested_category}
+                              onSelect={(cat) => handleCategoryChange(suggestion.id, cat)}
+                              onCancel={() => setEditingId(null)}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 group">
+                             <span>หมวดหมู่: <span className="font-semibold text-slate-900">{suggestion.suggested_category?.name_th || 'ไม่ระบุ'}</span></span>
+                             <button 
+                               onClick={() => setEditingId(suggestion.id)}
+                               className="opacity-0 group-hover:opacity-100 p-1 text-blue-500 hover:bg-blue-50 rounded transition-all"
+                             >
+                               <Edit2 className="w-3.5 h-3.5" />
+                             </button>
+                          </div>
+                        )}
+                        {!editingId && (
+                          <>
+                            <span>•</span>
+                            <span>Tokens: {suggestion.tokens?.length || 0}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
@@ -335,62 +421,80 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
                     className="border-t border-gray-200 bg-gray-50"
                   >
                     <div className="p-4 space-y-4">
+                      {/* Potential Duplicates Warning */}
+                      {suggestion.metadata?.is_duplicate_detected && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-inner">
+                          <div className="flex items-center gap-2 text-amber-800 font-bold text-sm mb-3">
+                            <AlertTriangle className="w-4 h-4" />
+                            พบสินค้าที่คล้ายกันในระบบ (Potential Duplicates)
+                          </div>
+                          <div className="space-y-2">
+                            {suggestion.metadata.potential_duplicates?.map((dup, idx) => (
+                              <div key={idx} className="flex items-center justify-between bg-white/80 p-2.5 rounded-lg text-xs border border-amber-100">
+                                <span className="font-medium text-slate-700">{dup.name_th}</span>
+                                <div className="flex items-center gap-4">
+                                  <span className="text-amber-600 font-bold">Similarity: {Math.round((1 - (dup as any).similarity) * 100)}%</span>
+                                  <Link href={`/products/${dup.id}`} target="_blank" className="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 transition-colors">
+                                    เปิดดู <ExternalLink className="w-3 h-3" />
+                                  </Link>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="mt-3 text-[10px] text-amber-600 font-medium">
+                            * หากเป็นสินค้าตัวเดียวกัน ควรปฏิเสธ (Reject) เพื่อไม่ให้ข้อมูลซ้ำซ้อน
+                          </p>
+                        </div>
+                      )}
+
                       {/* Cleaned Name */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           ชื่อที่ทำความสะอาดแล้ว
                         </label>
-                        <p className="text-sm text-gray-600 bg-white p-2 rounded border">
+                        <p className="text-sm text-gray-600 bg-white p-2 rounded border border-gray-200">
                           {suggestion.cleaned_name}
                         </p>
                       </div>
 
-                      {/* Tokens */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Tokens ({suggestion.tokens.length})
-                        </label>
-                        <div className="flex flex-wrap gap-1">
-                          {suggestion.tokens.map((token, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded"
-                            >
-                              {token}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Units */}
-                      {suggestion.units.length > 0 && (
+                      {/* Tokens & Units */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            หน่วย ({suggestion.units.length})
+                            Tokens ({suggestion.tokens?.length || 0})
                           </label>
                           <div className="flex flex-wrap gap-1">
-                            {suggestion.units.map((unit, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded"
-                              >
+                            {suggestion.tokens?.map((token, idx) => (
+                              <span key={idx} className="px-2 py-1 text-xs bg-blue-50 text-blue-700 border border-blue-100 rounded">
+                                {token}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            หน่วย ({suggestion.units?.length || 0})
+                          </label>
+                          <div className="flex flex-wrap gap-1">
+                            {suggestion.units?.map((unit, idx) => (
+                              <span key={idx} className="px-2 py-1 text-xs bg-green-50 text-green-700 border border-green-100 rounded">
                                 {unit}
                               </span>
                             ))}
                           </div>
                         </div>
-                      )}
+                      </div>
 
                       {/* Attributes */}
-                      {Object.keys(suggestion.attributes).length > 0 && (
+                      {suggestion.attributes && Object.keys(suggestion.attributes).length > 0 && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             คุณสมบัติที่สกัดได้ ({Object.keys(suggestion.attributes).length})
                           </label>
-                          <div className="bg-white border rounded p-3 space-y-2">
+                          <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
                             {Object.entries(suggestion.attributes).map(([key, value]) => (
                               <div key={key} className="flex justify-between items-start">
-                                <span className="font-medium text-gray-700 capitalize">
+                                <span className="font-semibold text-slate-500 text-xs uppercase tracking-wider capitalize">
                                   {key.replace(/_/g, ' ')}:
                                 </span>
                                 {renderAttributeValue(value)}
@@ -400,29 +504,17 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
                         </div>
                       )}
 
-                      {/* Explanation */}
-                      {suggestion.explanation && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            คำอธิบาย
-                          </label>
-                          <p className="text-sm text-gray-600 bg-white p-2 rounded border">
-                            {suggestion.explanation}
-                          </p>
-                        </div>
-                      )}
-
                       {/* Individual Actions */}
-                      <div className="flex items-center justify-end space-x-2 pt-2 border-t">
+                      <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
                         <button
                           onClick={() => {
                             setSelectedIds(new Set([suggestion.id]))
                             handleBatchAction('reject')
                           }}
                           disabled={processing}
-                          className="px-3 py-1 text-sm text-red-600 hover:text-red-800 transition-colors"
+                          className="px-4 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                         >
-                          ปฏิเสธ
+                          ปฏิเสธรายการนี้
                         </button>
                         <button
                           onClick={() => {
@@ -430,9 +522,9 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
                             handleBatchAction('approve')
                           }}
                           disabled={processing}
-                          className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                          className="px-6 py-2 text-sm font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
                         >
-                          อนุมัติ
+                          อนุมัติเข้าคลัง
                         </button>
                       </div>
                     </div>
@@ -446,28 +538,28 @@ export default function ApprovalStep({ onComplete, onBack }: ApprovalStepProps) 
 
       {/* Pagination */}
       {pagination.has_more && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-10">
           <button
             onClick={() => loadPendingSuggestions(pagination.offset + pagination.limit)}
             disabled={loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl hover:border-blue-300 hover:text-blue-600 disabled:opacity-50 transition-all font-black text-xs uppercase tracking-widest shadow-sm"
           >
-            โหลดเพิ่มเติม
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Load More Suggestions'}
           </button>
         </div>
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between pt-6 border-t">
+      <div className="flex justify-between items-center pt-8 border-t border-gray-200 mt-10">
         <button
           onClick={onBack}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          className="px-6 py-2 text-slate-400 hover:text-slate-900 transition-colors font-bold text-sm flex items-center gap-2"
         >
-          ย้อนกลับ
+          ← ย้อนกลับ
         </button>
         
-        <div className="text-sm text-gray-500">
-          แสดง {suggestions.length} จาก {pagination.total} รายการ
+        <div className="text-xs font-black text-slate-300 uppercase tracking-[0.2em]">
+          Total {pagination.total} Records Found
         </div>
       </div>
     </div>

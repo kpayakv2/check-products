@@ -388,7 +388,7 @@ class TestCORSPolicy:
         Test นี้ตรวจสอบว่าไฟล์มีค่านี้อยู่ (เพื่อ flag ให้แก้ไข)
         """
         api_server_path = os.path.join(
-            os.path.dirname(__file__), "..", "..", "api_server.py"
+            os.path.dirname(__file__), "..", "..", "src", "api", "api_server.py"
         )
         api_server_path = os.path.normpath(api_server_path)
 
@@ -463,7 +463,7 @@ class TestSensitiveDataExposure:
             )
             return sanitized
 
-        raw = 'File "d:/product_checker/api_server.py", line 367, in match_single_product'
+        raw = 'File "d:/product_checker/src/api/api_server.py", line 367, in match_single_product'
         sanitized = sanitize_error_message(raw)
 
         assert "d:/product_checker" not in sanitized

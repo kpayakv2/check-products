@@ -37,7 +37,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Local AI Backend (FastAPI)
-FASTAPI_URL=http://localhost:8000
+FASTAPI_URL=http://127.0.0.1:8000
 
 # App Settings
 NEXT_PUBLIC_APP_URL=http://localhost:3000

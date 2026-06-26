@@ -10,9 +10,9 @@ class TestConfig:
     
     # API Base URLs
     API_URLS = {
-        'main': 'http://localhost:5000',
-        'api': 'http://localhost:8000', 
-        'alt': 'http://localhost:5001'
+        'main': 'http://127.0.0.1:5000',
+        'api': 'http://127.0.0.1:8000', 
+        'alt': 'http://127.0.0.1:5001'
     }
     
     # API Endpoints

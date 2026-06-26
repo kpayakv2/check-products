@@ -23,11 +23,11 @@
 - **เหตุผล**: Logic ซ้ำกับ API helpers ใหม่
 - **ฟังก์ชัน**: `test_api_endpoints()` - ทดสอบ multiple endpoints
 - **ซ้ำกับ**: `tests/utils/api_helpers.py` + fixtures
-- **การทดสอบ**: /api/status, /save-feedback, hardcoded localhost:5001
+- **การทดสอบ**: /api/status, /save-feedback, hardcoded 127.0.0.1:5001
 
 #### **3. `test_api_client.py` ❌ ลบได้**
 - **เหตุผล**: Client testing ที่ไม่สอดคล้องกับ API structure ปัจจุบัน
-- **การทดสอบ**: localhost:8000 endpoints ที่อาจไม่ได้ใช้งาน
+- **การทดสอบ**: 127.0.0.1:8000 endpoints ที่อาจไม่ได้ใช้งาน
 
 #### **4. `test_run_output.py` ❌ ลบได้**
 - **เหตุผล**: Output testing ที่สามารถรวมเข้ากับ data helpers ได้

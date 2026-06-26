@@ -320,7 +320,7 @@ def complete_processing_pipeline():
     similarities = cosine_similarity(embeddings)
     
     # 5. Filter and rank results
-    filtered_results = filter_by_threshold(similarities, threshold=0.6)
+    filtered_results = filter_by_threshold(similarities, threshold=0.7)
     
     return filtered_results
 ```

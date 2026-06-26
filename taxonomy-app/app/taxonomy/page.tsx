@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
+import SynonymsPanel from '@/components/Taxonomy/SynonymsPanel'
 import { TaxonomyNode, DatabaseService } from '@/utils/supabase'
 import { 
   PlusIcon, 
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react'
 
 export default function TaxonomyManager() {
+  const [activeTab, setActiveTab] = useState<'tree' | 'synonyms'>('tree')
   const [categories, setCategories] = useState<TaxonomyNode[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -211,7 +213,36 @@ export default function TaxonomyManager() {
         
         <Header />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10">
+        {/* Taxonomy Tabs Header */}
+        <div className="bg-white border-b border-slate-200 px-8 py-4 z-20 relative shadow-sm">
+          <div className="max-w-7xl mx-auto flex gap-4 p-1.5 bg-slate-100/80 rounded-[20px] w-fit">
+            <button 
+              onClick={() => setActiveTab('tree')}
+              className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
+                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+              }`}
+            >
+              <FolderTreeIcon className="w-4 h-4" />
+              โครงสร้างหมวดหมู่ (Taxonomy Tree)
+            </button>
+            <button 
+              onClick={() => setActiveTab('synonyms')}
+              className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
+                activeTab === 'synonyms' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+              }`}
+            >
+              <LayersIcon className="w-4 h-4" />
+              คำพ้องความหมาย (Synonyms)
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'synonyms' ? (
+          <div className="flex-1 overflow-hidden relative bg-gray-50/50">
+            <SynonymsPanel />
+          </div>
+        ) : (
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10">
           <div className="max-w-7xl mx-auto">
             {/* Page Header Area */}
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16 gap-8">
@@ -282,7 +313,8 @@ export default function TaxonomyManager() {
               )}
             </div>
           </div>
-        </main>
+          </main>
+        )}
       </div>
 
       {/* Form Modal Overhaul */}

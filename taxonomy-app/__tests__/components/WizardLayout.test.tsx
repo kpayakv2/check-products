@@ -30,7 +30,7 @@ const mockSteps: WizardStep[] = [
   {
     id: 'processing',
     name: 'ประมวลผล',
-    description: 'AI กำลังวิเคราะห์สินค้า'
+    description: 'ระบบกำลังวิเคราะห์สินค้า'
   },
   {
     id: 'review',

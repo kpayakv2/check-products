@@ -59,7 +59,7 @@ describe('ProcessingStep', () => {
       />
     )
 
-    expect(screen.getByText('🤖 AI กำลังประมวลผล')).toBeInTheDocument()
+    expect(screen.getByText('🤖 พยัคฆ์อัจฉริยะกำลังประมวลผล')).toBeInTheDocument()
     expect(screen.getByText(/กำลังวิเคราะห์สินค้า/)).toBeInTheDocument()
   })
 

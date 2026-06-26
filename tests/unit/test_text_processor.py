@@ -14,7 +14,7 @@ Unit Tests — TextProcessor (BasicTextProcessor & ThaiTextProcessor)
 
 import pytest
 import unicodedata
-from fresh_implementations import (
+from src.core.fresh_implementations import (
     BasicTextProcessor,
     ThaiTextProcessor,
     ComponentFactory,

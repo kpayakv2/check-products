@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_URL || 'http://127.0.0.1:54331',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 // Thai text processing utilities
@@ -74,7 +74,7 @@ async function generateEmbeddingLocal(text: string): Promise<number[]> {
     
     // Fallback: Call FastAPI directly
     try {
-      const fastapiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+      const fastapiUrl = process.env.FASTAPI_URL || 'http://127.0.0.1:8000'
       const response = await fetch(`${fastapiUrl}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -297,7 +297,7 @@ export async function POST(request: NextRequest) {
         errors.push({ 
           line: i, 
           product: productName, 
-          error: error.message 
+          error: error instanceof Error ? error.message : 'Unknown error'
         })
       }
     }
@@ -308,7 +308,7 @@ export async function POST(request: NextRequest) {
       source_file: fileName,
       total_lines: lines.length - 1,
       processed: results.length,
-      errors: errors.length,
+      error_count: errors.length,
       results: results,
       errors: errors,
       processing_info: {
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Failed to process file from storage',
-      details: error.message
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

@@ -13,9 +13,10 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Import local modules
-sys.path.append(os.getcwd())
-from fresh_implementations import ThaiTextProcessor, ComponentFactory
-from advanced_models import SentenceTransformerModel
+from src.core.fresh_implementations import ThaiTextProcessor, ComponentFactory
+from src.core.advanced_models import SentenceTransformerModel
+from src.services.taxonomy_service import TaxonomyService
+from src.core.scoring_logic import calculate_hybrid_score, classify_confidence
 
 class StandardizedImportPipeline:
     """
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     load_dotenv = lambda: None # Mock
     
     # ดึงค่าจาก ENV หรือใส่ตรงๆ สำหรับทดสอบ
-    SUPABASE_URL = "http://localhost:54331"
+    SUPABASE_URL = "http://127.0.0.1:54331"
     SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     

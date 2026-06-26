@@ -8,7 +8,7 @@ if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
 file_path = 'input/รายการสินค้าพร้อมหมวดหมู่_AI.txt'
-url = 'http://localhost:54331'
+url = 'http://127.0.0.1:54331'
 key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 try:

@@ -8,13 +8,14 @@ jest.mock('framer-motion', () => ({
   }
 }))
 
-// Mock lucide-react icons
-jest.mock('lucide-react', () => ({
-  AlertCircleIcon: () => <div data-testid="alert-icon" />,
-  CheckCircleIcon: () => <div data-testid="check-icon" />,
-  InfoIcon: () => <div data-testid="info-icon" />,
-  ArrowRightIcon: () => <div data-testid="arrow-icon" />
-}))
+// Mock lucide-react icons dynamically using Proxy
+jest.mock('lucide-react', () => {
+  return new Proxy({}, {
+    get: (target, prop) => {
+      return (props: any) => <div data-testid={`mock-icon-${String(prop)}`} {...props} />;
+    }
+  });
+});
 
 // Mock file with text() method
 const createMockFile = (content: string) => {
@@ -142,7 +143,7 @@ describe('ColumnMappingStep', () => {
       expect(screen.getByText('✅ ได้เลือกคอลัมน์ชื่อสินค้าแล้ว')).toBeInTheDocument()
     }, { timeout: 3000 })
 
-    const nextButton = screen.getByText(/ถัดไป: เริ่มประมวลผล AI/)
+    const nextButton = screen.getByText(/เริ่มประมวลผลวิเคราะห์/)
     fireEvent.click(nextButton)
 
     expect(mockOnComplete).toHaveBeenCalled()
@@ -159,7 +160,7 @@ describe('ColumnMappingStep', () => {
     )
 
     await waitFor(() => {
-      const nextButton = screen.getByText(/ถัดไป: เริ่มประมวลผล AI/)
+      const nextButton = screen.getByText(/เริ่มประมวลผลวิเคราะห์/)
       expect(nextButton).toBeDisabled()
     }, { timeout: 3000 })
   })
