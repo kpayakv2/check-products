@@ -1,0 +1,88 @@
+### Product Similarity API - Endpoint Tester
+# สามารถใช้ร่วมกับ Extension "REST Client" ใน VS Code เพื่อกด Send Request ได้ทันที
+# =============================================================================
+
+@baseUrl = http://127.0.0.1:8000
+@contentType = application/json
+
+### 1. Root API Info
+GET {{baseUrl}}/
+Accept: {{contentType}}
+
+###
+
+### 2. System Health Check
+GET {{baseUrl}}/api/v1/health
+Accept: {{contentType}}
+
+###
+
+### 3. Generate Single Embedding (384-dim)
+POST {{baseUrl}}/api/embed
+Content-Type: {{contentType}}
+
+{
+  "text": "กะละมังพลาสติกสีน้ำเงิน 20 นิ้ว"
+}
+
+###
+
+### 4. Generate Batch Embeddings (384-dim)
+POST {{baseUrl}}/api/embed/batch
+Content-Type: {{contentType}}
+
+{
+  "texts": [
+    "กะละมังพลาสติกสีน้ำเงิน 20 นิ้ว",
+    "จานเซรามิก ลายไทย 10 นิ้ว",
+    "สว่านไฟฟ้า Makita 12V"
+  ]
+}
+
+###
+
+### 5. Hybrid Category Classification
+POST {{baseUrl}}/api/classify/category
+Content-Type: {{contentType}}
+
+{
+  "product_name": "สว่านไฟฟ้าไร้สาย Makita 12V",
+  "method": "hybrid",
+  "top_k": 3
+}
+
+###
+
+### 6. Keyword-Only Category Classification
+POST {{baseUrl}}/api/classify/category
+Content-Type: {{contentType}}
+
+{
+  "product_name": "จานเซรามิก ลายไทย 10 นิ้ว",
+  "method": "keyword",
+  "top_k": 3
+}
+
+###
+
+### 7. Embedding-Only Category Classification
+POST {{baseUrl}}/api/classify/category
+Content-Type: {{contentType}}
+
+{
+  "product_name": "ถังน้ำพลาสติก 20 ลิตร",
+  "method": "embedding",
+  "top_k": 3
+}
+
+###
+
+### 8. Match Two Products (Deduplication Check)
+POST {{baseUrl}}/api/match
+Content-Type: {{contentType}}
+
+{
+  "source_product": "กะละมัง 549 ดำ SMK",
+  "target_product": "กะละมัง 549 สี SMK",
+  "threshold": 0.6
+}

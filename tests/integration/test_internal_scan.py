@@ -22,47 +22,55 @@ def test_internal_scan():
         "limit": 10
     }
     
-    start_time = time.time()
-    try:
-        response = requests.post(
-            f"{API_BASE_URL}/api/v1/match/scan-internal",
-            json=payload,
-            timeout=90
-        )
-        elapsed = time.time() - start_time
+    response = requests.post(
+        f"{API_BASE_URL}/api/v1/match/scan-internal",
+        json=payload,
+        timeout=15
+    )
+    
+    assert response.status_code == 200, f"Failed to start scan: {response.text}"
+    start_res = response.json()
+    task_id = start_res.get("task_id")
+    assert task_id, f"No task_id in start response: {start_res}"
+    
+    print(f"Scan started, task_id: {task_id}")
+    
+    # Poll status
+    status = "pending"
+    max_polls = 30
+    poll_interval = 2.0
+    body = {}
+    for _ in range(max_polls):
+        status_res = requests.get(f"{API_BASE_URL}/api/v1/match/scan-internal/status/{task_id}", timeout=10)
+        assert status_res.status_code == 200, f"Failed to get task status: {status_res.text}"
+        body = status_res.json()
+        status = body.get("status")
+        if status in ("completed", "failed"):
+            break
+        time.sleep(poll_interval)
         
-        if response.ok:
-            data = response.json()
-            print("Connection successful!")
-            print(f"API Response time: {data['processing_time']}s (Total: {elapsed:.3f}s)")
-            print(f"Total Scanned Products: {data['total_scanned']}")
-            print(f"Pairs Found Exceeding 0.95: {data['pairs_found']}")
-            
-            # Print top matches
-            print(f"\nTop {len(data['results'])} Duplicate Matches Returned:")
-            for i, result in enumerate(data['results'], 1):
-                print(f"\n{i}. Cosine Match Similarity: {result['similarity']:.4f}")
-                print(f"   A: '{result['name_a']}'")
-                print(f"      SKU: {result['sku_a']} | Category: {result['category_a']}")
-                print(f"   B: '{result['name_b']}'")
-                print(f"      SKU: {result['sku_b']} | Category: {result['category_b']}")
-            
-            print("\n" + "=" * 60)
-            print("Internal duplicate scan API test completed successfully!")
-            print("=" * 60)
-            return True
-        else:
-            print(f"Scan failed: {response.status_code}")
-            print(f"   {response.text}")
-            return False
-            
-    except requests.exceptions.ConnectionError:
-        print("\nConnection Error!")
-        print("   Make sure the FastAPI server is running: python -m uvicorn src.api.api_server:app --reload")
-        return False
-    except Exception as e:
-        print(f"\n[ERR] Error occurred: {e}")
-        return False
+    assert status == "completed", f"Scan task did not complete (status={status}, error={body.get('error')})"
+    data = body.get("result")
+    assert data is not None, f"No result in body: {body}"
+    
+    print("Connection successful!")
+    print(f"API Response time: {data['processing_time']}s")
+    print(f"Total Scanned Products: {data['total_scanned']}")
+    print(f"Pairs Found Exceeding 0.95: {data['pairs_found']}")
+    
+    # Print top matches
+    print(f"\nTop {len(data['results'])} Duplicate Matches Returned:")
+    for i, result in enumerate(data['results'], 1):
+        print(f"\n{i}. Cosine Match Similarity: {result['similarity']:.4f}")
+        print(f"   A: '{result['name_a']}'")
+        print(f"      SKU: {result['sku_a']} | Category: {result['category_a']}")
+        print(f"   B: '{result['name_b']}'")
+        print(f"      SKU: {result['sku_b']} | Category: {result['category_b']}")
+    
+    print("\n" + "=" * 60)
+    print("Internal duplicate scan API test completed successfully!")
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     test_internal_scan()

@@ -18,7 +18,7 @@ from src.core.model_cache_manager import (
 )
 
 
-def test_model_caching():
+def run_model_caching():
     """ทดสอบการ cache models"""
     print("🔄 Testing Model Caching System")
     print("=" * 50)
@@ -40,8 +40,7 @@ def test_model_caching():
         print(f"✅ Model created: {type(model1).__name__}")
         print(f"⏱️  Time taken: {first_time:.2f} seconds")
     else:
-        print(f"❌ Model creation failed")
-        return False
+        assert False, "Model creation failed"
     
     # Test 2: สร้าง model อีกครั้งด้วย config เดียวกัน (จะเร็ว)
     print("\n2️⃣ Creating same model again (should be fast - cached)...")
@@ -56,8 +55,7 @@ def test_model_caching():
         print(f"🚀 Speed improvement: {first_time/second_time:.1f}x faster")
         print(f"📍 Same instance: {model1 is model2}")
     else:
-        print(f"❌ Model retrieval failed")
-        return False
+        assert False, "Model retrieval failed"
     
     # Test 3: สร้าง model ด้วย config ต่างกัน
     print("\n3️⃣ Creating model with different config...")
@@ -78,7 +76,7 @@ def test_model_caching():
     return True
 
 
-def test_cache_stats():
+def run_cache_stats():
     """ทดสอบ cache statistics"""
     print("\n📊 Testing Cache Statistics")
     print("=" * 30)
@@ -98,7 +96,7 @@ def test_cache_stats():
     return stats
 
 
-def test_memory_cleanup():
+def run_memory_cleanup():
     """ทดสอบ memory cleanup"""
     print("\n🧹 Testing Memory Cleanup")
     print("=" * 30)
@@ -122,7 +120,7 @@ def test_memory_cleanup():
     return models_after == 0
 
 
-def test_performance_impact():
+def run_performance_impact():
     """ทดสอบ performance impact ของ caching"""
     print("\n⚡ Testing Performance Impact")
     print("=" * 35)
@@ -151,8 +149,7 @@ def test_performance_impact():
         if model:
             print(f"✅ Model loaded in {elapsed:.2f} seconds")
         else:
-            print(f"❌ Model loading failed")
-            return False
+            assert False, "Model loading failed"
     
     print(f"\n📊 Performance Summary:")
     print(f"   1st run (no cache): {times[0]:.2f}s")
@@ -166,6 +163,15 @@ def test_performance_impact():
     return True
 
 
+def test_model_cache_workflow():
+    """Pytest entry point for model cache performance tests"""
+    run_model_caching()
+    stats = run_cache_stats()
+    assert stats is not None
+    run_performance_impact()
+    assert run_memory_cleanup()
+
+
 def main():
     """รันการทดสอบทั้งหมด"""
     print("🎯 Global Model Cache Testing Suite")
@@ -173,16 +179,24 @@ def main():
     
     try:
         # Test 1: Model Caching
-        success1 = test_model_caching()
-        
+        try:
+            run_model_caching()
+            success1 = True
+        except AssertionError:
+            success1 = False
+            
         # Test 2: Cache Statistics  
-        stats = test_cache_stats()
+        stats = run_cache_stats()
         
         # Test 3: Performance Impact
-        success2 = test_performance_impact()
-        
+        try:
+            run_performance_impact()
+            success2 = True
+        except AssertionError:
+            success2 = False
+            
         # Test 4: Memory Cleanup
-        success3 = test_memory_cleanup()
+        success3 = run_memory_cleanup()
         
         # Summary
         print("\n" + "=" * 60)

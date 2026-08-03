@@ -1,7 +1,9 @@
 from supabase import create_client
 import os
 import tempfile
+import pytest
 
+@pytest.mark.db
 def test_storage():
     url = os.getenv("SUPABASE_URL", "http://127.0.0.1:54331")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")

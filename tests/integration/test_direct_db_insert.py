@@ -1,7 +1,9 @@
 import os
+import pytest
 from supabase import create_client
 import uuid
 
+@pytest.mark.db
 def test_direct_insert():
     url = "http://127.0.0.1:54331"
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")

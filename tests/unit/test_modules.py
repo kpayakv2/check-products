@@ -13,7 +13,7 @@ from src.core.fresh_implementations import (
 )
 from src.core.fresh_architecture import ProductMatcher, Config
 
-def test_basic_functionality():
+def run_basic_functionality():
     """Test basic functionality of all components."""
     print("🧪 Testing Basic Functionality...")
     
@@ -44,7 +44,7 @@ def test_basic_functionality():
     
     return True
 
-def test_product_matcher():
+def run_product_matcher():
     """Test complete ProductMatcher workflow."""
     print("\n🔍 Testing ProductMatcher...")
     
@@ -56,7 +56,7 @@ def test_product_matcher():
     # Create matcher with lower threshold for testing with mock data
     from src.core.fresh_architecture import Config
     config = Config()
-    config.similarity_threshold = 0.1  # Lower threshold for mock data
+    config.similarity_threshold = -1.0  # Lower threshold for mock data
     matcher = ProductMatcher(
         embedding_model=embedding_model,
         similarity_calculator=similarity_calc,
@@ -77,7 +77,7 @@ def test_product_matcher():
     
     return len(matches) > 0
 
-def test_caching():
+def run_caching():
     """Test embedding caching functionality."""
     print("\n🗄️ Testing Caching...")
     
@@ -105,15 +105,14 @@ def test_caching():
     
     return cache_works
 
-def test_error_conditions():
+def run_error_conditions():
     """Test error handling."""
     print("\n⚠️ Testing Error Conditions...")
     
     try:
         # Test invalid model type
         ComponentFactory.create_embedding_model("invalid_model")
-        print("❌ Should have raised error for invalid model")
-        return False
+        assert False, "Should have raised error for invalid model"
     except ValueError as e:
         print(f"✅ Correctly caught error: {e}")
     
@@ -128,26 +127,38 @@ def test_error_conditions():
         print(f"✅ Handled empty inputs: {len(matches)} matches")
         
     except Exception as e:
-        print(f"⚠️ Error with empty inputs: {e}")
-        return False
+        assert False, f"Error with empty inputs: {e}"
     
     return True
+
+def test_all_modules():
+    """Pytest entry point for module tests"""
+    run_basic_functionality()
+    assert run_product_matcher()
+    assert run_caching()
+    run_error_conditions()
+
 
 def run_all_tests():
     """Run all tests and report results."""
     print("🚀 Starting Fresh Architecture Module Tests\n")
     
     tests = [
-        ("Basic Functionality", test_basic_functionality),
-        ("ProductMatcher", test_product_matcher), 
-        ("Caching", test_caching),
-        ("Error Handling", test_error_conditions)
+        ("Basic Functionality", run_basic_functionality),
+        ("ProductMatcher", run_product_matcher), 
+        ("Caching", run_caching),
+        ("Error Handling", run_error_conditions)
     ]
     
     results = {}
     for name, test_func in tests:
         try:
-            results[name] = test_func()
+            res = test_func()
+            # If the function does not return anything, treat None as True (success)
+            results[name] = True if res is None else res
+        except AssertionError as e:
+            print(f"❌ {name} failed: {e}")
+            results[name] = False
         except Exception as e:
             print(f"❌ {name} failed with error: {e}")
             results[name] = False

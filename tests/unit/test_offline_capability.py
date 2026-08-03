@@ -11,7 +11,7 @@ from src.core.advanced_models import (
 )
 
 
-def test_offline_models():
+def run_offline_models():
     """ทดสอบการตรวจสอบ offline models"""
     print("🔍 Testing Offline Model Detection")
     print("=" * 50)
@@ -27,7 +27,7 @@ def test_offline_models():
     return available_models, offline_ready
 
 
-def test_offline_model_loading():
+def run_offline_model_loading():
     """ทดสอบการโหลด model แบบ offline"""
     print("\n🤖 Testing Offline Model Loading")
     print("=" * 50)
@@ -61,7 +61,7 @@ def test_offline_model_loading():
         return False, None
 
 
-def test_force_offline_mode():
+def run_force_offline_mode():
     """ทดสอบ force offline mode"""
     print("\n🔌 Testing Force Offline Mode")
     print("=" * 50)
@@ -87,13 +87,25 @@ def test_force_offline_mode():
         return False
 
 
+def test_offline_capability_workflow():
+    """Pytest entry point for offline capability tests"""
+    import pytest
+    available_models, offline_ready = run_offline_models()
+    if not offline_ready:
+        pytest.skip("Offline models not ready in cache")
+        
+    model_loaded, model = run_offline_model_loading()
+    assert model_loaded, "Offline model loading failed"
+    assert run_force_offline_mode(), "Force offline mode test failed"
+
+
 def main():
     """รันการทดสอบทั้งหมด"""
     print("🎯 SentenceTransformer Offline Capability Test")
     print("=" * 60)
     
     # Test 1: ตรวจสอบ offline models
-    available_models, offline_ready = test_offline_models()
+    available_models, offline_ready = run_offline_models()
     
     if not offline_ready:
         print("\n❌ Cannot proceed - no offline models available")
@@ -101,10 +113,10 @@ def main():
         return
     
     # Test 2: ทดสอบ offline model loading
-    model_loaded, model = test_offline_model_loading()
+    model_loaded, model = run_offline_model_loading()
     
     # Test 3: ทดสอบ force offline mode  
-    force_offline_success = test_force_offline_mode()
+    force_offline_success = run_force_offline_mode()
     
     # สรุปผลการทดสอบ
     print("\n" + "=" * 60)

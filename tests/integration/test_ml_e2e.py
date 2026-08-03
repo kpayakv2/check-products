@@ -222,8 +222,29 @@ class TestStage2MLInference:
             pytest.skip(f"Server error: {r.text[:200]}")
 
         assert r.status_code == 200, f"Unexpected {r.status_code}: {r.text[:200]}"
-        body = r.json()
+        start_res = r.json()
+        task_id = start_res.get("task_id")
+        assert task_id, f"No task_id found in start response: {start_res}"
+
+        # Poll the status endpoint until completed or failed
+        status = "pending"
+        max_polls = 30
+        poll_interval = 2.0
+        body = {}
+        for _ in range(max_polls):
+            status_res = requests.get(f"{api_base}/api/v1/match/scan-internal/status/{task_id}", timeout=10)
+            assert status_res.status_code == 200, f"Failed to get task status: {status_res.text}"
+            body = status_res.json()
+            status = body.get("status")
+            if status in ("completed", "failed"):
+                break
+            time.sleep(poll_interval)
+
+        assert status == "completed", f"Scan task did not complete (status={status}, error={body.get('error')})"
+        result = body.get("result")
+        assert result is not None, f"No result found in task body: {body}"
+        
         # ScanInternalResponse fields: total_scanned, pairs_found, results, processing_time
         for field in ["total_scanned", "pairs_found", "results"]:
-            assert field in body, f"Response ไม่มี field '{field}': {list(body.keys())}"
-        assert isinstance(body["results"], list), "results ต้องเป็น list"
+            assert field in result, f"Response result ไม่มี field '{field}': {list(result.keys())}"
+        assert isinstance(result["results"], list), "results ต้องเป็น list"

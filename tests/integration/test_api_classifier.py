@@ -12,7 +12,7 @@ import time
 
 API_BASE_URL = "http://127.0.0.1:8000"
 
-def test_health():
+def run_health():
     """Test health endpoint."""
     print("\n" + "=" * 60)
     print("🏥 Testing Health Endpoint")
@@ -27,7 +27,7 @@ def test_health():
     else:
         print(f"❌ Health check failed: {response.status_code}")
 
-def test_root():
+def run_root():
     """Test root endpoint."""
     print("\n" + "=" * 60)
     print("🏠 Testing Root Endpoint")
@@ -43,7 +43,7 @@ def test_root():
     else:
         print(f"❌ Root endpoint failed: {response.status_code}")
 
-def test_single_classification():
+def run_single_classification():
     """Test single product classification."""
     print("\n" + "=" * 60)
     print("🎯 Testing Single Product Classification")
@@ -98,7 +98,7 @@ def test_single_classification():
             print(f"   ❌ Classification failed: {response.status_code}")
             print(f"      {response.text}")
 
-def test_batch_classification():
+def run_batch_classification():
     """Test batch product classification."""
     print("\n" + "=" * 60)
     print("📦 Testing Batch Classification")
@@ -148,7 +148,7 @@ def test_batch_classification():
         print(f"❌ Batch classification failed: {response.status_code}")
         print(f"   {response.text}")
 
-def test_methods_comparison():
+def run_methods_comparison():
     """Compare different classification methods."""
     print("\n" + "=" * 60)
     print("🔬 Testing Classification Methods Comparison")
@@ -198,13 +198,13 @@ def main():
     
     try:
         # Test basic endpoints
-        test_root()
-        test_health()
+        run_root()
+        run_health()
         
         # Test classification
-        test_single_classification()
-        test_batch_classification()
-        test_methods_comparison()
+        run_single_classification()
+        run_batch_classification()
+        run_methods_comparison()
         
         print("\n" + "=" * 60)
         print("✅ All tests completed!")

@@ -5,8 +5,10 @@
 ## 📚 โครงสร้างเอกสาร
 
 ### 🚀 [User Guides](guides/)
+- **[Product Requirements Document](PRD.md)** - เอกสารความต้องการระบบของโปรเจกต์
 - **[Quick Start Guide](guides/quick-start.md)** - เริ่มต้นติดตั้งและใช้งานระบบ Modern Stack (Next.js + Supabase)
 - **[Human Feedback System](guides/human-feedback.md)** - คู่มือการใช้งานระบบ Review และการให้ Feedback กับ AI
+- **[Clean PC Dev Guidelines](guides/ENVIRONMENT_SETUP.md)** - แนวทางปฏิบัติและวิธีบำรุงรักษาสภาพแวดล้อมไม่ให้เครื่องรก
 
 ### 🔧 [API Documentation](api/)
 - **[API Reference](api/api-reference.md)** - รายละเอียด API Endpoints ทั้ง FastAPI และ Edge Functions

@@ -318,14 +318,14 @@ SUPABASE_ANON_KEY = "env(SUPABASE_ANON_KEY)"
 
 [functions]
 # A mapping of function slug to function path.
-[functions.category-suggestions]
-verify_jwt = false
+#[functions.category-suggestions]
+#verify_jwt = false
 
 [functions.exec-sql]
 verify_jwt = false
 
-[functions.generate-embeddings]
-verify_jwt = false
+#[functions.generate-embeddings]
+#verify_jwt = false
 
 [functions.hybrid-search]
 verify_jwt = false

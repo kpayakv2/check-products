@@ -14,21 +14,13 @@ import time
 def test_health_check():
     """Test API health endpoint."""
     print("🔍 Testing Health Check...")
-    try:
-        response = requests.get("http://127.0.0.1:8000/api/v1/health")
-        if response.status_code == 200:
-            data = response.json()
-            print(f"✅ Health Check Success!")
-            print(f"   Status: {data['status']}")
-            print(f"   Version: {data['version']}")
-            print(f"   Uptime: {data['uptime']:.1f}s")
-            return True
-        else:
-            print(f"❌ Health Check Failed: {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"❌ Health Check Error: {e}")
-        return False
+    response = requests.get("http://127.0.0.1:8000/api/v1/health")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    data = response.json()
+    print(f"✅ Health Check Success!")
+    print(f"   Status: {data['status']}")
+    print(f"   Version: {data['version']}")
+    print(f"   Uptime: {data['uptime']:.1f}s")
 
 
 def test_single_match():
@@ -49,36 +41,25 @@ def test_single_match():
         "include_confidence": True
     }
     
-    try:
-        start_time = time.time()
-        response = requests.post(
-            "http://127.0.0.1:8000/api/v1/match/single",
-            json=payload,
-            headers={"Content-Type": "application/json"}
-        )
-        response_time = time.time() - start_time
-        
-        if response.status_code == 200:
-            results = response.json()
-            print(f"✅ Single Match Success!")
-            print(f"   Response Time: {response_time:.3f}s")
-            print(f"   Matches Found: {len(results)}")
-            
-            for i, match in enumerate(results[:2], 1):
-                print(f"   {i}. {match['matched_product'][:40]}...")
-                print(f"      Score: {match['similarity_score']:.4f}")
-                if 'confidence_level' in match:
-                    print(f"      Confidence: {match['confidence_level']}")
-            
-            return True
-        else:
-            print(f"❌ Single Match Failed: {response.status_code}")
-            print(f"   Error: {response.text}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Single Match Error: {e}")
-        return False
+    start_time = time.time()
+    response = requests.post(
+        "http://127.0.0.1:8000/api/v1/match/single",
+        json=payload,
+        headers={"Content-Type": "application/json"}
+    )
+    response_time = time.time() - start_time
+    
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+    results = response.json()
+    print(f"✅ Single Match Success!")
+    print(f"   Response Time: {response_time:.3f}s")
+    print(f"   Matches Found: {len(results)}")
+    
+    for i, match in enumerate(results[:2], 1):
+        print(f"   {i}. {match['matched_product'][:40]}...")
+        print(f"      Score: {match['similarity_score']:.4f}")
+        if 'confidence_level' in match:
+            print(f"      Confidence: {match['confidence_level']}")
 
 
 def test_batch_match():
@@ -100,69 +81,49 @@ def test_batch_match():
         "include_confidence": True
     }
     
-    try:
-        # Start batch job
-        response = requests.post(
-            "http://127.0.0.1:8000/api/v1/match/batch",
-            json=payload,
-            headers={"Content-Type": "application/json"}
-        )
+    # Start batch job
+    response = requests.post(
+        "http://127.0.0.1:8000/api/v1/match/batch",
+        json=payload,
+        headers={"Content-Type": "application/json"}
+    )
+    
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+    batch_response = response.json()
+    job_id = batch_response["job_id"]
+    print(f"✅ Batch Job Started!")
+    print(f"   Job ID: {job_id}")
+    print(f"   Total Queries: {batch_response['total_queries']}")
+    
+    # Check job status
+    print("   Checking job status...")
+    job_completed = False
+    for attempt in range(10):  # Wait up to 10 seconds
+        status_response = requests.get(f"http://127.0.0.1:8000/api/v1/jobs/{job_id}")
+        assert status_response.status_code == 200, f"Status check failed: {status_response.text}"
+        status_data = status_response.json()
+        print(f"   Progress: {status_data['progress']:.1%} - {status_data['message']}")
         
-        if response.status_code == 200:
-            batch_response = response.json()
-            job_id = batch_response["job_id"]
-            print(f"✅ Batch Job Started!")
-            print(f"   Job ID: {job_id}")
-            print(f"   Total Queries: {batch_response['total_queries']}")
-            
-            # Check job status
-            print("   Checking job status...")
-            for attempt in range(10):  # Wait up to 10 seconds
-                status_response = requests.get(f"http://127.0.0.1:8000/api/v1/jobs/{job_id}")
-                if status_response.status_code == 200:
-                    status_data = status_response.json()
-                    print(f"   Progress: {status_data['progress']:.1%} - {status_data['message']}")
-                    
-                    if status_data['status'] == 'completed':
-                        print(f"✅ Batch Job Completed!")
-                        return True
-                    elif status_data['status'] == 'failed':
-                        print(f"❌ Batch Job Failed: {status_data['message']}")
-                        return False
-                    
-                    time.sleep(1)
-                else:
-                    print(f"❌ Status Check Failed: {status_response.status_code}")
-                    break
-            
-            print("⏰ Batch job taking longer than expected...")
-            return True  # Still consider success if job started
-            
-        else:
-            print(f"❌ Batch Start Failed: {response.status_code}")
-            print(f"   Error: {response.text}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Batch Processing Error: {e}")
-        return False
+        if status_data['status'] == 'completed':
+            print(f"✅ Batch Job Completed!")
+            job_completed = True
+            break
+        elif status_data['status'] == 'failed':
+            assert False, f"Batch Job Failed: {status_data['message']}"
+        
+        time.sleep(1)
+    
+    if not job_completed:
+        print("⏰ Batch job taking longer than expected...")
 
 
 def test_api_documentation():
     """Test API documentation endpoint."""
     print("\n🔍 Testing API Documentation...")
-    try:
-        response = requests.get("http://127.0.0.1:8000/docs")
-        if response.status_code == 200:
-            print(f"✅ API Documentation Available!")
-            print(f"   URL: http://127.0.0.1:8000/docs")
-            return True
-        else:
-            print(f"❌ Documentation Failed: {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"❌ Documentation Error: {e}")
-        return False
+    response = requests.get("http://127.0.0.1:8000/docs")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    print(f"✅ API Documentation Available!")
+    print(f"   URL: http://127.0.0.1:8000/docs")
 
 
 def main():
@@ -181,8 +142,15 @@ def main():
     
     for test_name, test_func in tests:
         print(f"\n{'=' * 20}")
-        success = test_func()
-        results.append((test_name, success))
+        try:
+            test_func()
+            results.append((test_name, True))
+        except AssertionError as e:
+            print(f"❌ {test_name} failed: {e}")
+            results.append((test_name, False))
+        except Exception as e:
+            print(f"❌ {test_name} error: {e}")
+            results.append((test_name, False))
     
     # Summary
     print(f"\n🎯 Test Results Summary")

@@ -100,7 +100,7 @@ def extract_product_names(data):
     
     return products
 
-def test_sentence_transformer_with_cache():
+def run_sentence_transformer_with_cache():
     """ทดสอบ SentenceTransformer จาก cache"""
     print(f"\n🤖 Testing SentenceTransformer from local cache...")
     
@@ -215,7 +215,7 @@ def analyze_similarity_results(similarity_matrix, new_products, old_products, th
     
     return matches
 
-def test_different_thresholds(similarity_matrix, new_products, old_products):
+def run_different_thresholds(similarity_matrix, new_products, old_products):
     """ทดสอบ threshold ต่างๆ"""
     print(f"\n🎚️ Testing different thresholds:")
     
@@ -283,7 +283,7 @@ def main():
         print(f"   {i}. {product}")
     
     # Test model
-    model = test_sentence_transformer_with_cache()
+    model = run_sentence_transformer_with_cache()
     if not model:
         return
     
@@ -298,7 +298,7 @@ def main():
     )
     
     # Test different thresholds
-    test_different_thresholds(similarity_matrix, products['new'], products['old'])
+    run_different_thresholds(similarity_matrix, products['new'], products['old'])
     
     # Save results
     save_results(matches, similarity_matrix, products['new'], products['old'])

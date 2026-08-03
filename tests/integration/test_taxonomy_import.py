@@ -17,7 +17,9 @@ API_BASE_URL = "http://127.0.0.1:8000"
 CSV_FILE = "output/approved_products_for_import_20250914_110653.csv"
 TEST_LIMIT = 5  # ทดสอบแค่ 5 รายการก่อน
 
-def test_api_health():
+import pytest
+
+def run_api_health():
     """ทดสอบว่า API Server ทำงานหรือไม่"""
     print("🔍 Testing API Health...")
     try:
@@ -36,7 +38,7 @@ def test_api_health():
         return False
 
 
-def test_single_embedding():
+def run_single_embedding():
     """ทดสอบ Single Embedding"""
     print("\n🔍 Testing Single Embedding...")
     try:
@@ -64,7 +66,7 @@ def test_single_embedding():
         return False
 
 
-def test_batch_embedding():
+def run_batch_embedding():
     """ทดสอบ Batch Embedding"""
     print("\n🔍 Testing Batch Embedding...")
     try:
@@ -160,7 +162,7 @@ def analyze_embeddings(embedding_data):
         print()
 
 
-def test_product_matching():
+def run_product_matching():
     """ทดสอบ Product Matching API (ถ้ามี)"""
     print("\n🔍 Testing Product Matching...")
     try:
@@ -199,6 +201,20 @@ def test_product_matching():
         return False
 
 
+def test_import_pipeline():
+    """Pytest entry point for taxonomy import pipeline"""
+    csv_path = Path(CSV_FILE)
+    if not csv_path.exists():
+        pytest.skip(f"CSV file not found: {CSV_FILE}")
+        
+    assert run_api_health()
+    assert run_single_embedding()
+    embedding_data = run_batch_embedding()
+    assert embedding_data is not None
+    analyze_embeddings(embedding_data)
+    assert run_product_matching()
+
+
 def main():
     """Main test function"""
     print("=" * 70)
@@ -221,16 +237,16 @@ def main():
     results = {}
     
     # Test 1: API Health
-    results['health'] = test_api_health()
+    results['health'] = run_api_health()
     if not results['health']:
         print("\n❌ API is not running. Please start api_server.py first!")
         return
     
     # Test 2: Single Embedding
-    results['single_embedding'] = test_single_embedding()
+    results['single_embedding'] = run_single_embedding()
     
     # Test 3: Batch Embedding
-    embedding_data = test_batch_embedding()
+    embedding_data = run_batch_embedding()
     results['batch_embedding'] = embedding_data is not None
     
     # Test 4: Analyze Embeddings
@@ -238,7 +254,7 @@ def main():
         analyze_embeddings(embedding_data)
     
     # Test 5: Product Matching
-    results['matching'] = test_product_matching()
+    results['matching'] = run_product_matching()
     
     # Summary
     print("\n" + "=" * 70)

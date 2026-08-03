@@ -1,0 +1,30 @@
+=== MCP CONNECTION TEST RESULTS ===
+
+Testing MCP Server: postgres
+Command: npx.cmd -y --prefer-offline @modelcontextprotocol/server-postgres postgresql://postgres:postgres@127.0.0.1:54325/postgres
+Sending initialize request...
+Waiting for response...
+Timeout expired waiting for response.
+Stdout after timeout: {"result":{"protocolVersion":"2024-11-05","capabilities":{"resources":{},"tools":{}},"serverInfo":{"name":"example-servers/postgres","version":"0.1.0"}},"jsonrpc":"2.0","id":1}
+{"result":{"protocolVersion":"2024-11-05","capabilities":{"resources":{},"tools":{}},"serverInfo":{"name":"example-servers/postgres","version":"0.1.0"}},"jsonrpc":"2.0","id":1}
+
+
+Testing MCP Server: socraticode
+Command: node D:\SocratiCode-main\dist\index.js
+Sending initialize request...
+Waiting for response...
+Timeout expired waiting for response.
+
+Testing MCP Server: puppeteer
+Command: npx.cmd -y --prefer-offline @modelcontextprotocol/server-puppeteer
+Sending initialize request...
+Waiting for response...
+Timeout expired waiting for response.
+Stdout after timeout: {"result":{"protocolVersion":"2024-11-05","capabilities":{"resources":{},"tools":{}},"serverInfo":{"name":"example-servers/puppeteer","version":"0.1.0"}},"jsonrpc":"2.0","id":1}
+{"result":{"protocolVersion":"2024-11-05","capabilities":{"resources":{},"tools":{}},"serverInfo":{"name":"example-servers/puppeteer","version":"0.1.0"}},"jsonrpc":"2.0","id":1}
+
+Stderr after timeout: npm warn deprecated @modelcontextprotocol/server-puppeteer@2025.5.12: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+Puppeteer MCP Server closed
+
+
+=== TEST COMPLETED ===

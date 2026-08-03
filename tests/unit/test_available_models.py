@@ -51,7 +51,7 @@ def load_input_products():
     
     return products
 
-def test_with_different_models(new_products, old_products):
+def run_with_different_models(new_products, old_products):
     """ทดสอบกับโมเดลต่างๆ"""
     print(f"\n🧪 Testing with different models...")
     
@@ -123,7 +123,7 @@ def test_with_different_models(new_products, old_products):
     
     return results
 
-def test_sentence_transformer_if_available(new_products, old_products):
+def run_sentence_transformer_if_available(new_products, old_products):
     """ทดสอบ SentenceTransformer ถ้าโหลดเสร็จแล้ว"""
     print(f"\n🤖 Testing SentenceTransformer (if available)...")
     
@@ -276,10 +276,10 @@ def main():
     analyze_product_categories(new_products, old_products)
     
     # Test with different models
-    results = test_with_different_models(new_products, old_products)
+    results = run_with_different_models(new_products, old_products)
     
     # Try SentenceTransformer if available
-    st_model = test_sentence_transformer_if_available(new_products, old_products)
+    st_model = run_sentence_transformer_if_available(new_products, old_products)
     
     # Save results
     save_test_results(results, new_products, old_products)

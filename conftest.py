@@ -3,6 +3,12 @@ import pytest
 import sys
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+env_path = Path(__file__).parent / "taxonomy-app" / ".env.local"
+if env_path.exists():
+    load_dotenv(dotenv_path=str(env_path))
 
 # Add the project root to sys.path
 project_root = Path(__file__).parent
