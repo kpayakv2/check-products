@@ -32,8 +32,8 @@ npm install
 
 ### 2. รันระบบ (Local Development)
 1.  **Start Supabase:** `supabase start` (ต้องติดตั้ง Supabase CLI)
-2.  **Start AI Engine:** `python api_server.py` (รันที่ port 8000)
-3.  **Start Frontend:** `npm run dev` (รันที่ port 3000)
+2.  **Start AI Engine:** `python -m src.api.api_server` (รันที่ port 8000)
+3.  **Start Frontend:** `cd taxonomy-app && npm run dev` (รันที่ port 3000)
 
 ---
 
@@ -48,10 +48,9 @@ npm install
 
 ## 📁 Project Structure (โครงสร้างโปรเจกต์)
 
-*   `/taxonomy-app`: ระบบ Frontend (Next.js) และ Supabase Configurations
-*   `/supabase`: Edge Functions และ Database Migrations
-*   `api_server.py`: FastAPI สำหรับ Embedding Provider
-*   `fresh_implementations.py`: Core Logic สำหรับ Thai Text Processing
+*   `/taxonomy-app`: ระบบ Frontend (Next.js), Supabase Configurations และ Edge Functions/Migrations (`/taxonomy-app/supabase`)
+*   `/src/api/api_server.py`: FastAPI สำหรับ Embedding Provider
+*   `/src/core/fresh_implementations.py`: Core Logic สำหรับ Thai Text Processing
 *   `/docs`: เอกสารประกอบโปรเจกต์ฉบับเต็ม
 
 ---
@@ -60,9 +59,10 @@ npm install
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| **Web UI** | `http://localhost:3000` | หน้าจอหลักสำหรับใช้งานระบบ |
+| **Web UI** | `http://127.0.0.1:3000` | หน้าจอหลักสำหรับใช้งานระบบ |
 | **AI Engine** | `http://127.0.0.1:8000` | REST API สำหรับ Embeddings |
-| **Supabase Studio** | `http://localhost:54323` | จัดการฐานข้อมูลและ Edge Functions |
+| **Supabase Studio** | `http://127.0.0.1:54323` | จัดการฐานข้อมูลและ Edge Functions |
+| **Supabase API** | `http://127.0.0.1:54331` | REST API Gateway (ใช้โดย Backend/Scripts) |
 
 ---
 
