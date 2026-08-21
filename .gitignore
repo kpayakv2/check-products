@@ -177,6 +177,22 @@ output/
 results/
 temp/
 
+# Trained ML artifacts (regenerate via /api/v1/learn/retrain)
+*.joblib
+
+# One-off data dumps / recovered exports
+recovered_products.json
+
+# Frontend test artifacts (taxonomy-app)
+taxonomy-app/playwright-report/
+taxonomy-app/coverage/
+taxonomy-app/test-results/
+
+# Editor swap files
+*.swp
+*.swo
+*.swn
+
 # Log files
 *.log
 logs/
