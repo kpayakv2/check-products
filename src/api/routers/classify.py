@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 from src.api.dependencies import get_taxonomy_service, initialize_embedding_model
+from src.core.scoring_logic import calculate_hybrid_score
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/classify", tags=["Classification"])
@@ -163,11 +164,8 @@ def _classify_embedding_based(product_name: str, category_embeddings: dict, cate
 def _classify_hybrid(product_name: str, keyword_rules: list, category_embeddings: dict,
                      category_names: dict, embedding_model, top_k: int = 3) -> List[Dict]:
     """
-    Hybrid classification: Keyword 60% + Embedding 40%
+    Hybrid classification: Keyword 60% + Embedding 40% (see src/core/scoring_logic.py)
     """
-    KEYWORD_WEIGHT = 0.60
-    EMBEDDING_WEIGHT = 0.40
-
     kw_results = _classify_keyword_based(product_name, keyword_rules, category_names, top_k=top_k * 2)
     emb_results = _classify_embedding_based(product_name, category_embeddings, category_names,
                                             embedding_model, top_k=top_k * 2)
@@ -201,7 +199,7 @@ def _classify_hybrid(product_name: str, keyword_rules: list, category_embeddings
     # Compute hybrid score
     results = []
     for cid, data in combined.items():
-        hybrid_score = (data["kw_score"] * KEYWORD_WEIGHT) + (data["emb_score"] * EMBEDDING_WEIGHT)
+        hybrid_score = calculate_hybrid_score(data["kw_score"], data["emb_score"])
         results.append({
             "category_id": cid,
             "category_name": data["category_name"],
