@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { ThaiTextProcessor } from '@/utils/thai-text-processor'
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || 'http://127.0.0.1:54331',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabaseAdmin as supabase } from '@/utils/supabase-admin'
 
 /**
  * Generate embedding using local model via Edge Function
