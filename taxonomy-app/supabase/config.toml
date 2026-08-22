@@ -321,14 +321,8 @@ SUPABASE_ANON_KEY = "env(SUPABASE_ANON_KEY)"
 #[functions.category-suggestions]
 #verify_jwt = false
 
-[functions.exec-sql]
-verify_jwt = false
-
 #[functions.generate-embeddings]
 #verify_jwt = false
-
-[functions.hybrid-search]
-verify_jwt = false
 
 [analytics]
 enabled = false
