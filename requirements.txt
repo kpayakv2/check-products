@@ -23,7 +23,7 @@ openpyxl>=3.0.0
 # 🛠️ Utilities
 tqdm>=4.62.0
 python-multipart>=0.0.5
+python-dotenv>=1.0.0
 
 # 🗄️ Database (optional for feedback)
 supabase>=2.0.0
-sqlite3  # Built-in with Python
