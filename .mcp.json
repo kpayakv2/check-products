@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:postgres@127.0.0.1:54325/postgres"
+      ]
+    },
+    "socraticode": {
+      "command": "node",
+      "args": [
+        "D:\\SocratiCode-main\\dist\\index.js"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "D:\\product_checker\\check-products\\.mcp-memory\\memory.jsonl"
+      }
+    }
+  }
+}

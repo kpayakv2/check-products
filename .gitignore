@@ -1,4 +1,7 @@
 
+# MCP memory server persistent store (local knowledge graph, not for git)
+.mcp-memory/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
