@@ -33,7 +33,7 @@
     "dotenv": "^16.6.1",
     "framer-motion": "^10.16.5",
     "lucide-react": "^0.294.0",
-    "next": "14.0.3",
+    "next": "^14.2.35",
     "papaparse": "^5.5.3",
     "pg": "^8.16.3",
     "postcss": "^8.4.31",

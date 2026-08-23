@@ -201,6 +201,7 @@ def run_product_matching():
         return False
 
 
+@pytest.mark.live
 def test_import_pipeline():
     """Pytest entry point for taxonomy import pipeline"""
     csv_path = Path(CSV_FILE)

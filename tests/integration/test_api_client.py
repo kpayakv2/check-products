@@ -9,8 +9,10 @@ Simple client to test our Phase 5 API.
 import requests
 import json
 import time
+import pytest
 
 
+@pytest.mark.live
 def test_health_check():
     """Test API health endpoint."""
     print("🔍 Testing Health Check...")
@@ -23,6 +25,7 @@ def test_health_check():
     print(f"   Uptime: {data['uptime']:.1f}s")
 
 
+@pytest.mark.live
 def test_single_match():
     """Test single product matching."""
     print("\n🔍 Testing Single Product Match...")
@@ -62,6 +65,7 @@ def test_single_match():
             print(f"      Confidence: {match['confidence_level']}")
 
 
+@pytest.mark.live
 def test_batch_match():
     """Test batch processing."""
     print("\n🔍 Testing Batch Processing...")
@@ -117,6 +121,7 @@ def test_batch_match():
         print("⏰ Batch job taking longer than expected...")
 
 
+@pytest.mark.live
 def test_api_documentation():
     """Test API documentation endpoint."""
     print("\n🔍 Testing API Documentation...")

@@ -9,9 +9,11 @@ Verifies that the /api/v1/match/scan-internal endpoint is functional.
 import requests
 import json
 import time
+import pytest
 
 API_BASE_URL = "http://127.0.0.1:8000"
 
+@pytest.mark.live
 def test_internal_scan():
     print("\n" + "=" * 60)
     print("Testing Internal Catalog Deduplication Scan")

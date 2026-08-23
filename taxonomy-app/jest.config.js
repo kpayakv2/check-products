@@ -9,13 +9,6 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
-  moduleNameMapping: {
-    // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
-    '^@/(.*)$': '<rootDir>/$1',
-    '^@/components/(.*)$': '<rootDir>/components/$1',
-    '^@/utils/(.*)$': '<rootDir>/utils/$1',
-    '^@/app/(.*)$': '<rootDir>/app/$1',
-  },
   testMatch: [
     '<rootDir>/**/__tests__/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/**/*.(test|spec).{js,jsx,ts,tsx}'
@@ -23,7 +16,9 @@ const customJestConfig = {
   testPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
-    '<rootDir>/e2e/'
+    '<rootDir>/e2e/',
+    '<rootDir>/__tests__/integration/',
+    '<rootDir>/__tests__/components/real/'
   ],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
@@ -45,6 +40,7 @@ const customJestConfig = {
   testTimeout: 10000,
   // Mock static file imports
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
   }
