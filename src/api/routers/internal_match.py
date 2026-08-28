@@ -19,6 +19,29 @@ import io
 # Global in-memory storage for asynchronous scan tasks
 SCAN_TASKS: Dict[str, dict] = {}
 
+# ป้ายที่แปลว่า "สินค้าคู่นี้คือตัวเดียวกัน (มีในสตอกแล้ว)"
+#
+# ระวังคำศัพท์สองชุดที่ชนกันในระบบนี้:
+#   1. FeedbackType.SIMILAR = "สินค้าคล้าย แต่**ไม่ซ้ำ**" (คนละสินค้า เช่น กระชอนพลาสติก vs กระชอนเลส)
+#   2. ฟิลด์ mlPrediction ที่ API ส่งออก ใช้คำว่า "similar" แปลว่า "เจอคู่ที่ตรงกัน ควรให้คนดู"
+# คนละความหมายกันคนละชุด — ตรงนี้ยึดความหมายชุดที่ 1
+# มีแต่ DUPLICATE เท่านั้นที่แปลว่า "สินค้าตัวนี้มีในสตอกแล้ว ไม่ต้องนำเข้า"
+#
+# บั๊กเดิม: โค้ดเทียบ pred_label กับ FeedbackType.SIMILAR.value ซึ่งโมเดลไม่เคยทำนายออกมาเลย
+# (เทรนจาก similarity_matches ที่มีแค่ 'duplicate'/'different' — ดู
+# ml_feedback_learning._fetch_training_data) เงื่อนไขจึงเป็นเท็จเสมอ ทุกคู่ถูกรายงานว่า
+# "different" หมด รวมถึงคู่ที่ต่างกันแค่ช่องว่าง เช่น
+# "แขวนเสื้อลวด+หนีบ 99 SM" vs "แขวนเสื้อลวด + หนีบ 99 SM" (ความคล้าย 0.96)
+MATCH_LABELS = frozenset({FeedbackType.DUPLICATE.value})
+
+
+def is_match_label(pred_label) -> bool:
+    """โมเดลทำนายว่าคู่นี้เป็นสินค้าตัวเดียวกันหรือไม่
+
+    ใช้ตัดสินว่าสินค้าใหม่ที่กำลังตรวจ "มีในสตอกแล้ว" หรือ "ยังไม่เคยมี"
+    """
+    return str(pred_label) in MATCH_LABELS
+
 class ScanStartResponse(BaseModel):
     task_id: str
     status: str
@@ -249,7 +272,7 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
                         cat_a = category_mapping.get(cat_ids[i], "Unmapped")
                         cat_b = category_mapping.get(cat_ids[j], "Unmapped")
                         
-                        ml_pred_str = "similar" if pred_label == FeedbackType.SIMILAR.value else "different"
+                        ml_pred_str = "similar" if is_match_label(pred_label) else "different"
                         ml_label_th = "อาจซ้ำกัน" if ml_pred_str == "similar" else "อาจแตกต่าง"
                         reason_str = f"ความคล้ายเวกเตอร์ {sim*100:.1f}% | ML ประเมิน: {ml_label_th} (มั่นใจ {conf*100:.1f}%)"
                         
@@ -537,8 +560,9 @@ async def deduplicate_files(request: FileDeduplicationRequest):
                         
                     # Otherwise, add to review zone
                     # Calculate reasonable confidence
-                    confidence = float(min(0.95, sim + 0.1)) if pred_label == FeedbackType.SIMILAR.value else float(sim)
-                    ml_pred = "similar" if pred_label == FeedbackType.SIMILAR.value else "different"
+                    matched = is_match_label(pred_label)
+                    confidence = float(min(0.95, sim + 0.1)) if matched else float(sim)
+                    ml_pred = "similar" if matched else "different"
                     
                     matches.append(ProductMatchResult(
                         id=f"review_{i + 1}",
@@ -731,13 +755,15 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                     if pred_label == FeedbackType.DIFFERENT.value and conf > 0.6:
                         continue
                         
-                    confidence = float(min(0.95, sim + 0.1)) if pred_label == FeedbackType.SIMILAR.value else float(sim)
-                    ml_pred = "similar" if pred_label == FeedbackType.SIMILAR.value else "different"
+                    matched = is_match_label(pred_label)
+                    confidence = float(min(0.95, sim + 0.1)) if matched else float(sim)
+                    ml_pred = "similar" if matched else "different"
                     
                     matches.append(ProductMatchResult(
                         id=f"review_{i + 1}",
                         newProduct=input_products[i],
                         oldProduct=db_products[j]['name_th'],
+                        oldProductId=db_products[j].get('id'),
                         similarity=round(sim, 4),
                         confidence=round(confidence, 4),
                         mlPrediction=ml_pred,
@@ -754,6 +780,7 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                         id=f"review_{i + 1}",
                         newProduct=input_products[i],
                         oldProduct=db_products[j]['name_th'],
+                        oldProductId=db_products[j].get('id'),
                         similarity=round(sim, 4),
                         confidence=round(confidence, 4),
                         mlPrediction=ml_pred,

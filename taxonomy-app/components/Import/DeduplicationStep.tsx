@@ -95,23 +95,27 @@ export default function DeduplicationStep({
             ...item,
             _similarity_score: score,
             _matched_with: match.oldProduct || 'สินค้าในระบบ',
-            _matched_id: match.id,
+            // ต้องใช้ oldProductId (id จริงของสินค้าในคลัง) — `match.id` เป็นเลขลำดับรีวิว
+            // เช่น "review_1" ใช้เป็น FK ไม่ได้
+            _matched_id: match.oldProductId,
             _source: 'backend'
           }
           
           // Smart classification grouping based on ML model predictions
+          // _bucket ต้องติดไปกับข้อมูลด้วย ขั้นถัดไปใช้ตัดสินว่าจะบันทึกด้วยสถานะอะไร
           if (score >= 0.95) {
-            autoMerged.push(enriched)
+            autoMerged.push({ ...enriched, _bucket: 'duplicate' })
           } else if (match.mlPrediction === 'similar' || score >= 0.80) {
-            reviewZone.push(enriched)
+            reviewZone.push({ ...enriched, _bucket: 'review' })
           } else {
-            autoCreated.push(enriched)
+            autoCreated.push({ ...enriched, _bucket: 'new' })
           }
         } else {
           autoCreated.push({
             ...item,
             _similarity_score: 0,
             _matched_with: '',
+            _bucket: 'new',
             _source: 'backend'
           })
         }
@@ -145,9 +149,9 @@ export default function DeduplicationStep({
         _matched_with: `สินค้าอ้างอิง_${Math.floor(Math.random() * 100)}`,
         _source: 'mock'
       }
-      if (mockScore >= 0.95) autoMerged.push(enriched)
-      else if (mockScore <= 0.79) autoCreated.push(enriched)
-      else reviewZone.push(enriched)
+      if (mockScore >= 0.95) autoMerged.push({ ...enriched, _bucket: 'duplicate' })
+      else if (mockScore <= 0.79) autoCreated.push({ ...enriched, _bucket: 'new' })
+      else reviewZone.push({ ...enriched, _bucket: 'review' })
     })
     setDedupResults({ autoMerged, autoCreated, reviewZone })
     setProgress(100)
@@ -337,7 +341,14 @@ export default function DeduplicationStep({
         </button>
 
         <button
-          onClick={() => onComplete([...cleanedData])}
+          onClick={() => onComplete([
+            // ส่งผลที่แบ่งกลุ่มแล้วออกไป ไม่ใช่ข้อมูลดิบ
+            // เดิมส่ง cleanedData กลับไปเฉยๆ ทำให้ผลตรวจของซ้ำถูกทิ้งทั้งหมด
+            // ขั้นถัดไปจึงจัดหมวดสินค้าทุกตัวรวมทั้งตัวที่มีในสตอกอยู่แล้ว
+            ...dedupResults.autoMerged,
+            ...dedupResults.reviewZone,
+            ...dedupResults.autoCreated,
+          ])}
           className="px-10 py-4 bg-slate-900 hover:bg-black text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 thai-text"
         >
           ดำเนินการต่อ: จัดหมวดหมู่

@@ -71,10 +71,91 @@ export default function WizardTab() {
   const [cleanedData, setCleanedData] = useState<any[]>([])
   const [dedupedData, setDedupedData] = useState<any[]>([])
   const [categorizedData, setCategorizedData] = useState<any[]>([])
+  // ผลการบันทึกจริงจาก /api/import/commit — ขั้นสุดท้ายต้องแสดงตัวเลขจากตรงนี้
+  // ไม่ใช่เดาจาก state ในเบราว์เซอร์ ไม่งั้นจะบอกว่าสำเร็จทั้งที่ยังไม่ได้บันทึก
+  const [saveResult, setSaveResult] = useState<any | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const handleNext = () => {
     if (currentStep < wizardSteps.length - 1) {
       setCurrentStep(currentStep + 1)
+    }
+  }
+
+  /** บันทึกผลตรวจของซ้ำลงฐานข้อมูล แล้วจำ id ของแต่ละสินค้าไว้ให้ขั้นจัดหมวดใช้ต่อ */
+  const commitDedup = async (deduped: any[]) => {
+    // ห้ามบันทึกข้อมูลจำลองเด็ดขาด — fallback ของขั้นตรวจของซ้ำใช้คะแนนสุ่ม
+    // ถ้า backend ล่มแล้วเผลอบันทึก จะได้สินค้าที่จัดกลุ่มมั่วเข้าฐานข้อมูลจริง
+    if (deduped.some((item) => item._source === 'mock')) {
+      setSaveError('ระบบวิเคราะห์ไม่พร้อมใช้งาน จึงยังไม่บันทึก — กรุณาลองใหม่เมื่อ backend กลับมา')
+      return
+    }
+
+    setSaveError(null)
+    try {
+      const response = await fetch('/api/import/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'dedup',
+          file_name: file?.name,
+          items: deduped.map((item) => ({
+            name_th: item.name_th || item.name || item._cleaned_name,
+            cleaned_name: item._cleaned_name,
+            bucket: item._bucket ?? 'new',
+            similarity: item._similarity_score ?? 0,
+            matched_product_id: item._matched_id,
+          })),
+        }),
+      })
+      const payload = await response.json()
+      if (!payload.success) throw new Error(payload.error || 'บันทึกไม่สำเร็จ')
+      setSaveResult(payload)
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'บันทึกไม่สำเร็จ')
+    }
+  }
+
+  /** เติมหมวดหมู่ให้สินค้าที่บันทึกไว้แล้ว — จับคู่ด้วยชื่อเพราะ id อยู่ในผลลัพธ์ของขั้นก่อน */
+  const commitCategories = async (categorized: any[]) => {
+    if (!saveResult?.import_batch_id) return
+
+    const idByName = new Map<string, string>(
+      (saveResult.products ?? []).map((p: any) => [p.name_th, p.id])
+    )
+    const assignments = categorized
+      .map((item) => {
+        // ชื่อที่ใช้บันทึกตอน commitDedup คือ _cleaned_name (ข้อมูลจาก CSV ไม่มี name_th)
+        const productId = idByName.get(item.name_th || item.name || item._cleaned_name)
+        // CategorizationStep เก็บผลไว้ในคีย์ที่ขึ้นต้นด้วย _ ไม่ใช่ object suggested_category
+        const categoryId = item._suggested_category_id
+        if (!productId || !categoryId) return null
+        return {
+          product_id: productId,
+          category_id: categoryId,
+          category_name: item._suggested_category,
+          confidence_score: item._confidence ?? 0,
+        }
+      })
+      .filter(Boolean)
+
+    if (assignments.length === 0) return
+
+    try {
+      const response = await fetch('/api/import/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'categorize',
+          import_batch_id: saveResult.import_batch_id,
+          assignments,
+        }),
+      })
+      const payload = await response.json()
+      if (!payload.success) throw new Error(payload.error || 'บันทึกหมวดหมู่ไม่สำเร็จ')
+      setSaveResult({ ...saveResult, categorized: payload.updated })
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'บันทึกหมวดหมู่ไม่สำเร็จ')
     }
   }
 
@@ -139,6 +220,9 @@ export default function WizardTab() {
               cleanedData={cleanedData}
               onComplete={(deduped: any) => {
                 setDedupedData(deduped)
+                // บันทึกตั้งแต่ตรงนี้ ไม่รอขั้นสุดท้าย — ถ้าปิดเบราว์เซอร์กลางคัน
+                // รายการก้ำกึ่งที่ยังตรวจไม่จบต้องยังอยู่ให้ไปทำต่อที่หน้า Verify ได้
+                commitDedup(deduped)
                 handleNext()
               }}
               onBack={handleBack}
@@ -156,6 +240,7 @@ export default function WizardTab() {
               dedupedData={dedupedData}
               onComplete={(categorized: any) => {
                 setCategorizedData(categorized)
+                commitCategories(categorized)
                 handleNext()
               }}
               onBack={handleBack}
@@ -169,8 +254,10 @@ export default function WizardTab() {
   
         case 4:
           return (
-            <CompleteStep 
-              categorizedData={categorizedData} 
+            <CompleteStep
+              categorizedData={categorizedData}
+              saveResult={saveResult}
+              saveError={saveError}
               onReset={() => {
                 setCurrentStep(0)
                 setFile(null)
