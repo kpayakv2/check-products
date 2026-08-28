@@ -9,13 +9,6 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
-  moduleNameMapping: {
-    // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
-    '^@/(.*)$': '<rootDir>/$1',
-    '^@/components/(.*)$': '<rootDir>/components/$1',
-    '^@/utils/(.*)$': '<rootDir>/utils/$1',
-    '^@/app/(.*)$': '<rootDir>/app/$1',
-  },
   testMatch: [
     '<rootDir>/**/__tests__/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/**/*.(test|spec).{js,jsx,ts,tsx}'
@@ -43,8 +36,11 @@ const customJestConfig = {
     }
   },
   testTimeout: 10000,
-  // Mock static file imports
   moduleNameMapper: {
+    // Module aliases. next/jest already derives these from tsconfig.json "paths",
+    // so they are stated here only to keep the config self-describing.
+    '^@/(.*)$': '<rootDir>/$1',
+    // Static file imports
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
   }
