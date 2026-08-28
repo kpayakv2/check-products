@@ -227,8 +227,12 @@ class TestStage2MLInference:
         assert task_id, f"No task_id found in start response: {start_res}"
 
         # Poll the status endpoint until completed or failed
+        #
+        # งบเวลาเดิม 60 วิ ตั้งไว้ตอน DB ยังว่าง ทำให้ scan เสร็จทันที
+        # พอมีสินค้าจริง 3,103 รายการ การเทียบคู่ใช้เวลาราว 40 วิต่อรอบ
+        # และเมื่อรันหลายเทสต์ติดกัน รอบหลังต้องต่อคิว จึงต้องเผื่อมากกว่าเดิม
         status = "pending"
-        max_polls = 30
+        max_polls = 90
         poll_interval = 2.0
         body = {}
         for _ in range(max_polls):

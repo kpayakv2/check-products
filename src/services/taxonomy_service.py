@@ -13,13 +13,27 @@ import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 
 # Import ThaiTextProcessor
-from src.core.fresh_implementations import ThaiTextProcessor
+from src.core.fresh_implementations import (
+    ThaiTextProcessor,
+    merge_short_token_runs,
+    tokenize_thai,
+)
 
 logger = logging.getLogger(__name__)
 
 class TaxonomyService:
     """Service to handle all taxonomy and rule-related operations with Supabase."""
-    
+
+    # keyword ที่สั้นกว่านี้จะ match กลางคำจนจัดหมวดผิด (เช่น "สี" ใน "ยาสีฟัน")
+    MIN_KEYWORD_LENGTH = 3
+
+    # หน่วยวัดที่หลุดมาเป็น token แยกหลังตัดตัวเลขออก เช่น "1500g" -> "1500" + "g"
+    # ถ้าไม่กรองจะไปเกาะกับคำถัดไปกลายเป็น keyword เพี้ยน เช่น "gออริจิ"
+    MEASUREMENT_UNITS = {
+        'g', 'kg', 'mg', 'ml', 'l', 'cc', 'oz', 'lb', 'pcs', 'pc',
+        'ก', 'กก', 'กรัม', 'มล', 'ลิตร', 'ซม', 'มม', 'นิ้ว', 'ห่อ', 'ชิ้น',
+    }
+
     def __init__(self, supabase_client):
         self.supabase = supabase_client
         self.category_names = {}
@@ -45,34 +59,41 @@ class TaxonomyService:
             
         # 1. Clean with ThaiTextProcessor
         cleaned = self.processor.process(product_name)
-        
-        # 2. Tokenize (Simple split by space since ThaiTextProcessor already added spaces)
-        tokens = cleaned.split()
-        
-        extracted = []
-        for token in tokens:
-            # Skip if token is purely numeric or looks like measurement (e.g., 600มล., 1.5kg)
-            if re.match(r'^[\d\.]+$', token):
-                continue
-            if re.search(r'\d+', token) and any(unit in token for unit in ['ก.', 'กรัม', 'มล.', 'ลิตร', 'kg', 'g', 'ml', 'l']):
-                continue
-            if re.match(r'^\d+[กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮa-zA-Z\.]+$', token):
-                # Likely measurement like 60ก., 500ml
-                continue
-                
-            # Skip if it's a stopword
-            if token in self.product_stopwords:
-                continue
-                
-            # Clean "รส" prefix if it exists as a standalone token or part of token
-            # But "รสต้มยำกุ้ง" should stay as one if possible or split
-            if token.startswith('รส') and len(token) > 2:
-                # Keep the flavor part
-                extracted.append(token[2:])
-                continue
 
-            extracted.append(token)
-            
+        # 2. แบ่งตามช่องว่างที่คนพิมพ์ไว้ก่อน — เป็นขอบเขตคำที่เชื่อถือได้ที่สุด
+        #    ถ้าไม่แบ่ง เศษของ "บรีส" จะไปเกาะกับ "เอกเซล" กลายเป็น "บรีสเอก"
+        segments: List[List[str]] = []
+        for chunk in cleaned.split():
+            # ตัดคำจริง ไม่ใช่ split() เพราะภาษาไทยไม่เว้นวรรคภายในคำ
+            # split() เดิมให้ token ก้อนเดียวติดขนาดมาด้วย เช่น "ยาสีฟันดอกบัวคู่150g"
+            # ซึ่งไม่มีวันไป match สินค้าตัวอื่น ทำให้ระบบเรียนจาก UI แล้วไม่ได้อะไรเลย
+            segments.append([])
+            for token in tokenize_thai(chunk):
+                # ตัวเลขและหน่วยวัดเป็นเส้นแบ่งด้วย ไม่งั้น "150g ออริจิ" -> "gออริจิ"
+                # และ "โอโม่2100g" จะเสีย "โอ" ไปจนเหลือแค่ "โม่"
+                if re.search(r'\d', token) or token in self.MEASUREMENT_UNITS:
+                    segments.append([])
+                    continue
+                segments[-1].append(token)
+
+        extracted = []
+        for segment in segments:
+            # รวมเศษแบรนด์ที่พจนานุกรมไม่รู้จักกลับเป็นคำเดียว เช่น บ|รี|ส -> บรีส
+            for token in merge_short_token_runs(segment, self.MIN_KEYWORD_LENGTH):
+                if token in self.product_stopwords:
+                    continue
+
+                # เศษคำสั้นเกินไปจะ match มั่ว (บทเรียนจาก "สี" ที่ไป match ใน "ยาสีฟัน")
+                if len(token) < self.MIN_KEYWORD_LENGTH:
+                    continue
+
+                # "รสต้มยำกุ้ง" -> เก็บเฉพาะส่วนที่บอกรสชาติ
+                if token.startswith('รส') and len(token) > 2:
+                    extracted.append(token[2:])
+                    continue
+
+                extracted.append(token)
+
         return extracted
 
     def learn_from_verified_product(self, product_name: str, category_id: str) -> Dict[str, Any]:

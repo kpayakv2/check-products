@@ -10,7 +10,7 @@ import unicodedata
 import json
 import csv
 import hashlib
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Sequence, Union
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -157,6 +157,75 @@ class ThaiTextProcessor(BasicTextProcessor):
             
         return result.strip()
 
+
+# =============================================================================
+# THAI WORD SEGMENTATION
+# =============================================================================
+# ภาษาไทยไม่เว้นวรรคระหว่างคำ การเทียบ keyword ด้วย substring จึง match กลางคำได้
+# เช่น "สี" ไป match ใน "ยาสีฟัน" แล้วจัดยาสีฟันเข้าหมวดสีทาบ้าน
+# ตัดคำก่อนแล้วเทียบระดับ token จึงเป็นวิธีเดียวที่ถูกต้อง
+
+def tokenize_thai(text: str) -> List[str]:
+    """ตัดคำไทยแล้วคืน token ที่ normalize เป็นตัวพิมพ์เล็ก
+
+    ทิ้ง token ที่เป็นช่องว่างล้วน แต่เก็บตัวเลขและอักษรละตินไว้
+    เพราะชื่อสินค้าไทยมักปนขนาด/แบรนด์ เช่น "ผงซักฟอก 900 กรัม OMO"
+    """
+    if not isinstance(text, str) or not text.strip():
+        return []
+
+    # import ตรงนี้เพื่อไม่ให้ค่าโหลด dictionary ไปกระทบตอน import โมดูล
+    from pythainlp.tokenize import word_tokenize
+
+    tokens = word_tokenize(text.lower(), engine="newmm")
+    return [token.strip() for token in tokens if token.strip()]
+
+
+def merge_short_token_runs(tokens: Sequence[str], min_length: int = 3) -> List[str]:
+    """รวม token สั้นที่ติดกันเป็นคำเดียว
+
+    พจนานุกรมของ pythainlp ไม่รู้จักชื่อแบรนด์ จึงตัดแตกเป็นเศษ เช่น
+    "บรีส" -> ["บ", "รี", "ส"] และ "ออริจิ" -> ["ออ", "ริ", "จิ"]
+    เศษพวกนี้ถ้าเก็บแยกจะกลายเป็น keyword กว้างที่ match มั่วไปหมด
+    แต่ถ้ารวมกลับจะได้ชื่อแบรนด์ซึ่งเป็น keyword ที่มีค่าที่สุดในข้อมูลชุดนี้
+    """
+    merged: List[str] = []
+    buffer: List[str] = []
+
+    for token in tokens:
+        if len(token) < min_length:
+            buffer.append(token)
+            continue
+        # เศษที่ค้างอยู่ต้องเกาะไปกับคำถัดไป ไม่ใช่ปล่อยเป็น token เดี่ยว
+        # ไม่งั้น "โอ|โม่" จะเหลือ "โอ" (สั้นจนถูกกรองทิ้ง) กับ "โม่" แทนที่จะได้ "โอโม่"
+        merged.append("".join(buffer) + token)
+        buffer = []
+
+    if buffer:
+        merged.append("".join(buffer))
+
+    return merged
+
+
+def tokens_contain_phrase(tokens: Sequence[str], phrase: str) -> bool:
+    """เช็คว่า `phrase` ปรากฏใน `tokens` แบบเคารพขอบเขตคำหรือไม่
+
+    keyword ที่เป็นวลีหลายคำ (เช่น "น้ำยาล้างจาน") ต้องเจอ token ต่อเนื่องเรียงตามลำดับ
+    ไม่ใช่แค่มีคำเหล่านั้นกระจายอยู่
+    """
+    if not phrase or not phrase.strip() or not tokens:
+        return False
+
+    phrase_tokens = tokenize_thai(phrase)
+    if not phrase_tokens:
+        return False
+
+    lowered = [t.lower() for t in tokens]
+    span = len(phrase_tokens)
+    return any(
+        lowered[i:i + span] == phrase_tokens
+        for i in range(len(lowered) - span + 1)
+    )
 
 
 # =============================================================================

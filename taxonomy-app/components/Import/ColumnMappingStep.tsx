@@ -141,7 +141,10 @@ export default function ColumnMappingStep({
 
     try {
       const text = await file.text()
-      const parsed = parseCSV(text, { maxRows: 10 })
+      // ต้อง parse ทั้งไฟล์ — object นี้ถูกส่งต่อไปใช้เป็นข้อมูลจริงตลอด pipeline
+      // ไม่ใช่แค่พรีวิว เดิมจำกัด maxRows: 10 ทำให้ไฟล์ 405 รายการเหลือแค่ 10 เงียบๆ
+      // (ตารางพรีวิวด้านล่างตัดเหลือ 5 แถวเองอยู่แล้วด้วย .slice(0, 5))
+      const parsed = parseCSV(text)
       const validation = validateCSV(parsed)
 
       setPreview(parsed)

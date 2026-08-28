@@ -40,7 +40,7 @@ npm install
 ## 📊 AI Capabilities (ขีดความสามารถของ AI)
 
 *   **Hybrid Classification:** ผสมผสาน Keyword (60%) และ Embedding (40%) เพื่อความแม่นยำสูงสุด
-*   **Accuracy:** รักษามาตรฐานความแม่นยำที่ **~72%** สำหรับสินค้าไทย
+*   **Accuracy:** วัดจริงได้ **72.3%** (top-1 หมวดย่อย, test set 595 รายการ, 26 ส.ค. 2026) — ขึ้นจาก 25.5% หลังแก้การตัดคำไทยและสกัดคีย์เวิร์ดจากข้อมูลเก่าที่คนจัดหมวดไว้ ดู `tests/integration/test_classification_accuracy.py`
 *   **Vector Search:** ค้นหาสินค้าที่คล้ายคลึงกันด้วย `pgvector` (Cosine Distance)
 *   **Thai Text Processing:** รองรับการ Normalize ชื่อสินค้าไทย (ลบสระลอย, แปลงเลขไทย, ล้างคำขยะ)
 

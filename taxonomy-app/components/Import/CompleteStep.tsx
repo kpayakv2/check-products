@@ -1,51 +1,74 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CheckCircleIcon, DatabaseIcon, PlusIcon } from 'lucide-react'
+import { AlertTriangleIcon, CheckCircleIcon, DatabaseIcon, PlusIcon } from 'lucide-react'
 
+/**
+ * สรุปผลการนำเข้า
+ *
+ * ตัวเลขทุกตัวต้องมาจาก `saveResult` ซึ่งเป็นผลตอบกลับจริงจาก /api/import/commit
+ * ห้ามนับจาก state ในเบราว์เซอร์ — เดิมหน้านี้ขึ้นว่า "บันทึกเรียบร้อยแล้ว" ทุกครั้ง
+ * ทั้งที่ทั้ง wizard ไม่เคยเขียนฐานข้อมูลเลยสักแถว
+ */
 export default function CompleteStep({
   categorizedData,
+  saveResult,
+  saveError,
   onReset
 }: any) {
-  const approvedCount = categorizedData.filter((s: any) => s._status === 'approve').length
-  const rejectedCount = categorizedData.filter((s: any) => s._status === 'reject').length
-  const autoAssignedCount = categorizedData.length - approvedCount - rejectedCount // Fallback for pending
+  const saved = saveResult?.saved ?? 0
+  const counts = saveResult?.counts ?? {}
+  const succeeded = !saveError && saved > 0
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-10">
       <div className="premium-card p-12 text-center bg-white border border-slate-100 shadow-2xl rounded-[3rem] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] -mr-48 -mt-48" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -ml-48 -mb-48" />
-        
+
         <div className="relative z-10">
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", duration: 0.8, bounce: 0.5 }}
-            className="w-32 h-32 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/40"
+            className={`w-32 h-32 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl ${
+              succeeded ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-amber-500 shadow-amber-500/40'
+            }`}
           >
-            <CheckCircleIcon className="w-16 h-16" />
+            {succeeded ? <CheckCircleIcon className="w-16 h-16" /> : <AlertTriangleIcon className="w-16 h-16" />}
           </motion.div>
 
           <h2 className="text-4xl font-black mb-4 font-noto-sans-thai text-slate-900">
-            นำเข้าข้อมูลสำเร็จ!
+            {succeeded ? 'บันทึกเข้าฐานข้อมูลแล้ว' : 'ยังไม่ได้บันทึก'}
           </h2>
-          <p className="text-lg text-slate-500 mb-12 thai-text max-w-lg mx-auto">
-            ระบบได้บันทึกข้อมูลสินค้าพร้อมหมวดหมู่ใหม่เข้าสู่ฐานข้อมูลเรียบร้อยแล้ว
+          <p className="text-lg text-slate-500 mb-12 thai-text max-w-xl mx-auto">
+            {succeeded
+              ? 'สินค้ารอตรวจอยู่ที่หน้า Data Quality → Verify ทำต่อจากที่ค้างไว้ได้'
+              : saveError || 'ไม่มีข้อมูลถูกบันทึก — กรุณาตรวจสอบแล้วลองใหม่'}
           </p>
 
-          <div className="grid grid-cols-3 gap-6 mb-12">
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-              <p className="text-5xl font-black text-indigo-600 mb-2">{categorizedData.length}</p>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-wider thai-text">ทั้งหมดที่ประมวลผล</p>
+          {succeeded && saveResult?.missing_embedding > 0 && (
+            <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-sm font-bold text-amber-800 thai-text">
+              ⚠️ มี {saveResult.missing_embedding} รายการที่ไม่มี embedding — จะไม่ถูกนำไปเทียบในการตรวจของซ้ำครั้งหน้า
             </div>
-            <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
-              <p className="text-5xl font-black text-emerald-600 mb-2">{approvedCount}</p>
-              <p className="text-sm font-bold text-emerald-600 uppercase tracking-wider thai-text">อนุมัติแล้ว</p>
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+              <p className="text-4xl font-black text-slate-700 mb-2">{categorizedData.length}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider thai-text">ประมวลผล</p>
+            </div>
+            <div className="bg-indigo-50 p-6 rounded-3xl border border-indigo-100">
+              <p className="text-4xl font-black text-indigo-600 mb-2">{counts.pending_review_category ?? 0}</p>
+              <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider thai-text">ของใหม่ รอจัดหมวด</p>
+            </div>
+            <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
+              <p className="text-4xl font-black text-amber-600 mb-2">{counts.pending_review_dedup ?? 0}</p>
+              <p className="text-xs font-bold text-amber-600 uppercase tracking-wider thai-text">ก้ำกึ่ง รอตรวจ</p>
             </div>
             <div className="bg-rose-50 p-6 rounded-3xl border border-rose-100">
-              <p className="text-5xl font-black text-rose-600 mb-2">{rejectedCount}</p>
-              <p className="text-sm font-bold text-rose-600 uppercase tracking-wider thai-text">ปฏิเสธ / ยกเลิก</p>
+              <p className="text-4xl font-black text-rose-600 mb-2">{counts.rejected ?? 0}</p>
+              <p className="text-xs font-bold text-rose-600 uppercase tracking-wider thai-text">มีในสตอกแล้ว</p>
             </div>
           </div>
 

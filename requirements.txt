@@ -5,6 +5,10 @@ numpy>=1.21.0
 scikit-learn>=1.0.0
 transformers>=4.20.0
 
+# 🇹🇭 Thai NLP — ตัดคำก่อนเทียบ keyword (ภาษาไทยไม่เว้นวรรค)
+# จำเป็นต่อการจัดหมวด ไม่ใช่ optional: ถ้าไม่ตัดคำ "สี" จะ match กลางคำ "ยาสีฟัน"
+pythainlp>=5.0.0
+
 # 📊 Data Processing
 pandas>=1.3.0
 

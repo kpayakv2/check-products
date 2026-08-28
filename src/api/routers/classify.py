@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 from src.api.dependencies import get_taxonomy_service, initialize_embedding_model
+from src.core.fresh_implementations import tokenize_thai, tokens_contain_phrase
 from src.core.scoring_logic import calculate_hybrid_score
 
 logger = logging.getLogger(__name__)
@@ -65,7 +66,9 @@ def _classify_keyword_based(product_name: str, keyword_rules: list, category_nam
     Keyword-based classification.
     วนหา keyword_rules ที่ match ชื่อสินค้า แล้ว score ตาม priority + จำนวน match
     """
-    product_lower = product_name.lower()
+    # ตัดคำก่อนเทียบ — เทียบแบบ substring จะ match กลางคำ เช่น "สี" ใน "ยาสีฟัน"
+    # ทำให้ยาสีฟันถูกจัดเข้าหมวดสีทาบ้าน (วัดแล้วเป็นสาเหตุ ~47% ของการจัดผิด)
+    product_tokens = tokenize_thai(product_name)
     scores: Dict[str, float] = {}
     matched_kw: Dict[str, str] = {}
 
@@ -84,7 +87,7 @@ def _classify_keyword_based(product_name: str, keyword_rules: list, category_nam
         match_count = 0
         first_match = None
         for kw in keywords:
-            if kw and kw.lower() in product_lower:
+            if kw and tokens_contain_phrase(product_tokens, kw):
                 match_count += 1
                 if first_match is None:
                     first_match = kw
