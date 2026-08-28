@@ -6,7 +6,7 @@ Adapted for Claude Code from this repo's original Gemini CLI agent setup (`GEMIN
 AI-powered Thai product taxonomy management + similarity/dedup matching.
 - **Backend:** Python + FastAPI (embedding provider, 384-dim)
 - **Frontend:** Next.js + Supabase (Edge Functions + pgvector), Tailwind CSS
-- **Algorithm:** Hybrid classification — Keyword 60% + Embedding 40% → target accuracy ≥ 72%
+- **Algorithm:** Hybrid classification — Keyword 60% + Embedding 40%. Measured top-1 sub-category accuracy: **72.3%** on a 595-item held-out test set (2026-08-26), up from 25.5% at the start of that day. Most of the lift comes from `keyword_rules` rows with `match_type='mined_legacy'`, mined from the legacy labelled data by `scripts/mine_keywords_from_legacy.py` — if accuracy collapses, check those rows still exist
 
 ## Project Constitution (กฎเหล็ก)
 1. **`src/` structure only** — core code lives under `src/`
@@ -14,15 +14,28 @@ AI-powered Thai product taxonomy management + similarity/dedup matching.
 3. **384-dim embeddings only** — `paraphrase-multilingual-MiniLM-L12-v2`, column type `vector(384)`
 4. **No Tailwind outside `taxonomy-app/`**
 5. **Test before changing code or DB** — run pytest/jest first, never skip
-6. **Similarity benchmark ≥ 72% F1** — algorithm changes must not regress this
+6. **Never regress the measured accuracy baseline** — run `tests/integration/test_classification_accuracy.py` before and after any algorithm change. The old "≥72% F1" rule cited `tests/benchmark_similarity.py`, which printed a hardcoded "72%" without classifying anything; it was deleted 2026-08-26 and replaced by that real test. Raise the baselines in the test when an improvement is proven
 7. **`127.0.0.1`, never `localhost`, in Python/FastAPI on Win32** — see Windows rules below
 
-## Known Unresolved Issues (verify before trusting — status as of 2026-08-19)
-See `docs/reports/REPO_AUDIT_2026-08-19.md` for full detail. As of the last check, none of these were fixed:
-1. Edge Function `exec-sql` (`taxonomy-app/supabase/config.toml`) has `verify_jwt = false` + raw `EXECUTE query_text` + service_role — unauthenticated arbitrary SQL if deployed
-2. `taxonomy-app/app/api/` has no `middleware.ts` — no central auth layer on API routes
-3. `taxonomy-app/jest.config.js` — key is misspelled `moduleNameMapping` (should be `moduleNameMapper`); path aliases (`@/...`) aren't actually mapped in tests
-4. `requirements.txt` lists `sqlite3`, which isn't on PyPI — breaks `pip install` in CI
+## Known Unresolved Issues (re-verified 2026-08-26)
+Original audit: `docs/reports/REPO_AUDIT_2026-08-19.md`. Current status:
+1. ~~Edge Function `exec-sql` unauthenticated~~ — **fixed**: function removed, `verify_jwt` lines commented out, migration `20260822000003_drop_exec_sql_function.sql`
+2. ~~No `middleware.ts`~~ — **fixed**: `taxonomy-app/middleware.ts` gates every non-GET `/api/*` behind a session cookie
+3. `taxonomy-app/jest.config.js` — **still broken**: key misspelled `moduleNameMapping` (line 12) so `@/...` aliases aren't mapped in tests
+4. ~~`requirements.txt` lists `sqlite3`~~ — **fixed**
+
+## Legacy Data Workflow (added 2026-08-26)
+The 3,103 human-categorised products in `input/รายการสินค้าพร้อมหมวดหมู่_AI.txt` are the system's ground truth. Load them via `src/utils/legacy_dataset.py` — it handles the double encoding (UTF-16 wrapping cp874) and the stratified train/test split. Never mine keywords from the test split.
+
+Pipeline, in order:
+1. `scripts/mine_keywords_from_legacy.py` — builds `keyword_rules` (`match_type='mined_legacy'`). `--source all` for production, `--source train` to make accuracy measurable. The accuracy test auto-skips when rules were mined from all data, so re-mine with `--source train` before trusting a number.
+2. `scripts/import_legacy_products.py` — loads the 3,103 products with their human categories.
+3. `scripts/recheck_legacy_categories.py` — AI re-classifies them, writing `product_category_suggestions` (`suggestion_method='recheck_legacy'`) with `product_id` set. ~20% disagree with the human label.
+4. Review the disagreements at **/data-quality → ตรวจซ้ำของเก่า (Recheck)**. Confirming updates `products.category_id` in place, writes `review_history`, and calls `/api/v1/learn/verify` so the system keeps learning.
+
+**Two gotchas that cost real debugging time:**
+- FastAPI caches `keyword_rules` at startup. Adding rules to the DB changes nothing until the server reloads (it runs with `reload=True`, so touching a file under `src/` is enough).
+- `INTERNAL_API_SECRET` must be set in `taxonomy-app/.env.local` or **every mutating API route returns 401** and the UI silently cannot save. It is not in any committed example file. After setting it, restart `npm run dev` — the Edge middleware reads env at server start, so an API route can see the value while the middleware still does not.
 
 ## MCP Tools Available in This Project
 Configured in `.mcp.json` (ported from the old `.gemini/settings.json`, minus servers redundant with Claude Code's native tools):
