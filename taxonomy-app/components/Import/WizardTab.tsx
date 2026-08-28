@@ -234,10 +234,14 @@ export default function WizardTab() {
             </div>
           )
   
-        case 3:
-          return dedupedData.length > 0 ? (
+        case 3: {
+          // เฉพาะของใหม่ (_bucket === 'new') เท่านั้นที่ต้องจัดหมวด — รายการซ้ำแน่นอน
+          // ('duplicate') ถูก reject ไปแล้ว และรายการก้ำกึ่ง ('review') ยังไม่รู้ว่าจะกลาย
+          // เป็นสินค้าจริงหรือถูกรวมเป็นตัวซ้ำ จึงจัดหมวดตอนนี้ไปก็อาจเสียเปล่า
+          const newItems = dedupedData.filter((item: any) => item._bucket === 'new')
+          return newItems.length > 0 ? (
             <CategorizationStep
-              dedupedData={dedupedData}
+              dedupedData={newItems}
               onComplete={(categorized: any) => {
                 setCategorizedData(categorized)
                 commitCategories(categorized)
@@ -251,7 +255,8 @@ export default function WizardTab() {
               <button onClick={handleBack} className="px-6 py-2 bg-slate-200 text-slate-800 rounded-full">ย้อนกลับ</button>
             </div>
           )
-  
+        }
+
         case 4:
           return (
             <CompleteStep
