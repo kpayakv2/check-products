@@ -28,7 +28,7 @@ from pathlib import Path
 from src.services.human_feedback_system import (
     ProductComparison, FeedbackType
 )
-from src.core.fresh_implementations import ThaiTextProcessor
+from src.core.fresh_implementations import ThaiTextProcessor, tokenize_thai
 from supabase import Client
 
 # Setup logging
@@ -102,9 +102,13 @@ class FeatureExtractor:
         return intersection / union if union > 0 else 0.0
     
     def _calculate_word_overlap(self, text1: str, text2: str) -> float:
-        """คำนวณ word overlap"""
-        words1 = set(text1.lower().split())
-        words2 = set(text2.lower().split())
+        """คำนวณ word overlap
+
+        ต้องตัดคำจริง ไม่ใช่ .split() — ชื่อสินค้าไทยไม่เว้นวรรคระหว่างคำ
+        ของเดิมจึงได้ token ก้อนเดียวทำให้ค่านี้เป็น 0 หรือ 1 แทบตลอด ใช้แยกแยะไม่ได้
+        """
+        words1 = set(tokenize_thai(text1))
+        words2 = set(tokenize_thai(text2))
         intersection = len(words1.intersection(words2))
         union = len(words1.union(words2))
         return intersection / union if union > 0 else 0.0
@@ -139,27 +143,31 @@ class FeatureExtractor:
         return intersection / union
     
     def _brand_similarity(self, text1: str, text2: str) -> float:
-        """เปรียบเทียบแบรนด์ที่พบในข้อความ"""
-        common_brands = [
-            'iphone', 'samsung', 'galaxy', 'macbook', 'ipad', 'airpods',
-            'xiaomi', 'huawei', 'oppo', 'vivo', 'lenovo', 'asus', 'acer',
-            'hp', 'dell', 'microsoft', 'surface', 'sony', 'lg', 'nokia'
-        ]
-        
-        text1_lower = text1.lower()
-        text2_lower = text2.lower()
-        
-        brands1 = set([brand for brand in common_brands if brand in text1_lower])
-        brands2 = set([brand for brand in common_brands if brand in text2_lower])
-        
-        if not brands1 and not brands2:
-            return 0.5  # No brands detected
-        elif brands1 == brands2:
-            return 1.0  # Same brands
-        elif brands1.intersection(brands2):
-            return 0.7  # Some overlap
-        else:
-            return 0.0  # Different brands
+        """เปรียบเทียบคำนำหน้าชื่อสินค้า ซึ่งมักเป็นชนิดสินค้าหรือแบรนด์
+
+        เดิมใช้ลิสต์แบรนด์อิเล็กทรอนิกส์อังกฤษตายตัว (iphone, samsung, ...)
+        ซึ่งไม่มีทางพบในแคตตาล็อกสินค้าอุปโภคบริโภคไทย ทำให้คืน 0.5 ทุกคู่
+        กลายเป็นค่าคงที่ที่โมเดลใช้แยกแยะอะไรไม่ได้เลย
+
+        ชื่อสินค้าไทยขึ้นต้นด้วยชนิดหรือแบรนด์เสมอ เช่น "โอโม่ 2100g" / "ยาสีฟันคอลเกต"
+        จึงเทียบ token ตัวแรกๆ แทน ซึ่งได้สัญญาณจริงจากข้อมูลชุดนี้
+        """
+        LEADING_TOKENS = 2
+
+        tokens1 = tokenize_thai(text1)[:LEADING_TOKENS]
+        tokens2 = tokenize_thai(text2)[:LEADING_TOKENS]
+
+        if not tokens1 or not tokens2:
+            return 0.0
+
+        if tokens1 == tokens2:
+            return 1.0
+
+        overlap = len(set(tokens1) & set(tokens2))
+        if overlap:
+            return 0.5 + 0.25 * overlap / max(len(tokens1), len(tokens2))
+
+        return 0.0
 
 
 class FeedbackLearningModel:
@@ -367,9 +375,16 @@ class FeedbackLearningModel:
 
 class ContinuousLearningSystem:
     """ระบบเรียนรู้แบบต่อเนื่อง"""
-    
-    def __init__(self, supabase_client: Client, model_path: str = "feedback_model.joblib"):
+
+    # เก็บโมเดลอิงรากรีโปเสมอ ไม่อิง CWD
+    # เดิมเป็น path สัมพัทธ์ ทำให้เทรนจากที่หนึ่งแล้วเซิร์ฟเวอร์ที่รันจากอีกที่หนึ่งหาไฟล์ไม่เจอ
+    # แล้วรายงานว่า is_trained=false เงียบๆ โดยไม่มี error
+    DEFAULT_MODEL_PATH = Path(__file__).resolve().parents[2] / "model_cache" / "feedback_model.joblib"
+
+    def __init__(self, supabase_client: Client, model_path: str = None):
         self.supabase = supabase_client
+        model_path = str(model_path or self.DEFAULT_MODEL_PATH)
+        Path(model_path).parent.mkdir(parents=True, exist_ok=True)
         self.model_path = model_path
         self.model = FeedbackLearningModel()
         self.text_processor = ThaiTextProcessor(remove_all_spaces=True)
@@ -382,14 +397,27 @@ class ContinuousLearningSystem:
             except Exception as e:
                 logger.warning(f"ไม่สามารถโหลดโมเดลเดิม: {e}")
                 
+    # Supabase คืนสูงสุด 1000 แถวต่อ query ต้องดึงทีละหน้า
+    # ไม่งั้นข้อมูลเทรนส่วนเกินหายเงียบๆ โดยไม่มี error (เคยเสีย 344 จาก 1,344 ตัวอย่าง)
+    FETCH_PAGE_SIZE = 1000
+
     def _fetch_training_data(self) -> List[ProductComparison]:
         """ดึงข้อมูล feedback จาก Supabase similarity_matches ที่รีวิวแล้ว"""
-        response = self.supabase.table('similarity_matches') \
-            .select('*, product_a:products!similarity_matches_product_a_id_fkey(name_th), product_b:products!similarity_matches_product_b_id_fkey(name_th)') \
-            .eq('reviewed', True).execute()
-        
+        rows = []
+        page = 0
+        while True:
+            response = self.supabase.table('similarity_matches') \
+                .select('*, product_a:products!similarity_matches_product_a_id_fkey(name_th), product_b:products!similarity_matches_product_b_id_fkey(name_th)') \
+                .eq('reviewed', True) \
+                .range(page * self.FETCH_PAGE_SIZE, (page + 1) * self.FETCH_PAGE_SIZE - 1) \
+                .execute()
+            rows.extend(response.data)
+            if len(response.data) < self.FETCH_PAGE_SIZE:
+                break
+            page += 1
+
         comparisons = []
-        for row in response.data:
+        for row in rows:
             name1 = row.get('product_a', {}).get('name_th', '') if isinstance(row.get('product_a'), dict) else ''
             name2 = row.get('product_b', {}).get('name_th', '') if isinstance(row.get('product_b'), dict) else ''
             
