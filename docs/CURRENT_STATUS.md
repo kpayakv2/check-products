@@ -70,9 +70,14 @@
 - [x] **`src/api/models.py`, `src/api/routers/internal_match.py`** — เพิ่ม `oldPrice` ใน `ProductMatchResult` และ select ราคาสินค้าฝั่งสต๊อกมาด้วย พบและแก้เพิ่ม: จุด fallback ตอน ML ยังไม่ trained ขาด `oldProductId` (บั๊กเดิมที่ไม่มีใครเจอเพราะปกติ ML trained อยู่แล้ว)
 - ตั้งใจไม่ทำ: backfill ราคา 3,103 รายการเก่า, แก้ให้ `sku` เหมือนกัน, ใช้ราคาเป็น ML feature จริงจัง, ค้นหาคู่ซ้ำในโซน <80% ด้วยราคา — ทั้งหมดเก็บไว้เป็นงานแยกอนาคตตามที่ตกลงกับผู้ใช้
 
-**⚠️ เจอบั๊กเดิมระหว่างทดสอบ (ยังไม่แก้ อยู่นอกขอบเขตงานนี้):** `internal_match.py` endpoint `/api/v1/match/import-dedup` ดึงสินค้าฝั่งสต๊อกด้วย `.select(...).eq("status","approved")` **ไม่มี `ORDER BY`** และ Supabase/PostgREST จำกัดไว้ที่ 1,000 แถวต่อ request ทั้งที่สต๊อกมี 3,103 แถว — แปลว่าทุกครั้งที่ตรวจของซ้ำ ระบบเทียบกับสต๊อกแค่ ~32% แบบสุ่มไม่คงที่ (เรียกซ้ำได้ชุดต่างกัน) พิสูจน์แล้วด้วยการยิง endpoint ตรงๆ ว่าสินค้าที่ควรจะแมตช์ตัวเองได้ 100% กลับไม่เจอเลย เพราะไม่ได้อยู่ใน 1,000 แถวที่สุ่มมา **ควรแก้เป็นงานถัดไป** (เพิ่ม `.order("id")` + pagination หรือทำ query แบบ batch)
+**การตรวจสอบ:** ยืนยัน Part A (เก็บราคา) จริงผ่าน browser+backend จริง (อัปโหลด CSV ราคา 300/55 → เห็น `products.price = 300.00/55.00` ใน DB ก่อนลบทิ้ง) เนื่องจากบั๊ก 1,000-row (ดูหัวข้อถัดไป) ทำให้ทดสอบ Part B (bucket demotion) ผ่าน live endpoint ไม่เสถียรตอนแรก จึงพิสูจน์ policy ด้วย unit test 16 เคสใน `__tests__/utils/price.test.ts` แทน (ครอบคลุมทุก edge case ของนโยบายที่ตกลงกัน) — `pytest` 160 passed, `jest` ไม่มี suite ใหม่พัง (8 failed เดิมที่รู้อยู่แล้ว)
 
-**การตรวจสอบ:** ยืนยัน Part A (เก็บราคา) จริงผ่าน browser+backend จริง (อัปโหลด CSV ราคา 300/55 → เห็น `products.price = 300.00/55.00` ใน DB ก่อนลบทิ้ง) เนื่องจากบั๊ก 1,000-row ทำให้ทดสอบ Part B (bucket demotion) ผ่าน live endpoint ไม่เสถียร จึงพิสูจน์ด้วย unit test 16 เคสใน `__tests__/utils/price.test.ts` แทน (ครอบคลุมทุก edge case ของนโยบายที่ตกลงกัน) — `pytest` 160 passed, `jest` ไม่มี suite ใหม่พัง (8 failed เดิมที่รู้อยู่แล้ว)
+### 🐛 แก้บั๊ก: ตรวจของซ้ำเทียบกับสต๊อกแค่ ~32% แบบสุ่ม (28 ส.ค. ต่อเนื่อง)
+เจอระหว่างทดสอบ Part B ข้างบน — endpoint `/api/v1/match/import-dedup` ดึงสินค้าฝั่งสต๊อกด้วย `.select(...).eq("status","approved")` **ไม่มี `ORDER BY`** และ Supabase/PostgREST จำกัดไว้ที่ 1,000 แถวต่อ request เสมอ ทั้งที่สต๊อกมี 3,103 แถว — พิสูจน์แล้วว่าสินค้าที่ควรแมตช์ตัวเองได้ 100% (`cosine similarity` 0.985) กลับไม่เจอเลยเพราะไม่ได้อยู่ใน 1,000 แถวที่สุ่มมาในการเรียกครั้งนั้น
+- [x] เพิ่ม `fetch_all_approved_products()` ใน `internal_match.py` — แบ่งหน้าด้วย `.range()` พร้อม `.order("id")` (จำเป็น! ไม่งั้น Postgres ไม่การันตีลำดับแถวเดิมข้าม request ทำให้แบ่งหน้าแล้วข้ามหรือได้แถวซ้ำได้)
+- [x] ใช้ helper นี้แทนของเดิมทั้ง 2 จุด: `deduplicate_imports` (endpoint หลักที่มีบั๊ก ไม่เคยแบ่งหน้าเลย) และ `scan_internal_duplicates` (เดิมแบ่งหน้าอยู่แล้วแต่ไม่มี `.order()` เหมือนกัน เลยรวมให้ใช้โค้ดเดียวกัน)
+- **ยืนยันจริง:** เรียก `fetch_all_approved_products()` ตรงๆ ได้ 3,103 แถว unique ครบ (เดิม endpoint ดึงได้แค่ 1,000) และยิง `/api/v1/match/import-dedup` ซ้ำด้วยชื่อเดิมที่เคยหาไม่เจอ → เจอแมตช์ถูกต้องทันที (0.985, 0.901) `pytest` 160 passed ไม่มี regression
+- ยังไม่แก้ (พบแต่ไม่ใช่บั๊กแบบเดียวกัน เสี่ยงต่ำกว่า เก็บไว้ก่อน): `ml_feedback_learning._fetch_training_data()` และ `scripts/build_similarity_training_data.py` มีการแบ่งหน้าอยู่แล้วแต่ก็ไม่มี `.order()` เหมือนกัน — ควรเพิ่มให้ครบเป็นงานเล็กๆ ถัดไป
 
 ---
 

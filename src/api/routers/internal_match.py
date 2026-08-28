@@ -42,6 +42,39 @@ def is_match_label(pred_label) -> bool:
     """
     return str(pred_label) in MATCH_LABELS
 
+
+PRODUCTS_FETCH_PAGE_SIZE = 1000
+
+
+def fetch_all_approved_products(supabase, columns: str, page_size: int = PRODUCTS_FETCH_PAGE_SIZE) -> list:
+    """ดึงสินค้าที่ status='approved' ทั้งหมด แบ่งหน้าด้วย .range()
+
+    บั๊กเดิม: เรียก .select(...).eq("status","approved").execute() เฉยๆ โดยไม่มี .order()
+    และไม่แบ่งหน้า — PostgREST จำกัดผลลัพธ์ไว้ที่ 1,000 แถวต่อ request เสมอ (ตั้งค่าที่
+    db-max-rows) ทั้งที่สต๊อกมี 3,000+ แถว การตรวจของซ้ำจึงเทียบกับสต๊อกได้แค่ ~1 ใน 3
+    แบบสุ่มไม่คงที่ในแต่ละครั้ง (ไม่มี ORDER BY แปลว่า Postgres ไม่การันตีว่าแถวไหนจะมาก่อน)
+
+    ต้องมี .order("id") คู่กับ .range() เสมอ — ถ้าไม่มี การแบ่งหน้าไม่การันตีว่าจะได้ครบ
+    ไม่ซ้ำ เพราะ Postgres อาจคืนลำดับแถวต่างกันในแต่ละ request แม้ข้อมูลไม่เปลี่ยน
+    """
+    all_products: list = []
+    offset = 0
+    while True:
+        res = supabase.table("products")\
+                      .select(columns)\
+                      .eq("status", "approved")\
+                      .order("id")\
+                      .range(offset, offset + page_size - 1)\
+                      .execute()
+        data = res.data or []
+        if not data:
+            break
+        all_products.extend(data)
+        offset += len(data)
+        if len(data) < page_size:
+            break
+    return all_products
+
 class ScanStartResponse(BaseModel):
     task_id: str
     status: str
@@ -141,30 +174,11 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
                 pair = tuple(sorted([m["product_a_id"], m["product_b_id"]]))
                 reviewed_pairs.add(pair)
         
-        # 2. Fetch all Approved Products in pages
+        # 2. Fetch all Approved Products in pages (แบ่งหน้า — ดู fetch_all_approved_products)
         SCAN_TASKS[task_id]["message"] = "กำลังดาวน์โหลดรายการสินค้าที่ได้รับการอนุมัติ..."
         SCAN_TASKS[task_id]["progress"] = 25
-        all_products = []
-        page_size = 1000
-        offset = 0
-        
-        while True:
-            res = supabase.table("products")\
-                          .select("id, name_th, sku, category_id")\
-                          .eq("status", "approved")\
-                          .range(offset, offset + page_size - 1)\
-                          .execute()
-            
-            data = res.data
-            if not data:
-                break
-                
-            all_products.extend(data)
-            offset += len(data)
-            
-            if len(data) < page_size:
-                break
-                
+        all_products = fetch_all_approved_products(supabase, "id, name_th, sku, category_id")
+
         # 3. Clean product names using ThaiTextProcessor
         SCAN_TASKS[task_id]["message"] = "กำลังทำความสะอาดชื่อสินค้าภาษาไทย..."
         SCAN_TASKS[task_id]["progress"] = 40
@@ -658,14 +672,9 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
         if not input_products:
             return []
             
-        # 2. Fetch approved products from database
+        # 2. Fetch approved products from database (แบ่งหน้า — ดู fetch_all_approved_products)
         logger.info("Fetching approved products for import deduplication...")
-        res = supabase.table("products")\
-                      .select("id, name_th, embedding, price")\
-                      .eq("status", "approved")\
-                      .execute()
-        
-        db_products = res.data or []
+        db_products = fetch_all_approved_products(supabase, "id, name_th, embedding, price")
         if not db_products:
             return []
             
