@@ -61,6 +61,19 @@
 - [x] **`docs/architecture/DATABASE_SCHEMA.md`, `REAL_DATABASE_RELATIONSHIPS.md`** — เขียนใหม่ให้ตรงกับ `schema_export.sql` จริง (เดิมค้างที่ 2025-10-04 นับตาราง 14 ทั้งที่จริงมี 15)
 - Push แล้วที่ `8e8ab5c0` (4 คอมมิตแยกตามหัวข้อ: wizard fix, jest cleanup, docs rewrite, tsbuildinfo)
 
+### 💰 ราคาขาย: เก็บถึง DB จริง + ใช้ช่วยตรวจของซ้ำ (28 ส.ค. ต่อเนื่อง)
+ก่อนหน้านี้ผู้ใช้เลือกคอลัมน์ "ราคาขาย" ตอน map ได้ตั้งแต่ขั้นที่ 1 ของ wizard แต่ค่าหายไปกลางทาง — ยืนยันด้วย query ว่าราคาสินค้าทั้ง 3,508 แถวเป็น NULL 100%
+- [x] **`components/Import/DataCleaningStep.tsx`** — เดิมสร้างแค่ `_cleaned_name` ไม่เคยดึงราคาจาก raw row เลย เพิ่ม `price: parsePrice(row[columnMapping.price])` เข้าไปในทุกแถวที่ merge (ทั้ง flow ปกติและ fallback)
+- [x] **`components/Import/WizardTab.tsx`** — `commitDedup()` เดิมไม่ใส่ `price` ในสิ่งที่ส่งไป `/api/import/commit` ทั้งที่ backend (`app/api/import/commit/route.ts`) รองรับ field นี้สมบูรณ์อยู่แล้วตั้งแต่แรก (schema + insert มีให้ครบ ไม่เคยต้องแก้ backend เลย)
+- [x] **`utils/price.ts`** (ใหม่) — `parsePrice()` (แปลงสตริงราคาที่มีคอมม่า/สัญลักษณ์บาทให้เป็นตัวเลข), `isPriceMismatch()` (ราคาต่างกันเกิน 2 เท่า = mismatch, ข้ามการเช็คถ้าราคาใดราคาหนึ่งไม่มี), `classifyDedupBucket()` (ตัดสิน bucket duplicate/review/new)
+- [x] **`components/Import/DeduplicationStep.tsx`** — เพิ่ม `oldPrice`/`_new_price`/`_old_price`/`_price_mismatch` และเปลี่ยนมาเรียก `classifyDedupBucket()` แทน if/else เดิม นโยบาย: ราคาไม่เคยบล็อกการจับคู่แบบเด็ดขาด ใช้แค่ลดชั้นความมั่นใจเฉพาะโซน auto-merge (≥95%) — ถ้าราคาต่างกันเกิน 2 เท่า ดึงลงมาเป็น "ต้องตรวจสอบ" แทน ส่วนโซน 80-94% โชว์ราคาคู่กันเป็นข้อมูลช่วยตรวจ (ไม่เปลี่ยน bucket เพราะคนตรวจอยู่แล้ว) โซน <80% ไม่แตะเลย
+- [x] **`src/api/models.py`, `src/api/routers/internal_match.py`** — เพิ่ม `oldPrice` ใน `ProductMatchResult` และ select ราคาสินค้าฝั่งสต๊อกมาด้วย พบและแก้เพิ่ม: จุด fallback ตอน ML ยังไม่ trained ขาด `oldProductId` (บั๊กเดิมที่ไม่มีใครเจอเพราะปกติ ML trained อยู่แล้ว)
+- ตั้งใจไม่ทำ: backfill ราคา 3,103 รายการเก่า, แก้ให้ `sku` เหมือนกัน, ใช้ราคาเป็น ML feature จริงจัง, ค้นหาคู่ซ้ำในโซน <80% ด้วยราคา — ทั้งหมดเก็บไว้เป็นงานแยกอนาคตตามที่ตกลงกับผู้ใช้
+
+**⚠️ เจอบั๊กเดิมระหว่างทดสอบ (ยังไม่แก้ อยู่นอกขอบเขตงานนี้):** `internal_match.py` endpoint `/api/v1/match/import-dedup` ดึงสินค้าฝั่งสต๊อกด้วย `.select(...).eq("status","approved")` **ไม่มี `ORDER BY`** และ Supabase/PostgREST จำกัดไว้ที่ 1,000 แถวต่อ request ทั้งที่สต๊อกมี 3,103 แถว — แปลว่าทุกครั้งที่ตรวจของซ้ำ ระบบเทียบกับสต๊อกแค่ ~32% แบบสุ่มไม่คงที่ (เรียกซ้ำได้ชุดต่างกัน) พิสูจน์แล้วด้วยการยิง endpoint ตรงๆ ว่าสินค้าที่ควรจะแมตช์ตัวเองได้ 100% กลับไม่เจอเลย เพราะไม่ได้อยู่ใน 1,000 แถวที่สุ่มมา **ควรแก้เป็นงานถัดไป** (เพิ่ม `.order("id")` + pagination หรือทำ query แบบ batch)
+
+**การตรวจสอบ:** ยืนยัน Part A (เก็บราคา) จริงผ่าน browser+backend จริง (อัปโหลด CSV ราคา 300/55 → เห็น `products.price = 300.00/55.00` ใน DB ก่อนลบทิ้ง) เนื่องจากบั๊ก 1,000-row ทำให้ทดสอบ Part B (bucket demotion) ผ่าน live endpoint ไม่เสถียร จึงพิสูจน์ด้วย unit test 16 เคสใน `__tests__/utils/price.test.ts` แทน (ครอบคลุมทุก edge case ของนโยบายที่ตกลงกัน) — `pytest` 160 passed, `jest` ไม่มี suite ใหม่พัง (8 failed เดิมที่รู้อยู่แล้ว)
+
 ---
 
 ## ✅ Recently Completed (Session 31 พ.ค. 2569 — Deduplication Clean Refactor & Bug Fixes)
