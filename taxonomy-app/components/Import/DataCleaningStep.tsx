@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { SparklesIcon, CheckCircleIcon, ArrowRightIcon, BrainIcon } from 'lucide-react'
 import { ParsedCSV } from '@/utils/csv-parser'
 import { ColumnMapping } from './ColumnMappingStep'
+import { parsePrice } from '@/utils/price'
 
 interface DataCleaningStepProps {
   parsedData: ParsedCSV
@@ -45,13 +46,15 @@ export default function DataCleaningStep({
       
       const data = await response.json()
       
+      const priceCol = columnMapping.price
       const mergedResults = parsedData.rows.map((row, i) => {
         const cleanedText = data.results[i]?.cleaned || row[productNameCol]
         return {
           ...row,
           _original_name: row[productNameCol],
           _cleaned_name: cleanedText,
-          _is_changed: row[productNameCol] !== cleanedText
+          _is_changed: row[productNameCol] !== cleanedText,
+          price: priceCol ? parsePrice(row[priceCol]) : undefined
         }
       })
 
@@ -63,11 +66,13 @@ export default function DataCleaningStep({
     } catch (error) {
       console.error("Cleaning error:", error)
       // Fallback
+      const priceCol = columnMapping.price
       const mergedResults = parsedData.rows.map(row => ({
         ...row,
         _original_name: row[columnMapping.product_name],
         _cleaned_name: row[columnMapping.product_name],
-        _is_changed: false
+        _is_changed: false,
+        price: priceCol ? parsePrice(row[priceCol]) : undefined
       }))
       setCleanedResults(mergedResults)
       setStats({ total: mergedResults.length, changed: 0 })

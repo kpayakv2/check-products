@@ -174,6 +174,8 @@ class ProductMatchResult(BaseModel):
     # id จริงของสินค้าในคลังที่จับคู่ได้ — จำเป็นเวลาต้องบันทึกคู่ลง similarity_matches
     # ซึ่งมี FK บังคับทั้งสองฝั่ง (ฟิลด์ `id` ด้านบนเป็นเลขลำดับรีวิว ไม่ใช่ id ของสินค้า)
     oldProductId: Optional[str] = None
+    # ราคาสินค้าฝั่งสต๊อกที่จับคู่ได้ — ให้ frontend เทียบกับราคาของใหม่เพื่อช่วยตัดสินใจ
+    oldPrice: Optional[float] = None
     similarity: float
     confidence: float
     mlPrediction: str  # 'similar' or 'different'

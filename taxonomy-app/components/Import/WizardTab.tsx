@@ -105,6 +105,7 @@ export default function WizardTab() {
             bucket: item._bucket ?? 'new',
             similarity: item._similarity_score ?? 0,
             matched_product_id: item._matched_id,
+            price: item.price,
           })),
         }),
       })

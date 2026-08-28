@@ -661,7 +661,7 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
         # 2. Fetch approved products from database
         logger.info("Fetching approved products for import deduplication...")
         res = supabase.table("products")\
-                      .select("id, name_th, embedding")\
+                      .select("id, name_th, embedding, price")\
                       .eq("status", "approved")\
                       .execute()
         
@@ -764,6 +764,7 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                         newProduct=input_products[i],
                         oldProduct=db_products[j]['name_th'],
                         oldProductId=db_products[j].get('id'),
+                        oldPrice=db_products[j].get('price'),
                         similarity=round(sim, 4),
                         confidence=round(confidence, 4),
                         mlPrediction=ml_pred,
@@ -781,6 +782,7 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                         newProduct=input_products[i],
                         oldProduct=db_products[j]['name_th'],
                         oldProductId=db_products[j].get('id'),
+                        oldPrice=db_products[j].get('price'),
                         similarity=round(sim, 4),
                         confidence=round(confidence, 4),
                         mlPrediction=ml_pred,
@@ -797,6 +799,8 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                     id=f"review_{i + 1}",
                     newProduct=input_products[i],
                     oldProduct=db_products[j]['name_th'],
+                    oldProductId=db_products[j].get('id'),
+                    oldPrice=db_products[j].get('price'),
                     similarity=round(sim, 4),
                     confidence=round(confidence, 4),
                     mlPrediction=ml_pred,

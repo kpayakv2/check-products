@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  CopyIcon, CheckCircleIcon, ArrowRightIcon, AlertTriangleIcon, 
-  SearchIcon, CheckSquareIcon, WifiOffIcon, RefreshCwIcon 
+import {
+  CopyIcon, CheckCircleIcon, ArrowRightIcon, AlertTriangleIcon,
+  SearchIcon, CheckSquareIcon, WifiOffIcon, RefreshCwIcon
 } from 'lucide-react'
+import { isPriceMismatch, classifyDedupBucket } from '@/utils/price'
 
 interface DedupItem {
   _cleaned_name: string
@@ -91,6 +92,7 @@ export default function DeduplicationStep({
 
         if (match) {
           const score = match.similarity || 0
+          const priceMismatch = isPriceMismatch(item.price, match.oldPrice)
           const enriched: DedupItem = {
             ...item,
             _similarity_score: score,
@@ -98,14 +100,19 @@ export default function DeduplicationStep({
             // ต้องใช้ oldProductId (id จริงของสินค้าในคลัง) — `match.id` เป็นเลขลำดับรีวิว
             // เช่น "review_1" ใช้เป็น FK ไม่ได้
             _matched_id: match.oldProductId,
-            _source: 'backend'
+            _source: 'backend',
+            // ราคาแนบไว้เสมอเมื่อมี match — ใช้โชว์เป็นข้อมูลช่วยตรวจใน review zone
+            // ไม่ว่าจะ mismatch หรือไม่ (ราคาตรงกันก็ช่วยยืนยันว่าน่าจะเป็นของซ้ำจริง)
+            _new_price: item.price,
+            _old_price: match.oldPrice,
+            _price_mismatch: priceMismatch
           }
-          
-          // Smart classification grouping based on ML model predictions
+
           // _bucket ต้องติดไปกับข้อมูลด้วย ขั้นถัดไปใช้ตัดสินว่าจะบันทึกด้วยสถานะอะไร
-          if (score >= 0.95) {
+          const bucket = classifyDedupBucket(score, match.mlPrediction, item.price, match.oldPrice)
+          if (bucket === 'duplicate') {
             autoMerged.push({ ...enriched, _bucket: 'duplicate' })
-          } else if (match.mlPrediction === 'similar' || score >= 0.80) {
+          } else if (bucket === 'review') {
             reviewZone.push({ ...enriched, _bucket: 'review' })
           } else {
             autoCreated.push({ ...enriched, _bucket: 'new' })
@@ -307,19 +314,33 @@ export default function DeduplicationStep({
                 <CheckSquareIcon className="w-3.5 h-3.5 fill-current" />
               </button>
               
-              <div className="flex-1 grid grid-cols-2 gap-8 items-center">
-                <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าที่อัปโหลด</div>
-                  <div className="font-bold text-slate-800">{item._cleaned_name}</div>
-                </div>
-                
-                <div className="relative pl-8 border-l border-slate-200">
-                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
-                    <div className="text-[10px] font-black text-amber-500">{(item._similarity_score * 100).toFixed(0)}%</div>
+              <div className="flex-1">
+                <div className="grid grid-cols-2 gap-8 items-center">
+                  <div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าที่อัปโหลด</div>
+                    <div className="font-bold text-slate-800">{item._cleaned_name}</div>
+                    {item._new_price != null && (
+                      <div className="text-xs font-bold text-slate-500 mt-1">฿{item._new_price}</div>
+                    )}
                   </div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าในระบบ (อาจจะซ้ำ)</div>
-                  <div className="font-bold text-slate-700">{item._matched_with}</div>
+
+                  <div className="relative pl-8 border-l border-slate-200">
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
+                      <div className="text-[10px] font-black text-amber-500">{(item._similarity_score * 100).toFixed(0)}%</div>
+                    </div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าในระบบ (อาจจะซ้ำ)</div>
+                    <div className="font-bold text-slate-700">{item._matched_with}</div>
+                    {item._old_price != null && (
+                      <div className="text-xs font-bold text-slate-500 mt-1">฿{item._old_price}</div>
+                    )}
+                  </div>
                 </div>
+                {item._price_mismatch && (
+                  <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-lg w-fit">
+                    <AlertTriangleIcon className="w-3.5 h-3.5" />
+                    ราคาต่างกันมาก (฿{item._old_price} → ฿{item._new_price}) อาจเป็นคนละสินค้า
+                  </div>
+                )}
               </div>
             </div>
           ))}
