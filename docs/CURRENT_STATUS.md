@@ -79,6 +79,18 @@
 - **ยืนยันจริง:** เรียก `fetch_all_approved_products()` ตรงๆ ได้ 3,103 แถว unique ครบ (เดิม endpoint ดึงได้แค่ 1,000) และยิง `/api/v1/match/import-dedup` ซ้ำด้วยชื่อเดิมที่เคยหาไม่เจอ → เจอแมตช์ถูกต้องทันที (0.985, 0.901) `pytest` 160 passed ไม่มี regression
 - ยังไม่แก้ (พบแต่ไม่ใช่บั๊กแบบเดียวกัน เสี่ยงต่ำกว่า เก็บไว้ก่อน): `ml_feedback_learning._fetch_training_data()` และ `scripts/build_similarity_training_data.py` มีการแบ่งหน้าอยู่แล้วแต่ก็ไม่มี `.order()` เหมือนกัน — ควรเพิ่มให้ครบเป็นงานเล็กๆ ถัดไป
 
+### 🔐 ER/Schema Audit → 4 Migration แก้ RLS/FK/Index (28 ส.ค. ต่อเนื่อง — เซสชันคู่ขนาน check-products-db)
+สำรวจ schema ทั้ง 15 ตารางแบบ read-only (2 Explore agent ไล่ migration ทั้งหมด + ไล่โค้ดจริงว่าตารางไหนถูกใช้งานจริง/ตายแล้ว) สรุปว่าตารางหลัก (`products`/`taxonomy_nodes`/`similarity_matches`) ออกแบบดีตอบโจทย์ธุรกิจจริง แต่เจอช่องโหว่ RLS ที่ยังไม่มีใครรู้:
+- [x] **พบร้ายแรงสุด:** `system_settings` **ไม่เปิด RLS เลย** + ให้สิทธิ์ `anon` (ไม่ต้อง login) `INSERT/SELECT/UPDATE/DELETE/TRUNCATE` เต็ม — ยืนยันกับ DB จริง ปลอดภัยอยู่ตอนนี้เพราะแอปใช้ service-role key เท่านั้น แต่เป็นระเบิดเวลา
+- [x] พบ 8/15 ตาราง เปิด RLS แต่ **0 policy** (`keyword_rules`, `regex_rules`, `product_category_suggestions`, `product_attributes`, `similarity_matches`, `review_history`, `imports` + `system_settings` ข้างบน) — วันที่มีอะไรเรียก Supabase ด้วย key ที่ไม่ใช่ service-role ตารางพวกนี้จะว่างเปล่าเงียบๆ หรือใช้งานไม่ได้เลย
+- [x] พบ 16 คอลัมน์ attribution (`created_by`/`updated_by`/`reviewed_by`) ไม่มี FK ไป `auth.users`, และ `products.import_batch_id` ไม่มี FK ไป `imports.id` (ตรวจกับ DB จริง: ไม่มีข้อมูลขาดหาย เพิ่มได้ทันทีไม่ต้อง backfill)
+- [x] พบ index ซ้ำซ้อน 2 คู่บน `taxonomy_nodes` (ivfflat embedding ซ้อนกัน 2 ตัว lists=100/20, GIN keywords ซ้ำ) + code index ซ้ำกับ unique constraint
+- [x] พบบั๊ก `ml_training_history` policy insert/delete comment เขียนว่า "service_role only" แต่เงื่อนไขจริงเป็น `USING(true)` — เปิดกว้างจริง ขัดกับ comment
+- [x] สร้าง 4 migration แก้ครบ: `20260828000000_fix_rls_gaps.sql`, `20260828000001_add_missing_foreign_keys.sql`, `20260828000002_cleanup_redundant_indexes.sql`, `20260828000003_fix_ml_training_history_policy_bug.sql`
+- **ยืนยันแล้ว:** apply เข้า local DB สำเร็จ (`npx supabase migration up --local --include-all`), query `pg_policies`/`pg_constraint`/`pg_indexes` ตรงตามที่ตั้งใจทุกจุด (ไม่มีตารางไหนเปิด RLS แล้วไม่มี policy อีกเลย, FK รวม 36 ตัวถูกต้องครบ, index เหลือตัวเดียวต่อชนิดตามแผน), `EXPLAIN` ยืนยัน query vector ยังใช้ index ที่เหลือถูกต้อง, `pytest tests/integration/` ผ่าน 20 passed/6 skipped/1 failed — ตัวที่ fail (`test_internal_scan`) เป็น test timeout 60s ของ scan ที่ใช้เวลาจริง 74s ไม่เกี่ยวกับ schema ที่แก้ (เช็ค task status ตรงๆ พบว่า scan เสร็จสมบูรณ์ถูกต้อง 114 คู่)
+- ไม่ทำ (นอกขอบเขต แจ้งผู้ใช้ไว้แล้ว): จัดระเบียบ `system_settings` ที่ปนสองแบบ (JSONB blob + key/value) รอ audit โค้ดแอปที่อ่านคอลัมน์ blob ก่อน; cleanup 4 route insert สินค้าเก่าที่ตายแล้ว (`process`, `process-local`, `process-storage`, `approve`) เป็นหนี้เทคนิคแยกจาก schema
+- ก่อนลงมือ เช็คกับเซสชันคู่ขนาน `check-products-e3` แล้วว่าไม่ชนไฟล์กัน (เขาไม่แตะ migrations/RLS) — ยังไม่ commit ไฟล์ migration ทั้ง 4 นี้
+
 ---
 
 ## ✅ Recently Completed (Session 31 พ.ค. 2569 — Deduplication Clean Refactor & Bug Fixes)
