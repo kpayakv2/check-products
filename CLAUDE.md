@@ -2,6 +2,9 @@
 
 Adapted for Claude Code from this repo's original Gemini CLI agent setup (`GEMINI.md`, `.gemini/`, `.agents/`). Those files are kept as reference material — this file is the one Claude Code actually loads.
 
+## Where the project currently stands
+Read `docs/CURRENT_STATUS.md` first — it carries the running session log, the measured numbers, and what is in flight. Append a session entry there when you finish a piece of work; it is the handover point between sessions. (Only the legacy `.agents/workflows/` files used to reference it, so it was going unread.)
+
 ## Project Overview
 AI-powered Thai product taxonomy management + similarity/dedup matching.
 - **Backend:** Python + FastAPI (embedding provider, 384-dim)

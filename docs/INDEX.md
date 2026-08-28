@@ -4,6 +4,9 @@
 
 ## 📚 โครงสร้างเอกสาร
 
+### 📌 สถานะปัจจุบัน
+- **[Current Status](CURRENT_STATUS.md)** - บันทึกความคืบหน้ารายเซสชัน ตัวเลขที่วัดได้จริง และงานที่ค้างอยู่ — **อ่านไฟล์นี้ก่อนเริ่มงานใหม่**
+
 ### 🚀 [User Guides](guides/)
 - **[Product Requirements Document](PRD.md)** - เอกสารความต้องการระบบของโปรเจกต์
 - **[Quick Start Guide](guides/quick-start.md)** - เริ่มต้นติดตั้งและใช้งานระบบ Modern Stack (Next.js + Supabase)
