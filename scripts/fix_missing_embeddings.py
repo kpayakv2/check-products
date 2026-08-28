@@ -1,9 +1,13 @@
 import asyncio
 import httpx
-import json
+import sys
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
+
+# Fix Windows console encoding (คอนโซลไทยเป็น cp874 พิมพ์ emoji ไม่ได้)
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # โหลด Environment Variables
 load_dotenv('taxonomy-app/.env.local')
@@ -16,7 +20,7 @@ async def generate_category_embeddings():
     
     # 1. ดึงหมวดหมู่ที่ไม่มี Embedding
     print("🔍 Fetching categories without embeddings...")
-    response = supabase.table("taxonomy_nodes").select("id, name_th").is_("embedding", "null").execute()
+    response = supabase.table("taxonomy_nodes").select("id, name_th, keywords").is_("embedding", "null").execute()
     categories = response.data
     
     if not categories:
@@ -28,11 +32,15 @@ async def generate_category_embeddings():
     async with httpx.AsyncClient() as client:
         for cat in categories:
             name = cat['name_th']
+            # ใช้ชื่อ + keywords ให้ตรงกับสูตรของ embedding เดิมใน DB
+            # (เทียบแล้ว cos ~0.95-0.97 เทียบกับ name_th อย่างเดียวที่ได้แค่ 0.34-0.87)
+            keywords = cat.get('keywords') or []
+            text = ' '.join([name] + keywords)
             print(f"🧠 Generating embedding for: {name}")
-            
+
             # 2. เรียก FastAPI เพื่อขอ Embedding
             try:
-                res = await client.post(fastapi_url, json={"text": name}, timeout=30.0)
+                res = await client.post(fastapi_url, json={"text": text}, timeout=30.0)
                 if res.status_code == 200:
                     embedding = res.json()['embedding']
                     
