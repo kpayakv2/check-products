@@ -1,10 +1,59 @@
 # 📊 Current Project Status (Compact Context)
-*Last Updated: 2026-06-07 (By Phayak)*
+*Last Updated: 2026-08-28*
 
 ## 🎯 Current Focus
-- ระบบ **Deduplication Refactor**: ปรับโครงสร้างระบบตรวจจับสินค้าซ้ำให้คลีน 100% จัดสรรขอบเขตงานของหน้าจอให้ชัดเจน และถอน dead code
-- ระบบ **ML Continuous Learning Pipeline** ทำงานปกติ: AI เรียนรู้จากการรีวิวของผู้ใช้ใน Supabase
-- User Workflow: **Import (Wizard) → Dedup (Catalog Audit) → Review → AI Learns → Better Dedup**
+- **งานจริงของระบบ:** รับไฟล์รายการสินค้าใหม่ → เทียบกับสินค้าในสตอก 3,103 รายการ → **เอาเฉพาะตัวที่ยังไม่เคยมี**
+- สินค้าเก่า 3,103 รายการที่คนจัดหมวดไว้ = ข้อมูลตั้งต้นให้ ML ฝึกทั้งการจัดหมวดและการตรวจซ้ำ
+- ในสตอกเองก็ยังมีของซ้ำอยู่ การเก็บกวาดสตอกจึงป้อนข้อมูลฝึกให้ ML ไปในตัว — สองงานนี้เป็นวงจรเดียวกัน
+- User Workflow: **Import (Wizard) → Dedup → Review (Verify/Recheck) → AI Learns → Better Dedup**
+
+## 📈 ตัวเลขที่วัดได้จริง (2026-08-28)
+| ตัวชี้วัด | ค่า |
+|---|---|
+| accuracy การจัดหมวด (top-1 หมวดย่อย) | **72.3%** วัดจาก test set 595 รายการที่กันไว้ |
+| AI ตรวจซ้ำหมวดเก่าแล้วเห็นตรงกับคน | 79.5% (เหลือให้คนดู 635 รายการ) |
+| ไฟล์สินค้าใหม่ 405 รายการ | มีในสตอกแล้ว 37 / ก้ำกึ่ง 147 / **ของใหม่ 221** |
+
+> ⚠️ ตัวเลข "72%" ที่เคยอ้างในเอกสารเก่า**ไม่เคยถูกวัดจริง** มาจาก `tests/benchmark_similarity.py` ที่ print ค่า hardcode (ลบไฟล์นั้นแล้ว) ตัวเลขข้างบนมาจาก `tests/integration/test_classification_accuracy.py` ที่วัดของจริง
+
+---
+
+## ✅ Recently Completed (Session 25-28 ส.ค. 2569 — Classification Accuracy & Working Import Pipeline)
+
+### 📏 สร้างเครื่องวัดที่เชื่อถือได้ (เดิมไม่มีเลย)
+- [x] **`src/utils/legacy_dataset.py`** — โหลดข้อมูลเก่า (ไฟล์เป็น UTF-16 หุ้ม cp874 อ่านตรงๆ จะได้ตัวขยะเงียบๆ) + แบ่ง train/test แบบ stratified seed คงที่
+- [x] **`tests/integration/test_classification_accuracy.py`** — วัด accuracy จริง และ **skip อัตโนมัติ** ถ้ากฎถูกสกัดจากข้อมูลทั้งหมด (เห็น test set แล้ว) เพื่อไม่รายงานตัวเลขลวง
+- [x] **ลบ `tests/benchmark_similarity.py`** — ต้นตอตัวเลข 72% ปลอม
+
+### 🇹🇭 แก้การจัดหมวดหมู่ (25.5% → 72.3%)
+- [x] **`src/core/fresh_implementations.py`** — เพิ่ม `tokenize_thai` / `tokens_contain_phrase` / `merge_short_token_runs` (pythainlp) แก้ปัญหา keyword สั้น match กลางคำ เช่น "สี" ใน "ยาสีฟัน" ทำให้ยาสีฟันถูกจัดเป็นสีทาบ้าน
+- [x] **`scripts/mine_keywords_from_legacy.py`** — สกัดคีย์เวิร์ดจากข้อมูลที่คนจัดหมวดไว้ เข้า `keyword_rules` **ตัวนี้ให้ผลมากที่สุด (+43 จุด)** เพราะ 58% ของสินค้าอยู่ในหมวดที่ชื่อหมวดไม่ปรากฏในชื่อสินค้าเลย (เช่นหมวดแชมพูมีแต่ชื่อแบรนด์)
+- [x] **`src/services/taxonomy_service.py`** — `extract_auto_keywords` เดิมใช้ `.split()` ได้ token ก้อนเดียวติดขนาดมาด้วย ระบบเรียนจาก UI แล้วไม่ได้อะไรเลย
+- [x] **migration `20260825000000`** — เพิ่ม taxonomy 4 หมวดหลัก + 63 หมวดย่อยที่ขาด สินค้าเก่า map ได้ครบ 3,103/3,103 (เดิม 45% map ไม่ได้)
+
+### 🔁 ระบบตรวจซ้ำหมวดหมู่ของเก่า
+- [x] **`scripts/import_legacy_products.py`**, **`scripts/recheck_legacy_categories.py`**
+- [x] **`app/api/recheck/route.ts`** + **`components/data-quality/RecheckTab.tsx`** — แสดงหมวดที่คนจัดคู่กับหมวดที่ AI เสนอ ยืนยันแล้วอัปเดต `products.category_id` ของแถวเดิม เขียน `review_history` (ตารางนี้ไม่เคยมี UI ไหนเขียนเลย) และเรียก `/learn/verify` ให้เรียนต่อ
+- [x] **`e2e/recheck-legacy.spec.ts`** — ทดสอบผ่าน Playwright จริง
+
+### 🤖 ML ตรวจซ้ำ — แก้ 4 บั๊กที่ทำให้ใช้งานไม่ได้จริง
+- [x] `similarity_matches` **ไม่เคยมีข้อมูลเลย** — `internal_match.py` มีแต่ read ผลสแกนอยู่ใน dict หน่วยความจำ หายทุกครั้งที่รีสตาร์ท → เพิ่ม `scripts/build_similarity_training_data.py`
+- [x] `word_overlap` แยกคำด้วยช่องว่าง (ไทยไม่เว้นวรรค) → ใช้ตัดคำจริง
+- [x] `brand_similarity` ใช้ลิสต์แบรนด์อิเล็กทรอนิกส์อังกฤษ (iphone, samsung) คืน 0.5 คงที่ทุกคู่ → เทียบ token นำหน้า
+- [x] `_fetch_training_data` โดนลิมิต 1000 แถวของ Supabase เสียตัวอย่างไป 344 จาก 1,344 แบบเงียบๆ → ทำ pagination
+- [x] model path สัมพัทธ์ ขึ้นกับ CWD → ย้ายไป `model_cache/feedback_model.joblib`
+
+### 📦 Import Wizard — แก้บั๊กที่ทำให้ไม่บันทึกอะไรเลย
+- [x] **`app/api/import/commit/route.ts`** — บันทึกจริง แยกสองจังหวะ (`dedup` / `categorize`) **บันทึกตั้งแต่จบขั้นตรวจของซ้ำ** ไม่รอขั้นสุดท้าย เพื่อให้ปิดเบราว์เซอร์กลางคันแล้วไปทำต่อที่หน้า Verify ได้
+- [x] `ColumnMappingStep` parse ด้วย `maxRows: 10` เพื่อพรีวิว แต่ส่ง object เดิมไปใช้เป็นข้อมูลจริง → **ไฟล์ 405 รายการถูกประมวลผลแค่ 10** (หน้าจอยังโชว์ 405 เพราะอ่านคนละฟิลด์)
+- [x] `DeduplicationStep.onComplete` ส่งข้อมูลดิบกลับ ทิ้งผลแบ่งกลุ่มทั้งหมด → ขั้นถัดไปจึงจัดหมวดสินค้าที่มีในสตอกอยู่แล้วด้วย
+- [x] `ProductMatchResult` ไม่เคยคืน id ของสินค้าในคลัง (`id` เป็นเลขลำดับรีวิว) → เพิ่ม `oldProductId` ไม่งั้นเขียน FK ของ `similarity_matches` ไม่ได้
+- [x] ทั้งสอง route เดิม**ไม่ใส่ embedding** สินค้าที่เพิ่มผ่าน UI จะมองไม่เห็นในการสแกนครั้งหน้าและถูกนำเข้าซ้ำได้เรื่อยๆ → commit route คำนวณ embedding เป็นชุดก่อนบันทึก
+- [x] `CompleteStep` ขึ้นว่า "บันทึกเรียบร้อยแล้ว" ทุกครั้งทั้งที่ไม่เคยเขียน DB เลย → แสดงตัวเลขจริงจากผลตอบกลับ และเตือนถ้าล้มเหลว
+- [x] fallback ของขั้นตรวจของซ้ำใช้ `Math.random()` → ใส่การ์ดกันข้อมูลจำลองไม่ให้ลง DB
+
+### 🐛 บั๊กร้ายแรงที่สุดที่เจอ
+`internal_match.py` เทียบผลทำนายกับ `FeedbackType.SIMILAR.value` (`'similar'`) แต่โมเดลเทรนจาก `similarity_matches` ซึ่งมีแค่ `'duplicate'`/`'different'` → **เงื่อนไขเป็นเท็จเสมอ ทุกคู่ถูกรายงานว่า "different"** รวมถึงคู่ที่ต่างกันแค่ช่องว่าง (`แขวนเสื้อลวด+หนีบ 99 SM` vs `แขวนเสื้อลวด + หนีบ 99 SM` = 0.96) ถ้าไม่แก้ ผู้ใช้จะนำเข้าสินค้าซ้ำเข้าสตอก มีบั๊กนี้อยู่ 5 จุดใน 3 endpoint
 
 ---
 
