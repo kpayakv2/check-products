@@ -19,12 +19,14 @@ jest.mock('@/utils/supabase', () => ({
   }
 }))
 
+import { toast } from 'react-hot-toast'
 import SettingsPage from '@/app/settings/page'
 import SynonymsPanel from '@/components/Taxonomy/SynonymsPanel'
 
 let fetchMock: jest.Mock
 
 beforeEach(() => {
+  ;(toast.error as jest.Mock).mockClear()
   fetchMock = jest.fn(async () => ({
     ok: true,
     status: 200,
@@ -41,6 +43,21 @@ describe('หน้าตั้งค่า', () => {
     render(<SettingsPage />)
 
     await waitFor(() => expect(requestsTo('/api/settings').length).toBeGreaterThan(0))
+  })
+
+  it('บอกให้ไปปลดล็อกเมื่อ route ตอบ 401 แทนที่จะโชว์ค่าเริ่มต้นเงียบๆ', async () => {
+    // เส้นทางนี้อ่านผ่าน service role ข้าม RLS จึงถูก middleware กั้นไว้ด้วย
+    fetchMock = jest.fn(async () => ({
+      ok: false,
+      status: 401,
+      json: async () => ({ success: false, error: 'Unauthorized' })
+    }))
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    render(<SettingsPage />)
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(String((toast.error as jest.Mock).mock.calls[0][0])).toContain('ปลดล็อก')
   })
 })
 

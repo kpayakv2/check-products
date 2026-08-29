@@ -148,6 +148,10 @@ export default function SettingsPage() {
     try {
       // ผ่าน API route ที่ใช้ service role — anon key อ่านตารางนี้ไม่ได้ (RLS)
       const response = await fetch('/api/settings')
+      if (response.status === 401) {
+        // เส้นทางนี้อ่านผ่าน service role ข้าม RLS จึงต้องปลดล็อกก่อน
+        throw new Error('ยังไม่ได้ปลดล็อกระบบ — เปิดหน้า /unlock แล้วใส่รหัสก่อนจึงจะโหลดค่าตั้งค่าได้')
+      }
       if (!response.ok) throw new Error(`โหลดค่าตั้งค่าไม่สำเร็จ (${response.status})`)
       const body = await response.json()
       if (body.data) {
@@ -155,6 +159,7 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Failed to load system settings:', error)
+      toast.error(error instanceof Error ? error.message : 'โหลดค่าตั้งค่าไม่สำเร็จ')
     }
   }
 

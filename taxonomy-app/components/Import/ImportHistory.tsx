@@ -58,6 +58,7 @@ export default function ImportHistory() {
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [downloading, setDownloading] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { loadHistory() }, [])
 
@@ -66,12 +67,18 @@ export default function ImportHistory() {
     try {
       // ต้องผ่าน API route ที่ใช้ service role — RLS ของตาราง imports
       // ไม่ให้ anon key อ่าน และจะคืนรายการว่างแบบเงียบๆ ถ้าเรียกตรงจากเบราว์เซอร์
+      setError(null)
       const response = await fetch('/api/import/history?limit=20')
+      if (response.status === 401) {
+        // เส้นทางนี้อ่านผ่าน service role จึงต้องปลดล็อกก่อน — เดิมเงียบแล้วโชว์ว่าไม่มีประวัติ
+        throw new Error('ยังไม่ได้ปลดล็อกระบบ — เปิดหน้า /unlock แล้วใส่รหัสก่อนจึงจะดูประวัติได้')
+      }
       if (!response.ok) throw new Error(`โหลดประวัติไม่สำเร็จ (${response.status})`)
       const body = await response.json()
       setRecords(body.data || [])
     } catch (err) {
       console.error('Error loading import history:', err)
+      setError(err instanceof Error ? err.message : 'โหลดประวัติไม่สำเร็จ')
     } finally {
       setLoading(false)
     }
@@ -107,6 +114,19 @@ export default function ImportHistory() {
     <div className="flex items-center justify-center py-16 gap-3 text-slate-400">
       <RefreshCwIcon className="w-5 h-5 animate-spin" />
       <span className="font-medium thai-text">กำลังโหลดประวัติ...</span>
+    </div>
+  )
+
+  if (error) return (
+    <div className="text-center py-16" data-testid="history-error">
+      <AlertCircleIcon className="w-12 h-12 mx-auto mb-3 text-rose-200" />
+      <p className="text-rose-500 font-medium thai-text">{error}</p>
+      <button
+        onClick={loadHistory}
+        className="mt-4 px-5 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50"
+      >
+        ลองใหม่
+      </button>
     </div>
   )
 

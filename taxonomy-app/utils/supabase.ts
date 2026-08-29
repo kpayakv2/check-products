@@ -583,32 +583,6 @@ export class DatabaseService {
     return data || []
   }
 
-  static async updateProductStatus(id: string, status: Product['status'], reviewerId?: string): Promise<Product> {
-    const updates: any = { 
-      status,
-      reviewed_at: new Date().toISOString()
-    }
-    
-    if (reviewerId) {
-      updates.reviewed_by = reviewerId
-    }
-
-    const { data, error } = await supabase
-      .from('products')
-      .update(updates)
-      .eq('id', id)
-      .select(`
-        *,
-        category:taxonomy_nodes(*),
-        attributes:product_attributes(*)
-      `)
-      .single()
-
-    if (error) throw error
-    return data
-  }
-
-  // Similarity Matches
   static async getSimilarityMatches(productId?: string): Promise<SimilarityMatch[]> {
     let query = supabase
       .from('similarity_matches')
@@ -806,21 +780,6 @@ export class DatabaseService {
       .eq('id', id)
 
     if (error) throw error
-  }
-
-  // Review History
-  static async createReviewHistory(historyData: Partial<ReviewHistory>): Promise<ReviewHistory> {
-    const { data, error } = await supabase
-      .from('review_history')
-      .insert({
-        ...historyData,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
   }
 
   // Dashboard Statistics
