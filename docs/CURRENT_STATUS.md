@@ -49,11 +49,25 @@
 - ลบกฎนั้นผ่าน route → หายจาก DB จริง · id ที่ไม่มีอยู่ → 404 ทั้งสองเส้น
 - เทสต์: jest 186 ผ่าน 0 ตก (เหลือ 4 suite ที่ล้มเพราะไม่มี env เหมือนเดิม) · tsc 9 error ตาม baseline
 
-**ยังเหลือ (ยังไม่ได้แก้ รอเจ้าของงานตัดสิน)**
-- `/api/products/[id]/review` ยังใช้ anon client อยู่ (ไม่มี UI ไหนเรียกแล้ว)
-- `GET /api/settings` และ `GET /api/import/history` ไม่ถูก middleware กั้น (middleware ปล่อย GET ทั้งหมด)
-- `docs/SYSTEM_OVERVIEW_TH.md` ยังอ้างถึง `ProcessingStep.tsx` ที่ลบไปแล้ว
+**เก็บกวาดต่อในรอบเดียวกัน**
+- `GET /api/settings` และ `GET /api/import/history` ถูกกั้นด้วย session cookie แล้ว
+  (สองเส้นนี้อ่านผ่าน service role ข้าม RLS — ปล่อย GET ไว้เท่ากับเปิดข้อมูลที่ตั้งใจปิดให้ทั้งวง LAN)
+  ยืนยันกับเซิร์ฟเวอร์จริง: ไม่มีคุกกี้ → 401 ทั้งคู่ · ปลดล็อกแล้ว → 200 · `/api/products` ยังเปิดตามเดิม
+  สองหน้าที่เรียกมันเคยกลืน error แล้วโชว์ "ไม่มีข้อมูล" ตอนนี้บอกให้ไปปลดล็อกที่ /unlock
+- ลบ `/api/products/[id]/review` (เขียนด้วย anon key แบบเดียวกัน ไม่มีใครเรียกแล้ว)
+  พร้อม `DatabaseService.updateProductStatus` / `createReviewHistory` ที่มีมันเป็นผู้เรียกรายเดียว
+  และ `utils/database-service.ts` (302 บรรทัด คลาสชื่อซ้ำที่ไม่เคยมีใคร import)
+- `docs/SYSTEM_OVERVIEW_TH.md` เขียนใหม่ตามของจริง — วิซาร์ด 5 ขั้น + `/api/import/commit`
+  แทนที่ `ProcessingStep.tsx` → `/api/import/process` ที่ลบไปแล้ว
+- เทสต์ `WizardTab` ที่ตกแบบสุ่ม ~1 ใน 3 รอบ เจอต้นเหตุจริงแล้ว: `runToDedup` รอแค่ "ยิงคำขอแล้ว"
+  ยังไม่ได้รอให้ผลลัพธ์ลง `saveResult` (โค้ดถูก เทสต์ผิด) — รัน 6 รอบติดผ่านหมด
+- ตัวเลขล่าสุด: jest **195 ผ่าน 0 ตก** (4 suite ที่ล้มเพราะไม่มี env เหมือนเดิม) · tsc 9 error ตาม baseline
+
+**ยังเหลือ (รอเจ้าของงานตัดสิน)**
 - ชุด Playwright ยังผุอยู่ (ผ่าน 2 จาก 20) ต้องเขียนใหม่ก่อนใช้เป็นด่านตรวจ
+- สาขา `fix/status-mismatch-and-page-cleanup` สะสม 19 commit แล้ว ยังไม่ได้ merge เข้า main
+- เซิร์ฟเวอร์ dev ที่รันอยู่เสิร์ฟ chunk เก่าค้าง (ผลจาก `npm run build` ทับ `.next` ในรอบก่อน)
+  API ใช้งานได้ปกติ แต่หน้าเว็บต้อง restart `npm run dev` ก่อนถึงจะเปิดดูได้
 
 ---
 
