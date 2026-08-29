@@ -7,9 +7,10 @@ import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import { 
   DatabaseService, 
+  PENDING_REVIEW_STATUSES,
   Product, 
-  TaxonomyNode, 
-  SimilarityMatch 
+  ProductStatus,
+  TaxonomyNode
 } from '@/utils/supabase'
 import { 
   CheckCircleIcon, 
@@ -40,102 +41,102 @@ interface ProductFilters {
   status: string
   category: string
   search: string
-  dateRange: string
 }
+
+const PAGE_SIZE = 50
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<TaxonomyNode[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  const [total, setTotal] = useState(0)
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({})
+  const [offset, setOffset] = useState(0)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [similarityMatches, setSimilarityMatches] = useState<SimilarityMatch[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showProductDetail, setShowProductDetail] = useState(false)
-  
+
   const [filters, setFilters] = useState<ProductFilters>({
-    status: 'pending',
+    status: '',
     category: '',
-    search: '',
-    dateRange: ''
+    search: ''
   })
 
   useEffect(() => {
-    loadData()
-  }, [])
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        setIsLoading(true)
+        const result = await DatabaseService.searchProducts({
+          status: (filters.status || undefined) as ProductStatus | undefined,
+          categoryId: filters.category || undefined,
+          search: filters.search || undefined,
+          limit: PAGE_SIZE,
+          offset
+        })
+        if (cancelled) return
+        setProducts(result.products)
+        setTotal(result.total)
+      } catch (error) {
+        console.error('Error loading products data:', error)
+        toast.error('ไม่สามารถโหลดข้อมูลสินค้าได้')
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+
+    // หน่วงไว้เล็กน้อยเพื่อไม่ยิง query ทุกตัวอักษรที่พิมพ์
+    const timer = setTimeout(load, filters.search ? 300 : 0)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [filters, offset])
 
   useEffect(() => {
-    let filtered = products
-
-    if (filters.status) {
-      filtered = filtered.filter(product => product.status === filters.status)
+    const loadContext = async () => {
+      try {
+        const [taxonomyData, counts] = await Promise.all([
+          DatabaseService.getTaxonomyTree(),
+          DatabaseService.getProductStatusCounts()
+        ])
+        setCategories(taxonomyData || [])
+        setStatusCounts(counts)
+      } catch (error) {
+        console.error('Error loading products context:', error)
+      }
     }
+    loadContext()
+  }, [])
 
-    if (filters.category) {
-      filtered = filtered.filter(product => product.category_id === filters.category)
-    }
-
-    if (filters.search) {
-      const s = filters.search.toLowerCase()
-      filtered = filtered.filter(product => 
-        product.name_th.toLowerCase().includes(s) ||
-        (product.name_en && product.name_en.toLowerCase().includes(s)) ||
-        (product.brand && product.brand.toLowerCase().includes(s)) ||
-        (product.sku && product.sku.toLowerCase().includes(s))
-      )
-    }
-
-    setFilteredProducts(filtered)
-  }, [products, filters])
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true)
-      const [productData, taxonomyData] = await Promise.all([
-        DatabaseService.getProducts(),
-        DatabaseService.getTaxonomyTree()
-      ])
-      setProducts(productData || [])
-      setCategories(taxonomyData || [])
-    } catch (error) {
-      console.error('Error loading products data:', error)
-      toast.error('ไม่สามารถโหลดข้อมูลสินค้าได้')
-    } finally {
-      setIsLoading(false)
-    }
+  /** เปลี่ยนตัวกรองแล้วต้องกลับไปหน้าแรกเสมอ ไม่งั้นค้างอยู่หน้าที่ผลลัพธ์ชุดใหม่ไปไม่ถึง */
+  const updateFilters = (next: Partial<ProductFilters>) => {
+    setFilters(current => ({ ...current, ...next }))
+    setOffset(0)
   }
 
-  const loadSimilarityMatches = async (productId: string) => {
-    try {
-      setSimilarityMatches([]) 
-    } catch (error) {
-      console.error('Error loading similarity matches:', error)
-    }
-  }
+  const pendingCount =
+    PENDING_REVIEW_STATUSES.reduce((sum, status) => sum + (statusCounts[status] || 0), 0)
 
-  const handleProductSelect = async (product: Product) => {
+  const handleProductSelect = (product: Product) => {
     setSelectedProduct(product)
     setShowProductDetail(true)
-    await loadSimilarityMatches(product.id)
-  }
-
-  const handleProductReview = async (productId: string, status: Product['status']) => {
-    try {
-      await DatabaseService.updateProductStatus(productId, status, 'current-user-id')
-      toast.success(`${status === 'approved' ? 'อนุมัติ' : 'ปฏิเสธ'}สินค้าเรียบร้อยแล้ว`)
-      setShowProductDetail(false)
-      loadData()
-    } catch (error) {
-      toast.error('เกิดข้อผิดพลาดในการอัปเดตสถานะ')
-    }
   }
 
   const getStatusBadge = (status: Product['status']) => {
     switch (status) {
-      case 'pending':
+      case 'pending_review_dedup':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm">
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm thai-text">
             <ClockIcon className="mr-2 h-3.5 w-3.5" />
-            Pending Action
+            รอตรวจของซ้ำ
+          </span>
+        )
+      case 'pending_review_category':
+        return (
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-sky-50 text-sky-600 border border-sky-100/50 shadow-sm thai-text">
+            <ClockIcon className="mr-2 h-3.5 w-3.5" />
+            รอตรวจหมวดหมู่
           </span>
         )
       case 'approved':
@@ -181,7 +182,7 @@ export default function ProductsPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden relative">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-50/30 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
-        <Header title="คลังสินค้าและประวัติการตรวจสอบ" subtitle="Inventory Audit Dashboard" />
+        <Header title="คลังสินค้า" subtitle="Product Stock Browser" />
         
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10">
           <div className="max-w-7xl mx-auto">
@@ -190,25 +191,25 @@ export default function ProductsPage() {
                <div>
                   <div className="flex items-center gap-3 mb-4">
                      <span className="px-4 py-1 bg-white border border-slate-100 rounded-full text-xs font-bold text-slate-400 uppercase tracking-wider shadow-sm">Product Registry</span>
-                     <span className="px-4 py-1 bg-indigo-600 rounded-full text-xs font-bold text-white uppercase tracking-wider shadow-lg shadow-indigo-100">Audit Active</span>
+                     <span className="px-4 py-1 bg-indigo-600 rounded-full text-xs font-bold text-white uppercase tracking-wider shadow-lg shadow-indigo-100">Read Only</span>
                   </div>
                   <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase thai-text">
                     Inventory Audit
                   </h1>
                   <p className="text-slate-500 mt-4 text-lg font-medium thai-text max-w-2xl leading-relaxed">
-                    ตรวจสอบและยืนยันความถูกต้องของข้อมูลสินค้าก่อนการประมวลผลเข้าสู่ฐานข้อมูลหลักขององค์กร
+                    ค้นและดูสินค้าทั้งหมดในสตอก — หน้านี้ดูอย่างเดียว งานตรวจอยู่ที่ศูนย์ตรวจสอบข้อมูล
                   </p>
                </div>
 
                <div className="flex items-center gap-8 bg-white/40 backdrop-blur-md p-6 rounded-[40px] border border-white shadow-xl">
                   <div className="flex flex-col items-center">
                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending</span>
-                     <span className="text-xl font-black text-amber-500">{products.filter(p=>p.status==='pending').length}</span>
+                     <span data-testid="pending-count" className="text-xl font-black text-amber-500">{pendingCount.toLocaleString()}</span>
                   </div>
                   <div className="w-[1px] h-10 bg-slate-100" />
                   <div className="flex flex-col items-center uppercase text-[10px] font-black text-slate-400 tracking-widest">
                      <span className="mb-1">Verified</span>
-                     <span className="text-xl font-black text-emerald-500 tracking-tight">{products.filter(p=>p.status==='approved').length}</span>
+                     <span className="text-xl font-black text-emerald-500 tracking-tight">{(statusCounts.approved || 0).toLocaleString()}</span>
                   </div>
                </div>
             </div>
@@ -221,8 +222,9 @@ export default function ProductsPage() {
                     <input
                       type="text"
                       placeholder="Search SKU, Brands, or Identity Attributes..."
+                      data-testid="product-search"
                       value={filters.search}
-                      onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                      onChange={(e) => updateFilters({ search: e.target.value })}
                       className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-slate-100 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-black text-slate-800 placeholder:text-slate-300 uppercase text-xs tracking-widest"
                     />
                   </div>
@@ -232,11 +234,12 @@ export default function ProductsPage() {
                        <FilterIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-indigo-600" />
                        <select
                          value={filters.status}
-                         onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                         onChange={(e) => updateFilters({ status: e.target.value })}
                          className="w-full pl-14 pr-10 py-5 bg-white border border-slate-100 rounded-[32px] appearance-none font-black text-[11px] text-slate-600 uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                        >
                          <option value="">Status: All</option>
-                         <option value="pending">🟡 Pending</option>
+                         <option value="pending_review_dedup">🟡 รอตรวจของซ้ำ</option>
+                         <option value="pending_review_category">🔵 รอตรวจหมวดหมู่</option>
                          <option value="approved">🟢 Verified</option>
                          <option value="rejected">🔴 Rejected</option>
                        </select>
@@ -249,7 +252,7 @@ export default function ProductsPage() {
             <div className="premium-card bg-white/40 border-white shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/20 rounded-full blur-[80px]" />
               
-              {filteredProducts.length === 0 ? (
+              {products.length === 0 ? (
                 <div className="py-32 text-center flex flex-col items-center">
                    <div className="p-10 bg-slate-50 rounded-full mb-8 border border-slate-100">
                       <SearchIcon className="w-16 h-16 text-slate-200" />
@@ -270,7 +273,7 @@ export default function ProductsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50/50">
-                      {filteredProducts.map((product, idx) => (
+                      {products.map((product, idx) => (
                         <motion.tr
                           key={product.id}
                           initial={{ opacity: 0, y: 10 }}
@@ -321,6 +324,33 @@ export default function ProductsPage() {
                 </div>
               )}
             </div>
+
+            {/* แบ่งหน้า — สตอกมีหลายพันแถว หน้านี้จึงโหลดทีละหน้าจากฐานข้อมูล */}
+            <div className="flex items-center justify-between gap-6 mt-10 px-4">
+               <p data-testid="result-range" className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                 {total === 0
+                   ? 'ไม่พบรายการ'
+                   : `${(offset + 1).toLocaleString()}–${Math.min(offset + PAGE_SIZE, total).toLocaleString()} จาก ${total.toLocaleString()}`}
+               </p>
+               <div className="flex gap-3">
+                  <button
+                    data-testid="prev-page"
+                    onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+                    disabled={offset === 0}
+                    className="px-8 py-4 bg-white border border-slate-100 rounded-[32px] text-[11px] font-black text-slate-600 uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md transition-all"
+                  >
+                    ก่อนหน้า
+                  </button>
+                  <button
+                    data-testid="next-page"
+                    onClick={() => setOffset(offset + PAGE_SIZE)}
+                    disabled={offset + PAGE_SIZE >= total}
+                    className="px-8 py-4 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-600 transition-all"
+                  >
+                    ถัดไป
+                  </button>
+               </div>
+            </div>
           </div>
         </main>
       </div>
@@ -333,6 +363,7 @@ export default function ProductsPage() {
                initial={{ opacity: 0, scale: 0.9, y: 40 }}
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.9, y: 40 }}
+               data-testid="product-detail"
                className="bg-white rounded-[64px] shadow-[0_48px_120px_-24px_rgba(0,0,0,0.3)] w-full max-w-5xl overflow-hidden border border-white relative shadow-indigo-100/50"
              >
                 {/* Hero Gradient Header */}
@@ -410,22 +441,19 @@ export default function ProductsPage() {
                          </div>
                       </section>
 
-                      {selectedProduct.status === 'pending' && (
-                        <section className="space-y-4">
-                           <button 
-                             onClick={()=>handleProductReview(selectedProduct.id, 'approved')}
-                             className="w-full py-6 bg-slate-900 text-white rounded-[32px] font-black uppercase tracking-[0.3em] hover:bg-emerald-600 hover:shadow-2xl transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-4 group"
+                      {PENDING_REVIEW_STATUSES.includes(selectedProduct.status) && (
+                        <section className="p-10 bg-amber-50/60 rounded-[48px] border border-amber-100 space-y-4">
+                           <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">รอการตรวจ</p>
+                           <p className="text-sm font-medium text-slate-600 thai-text leading-relaxed">
+                             สินค้าชิ้นนี้ยังรอคนตรวจอยู่ หน้านี้ดูอย่างเดียว — งานตรวจทั้งหมดอยู่ที่ศูนย์ตรวจสอบข้อมูล
+                           </p>
+                           <a
+                             href="/data-quality"
+                             className="inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-indigo-600 transition-all"
                            >
-                              <CheckCircleIcon className="w-6 h-6 group-hover:rotate-12 transition-all" />
-                              Commit Approval
-                           </button>
-                           <button 
-                             onClick={()=>handleProductReview(selectedProduct.id, 'rejected')}
-                             className="w-full py-6 bg-white border-2 border-rose-100 text-rose-500 rounded-[32px] font-black uppercase tracking-[0.3em] hover:bg-rose-50 hover:border-rose-300 transition-all flex items-center justify-center gap-4 group"
-                           >
-                              <XCircleIcon className="w-6 h-6 group-hover:scale-90 transition-all" />
-                              Decline Entry
-                           </button>
+                             ไปที่ศูนย์ตรวจสอบข้อมูล
+                             <ArrowRightIcon className="w-4 h-4" />
+                           </a>
                         </section>
                       )}
                    </div>

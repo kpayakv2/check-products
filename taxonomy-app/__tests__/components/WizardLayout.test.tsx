@@ -91,8 +91,8 @@ describe('WizardLayout', () => {
     )
 
     // Step 3 of 5 = 60%
-    expect(screen.getByText('ขั้นตอนที่ 3 จาก 5')).toBeInTheDocument()
-    expect(screen.getByText('60% เสร็จสมบูรณ์')).toBeInTheDocument()
+    expect(screen.getByText('Step 3 of 5')).toBeInTheDocument()
+    expect(screen.getByText('60% Complete')).toBeInTheDocument()
   })
 
   it('should render children content', () => {
@@ -181,8 +181,8 @@ describe('WizardLayout', () => {
       </WizardLayout>
     )
 
-    expect(screen.getByText('ขั้นตอนที่ 1 จาก 5')).toBeInTheDocument()
-    expect(screen.getByText('20% เสร็จสมบูรณ์')).toBeInTheDocument()
+    expect(screen.getByText('Step 1 of 5')).toBeInTheDocument()
+    expect(screen.getByText('20% Complete')).toBeInTheDocument()
   })
 
   it('should calculate progress correctly for last step', () => {
@@ -196,8 +196,8 @@ describe('WizardLayout', () => {
       </WizardLayout>
     )
 
-    expect(screen.getByText('ขั้นตอนที่ 5 จาก 5')).toBeInTheDocument()
-    expect(screen.getByText('100% เสร็จสมบูรณ์')).toBeInTheDocument()
+    expect(screen.getByText('Step 5 of 5')).toBeInTheDocument()
+    expect(screen.getByText('100% Complete')).toBeInTheDocument()
   })
 
   it('should handle empty children', () => {
@@ -231,6 +231,6 @@ describe('WizardLayout', () => {
     )
 
     expect(screen.getByText('Step 1')).toBeInTheDocument()
-    expect(screen.getByText('100% เสร็จสมบูรณ์')).toBeInTheDocument()
+    expect(screen.getByText('100% Complete')).toBeInTheDocument()
   })
 })

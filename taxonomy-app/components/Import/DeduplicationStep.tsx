@@ -1,33 +1,27 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   CopyIcon, CheckCircleIcon, ArrowRightIcon, AlertTriangleIcon,
-  SearchIcon, CheckSquareIcon, WifiOffIcon, RefreshCwIcon
+  ScaleIcon, WifiOffIcon, RefreshCwIcon
 } from 'lucide-react'
 import { isPriceMismatch, classifyDedupBucket } from '@/utils/price'
+import type { DedupBucket, DedupResults, WizardItem } from '@/types/import'
 
-interface DedupItem {
-  _cleaned_name: string
-  _similarity_score: number
-  _matched_with: string
-  _matched_id?: string
-  _source: 'backend' | 'mock'
-  [key: string]: any
-}
+type DedupItem = WizardItem
 
-interface DedupResults {
-  autoMerged: DedupItem[]
-  autoCreated: DedupItem[]
-  reviewZone: DedupItem[]
+interface DeduplicationStepProps {
+  cleanedData: WizardItem[]
+  onComplete: (deduped: WizardItem[]) => void
+  onBack?: () => void
 }
 
 export default function DeduplicationStep({
   cleanedData,
   onComplete,
   onBack
-}: any) {
+}: DeduplicationStepProps) {
   const [isProcessing, setIsProcessing] = useState(true)
   const [progress, setProgress] = useState(0)
   const [statusMsg, setStatusMsg] = useState('กำลังเชื่อมต่อระบบแนะนำอัจฉริยะ...')
@@ -36,7 +30,10 @@ export default function DeduplicationStep({
   const [dedupResults, setDedupResults] = useState<DedupResults>({ 
     autoMerged: [], autoCreated: [], reviewZone: [] 
   })
-  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
+  // ตรวจทีละรายการเหมือนหน้า Data Quality → ตรวจของซ้ำในคลัง
+  // เก็บผลไว้ในเครื่องก่อน ยิงขึ้นฐานข้อมูลทีเดียวตอนจบขั้นตอน — ต่างจากหน้านั้นตรงที่
+  // สินค้ายังไม่มีอยู่จริงในฐานข้อมูล เพิ่งจะถูกสร้างตอน commit จึงยิง API รายตัวไม่ได้
+  const [reviewIndex, setReviewIndex] = useState(0)
 
   useEffect(() => {
     runDeduplication()
@@ -129,6 +126,8 @@ export default function DeduplicationStep({
       })
 
       setDedupResults({ autoMerged, autoCreated, reviewZone })
+      // ตรวจใหม่ทั้งชุด ต้องกลับไปเริ่มที่รายการแรกเสมอ
+      setReviewIndex(0)
       setIsMock(false)
       setProgress(100)
     } catch (err: any) {
@@ -161,27 +160,74 @@ export default function DeduplicationStep({
       else reviewZone.push({ ...enriched, _bucket: 'review' })
     })
     setDedupResults({ autoMerged, autoCreated, reviewZone })
+    setReviewIndex(0)
     setProgress(100)
   }
 
-  const toggleSelect = (index: number) => {
-    const newSet = new Set(selectedItems)
-    if (newSet.has(index)) newSet.delete(index)
-    else newSet.add(index)
-    setSelectedItems(newSet)
-  }
+  /**
+   * บันทึกผลตัดสินของรายการปัจจุบันแล้วเลื่อนไปรายการถัดไป
+   *
+   * 'review' = ยังไม่ตัดสิน ปล่อยให้ไปตัดสินต่อที่หน้า Data Quality → Verify
+   * ซึ่งเป็นพฤติกรรมเดิมของทุกรายการในโซนนี้ การกดข้ามจึงไม่ทำให้เสียข้อมูล
+   */
+  const decideCurrent = useCallback((bucket: DedupBucket) => {
+    setDedupResults((prev) => {
+      if (!prev.reviewZone[reviewIndex]) return prev
+      const reviewZone = prev.reviewZone.map((item, i) =>
+        i === reviewIndex ? { ...item, _bucket: bucket, _reviewed_by_user: true } : item
+      )
+      return { ...prev, reviewZone }
+    })
+    setReviewIndex((i) => Math.min(i + 1, dedupResults.reviewZone.length))
+  }, [reviewIndex, dedupResults.reviewZone.length])
 
-  const selectAll = () => {
-    if (selectedItems.size === dedupResults.reviewZone.length) {
-      setSelectedItems(new Set())
-    } else {
-      setSelectedItems(new Set(dedupResults.reviewZone.map((_, i) => i)))
+  const currentReviewItem = dedupResults.reviewZone[reviewIndex]
+  // ต้องระบุชนิดของตัวสะสมเอง — WizardItem มี index signature จึงรับ object literal นี้ได้ด้วย
+  // TypeScript เลยเลือก overload ที่ตัวสะสมเป็น WizardItem แล้วค่าที่นับออกมากลายเป็น unknown
+  const reviewDecidedCounts = dedupResults.reviewZone.reduce<{
+    duplicate: number
+    new: number
+    skipped: number
+  }>(
+    (acc, item) => {
+      if (!item._reviewed_by_user) return acc
+      if (item._bucket === 'duplicate') acc.duplicate += 1
+      else if (item._bucket === 'new') acc.new += 1
+      else acc.skipped += 1
+      return acc
+    },
+    { duplicate: 0, new: 0, skipped: 0 }
+  )
+  const reviewDecidedCount =
+    reviewDecidedCounts.duplicate + reviewDecidedCounts.new + reviewDecidedCounts.skipped
+
+  // ปุ่มลัดชุดเดียวกับหน้าตรวจของซ้ำในคลัง รวมทั้งผังแป้นไทย
+  // ผู้ใช้ที่ชินกับหน้านั้นแล้วจะใช้ที่นี่ได้ทันทีโดยไม่ต้องจำใหม่
+  useEffect(() => {
+    if (isProcessing || !dedupResults.reviewZone[reviewIndex]) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+
+      const key = e.key.toLowerCase()
+      const code = e.code
+
+      if (code === 'KeyA' || code === 'ArrowLeft' || key === 'a' || key === 'ฟ' || key === 'ฤ') {
+        e.preventDefault()
+        decideCurrent('duplicate')
+      } else if (code === 'KeyD' || code === 'ArrowRight' || key === 'd' || key === 'ก' || key === 'ฏ') {
+        e.preventDefault()
+        decideCurrent('new')
+      } else if (code === 'KeyS' || code === 'ArrowDown' || key === 's' || key === 'ห' || key === 'ฆ') {
+        e.preventDefault()
+        decideCurrent('review')
+      }
     }
-  }
 
-  const handleBulkAction = (action: 'merge' | 'create') => {
-    setSelectedItems(new Set())
-  }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isProcessing, dedupResults.reviewZone, reviewIndex, decideCurrent])
 
   if (isProcessing) {
     return (
@@ -263,93 +309,115 @@ export default function DeduplicationStep({
         </div>
       </div>
 
-      {/* Review Zone List */}
+      {/* Review Zone — ตรวจทีละรายการ */}
       <div className="premium-card bg-white border border-slate-200 shadow-xl rounded-3xl overflow-hidden">
         <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h3 className="font-bold text-slate-800 thai-text">รายการที่ต้องตรวจสอบ ({dedupResults.reviewZone.length})</h3>
-            {selectedItems.size > 0 && (
-              <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
-                เลือกแล้ว {selectedItems.size} รายการ
-              </span>
-            )}
-          </div>
-          
-          {selectedItems.size > 0 ? (
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => handleBulkAction('merge')}
-                className="px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-xl font-bold text-sm thai-text transition-colors"
-              >
-                รวมเป็นของชิ้นเดียวกัน
-              </button>
-              <button 
-                onClick={() => handleBulkAction('create')}
-                className="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-xl font-bold text-sm thai-text transition-colors"
-              >
-                แยกเป็นของใหม่
-              </button>
-            </div>
-          ) : (
-            <div className="relative">
-              <SearchIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input 
-                type="text" 
-                placeholder="ค้นหารายการ..." 
-                className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-64"
-              />
-            </div>
+          <h3 className="font-bold text-slate-800 thai-text">
+            รายการที่ต้องตรวจสอบ ({dedupResults.reviewZone.length})
+          </h3>
+          {dedupResults.reviewZone.length > 0 && (
+            <span className="px-5 py-2 bg-indigo-500 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-100">
+              {Math.min(reviewIndex + 1, dedupResults.reviewZone.length)} / {dedupResults.reviewZone.length}
+            </span>
           )}
         </div>
 
-        <div className="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
-          {dedupResults.reviewZone.map((item, index) => (
-            <div key={index} className={`p-4 flex items-center gap-6 transition-colors ${selectedItems.has(index) ? 'bg-indigo-50/50' : 'hover:bg-slate-50'}`}>
-              <button 
-                onClick={() => toggleSelect(index)}
-                className={`w-5 h-5 rounded flex items-center justify-center border transition-colors shrink-0 ${
-                  selectedItems.has(index) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 text-transparent'
-                }`}
-              >
-                <CheckSquareIcon className="w-3.5 h-3.5 fill-current" />
-              </button>
-              
-              <div className="flex-1">
-                <div className="grid grid-cols-2 gap-8 items-center">
-                  <div>
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าที่อัปโหลด</div>
-                    <div className="font-bold text-slate-800">{item._cleaned_name}</div>
-                    {item._new_price != null && (
-                      <div className="text-xs font-bold text-slate-500 mt-1">฿{item._new_price}</div>
-                    )}
-                  </div>
-
-                  <div className="relative pl-8 border-l border-slate-200">
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
-                      <div className="text-[10px] font-black text-amber-500">{(item._similarity_score * 100).toFixed(0)}%</div>
-                    </div>
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 thai-text">สินค้าในระบบ (อาจจะซ้ำ)</div>
-                    <div className="font-bold text-slate-700">{item._matched_with}</div>
-                    {item._old_price != null && (
-                      <div className="text-xs font-bold text-slate-500 mt-1">฿{item._old_price}</div>
-                    )}
-                  </div>
+        {currentReviewItem ? (
+          <div className="p-8 space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 relative">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex w-16 h-16 rounded-full bg-white shadow-2xl border border-slate-100 items-center justify-center">
+                <div className="text-xs font-black text-amber-500">
+                  {((currentReviewItem._similarity_score ?? 0) * 100).toFixed(0)}%
                 </div>
-                {item._price_mismatch && (
-                  <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-lg w-fit">
-                    <AlertTriangleIcon className="w-3.5 h-3.5" />
-                    ราคาต่างกันมาก (฿{item._old_price} → ฿{item._new_price}) อาจเป็นคนละสินค้า
-                  </div>
-                )}
+              </div>
+
+              <div className="border border-slate-100 rounded-3xl overflow-hidden">
+                <div className="px-6 py-3 bg-indigo-600 text-white">
+                  <span className="text-xs font-black uppercase tracking-[0.2em] thai-text">สินค้าที่อัปโหลด</span>
+                </div>
+                <div className="p-8 min-h-[140px] flex flex-col justify-between">
+                  <p className="text-lg font-black text-slate-800 thai-text leading-relaxed">
+                    {currentReviewItem._cleaned_name}
+                  </p>
+                  {currentReviewItem._new_price != null && (
+                    <p className="text-sm font-bold text-slate-500 mt-4">฿{currentReviewItem._new_price}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="border border-slate-100 rounded-3xl overflow-hidden">
+                <div className="px-6 py-3 bg-emerald-600 text-white">
+                  <span className="text-xs font-black uppercase tracking-[0.2em] thai-text">สินค้าในระบบ (อาจจะซ้ำ)</span>
+                </div>
+                <div className="p-8 min-h-[140px] flex flex-col justify-between">
+                  <p className="text-lg font-black text-slate-700 thai-text leading-relaxed">
+                    {currentReviewItem._matched_with}
+                  </p>
+                  {currentReviewItem._old_price != null && (
+                    <p className="text-sm font-bold text-slate-500 mt-4">฿{currentReviewItem._old_price}</p>
+                  )}
+                </div>
               </div>
             </div>
-          ))}
-          {dedupResults.reviewZone.length === 0 && (
-            <div className="p-12 text-center text-slate-500 thai-text">
-              ไม่มีรายการที่ต้องตรวจสอบเพิ่มเติม ยอดเยี่ยมมาก!
+
+            {currentReviewItem._price_mismatch && (
+              <div className="flex items-center gap-2 text-xs font-bold text-rose-600 bg-rose-50 px-4 py-2.5 rounded-xl w-fit mx-auto thai-text">
+                <AlertTriangleIcon className="w-4 h-4" />
+                ราคาต่างกันมาก (฿{currentReviewItem._old_price} → ฿{currentReviewItem._new_price}) อาจเป็นคนละสินค้า
+              </div>
+            )}
+
+            <div className="bg-slate-950 p-8 rounded-[2.5rem] text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+              <div className="relative z-10">
+                <h4 className="text-base font-black text-white thai-text mb-2">สินค้าชิ้นนี้ซ้ำกับของในสตอกหรือไม่</h4>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8 thai-text">
+                  ใช้ปุ่มลัด [A] [S] [D] หรือปุ่มลูกศร [←] [↓] [→] เพื่อทำงานได้เร็วขึ้น
+                </p>
+
+                <div className="flex flex-col md:flex-row justify-center items-stretch gap-4">
+                  <button
+                    onClick={() => decideCurrent('duplicate')}
+                    className="flex-1 px-6 py-4 bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                  >
+                    ซ้ำ — มีอยู่แล้วในสตอก
+                    <span className="block text-[10px] font-bold text-emerald-100 mt-1 tracking-widest">[A] / [←]</span>
+                  </button>
+                  <button
+                    onClick={() => decideCurrent('review')}
+                    className="flex-1 px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                  >
+                    ยังไม่ตัดสิน — ไว้ดูที่หน้า Verify
+                    <span className="block text-[10px] font-bold text-slate-400 mt-1 tracking-widest">[S] / [↓]</span>
+                  </button>
+                  <button
+                    onClick={() => decideCurrent('new')}
+                    className="flex-1 px-6 py-4 bg-blue-500 hover:bg-blue-400 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                  >
+                    คนละตัว — เป็นของใหม่
+                    <span className="block text-[10px] font-bold text-blue-100 mt-1 tracking-widest">[D] / [→]</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="p-12 text-center text-slate-500 thai-text">
+            {dedupResults.reviewZone.length === 0
+              ? 'ไม่มีรายการที่ต้องตรวจสอบเพิ่มเติม ยอดเยี่ยมมาก!'
+              : `ตรวจครบทั้ง ${dedupResults.reviewZone.length} รายการแล้ว — กดดำเนินการต่อได้เลย`}
+          </div>
+        )}
+
+        {reviewDecidedCount > 0 && (
+          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center gap-6 text-xs font-bold thai-text">
+            <span className="text-emerald-700">ตัดสินว่าซ้ำ {reviewDecidedCounts.duplicate}</span>
+            <span className="text-blue-700">ตัดสินว่าของใหม่ {reviewDecidedCounts.new}</span>
+            <span className="text-slate-500">
+              ยังไม่ตัดสิน {dedupResults.reviewZone.length - reviewDecidedCount} — จะไปรอที่หน้า Data Quality → Verify
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Footer Actions */}

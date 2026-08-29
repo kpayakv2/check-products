@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { DatabaseService } from '@/utils/supabase'
+import { createRow, nextSortOrder, readRowById } from '@/utils/admin-db'
 import { rateLimit } from '@/utils/rate-limit'
 import { withErrorHandling } from '@/utils/error-handler'
 import { validateRequest } from '@/utils/validation'
@@ -42,9 +43,12 @@ const CreateTaxonomySchema = z.object({
   description: z.string()
     .max(1000, 'คำอธิบายต้องไม่เกิน 1000 ตัวอักษร')
     .optional(),
-  parent_id: z.string()
-    .uuid('parent_id ต้องเป็น UUID ที่ถูกต้อง')
-    .optional(),
+  // ฟอร์มส่งสตริงว่างมาเมื่อไม่ได้เลือกหมวดแม่ ต้องกลายเป็น undefined
+  // ไม่ใช่ '' ที่ทำให้คอลัมน์ uuid ตอบ 22P02 invalid input syntax
+  parent_id: z.preprocess(
+    (value) => (value === '' || value === null ? undefined : value),
+    z.string().uuid('parent_id ต้องเป็น UUID ที่ถูกต้อง').optional()
+  ),
   keywords: z.array(z.string())
     .max(20, 'keywords ต้องไม่เกิน 20 รายการ')
     .optional(),
@@ -173,7 +177,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     let path = '/'
     
     if (parent_id) {
-      const parent = await DatabaseService.getTaxonomyNode(parent_id)
+      const parent = await readRowById<TaxonomyNode>('taxonomy_nodes', parent_id)
       if (!parent) {
         console.warn('Parent taxonomy node not found', { parent_id })
         return NextResponse.json(
@@ -186,10 +190,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Get next sort order
-    const sort_order = await DatabaseService.getNextSortOrder(parent_id)
+    const sort_order = await nextSortOrder(parent_id)
 
-    // Create taxonomy node - แก้ไขชื่อ method ที่ถูกต้อง
-    const category = await DatabaseService.createTaxonomyNode({
+    // เขียนผ่าน service role — anon key ถูก RLS ปฏิเสธ (42501)
+    // `code` เป็น NOT NULL และไม่มี default จึงต้องสร้างที่ฝั่ง server
+    const category = await createRow<TaxonomyNode>('taxonomy_nodes', {
+      code: `CAT-${Date.now().toString(36).toUpperCase()}`,
       name_th,
       name_en,
       description,

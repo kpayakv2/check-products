@@ -1,5 +1,5 @@
 # 📊 Current Project Status (Compact Context)
-*Last Updated: 2026-08-28*
+*Last Updated: 2026-08-29 (รอบสาม)*
 
 ## 🎯 Current Focus
 - **งานจริงของระบบ:** รับไฟล์รายการสินค้าใหม่ → เทียบกับสินค้าในสตอก 3,103 รายการ → **เอาเฉพาะตัวที่ยังไม่เคยมี**
@@ -15,6 +15,296 @@
 | ไฟล์สินค้าใหม่ 405 รายการ | มีในสตอกแล้ว 37 / ก้ำกึ่ง 146-147 / **ของใหม่ 221-222** (wizard ขั้นจัดหมวดตอนนี้ทำเฉพาะกลุ่มนี้แล้ว ไม่ทำทั้ง 405) |
 
 > ⚠️ ตัวเลข "72%" ที่เคยอ้างในเอกสารเก่า**ไม่เคยถูกวัดจริง** มาจาก `tests/benchmark_similarity.py` ที่ print ค่า hardcode (ลบไฟล์นั้นแล้ว) ตัวเลขข้างบนมาจาก `tests/integration/test_classification_accuracy.py` ที่วัดของจริง
+
+---
+
+## ✅ Session 29 ส.ค. 2569 (รอบสี่) — งานตรวจใน /data-quality บันทึกไม่ลงเลย
+
+ตรวจผลกระทบจากรอบสามแล้วเจอว่ารากเดียวกัน (anon key ชน RLS) ยังเหลืออยู่ในจุดที่หนักที่สุด
+คือแท็บ Verify ซึ่งเป็นที่ทำงานของงานค้าง 368 รายการที่รอบสองย้ายมารวมไว้ตรงนี้
+
+**สิ่งที่พัง**
+- `VerifyTab` เขียน `products` ตรงด้วย anon key — ยิงจริงได้ `PATCH 200` พร้อม `[]` และ `DELETE 204`
+  โดยไม่มีแถวไหนเปลี่ยน ไม่มี error ให้จับ กดตรวจแล้วรีเฟรชก็เจอรายการเดิมค้างที่เดิม
+- `human_feedback` ยิ่งไปกว่านั้น: คอลัมน์ที่โค้ดส่งไป (`product_id` / `category_id` / `is_correct` /
+  `comment`) **ไม่มีอยู่ในตารางเลย** ต่อให้ใช้ service role ก็ insert ไม่ผ่าน
+  ของจริงคือ `old_product` / `new_product` / `similarity_score` / `human_decision` (NOT NULL ทั้งชุด)
+  ซึ่งคือ "คู่ที่คนตัดสินว่าซ้ำ/ไม่ซ้ำ" — ตรงกับด่าน 1 พอดี ส่วนการยืนยันหมวดต้องลง `review_history`
+- `AutoLearnTab.deleteRule` ลบด้วย anon key แล้วตัดการ์ดออกจากจอทันที ดูเหมือนลบสำเร็จจนกว่าจะรีเฟรช
+
+**สิ่งที่แก้**
+- เพิ่ม `POST /api/verify` (keep / discard / confirm_category) และ `DELETE /api/keyword-rules/[id]`
+  ทั้งคู่ใช้ service role และตอบ 404 เมื่อไม่มีแถวไหนเปลี่ยนจริง
+- ด่าน 1 บันทึก `human_feedback` **ก่อน** ลบของซ้ำ เพราะ `review_history` ผูก FK แบบ CASCADE
+  จะหายไปพร้อมสินค้า ส่วน `human_feedback` ไม่มี FK ถึง `products` จึงอยู่ต่อได้
+- ด่าน 2 เขียน `review_history` แล้วเรียก `/api/v1/learn/verify` แบบเดียวกับ `/api/recheck`
+- หน้าเว็บทั้งสองแท็บอัปเดตตัวเองเฉพาะตอน route ยืนยันว่าเขียนจริง และแสดงข้อความจาก route เมื่อพลาด
+- `VerifyTab` เคยโหลดรายการซ้ำสองรอบทุกครั้งที่เข้าหน้า เพราะ `fetchData` มี `taxonomy.length`
+  เป็น dependency — แยกการโหลดหมวดหมู่ออกเป็น effect ของตัวเอง
+
+**ยืนยันกับฐานข้อมูลจริง** (คืนค่าข้อมูลทดสอบกลับหมดแล้ว)
+- keep → สินค้าเปลี่ยนเป็น `pending_review_category` และเกิดแถวแรกใน `human_feedback` (ตารางนี้เคยว่างมาตลอด)
+- confirm_category → `status='approved'` + `reviewed_at` + แถวใน `review_history` + `learned: true`
+  (FastAPI สร้างกฎ `auto_learned` ให้จริง)
+- ลบกฎนั้นผ่าน route → หายจาก DB จริง · id ที่ไม่มีอยู่ → 404 ทั้งสองเส้น
+- เทสต์: jest 186 ผ่าน 0 ตก (เหลือ 4 suite ที่ล้มเพราะไม่มี env เหมือนเดิม) · tsc 9 error ตาม baseline
+
+**เก็บกวาดต่อในรอบเดียวกัน**
+- `GET /api/settings` และ `GET /api/import/history` ถูกกั้นด้วย session cookie แล้ว
+  (สองเส้นนี้อ่านผ่าน service role ข้าม RLS — ปล่อย GET ไว้เท่ากับเปิดข้อมูลที่ตั้งใจปิดให้ทั้งวง LAN)
+  ยืนยันกับเซิร์ฟเวอร์จริง: ไม่มีคุกกี้ → 401 ทั้งคู่ · ปลดล็อกแล้ว → 200 · `/api/products` ยังเปิดตามเดิม
+  สองหน้าที่เรียกมันเคยกลืน error แล้วโชว์ "ไม่มีข้อมูล" ตอนนี้บอกให้ไปปลดล็อกที่ /unlock
+- ลบ `/api/products/[id]/review` (เขียนด้วย anon key แบบเดียวกัน ไม่มีใครเรียกแล้ว)
+  พร้อม `DatabaseService.updateProductStatus` / `createReviewHistory` ที่มีมันเป็นผู้เรียกรายเดียว
+  และ `utils/database-service.ts` (302 บรรทัด คลาสชื่อซ้ำที่ไม่เคยมีใคร import)
+- `docs/SYSTEM_OVERVIEW_TH.md` เขียนใหม่ตามของจริง — วิซาร์ด 5 ขั้น + `/api/import/commit`
+  แทนที่ `ProcessingStep.tsx` → `/api/import/process` ที่ลบไปแล้ว
+- เทสต์ `WizardTab` ที่ตกแบบสุ่ม ~1 ใน 3 รอบ เจอต้นเหตุจริงแล้ว: `runToDedup` รอแค่ "ยิงคำขอแล้ว"
+  ยังไม่ได้รอให้ผลลัพธ์ลง `saveResult` (โค้ดถูก เทสต์ผิด) — รัน 6 รอบติดผ่านหมด
+- ตัวเลขล่าสุด: jest **195 ผ่าน 0 ตก** (4 suite ที่ล้มเพราะไม่มี env เหมือนเดิม) · tsc 9 error ตาม baseline
+
+**ยังเหลือ (รอเจ้าของงานตัดสิน)**
+- ชุด Playwright ยังผุอยู่ (ผ่าน 2 จาก 20) ต้องเขียนใหม่ก่อนใช้เป็นด่านตรวจ
+- สาขา `fix/status-mismatch-and-page-cleanup` merge เข้า `main` แล้ว (30 ส.ค. 2569) ยังไม่ได้ push ขึ้น origin
+- เซิร์ฟเวอร์ dev ที่รันอยู่เสิร์ฟ chunk เก่าค้าง (ผลจาก `npm run build` ทับ `.next` ในรอบก่อน)
+  API ใช้งานได้ปกติ แต่หน้าเว็บต้อง restart `npm run dev` ก่อนถึงจะเปิดดูได้
+
+---
+
+## ✅ Session 29 ส.ค. 2569 (รอบสาม) — บั๊กหน้า /taxonomy และ /ai-brain
+
+เจ้าของงานแจ้งว่าสองหน้านี้มีปัญหา ตรวจแล้วเจอของจริง 3 เรื่อง (ไม่ใช่ของใหม่จากรอบสอง)
+
+### 🔴 /taxonomy เขียนอะไรไม่ได้เลย — และ "ลบ" หลอกว่าสำเร็จ
+ทุกหน้าคุยกับ Supabase ด้วย **anon key** แต่ policy ของ `taxonomy_nodes` /
+`synonym_lemmas` / `synonym_terms` / `system_settings` ให้เขียนได้เฉพาะ
+`taxonomy_editor` / `taxonomy_admin` (มาตั้งแต่ migration แรก `20250924120000` ไม่ใช่ของรอบที่แล้ว)
+ยิงจริงกับ DB แล้วได้: `INSERT` → **42501**, `UPDATE` → **200 พร้อม array ว่าง**, `DELETE` → **204 ที่ไม่ลบอะไร**
+สองอันหลัง**ไม่มี error** หน้าเว็บจึงขึ้น "ลบเรียบร้อยแล้ว" ทั้งที่ข้อมูลยังอยู่ครบ
+- [x] `utils/admin-db.ts` (ใหม่) — create/update/delete/upsert ผ่าน `supabaseAdmin`
+      คืน `null`/`false` เมื่อไม่มีแถวถูกแตะ แทนที่จะเงียบแล้วดูเหมือนสำเร็จ
+- [x] `/api/taxonomy`, `/api/synonyms` (+ `[id]`) เขียนผ่าน service role และตอบ **404** เมื่อไม่มีแถวตรง
+- [x] `/api/settings` (ใหม่) — หน้า `/settings` เดิมอ่าน `system_settings` ตรง ๆ ได้ **406 ทุกครั้งที่โหลด**
+- [x] อีกบั๊กที่ซ้อนอยู่: ฟอร์มส่ง `parent_id: ''` ไปให้คอลัมน์ uuid → `22P02` สร้างหมวดไม่ได้ตั้งแต่แรก
+      แก้ด้วย `z.preprocess` ที่ route + ตัดคีย์ค่าว่างทิ้งใน `admin-db`
+- [x] `POST /api/synonyms` บังคับให้ส่ง `terms` มา **แล้วไม่เคยบันทึก terms เลย** — คำพ้องที่พิมพ์หายเงียบ ๆ
+- [x] ตัวนับ "Global Nodes" นับเฉพาะโหนดบนสุด (12) → นับทั้งต้น = **134**
+
+### 🔴 /ai-brain โชว์ "ความมั่นใจในการปัดตก 85%" ที่ฝังไว้ในโค้ด
+`src/api/routers/learn.py` เขียนว่า `average_confidence = 85.0 # Fixed or from training history`
+ทั้งที่ `ml_feedback_learning.py` คำนวณค่าจริงได้อยู่แล้วแต่ไม่มีใครเรียกใช้
+- [x] ตอนเทรนเก็บ `average_confidence` (ค่าเฉลี่ยความน่าจะเป็นสูงสุดบนชุดทดสอบ) ลง training history
+- [x] `/learn/status` ส่งค่าจริง และส่ง `null` เมื่อโมเดลถูกเทรนไว้ก่อนมีฟิลด์นี้
+- [x] หน้าเว็บ**ซ่อนการ์ดไปเลย**เมื่อไม่มีค่า (ไม่โชว์ 0% ไม่เดา) — โมเดลปัจจุบันเข้าเคสนี้จนกว่าจะกด retrain
+
+### ⚠️ เรื่องที่เกิดจากเซสชันนี้เอง
+`npm run build` ตอนตรวจงานรอบสอง **ทับ `.next` ของ dev server ที่เปิดค้างไว้** ทำให้หน้าเว็บ 404
+ทุก chunk จนกว่าจะรัน `npm run dev` ใหม่ — ไม่ใช่บั๊กของโค้ด
+
+### ผลการตรวจสอบ (รอบสาม)
+| อย่าง | ผล |
+|---|---|
+| `pytest` | **163 passed / 7 skipped / 0 failed** |
+| `npx jest --ci` | **23 suite ผ่าน / 4 พัง (env เดิม), 168 เทสต์ผ่าน 0 ตก** |
+| `npx tsc --noEmit` | 9 error ตาม baseline |
+| ยิง API จริงกับ DB จริง | create 201 · update 200 · update id ที่ไม่มี 404 · delete 200 · delete ซ้ำ **404** · synonym สร้างพร้อม term · settings โหลดได้ไม่มี 406 · **ลบ probe ออกครบ ไม่มีขยะค้างใน DB** |
+
+---
+
+## ✅ Session 29 ส.ค. 2569 (รอบสอง) — แก้ status mismatch, ลบ /reports, เก็บกวาดของตาย
+
+ทำตามลำดับที่รอบก่อนเสนอไว้ครบทั้ง 4 ข้อ บนสาขา `fix/status-mismatch-and-page-cleanup`
+(commit งานค้าง 24 ไฟล์ของรอบก่อนเป็น 5 commit ก่อนเริ่ม)
+
+### 1. status mismatch — จุดเดียว แก้ได้ 3 หน้า
+- [x] `utils/product-status.ts` (ใหม่) — `ProductStatus` + `PENDING_REVIEW_STATUSES`
+      **แยกไฟล์เพราะ `utils/supabase.ts` สร้าง client ตอน import** โค้ดฝั่ง server และเทสต์
+      จึงอ้างค่าคงที่ได้โดยไม่ต้องมี env ของ client
+- [x] `getDashboardStats` นับสองด่านจริง (368) · `getProducts` รับ array แล้วใช้ `.in()`
+- [x] `POST /api/products` เคยสร้างสินค้าเป็น `'pending'` = มองไม่เห็นทุกหน้า → `pending_review_category`
+- [x] `__tests__/api/products/route.test.ts` เดิมทดสอบแต่ fixture ของตัวเอง เขียนใหม่ให้ยิง route จริง
+- [x] `jest.setup.js` mock framer-motion เป็นรายการแท็กตายตัว เจอ `motion.tr` แล้วพัง → เปลี่ยนเป็น Proxy
+
+### 2. `/products` เป็นหน้าดูสตอกอย่างเดียว
+- [x] ตัดปุ่ม approve/reject ออก สินค้าที่ยังรอตรวจแสดงป้ายและลิงก์ไป `/data-quality` แทน
+- [x] **เจอบั๊กที่ใหญ่กว่าที่คิด:** `getProducts` ดึง 50 แถวมากรองในเบราว์เซอร์ = ค้นได้แค่ 50 ตัวล่าสุด
+      จาก 3,103 → เพิ่ม `searchProducts()` (ค้น/กรอง/แบ่งหน้าที่ Postgres) + `getProductStatusCounts()`
+- [x] คำค้นถูกตัด `, ( ) * % \` ทิ้งก่อนเข้า `.or()` เพราะอักขระพวกนี้เป็นไวยากรณ์ของ PostgREST
+
+### 3. ลบ `/reports` ยุบเข้าหน้าแรก — ไม่เหลือเลขปลอมสักตัว
+- [x] ลบทั้งหน้า (229 บรรทัด) + เมนู + `e2e/report-dashboard.spec.ts`
+- [x] หน้าแรกเองก็มีเลขปลอม: `Accuracy 99.8%`, `Latency 12ms`, ป้าย `+8.2%/+4.1%/+12.5%` → ลบหมด
+- [x] ตัวเลขใหม่มาจาก DB ทั้งหมด: งานค้างแยกด่าน (147/221), คู่ซ้ำ 1,781 (คนตัดสินแล้ว 1,381),
+      ตรวจวันนี้นับจาก `review_history`, และ **AI ตรงกับคน 79.6%** จาก function ใหม่
+      `recheck_agreement_stats()` (migration `20260829000000`)
+- [x] **ตั้งใจไม่โชว์ 72.3%** — มาจากการรันเทสต์กับ test split ไม่ใช่ค่าที่ query ได้ ถ้า hardcode ไว้ก็เน่าซ้ำรอยเดิม
+- [x] แก้ลิงก์ตายบนหน้าแรก 2 จุด (`/synonyms` ที่ยุบไปแล้ว, ปุ่มรีวิวที่ชี้ไป `/products`)
+
+### 4. ลบของตาย
+- [x] `PendingTab` + `ApprovalStep` + `CategorySelector` (757 บรรทัด) และ route `pending` /
+      `process` / `process-local` / `process-storage` / `approve` — เหลือ `commit` เส้นเดียว
+- [x] `/import` เหลือ Wizard + ประวัติการนำเข้า
+
+### 🔍 สองบั๊กที่เจอจากการเปิดเบราว์เซอร์จริง (เทสต์จับไม่ได้ เพราะมันเงียบสนิท)
+- **`recheck_agreement_stats()` เรียกไม่ได้จากหน้าเว็บ** — migration แรก grant ให้แค่
+  `authenticated`/`service_role` แต่หน้าแรกเป็น client component ใช้ anon key → `42501 permission denied`
+  แก้ด้วย migration `20260829000001` (grant anon — ไม่เพิ่มการเปิดเผย เพราะ function เป็น SECURITY INVOKER
+  บนสองตารางที่ anon อ่านทีละแถวได้อยู่แล้ว)
+- **ประวัติการนำเข้าว่างเปล่าถาวร** — `ImportHistory` อ่านตาราง `imports` ตรงๆ ด้วย anon key
+  แต่ migration `20260828000000` จำกัด SELECT ไว้ที่ editor/admin → ได้ array ว่าง **ไม่มี error**
+  แก้ด้วย `GET /api/import/history` ที่ใช้ service role
+
+### ⚠️ ยังค้าง (รากเดียวกัน แต่อยู่นอกขอบเขตที่ตกลงกันรอบนี้)
+~~`/settings` อ่าน/เขียน `system_settings` ด้วย anon key~~ — **แก้แล้วในรอบสาม** (`/api/settings`)
+(ตารางที่จำกัดสิทธิ์เหลืออีก: `product_attributes` — `getProducts`/`getProduct` ยัง embed มาด้วย
+จะได้ array ว่างเงียบๆ เหมือนกัน แต่ตอนนี้ยังไม่มีหน้าไหนแสดงผลจริง)
+
+### ผลการตรวจสอบ
+| อย่าง | ผล |
+|---|---|
+| `npx jest --ci` | **19 suite ผ่าน / 4 พัง (env เดิม), 152 เทสต์ผ่าน 0 ตก** (ก่อนเริ่ม: 14 ผ่าน/4 พัง 134 เทสต์) |
+| `npx tsc --noEmit` | **9 error ตาม baseline** (เหลือแต่ `e2e/` + `__tests__/integration/`) |
+| `npm run build` | ผ่าน |
+| เบราว์เซอร์จริง + DB จริง | หน้าแรกขึ้น 368 (147/221), 3,103, 1,781, **79.6%** · `/products` ค้น "ยาสีฟัน" ได้ 46 จาก 3,508 (ตรงกับ SQL) · `/import` มีประวัติจริง · ไม่มี console error |
+
+> ทุกอย่างเขียนแบบ TDD — เทสต์ที่แดงก่อนแล้วค่อยแก้โค้ด (ยกเว้นการลบไฟล์ตาย)
+
+---
+
+## ✅ Session 29 ส.ค. 2569 — ตรวจหน้าเพจ/คอมโพเนนต์ทั้งแอป แล้วแก้บั๊ก Import Wizard
+
+ตรวจ 9 หน้าและ 26 คอมโพเนนต์ พบบั๊กจริง 4 ข้อ กระจุกอยู่ใน Import Wizard ซึ่งเป็นเส้นทางหลักที่เขียนข้อมูลลงฐานข้อมูล
+
+### 🔴 กันบันทึกซ้ำ (ข้อที่หนักที่สุด — เขียนข้อมูลผิดลง DB จริง)
+แถบขั้นตอนให้กดย้อนกลับได้ กลับไปขั้นตรวจของซ้ำแล้วเดินหน้าใหม่ = `commitDedup` ยิงรอบสอง
+และ route ใช้ `.insert()` เปล่า ไม่มี guard → ได้ `imports` ใหม่ทั้งใบ + `products` ซ้ำทุกแถว
+ซึ่งย้อนกลับไปทำให้การตรวจของซ้ำรอบหน้าเพี้ยนตามไปด้วย
+- [x] `WizardTab.tsx` — `wizard_run_id` หนึ่งค่าต่อหนึ่งรอบ ส่งไปกับทุก commit เปลี่ยนใหม่เมื่อกดเริ่มใหม่เท่านั้น
+      **มี fallback ให้ `crypto.randomUUID`** เพราะ LAN เข้าผ่าน `http://192.168.x.x` ไม่ใช่ secure context ฟังก์ชันนี้จะเป็น `undefined`
+- [x] `app/api/import/commit/route.ts` — เช็ค `metadata->>wizard_run_id` **ก่อน** `embedAll` (ซึ่งกินเวลานาน เป็นช่องให้กดซ้ำ)
+      เจอแล้วคืนผลของ batch เดิมพร้อมคีย์ `products` ครบ (ขั้นจัดหมวดใช้ทำ map ชื่อ → id)
+- [x] migration `20260828000004` — unique index บน `(metadata->>'wizard_run_id')` เพราะลำพัง SELECT-แล้ว-INSERT ยังแข่งกันได้
+      route ดัก `23505` แล้วคืนผลของ batch ที่ชนะแทนการโยน error
+- [x] **กับดักที่เกือบพลาด:** `.update()` ตอนจบเขียนทับ `metadata` ทั้งก้อน ถ้าไม่ใส่ `wizard_run_id` กลับไปด้วย คีย์จะหายและ guard ตายตั้งแต่รอบแรก
+- [x] `product_category_suggestions` ก็ insert ซ้ำได้ → ล้างของ batch เดียวกันก่อน insert
+
+### 🔴 หน้าสรุปโชว์ผลของรอบก่อน / ล้มเหลวแบบเงียบ
+- [x] `onReset` ไม่ได้ล้าง `saveResult`/`saveError` → รอบถัดไปที่บันทึกพลาดจะเอาหมวดหมู่ไปแปะสินค้าของ batch เก่า
+- [x] `commitCategories` เคย `return` เงียบ ๆ 2 จุด ผู้ใช้เห็น "บันทึกเข้าฐานข้อมูลแล้ว" ทั้งที่หมวดหมู่ไม่ลง DB เลย → ขึ้น `saveError` ทั้งสองกรณี
+
+### 🔴 ปุ่มรีวิวของซ้ำเป็นปุ่มหลอก
+`handleBulkAction` มีบรรทัดเดียวคือล้างการเลือกทิ้ง ปุ่ม "รวมเป็นของชิ้นเดียวกัน"/"แยกเป็นของใหม่" ไม่เปลี่ยน `_bucket` เลย
+และไม่มี action รายตัว → ทุกอย่างในโซนรีวิวออกไปเป็น `'review'` เหมือนเดิมหมด ช่องค้นหาก็ไม่มี `onChange`
+- [x] `DeduplicationStep.tsx` — เปลี่ยนเป็นตรวจทีละรายการ + คีย์ลัด `A`/`D`/`S` และลูกศร **รวมผังแป้นไทย `ฟ`/`ก`/`ห`**
+      ยกแพตเทิร์นมาจาก `DeduplicationTab.tsx` (หน้าตรวจของซ้ำในคลัง) ให้ผู้ใช้ไม่ต้องจำสองชุด
+- [x] **ต่างจากต้นแบบตรงที่ยิง API รายตัวไม่ได้** — สินค้ายังไม่มีอยู่ใน DB เพิ่งถูกสร้างตอน commit จึงเก็บผลตัดสินใน state ก่อน
+
+### 🧹 ล้างบ้าน
+- [x] `types/import.ts` — `WizardItem` / `DedupResults` / `SaveResult` คุมข้อมูลที่ไหลผ่าน 5 ขั้น
+      เลิกใช้ `}: any)` ใน 3 คอมโพเนนต์ **พอใส่ type แล้วเจอจุดหละหลวมที่ `any` บังไว้ทันที 8 จุด** (เช่น `_confidence` อาจ undefined)
+      `DedupBucket` ดึงมาจาก `utils/price.ts` ที่มีอยู่แล้ว ไม่ประกาศซ้ำ
+- [x] ลบ dead component 5 ไฟล์ (2,337 บรรทัด) ที่ถูกเขียนแทนลงในหน้าไปแล้ว — **เก็บ `HybridSearch.tsx` ไว้** เพราะไม่ได้ถูกแทน
+      เป็นฟีเจอร์ค้างที่ยังไม่ต่อเข้าแอป และ `settings/page.tsx` ยังมีตัวตั้งค่า `hybridSearchEnabled` รออยู่
+
+### 🧪 เทสต์ที่เคยเชื่อไม่ได้
+- [x] ลบ 4 suite ที่ "ผ่าน" แต่ **นิยาม mock component ในไฟล์เทสต์เองแล้ว render อันนั้น** (แก้โค้ดจริงพังยังไงก็ยังเขียว)
+- [x] เขียน `ColumnMappingStep.test.tsx` ใหม่ทั้งไฟล์ และแก้ `WizardLayout.test.tsx` (assert ข้อความ UI ที่ถูกรื้อไปแล้ว)
+- [x] เพิ่ม `WizardTab.test.tsx` (6), `Import/DeduplicationStep.test.tsx` (10), `api/import/commit.test.ts` (5) คุมบั๊กทั้ง 4 ข้อ
+- [x] `jest.setup.js` — polyfill `AbortSignal.timeout` (jsdom ไม่มี ทำให้ `DeduplicationStep` ตกไปทาง fallback สุ่ม เทสต์เลยผ่านบ้างไม่ผ่านบ้าง)
+      และกัน `window` ให้เทสต์ API route รันบน environment `node` ได้
+
+### ผลการตรวจสอบ
+| อย่าง | ก่อน | หลัง |
+|---|---|---|
+| `npx jest --ci` | 12 ผ่าน / 8 พัง, 20 เทสต์ตก | **14 ผ่าน / 4 พัง, 0 เทสต์ตก** (4 ที่เหลือต้องใช้ Supabase credentials) |
+| `npx tsc --noEmit` | 11 error | **9 error** (เหลือแต่ใน `e2e/` + `__tests__/integration/` ตาม baseline) |
+| ยิง commit ซ้ำด้วย run id เดิมบน DB จริง | ได้ 2 batch / 4 แถว | **1 batch / 2 แถว, ครั้งที่สองคืน `reused: true`** |
+
+### ⚠️ ยังค้างอยู่ (ไม่ได้เกิดจากงานรอบนี้)
+- **ชุด e2e เน่าทั้งชุด** — `npx playwright test` ผ่าน 2 จาก 20 specs assert ข้อความอย่าง
+  `เลือกวิธีการ Import` ที่**ไม่มีอยู่ในโค้ดแล้ว** และ `real-user-workflows.spec.ts` collect ไม่ผ่านเลย
+  เพราะ import `__tests__/setup/database-setup.ts` ที่ throw เมื่อไม่มี env — เป็นปัญหาเดียวกับ 4 jest suite ที่เหลือ
+  (playwright ไม่ได้โหลด `.env.local`) **ควรเป็นงานรอบถัดไป**
+- `__tests__/api/products/route.test.ts` ยังเป็นเทสต์ที่ทดสอบแต่ฟังก์ชันสร้าง fixture ไม่ได้แตะ route จริง
+- `any` ที่เหลือ ~56 จุดใน API routes และ `icon: any` (ตั้งใจไม่แตะ เพื่อให้ diff รีวิวได้)
+
+---
+
+## 🔎 ผลตรวจ 9 หน้า (29 ส.ค. 2569) — ✅ **แก้ครบแล้วในรอบสอง (ดูหัวข้อบนสุด)** เก็บไว้เป็นบันทึกว่าเจออะไร
+
+ตรวจครบทั้ง 9 หน้าหลังแก้บั๊ก wizard เสร็จ ข้อสรุป: **จำนวนหน้าไม่ใช่ปัญหา
+แต่ 4 หน้าแสดงข้อมูลผิดหรือว่างเปล่าถาวร** ซึ่งอันตรายกว่า เพราะคนตัดสินใจจากตัวเลขที่ไม่จริง
+
+### 🔥 ปัญหาราก: `status` ไม่ตรงกัน 2 ชุด (จุดเดียว พัง 3 หน้า)
+
+UI เก่าเชื่อว่าสถานะคือ `'pending'` แต่ pipeline จริงที่ `commit/route.ts` เขียนใช้
+`pending_review_category` / `pending_review_dedup` — **ไม่มีสินค้าสักตัวที่ status เป็น `'pending'` ในฐานข้อมูล**
+
+| จุดที่ยังใช้ `'pending'` | ผลที่เกิด |
+|---|---|
+| `app/products/page.tsx:56` (default filter) | เปิดหน้ามาว่างเปล่า |
+| `app/products/page.tsx:206` (ตัวนับ) | ขึ้น 0 เสมอ |
+| `app/products/page.tsx:413` (เงื่อนไขปุ่ม) | ปุ่ม approve/reject ไม่มีวันโผล่ |
+| `utils/supabase.ts:753` (`getDashboardStats`) | หน้าแรกนับงานค้าง 0 ทั้งที่จริงมี **368** |
+
+### หน้าที่มีปัญหา เรียงตามความอันตราย
+
+1. **🔴 `/reports` ปลอมทั้งหน้า** — ไม่มี `fetch` สักบรรทัด มีแต่ `setTimeout(800)` ที่คอมเมนต์เขียนว่า
+   *"Artificial delay for premium loading feel"* แล้วตามด้วยตัวเลข hardcode 4 ตัวที่ `reports/page.tsx:85-88`
+   **โชว์ Overall Accuracy 99.8% ทั้งที่ค่าจริงที่วัดได้คือ 72.3%**
+   → บั๊กชนิดเดียวกับ `benchmark_similarity.py` ที่เคยลบไป แต่รอบนี้อยู่บนหน้าจอที่ผู้ใช้เห็นทุกวัน
+2. **🔴 `/products` เปิดมาว่างเสมอ** (ราก: status mismatch)
+3. **🟠 หน้าแรกนับงานค้าง 0** ทั้งที่มี 368 รายการรอจริง (ราก: เดียวกัน)
+4. **🟠 `/import` → แท็บ "รอการอนุมัติ" ตายสนิท** — `api/import/pending/route.ts:27` กรอง
+   `suggestion_method='hybrid_ai_preview'` ซึ่ง**คนเขียนค่านี้มีที่เดียวคือ `/api/import/process`**
+   ที่ไม่มี UI เรียกแล้ว (เป็นของ `ProcessingStep` ที่ลบไปแล้ว) เช็ค DB แล้วมี **0 แถว**
+
+### ของตายที่ยังค้าง
+| อย่าง | ขนาด |
+|---|---|
+| `PendingTab` + `ApprovalStep` + `CategorySelector` | 757 บรรทัด |
+| API routes `process` / `process-local` / `process-storage` / `approve` | 4 เส้น ไม่มี UI เรียก |
+| `/reports` ทั้งหน้า | 229 บรรทัด |
+
+> เหลือ import route ที่ใช้จริงเส้นเดียวคือ `commit` — ตรงกับที่เคยบันทึกไว้ว่า "import route ซ้ำ 4 เส้น"
+
+### ✅ ทิศทางที่เจ้าของงานตัดสินใจแล้ว (29 ส.ค.)
+- **`/reports`** → **ลบหน้าทิ้ง ยุบเข้าหน้าแรก** ใช้ตัวเลขจริงชุดเดียว
+- **`/products`** → เปลี่ยนเป็น **หน้าค้น/ดูสตอกอย่างเดียว ไม่ทำ review** (งานตรวจอยู่ที่ `/data-quality` ที่เดียว)
+- ขอบเขตตอนนั้น: **ขอรายงานก่อน ยังไม่ลงมือแก้**
+
+### โครงที่เสนอ (9 → 7 หน้า + `/unlock` ที่ไม่อยู่ในเมนู)
+```
+/              แดชบอร์ด (ยุบ /reports เข้ามา ตัวเลขจริงชุดเดียว)
+/import        Wizard อย่างเดียว (ตัดแท็บที่ตายออก)
+/data-quality  ศูนย์รวมงานตรวจ 368 รายการ ← "ที่ทำงาน" จริงของระบบ
+/products      ค้น/ดูสตอก 3,103 ตัว อ่านอย่างเดียว
+/taxonomy      หมวดหมู่ + synonyms
+/ai-brain      ML
+/settings      กฎ keyword/regex
+```
+ที่สำคัญกว่าจำนวนหน้าคือ **งานตรวจมีบ้านเดียว ไม่กระจาย 3 ที่**
+
+### ลำดับที่แนะนำให้ทำต่อ
+1. **แก้ status mismatch** — จุดเดียวแก้ได้ 3 หน้า คุ้มที่สุด งานน้อยสุด
+2. **จัดการ `/reports`** — ตัวเลขปลอมอยู่บนจอทุกวัน อันตรายเชิงตัดสินใจ
+3. **ลบของตาย** — PendingTab + 4 routes เก็บกวาดตามหลัง
+
+### ❓ 2 ข้อที่ยังไม่มีคำตอบ (ต้องถามเจ้าของงาน ตอบจากโค้ดอย่างเดียวไม่ได้)
+- `/ai-brain` ควรยุบเป็นแท็บที่ 5 ของ `/data-quality` ไหม — ขึ้นกับว่าใช้เป็นหน้าคุมโมเดลแยกจริงหรือเปล่า
+- `/import` เหลือ wizard อย่างเดียวแล้ว ยังต้องมี `ImportHistory` ไหม
+
+---
+
+## ⚠️ สถานะ git ตอนส่งต่อ (29 ส.ค. 2569 รอบสอง)
+
+งานค้าง 24 ไฟล์ของรอบก่อน **commit แล้ว** (5 commit) และงานรอบสองอีก 5 commit
+ทั้งหมดอยู่บนสาขา **`fix/status-mismatch-and-page-cleanup`** ยังไม่ merge เข้า `main` และยังไม่ push
+
+migration ที่ apply ลง local DB แล้วและ commit แล้ว: `20260828000004`, `20260829000000`, `20260829000001`
+
+`.mcp.json` มีการแก้ path ของ socraticode จาก `D:\SocratiCode-main\` ไปเป็น path ใน nvm
+**ไม่ใช่งานของเซสชันนี้** ไม่ได้แตะ ปล่อยไว้ตามเดิม
 
 ---
 

@@ -29,6 +29,8 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock matchMedia
+// เทสต์ของ API route รันบน environment 'node' ซึ่งไม่มี window — ข้ามส่วนนี้ไป
+if (typeof window !== 'undefined') {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -42,6 +44,7 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 })
+}
 
 // Mock next/router
 jest.mock('next/router', () => ({
@@ -108,18 +111,29 @@ jest.mock('@supabase/supabase-js', () => ({
 }))
 
 // Mock framer-motion
+// เดิมเป็นรายการแท็กแบบตายตัว พอเจอ motion.tr / motion.section ที่ไม่ได้อยู่ในรายการ
+// จะได้ undefined แล้วพังด้วย "Element type is invalid" — ใช้ Proxy รองรับทุกแท็กแทน
+const MOTION_ONLY_PROPS = new Set([
+  'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId',
+  'whileHover', 'whileTap', 'whileFocus', 'whileDrag', 'whileInView', 'viewport',
+  'drag', 'dragConstraints', 'onAnimationStart', 'onAnimationComplete',
+])
+
 jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-    span: ({ children, ...props }) => <span {...props}>{children}</span>,
-    button: ({ children, ...props }) => <button {...props}>{children}</button>,
-    form: ({ children, ...props }) => <form {...props}>{children}</form>,
-    input: ({ children, ...props }) => <input {...props}>{children}</input>,
-    textarea: ({ children, ...props }) => <textarea {...props}>{children}</textarea>,
-    select: ({ children, ...props }) => <select {...props}>{children}</select>,
-    ul: ({ children, ...props }) => <ul {...props}>{children}</ul>,
-    li: ({ children, ...props }) => <li {...props}>{children}</li>,
-  },
+  motion: new Proxy(
+    {},
+    {
+      get: (_target, tag) => {
+        const Tag = tag
+        return ({ children, ...props }) => {
+          const domProps = Object.fromEntries(
+            Object.entries(props).filter(([key]) => !MOTION_ONLY_PROPS.has(key))
+          )
+          return <Tag {...domProps}>{children}</Tag>
+        }
+      },
+    }
+  ),
   AnimatePresence: ({ children }) => children,
   useAnimation: () => ({
     start: jest.fn(),
@@ -165,4 +179,16 @@ global.testUtils = {
     email: 'test@example.com',
     user_metadata: { name: 'Test User' },
   },
+}
+
+// jsdom ที่ใช้อยู่ยังไม่มี AbortSignal.timeout แต่โค้ดจริงเรียกใช้ (เช่น DeduplicationStep)
+// ถ้าไม่เติมให้ fetch จะโยน error ทิ้งตั้งแต่ยังไม่ได้ยิง แล้วคอมโพเนนต์จะตกไปทาง
+// fallback ที่ใช้คะแนนสุ่ม ทำให้เทสต์ผ่านบ้างไม่ผ่านบ้างโดยไม่เกี่ยวกับสิ่งที่กำลังทดสอบ
+if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout !== 'function') {
+  AbortSignal.timeout = (ms) => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), ms)
+    if (typeof timer.unref === 'function') timer.unref()
+    return controller.signal
+  }
 }

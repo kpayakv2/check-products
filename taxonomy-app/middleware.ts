@@ -6,10 +6,18 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 // Requests that must remain reachable without an unlocked session.
 const UNGATED_PATHS = new Set(['/api/unlock'])
 
+// Reads that go through the service role and therefore bypass RLS. A GET here
+// hands out exactly the rows the anon key is denied, so it needs the session too.
+const GATED_READ_PATHS = new Set(['/api/settings', '/api/import/history'])
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (SAFE_METHODS.has(request.method) || UNGATED_PATHS.has(pathname)) {
+  if (UNGATED_PATHS.has(pathname)) {
+    return NextResponse.next()
+  }
+
+  if (SAFE_METHODS.has(request.method) && !GATED_READ_PATHS.has(pathname)) {
     return NextResponse.next()
   }
 

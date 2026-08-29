@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { AlertTriangleIcon, CheckCircleIcon, DatabaseIcon, PlusIcon } from 'lucide-react'
+import type { SaveResult, WizardItem } from '@/types/import'
 
 /**
  * สรุปผลการนำเข้า
@@ -10,15 +11,23 @@ import { AlertTriangleIcon, CheckCircleIcon, DatabaseIcon, PlusIcon } from 'luci
  * ห้ามนับจาก state ในเบราว์เซอร์ — เดิมหน้านี้ขึ้นว่า "บันทึกเรียบร้อยแล้ว" ทุกครั้ง
  * ทั้งที่ทั้ง wizard ไม่เคยเขียนฐานข้อมูลเลยสักแถว
  */
+interface CompleteStepProps {
+  categorizedData: WizardItem[]
+  saveResult: SaveResult | null
+  saveError: string | null
+  onReset: () => void
+}
+
 export default function CompleteStep({
   categorizedData,
   saveResult,
   saveError,
   onReset
-}: any) {
+}: CompleteStepProps) {
   const saved = saveResult?.saved ?? 0
   const counts = saveResult?.counts ?? {}
   const succeeded = !saveError && saved > 0
+  const missingEmbedding = saveResult?.missing_embedding ?? 0
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-10">
@@ -47,9 +56,9 @@ export default function CompleteStep({
               : saveError || 'ไม่มีข้อมูลถูกบันทึก — กรุณาตรวจสอบแล้วลองใหม่'}
           </p>
 
-          {succeeded && saveResult?.missing_embedding > 0 && (
+          {succeeded && missingEmbedding > 0 && (
             <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-sm font-bold text-amber-800 thai-text">
-              ⚠️ มี {saveResult.missing_embedding} รายการที่ไม่มี embedding — จะไม่ถูกนำไปเทียบในการตรวจของซ้ำครั้งหน้า
+              ⚠️ มี {missingEmbedding} รายการที่ไม่มี embedding — จะไม่ถูกนำไปเทียบในการตรวจของซ้ำครั้งหน้า
             </div>
           )}
 

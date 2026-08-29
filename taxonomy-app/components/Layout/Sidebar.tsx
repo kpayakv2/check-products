@@ -9,7 +9,6 @@ import {
   BookOpenIcon, 
   ShoppingBagIcon,
   UploadIcon,
-  BarChartIcon,
   SettingsIcon,
   MenuIcon,
   XIcon,
@@ -62,13 +61,6 @@ const navigation = [
     icon: UploadIcon,
     description: 'Bulk Intake',
     thai: 'นำเข้าข้อมูล'
-  },
-  {
-    name: 'Reports',
-    href: '/reports',
-    icon: BarChartIcon,
-    description: 'Performance Analytics',
-    thai: 'รายงานวิเคราะห์'
   },
   {
     name: 'Settings',

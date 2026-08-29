@@ -4,21 +4,27 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TagsIcon, CheckCircleIcon, ArrowRightIcon, AlertTriangleIcon, CheckIcon, XIcon, ChevronDownIcon, ChevronUpIcon, WifiOffIcon, RefreshCwIcon } from 'lucide-react'
 
-interface CategorySuggestion {
+import type { WizardItem } from '@/types/import'
+
+/** ขั้นนี้เติมค่าให้ครบทุกรายการก่อนแสดงผลเสมอ จึงบังคับให้มีจริงไม่ใช่ optional */
+interface CategorySuggestion extends WizardItem {
   _cleaned_name: string
   _suggested_category: string
-  _suggested_category_id?: string
   _confidence: number
   _status: 'pending' | 'approve' | 'reject'
-  _source: 'backend' | 'mock'
-  [key: string]: any
+}
+
+interface CategorizationStepProps {
+  dedupedData: WizardItem[]
+  onComplete: (categorized: WizardItem[]) => void
+  onBack?: () => void
 }
 
 export default function CategorizationStep({
   dedupedData,
   onComplete,
   onBack
-}: any) {
+}: CategorizationStepProps) {
   const [isProcessing, setIsProcessing] = useState(true)
   const [progress, setProgress] = useState(0)
   const [statusMsg, setStatusMsg] = useState('กำลังเชื่อมต่อระบบแนะนำอัจฉริยะ...')
@@ -299,7 +305,7 @@ export default function CategorizationStep({
                   <h3 className="text-lg font-bold text-slate-800 truncate thai-text">
                     {suggestion._cleaned_name}
                   </h3>
-                  <p className="text-sm text-slate-500 truncate thai-text mt-1">{suggestion.description || 'ไม่มีรายละเอียด'}</p>
+                  <p className="text-sm text-slate-500 truncate thai-text mt-1">{typeof suggestion.description === 'string' && suggestion.description ? suggestion.description : 'ไม่มีรายละเอียด'}</p>
                 </div>
                 
                 <div className="col-span-5">

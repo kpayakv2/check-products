@@ -255,6 +255,14 @@ class FeedbackLearningModel:
         else:
             feature_importance = []
         
+        # ความมั่นใจเฉลี่ยของโมเดลบนชุดทดสอบ — เก็บไว้ตอนเทรนเพราะคำนวณตอนเรียก
+        # /learn/status ไม่ได้ (ต้องมีข้อมูลทดสอบอยู่ในมือ) เดิมหน้า AI Brain
+        # จึงโชว์เลข 85 ที่ฝังไว้ในโค้ดแทน
+        if hasattr(self.model, 'predict_proba'):
+            average_confidence = float(self.model.predict_proba(X_test).max(axis=1).mean())
+        else:
+            average_confidence = None
+
         training_result = {
             'training_date': datetime.now().isoformat(),
             'model_type': self.model_type,
@@ -263,6 +271,7 @@ class FeedbackLearningModel:
             'test_samples': len(X_test),
             'train_accuracy': train_accuracy,
             'test_accuracy': test_accuracy,
+            'average_confidence': average_confidence,
             'cv_mean_accuracy': cv_scores.mean(),
             'cv_std_accuracy': cv_scores.std(),
             'classification_report': class_report,

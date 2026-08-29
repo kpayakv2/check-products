@@ -1,48 +1,56 @@
-import { generateProductTestData } from '../../utils/api-test-utils'
+/**
+ * เดิมไฟล์นี้ทดสอบแต่ฟังก์ชันสร้าง fixture ของตัวเอง ไม่เคยเรียก route จริงเลย
+ * เขียนใหม่ให้ยิง route จริง โดยเฉพาะ status ที่ POST ใช้ตอนสร้างสินค้า —
+ * ค่าเดิมคือ 'pending' ซึ่งไม่มีหน้าไหนในระบบมองเห็น
+ *
+ * @jest-environment node
+ */
+import { NextRequest } from 'next/server'
 
-// Simple Product API tests
-describe('Products API Route', () => {
-  it('should generate product test data', () => {
-    const products = generateProductTestData()
-    expect(products).toHaveLength(2)
-    expect(products[0].name).toBe('iPhone 15 Pro')
-    expect(products[1].name).toBe('Samsung Galaxy S24')
-  })
+const createProduct = jest.fn(async (payload: Record<string, unknown>) => ({
+  id: 'p-1',
+  ...payload
+}))
 
-  it('should validate product data structure', () => {
-    const products = generateProductTestData()
-    
-    products.forEach(product => {
-      expect(product).toHaveProperty('id')
-      expect(product).toHaveProperty('name')
-      expect(product).toHaveProperty('description')
-      expect(product).toHaveProperty('status')
-      expect(product).toHaveProperty('similarity_score')
+jest.mock('@/utils/supabase', () => {
+  const actual = jest.requireActual('@/utils/product-status')
+  return {
+    ...actual,
+    DatabaseService: {
+      createProduct: (payload: Record<string, unknown>) => createProduct(payload),
+      createProductAttribute: jest.fn(),
+      getProducts: jest.fn(async () => [])
+    }
+  }
+})
+
+import { POST } from '@/app/api/products/route'
+import { PENDING_REVIEW_STATUSES } from '@/utils/product-status'
+
+const post = (body: unknown) =>
+  POST(
+    new NextRequest('http://127.0.0.1:3000/api/products', {
+      method: 'POST',
+      body: JSON.stringify(body)
     })
+  )
+
+beforeEach(() => {
+  createProduct.mockClear()
+})
+
+describe('POST /api/products', () => {
+  it('สร้างสินค้าด้วยสถานะที่หน้ารีวิวมองเห็นจริง', async () => {
+    await post({ name_th: 'ปากกาลูกลื่น' })
+
+    const [payload] = createProduct.mock.calls[0]
+    expect(PENDING_REVIEW_STATUSES).toContain(payload.status)
   })
 
-  it('should handle product filtering by status', () => {
-    const products = generateProductTestData()
-    const pendingProducts = products.filter(p => p.status === 'pending')
-    const approvedProducts = products.filter(p => p.status === 'approved')
-    
-    expect(pendingProducts).toHaveLength(1)
-    expect(approvedProducts).toHaveLength(1)
-  })
+  it('ปฏิเสธคำขอที่ไม่มีชื่อสินค้า', async () => {
+    const response = await post({ name_en: 'ball pen' })
 
-  it('should validate required fields', () => {
-    const invalidProduct: any = { description: 'Test' } // Missing name
-    
-    const isValid = invalidProduct.name && invalidProduct.description
-    expect(isValid).toBeFalsy()
-  })
-
-  it('should handle similarity scores', () => {
-    const products = generateProductTestData()
-    
-    products.forEach(product => {
-      expect(product.similarity_score).toBeGreaterThan(0)
-      expect(product.similarity_score).toBeLessThanOrEqual(1)
-    })
+    expect(response.status).toBe(400)
+    expect(createProduct).not.toHaveBeenCalled()
   })
 })

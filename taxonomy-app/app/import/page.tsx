@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import WizardTab from '@/components/Import/WizardTab'
-import PendingTab from '@/components/Import/PendingTab'
 import ImportHistory from '@/components/Import/ImportHistory'
 import { 
   UploadIcon,
@@ -23,25 +22,7 @@ import {
 } from 'lucide-react'
 
 export default function ImportPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'wizard' | 'pending'>('dashboard')
-  const [pendingCount, setPendingCount] = useState<number | null>(null)
-
-  // Load pending count
-  useEffect(() => {
-    const loadPendingCount = async () => {
-      try {
-        const response = await fetch('/api/import/pending?limit=1')
-        if (response.ok) {
-          const data = await response.json()
-          setPendingCount(data.pagination.total)
-        }
-      } catch (error) {
-        console.error('Error loading pending count:', error)
-      }
-    }
-
-    loadPendingCount()
-  }, [])
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'wizard'>('dashboard')
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
@@ -52,12 +33,6 @@ export default function ImportPage() {
         {activeTab === 'wizard' && (
           <div className="flex-1 overflow-hidden">
              <WizardTab />
-          </div>
-        )}
-
-        {activeTab === 'pending' && (
-          <div className="flex-1 overflow-hidden">
-             <PendingTab onBack={() => setActiveTab('dashboard')} />
           </div>
         )}
 
@@ -75,7 +50,7 @@ export default function ImportPage() {
             </div>
 
             {/* Main Action Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="mb-12 max-w-2xl">
               {/* New Import Card */}
               <motion.div
                 whileHover={{ y: -8 }}
@@ -102,39 +77,6 @@ export default function ImportPage() {
                 </div>
               </motion.div>
 
-              {/* Pending Approvals Card */}
-              <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              >
-                <div onClick={() => setActiveTab('pending')} data-testid="pending-reviews-card" className="block group">
-                  <div className="bg-white/60 backdrop-blur-md rounded-[48px] p-10 border border-white shadow-xl shadow-amber-100/20 group-hover:bg-white group-hover:border-amber-100 transition-all cursor-pointer h-full flex flex-col items-start">
-                    <div className="w-16 h-16 bg-amber-100 rounded-3xl flex items-center justify-center text-amber-600 border border-amber-200/50 mb-8 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                      <InboxIcon className="w-8 h-8" />
-                    </div>
-                    
-                    <div className="flex items-center justify-between w-full mb-4">
-                      <h3 data-testid="pending-reviews-title" className="text-2xl font-black text-slate-900 thai-text tracking-tight uppercase">
-                        Pending Reviews
-                      </h3>
-                      {pendingCount !== null && (
-                        <div className="bg-amber-600 text-white px-3 py-1.5 rounded-2xl text-xs font-black tracking-widest shadow-lg shadow-amber-600/20">
-                          {pendingCount}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <p className="text-slate-500 text-base font-medium thai-text leading-relaxed mb-10 flex-1">
-                      ตรวจสอบสินค้าที่ระบบวิเคราะห์เสร็จสิ้นแล้ว คุณสามารถปรับแก้ชื่อ คุณลักษณะ หรือสถานะได้รายชิ้นหรือแบบกลุ่ม
-                    </p>
-                    
-                    <div className="flex items-center gap-2 text-amber-600 font-black tracking-widest text-xs uppercase">
-                      Review Work Queue
-                      <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
             </div>
 
             {/* Advanced Utility Grid */}

@@ -232,3 +232,6 @@ gha-creds-*.json
 
 # Scratch folder (temporary AI agent files)
 scratch/
+
+# artifacts จาก Playwright MCP (snapshot/console log ระหว่างตรวจงาน)
+.playwright-mcp/

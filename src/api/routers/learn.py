@@ -109,7 +109,12 @@ async def get_ml_status():
             last_training = learning_system.model.training_history[-1]
             accuracy = round(last_training.get("test_accuracy", 0) * 100, 2)
             total_samples = last_training.get("total_samples", 0)
-            average_confidence = 85.0 # Fixed or from training history
+            # None เมื่อโมเดลถูกเทรนก่อนที่จะมีการเก็บค่านี้ — หน้าเว็บซ่อนการ์ดไป
+            # ดีกว่าโชว์ตัวเลขที่ไม่ได้มาจากโมเดล (เดิมส่ง 85.0 ตายตัว)
+            trained_confidence = last_training.get("average_confidence")
+            average_confidence = (
+                round(trained_confidence * 100, 2) if trained_confidence is not None else None
+            )
             
         return {
             "is_trained": True,

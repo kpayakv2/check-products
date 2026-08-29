@@ -39,14 +39,20 @@ const ItemSchema = z.object({
   price: z.coerce.number().optional(),
 })
 
+// ไอดีประจำหนึ่งรอบ wizard — ไม่บังคับเป็น uuid เพราะฝั่งเบราว์เซอร์มีทางสำรอง
+// สำหรับเครื่อง LAN ที่ crypto.randomUUID ใช้ไม่ได้ (ไม่ใช่ secure context)
+const WizardRunId = z.string().min(8).max(128)
+
 const DedupCommitSchema = z.object({
   action: z.literal('dedup'),
+  wizard_run_id: WizardRunId,
   file_name: z.string().optional(),
   items: z.array(ItemSchema).min(1, 'ต้องมีอย่างน้อย 1 รายการ').max(5000),
 })
 
 const CategorizeCommitSchema = z.object({
   action: z.literal('categorize'),
+  wizard_run_id: WizardRunId.optional(),
   import_batch_id: z.string().uuid(),
   assignments: z.array(z.object({
     product_id: z.string().uuid(),
@@ -93,8 +99,48 @@ async function embedAll(texts: string[]): Promise<(number[] | null)[]> {
   return vectors
 }
 
+/**
+ * ประกอบผลลัพธ์ของ batch ที่บันทึกไปแล้วขึ้นมาใหม่
+ *
+ * ใช้ตอบเมื่อพบว่ารอบนี้เคยบันทึกไปแล้ว ต้องคืนคีย์ `products` ให้ครบเหมือนการบันทึกครั้งแรก
+ * เพราะขั้นจัดหมวดหมู่เอาไปทำ map ชื่อ → id ถ้าขาดไปหมวดหมู่จะไม่ถูกบันทึกทั้งรอบ
+ */
+async function existingBatchResponse(batchId: string) {
+  const { data: products, error } = await supabaseAdmin
+    .from('products')
+    .select('id, name_th, status')
+    .eq('import_batch_id', batchId)
+  if (error) throw error
+
+  const rows = products ?? []
+  const counts = rows.reduce<Record<string, number>>((acc, row) => {
+    acc[row.status] = (acc[row.status] ?? 0) + 1
+    return acc
+  }, {})
+
+  return NextResponse.json({
+    success: true,
+    import_batch_id: batchId,
+    saved: rows.length,
+    counts,
+    // รอบนี้บันทึกไปแล้ว ไม่ได้เขียนอะไรเพิ่ม — บอกไว้เพื่อให้ debug ย้อนหลังได้
+    reused: true,
+    products: rows.map((row) => ({ id: row.id, name_th: row.name_th, status: row.status })),
+  })
+}
+
 async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
-  const { items, file_name } = body
+  const { items, file_name, wizard_run_id } = body
+
+  // กันบันทึกซ้ำก่อนทำงานหนัก — ผู้ใช้กดย้อน step กลับมาแล้วเดินหน้าใหม่ได้
+  // ถ้าปล่อยผ่านจะได้ imports ใหม่ทั้งใบและ products ซ้ำทุกแถว
+  // ซึ่งย้อนกลับไปทำให้การตรวจของซ้ำรอบหน้าเพี้ยนตามไปด้วย
+  const { data: priorBatch } = await supabaseAdmin
+    .from('imports')
+    .select('id')
+    .eq('metadata->>wizard_run_id', wizard_run_id)
+    .maybeSingle()
+  if (priorBatch) return existingBatchResponse(priorBatch.id)
 
   const embeddings = await embedAll(items.map((item) => item.name_th))
   const embeddedCount = embeddings.filter(Boolean).length
@@ -118,11 +164,26 @@ async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
       file_name: file_name ?? null,
       total_records: items.length,
       status: 'processing',
+      // ต้องเขียนตั้งแต่ตอน insert ไม่ใช่ตอน update ท้ายฟังก์ชัน
+      // เพราะช่วง embedAll ข้างบนกินเวลานานพอให้คำขอที่สองแทรกเข้ามาได้
+      metadata: { wizard_run_id },
     })
     .select()
     .single()
 
-  if (batchError) throw batchError
+  if (batchError) {
+    // แข่งกันเข้ามาพร้อมกันจน unique index ตัดออก — อีกคำขอบันทึกสำเร็จไปแล้ว
+    // คืนผลของ batch นั้นแทน ไม่ใช่โยน error ให้ผู้ใช้เห็นว่าบันทึกไม่สำเร็จ
+    if (batchError.code === '23505') {
+      const { data: raced } = await supabaseAdmin
+        .from('imports')
+        .select('id')
+        .eq('metadata->>wizard_run_id', wizard_run_id)
+        .maybeSingle()
+      if (raced) return existingBatchResponse(raced.id)
+    }
+    throw batchError
+  }
 
   const rows = items.map((item, index) => ({
     name_th: item.name_th,
@@ -189,7 +250,9 @@ async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
       processed_records: inserted.length,
       success_records: inserted.length,
       error_records: items.length - inserted.length,
-      metadata: { counts, similarity_pairs: pairs.length, embedded: embeddedCount },
+      // ต้องคง wizard_run_id ไว้ — update ทับ metadata ทั้งก้อน ถ้าลืมใส่คีย์จะหาย
+      // แล้วการกันบันทึกซ้ำจะใช้ไม่ได้ตั้งแต่รอบแรก
+      metadata: { wizard_run_id, counts, similarity_pairs: pairs.length, embedded: embeddedCount },
     })
     .eq('id', batch.id)
 
@@ -244,6 +307,14 @@ async function commitCategorize(body: z.infer<typeof CategorizeCommitSchema>) {
     suggestion_method: 'import_wizard',
     metadata: { import_batch_id },
   }))
+
+  // การ update products ข้างบนเขียนทับค่าเดิมอยู่แล้วจึงเรียกซ้ำได้
+  // แต่ตารางนี้เป็น insert ล้วน ต้องล้างของรอบเดียวกันทิ้งก่อน ไม่งั้นกดซ้ำแล้วได้ข้อเสนอซ้ำ
+  await supabaseAdmin
+    .from('product_category_suggestions')
+    .delete()
+    .eq('suggestion_method', 'import_wizard')
+    .eq('metadata->>import_batch_id', import_batch_id)
 
   for (let start = 0; start < suggestions.length; start += INSERT_BATCH) {
     await supabaseAdmin

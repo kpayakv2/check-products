@@ -1,4 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
+import { ProductStatus, PENDING_REVIEW_STATUSES } from './product-status'
+
+export type { ProductStatus }
+export { PENDING_REVIEW_STATUSES }
 
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -106,7 +110,7 @@ export interface Product {
   embedding?: number[]
   keywords?: string[]
   metadata?: any
-  status: 'pending' | 'approved' | 'rejected' | 'draft'
+  status: ProductStatus
   confidence_score?: number
   import_batch_id?: string
   reviewed_by?: string
@@ -212,6 +216,33 @@ export interface ReviewHistory {
   old_category?: TaxonomyNode
   new_category?: TaxonomyNode
 }
+
+/** ตัวเลขบนหน้าแรก — ทุกค่าต้องมาจากฐานข้อมูล ไม่มีค่าที่ฝังไว้ในโค้ด */
+export interface DashboardStats {
+  totalCategories: number
+  totalSynonyms: number
+  /** รอตรวจของซ้ำ (ด่าน 1) */
+  pendingDedup: number
+  /** รอตรวจหมวดหมู่ (ด่าน 2) */
+  pendingCategory: number
+  /** ผลรวมของสองด่าน */
+  pendingProducts: number
+  approvedProducts: number
+  rejectedProducts: number
+  duplicatePairs: number
+  duplicatePairsReviewed: number
+  /** จำนวนการตรวจที่บันทึกลง review_history วันนี้ */
+  reviewsToday: number
+  /** null = ยังไม่เคยรันตรวจซ้ำ จึงยังไม่มีตัวเลขให้แสดง */
+  recheckAgreement: { total: number; agreed: number } | null
+}
+
+/**
+ * ตัวกรอง `or(...)` ของ PostgREST คั่นเงื่อนไขด้วยจุลภาคและใช้วงเล็บจัดกลุ่ม
+ * ถ้าปล่อยอักขระพวกนี้ติดไปกับคำค้น ตัวกรองจะเพี้ยนหรือ error ทั้งชุด
+ */
+const sanitizeSearchTerm = (term?: string): string =>
+  (term || '').replace(/[,()*\\%]/g, ' ').trim()
 
 // Database Operations
 export class DatabaseService {
@@ -467,7 +498,72 @@ export class DatabaseService {
   }
 
   // Products
-  static async getProducts(status?: Product['status'], limit = 50): Promise<Product[]> {
+  /**
+   * ค้นและแบ่งหน้าที่ฝั่งฐานข้อมูล — สตอกมี 3,000+ แถว การดึงมากรองในเบราว์เซอร์
+   * (แบบที่ `getProducts` ทำ) จะเห็นแค่หน้าแรกเท่านั้นและค้นไม่เจอของที่เหลือ
+   */
+  static async searchProducts(options: {
+    status?: ProductStatus | ProductStatus[]
+    categoryId?: string
+    search?: string
+    limit?: number
+    offset?: number
+  } = {}): Promise<{ products: Product[]; total: number }> {
+    const limit = options.limit ?? 50
+    const offset = options.offset ?? 0
+
+    let query = supabase
+      .from('products')
+      .select('*, category:taxonomy_nodes(*)', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (options.status) {
+      query = Array.isArray(options.status)
+        ? query.in('status', options.status)
+        : query.eq('status', options.status)
+    }
+
+    if (options.categoryId) {
+      query = query.eq('category_id', options.categoryId)
+    }
+
+    const term = sanitizeSearchTerm(options.search)
+    if (term) {
+      query = query.or(
+        `name_th.ilike.%${term}%,name_en.ilike.%${term}%,brand.ilike.%${term}%,sku.ilike.%${term}%`
+      )
+    }
+
+    const { data, count, error } = await query
+    if (error) throw error
+    return { products: data || [], total: count || 0 }
+  }
+
+  /** นับแยกรายสถานะด้วย head query — ไม่ดึงแถวจริงมาเลย */
+  static async getProductStatusCounts(): Promise<Record<ProductStatus, number>> {
+    const statuses: ProductStatus[] = [
+      'pending_review_dedup',
+      'pending_review_category',
+      'approved',
+      'rejected',
+      'draft'
+    ]
+
+    const counts = await Promise.all(
+      statuses.map(async status => {
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', status)
+        return [status, count || 0] as const
+      })
+    )
+
+    return Object.fromEntries(counts) as Record<ProductStatus, number>
+  }
+
+  static async getProducts(status?: ProductStatus | ProductStatus[], limit = 50): Promise<Product[]> {
     let query = supabase
       .from('products')
       .select(`
@@ -479,7 +575,7 @@ export class DatabaseService {
       .limit(limit)
 
     if (status) {
-      query = query.eq('status', status)
+      query = Array.isArray(status) ? query.in('status', status) : query.eq('status', status)
     }
 
     const { data, error } = await query
@@ -487,32 +583,6 @@ export class DatabaseService {
     return data || []
   }
 
-  static async updateProductStatus(id: string, status: Product['status'], reviewerId?: string): Promise<Product> {
-    const updates: any = { 
-      status,
-      reviewed_at: new Date().toISOString()
-    }
-    
-    if (reviewerId) {
-      updates.reviewed_by = reviewerId
-    }
-
-    const { data, error } = await supabase
-      .from('products')
-      .update(updates)
-      .eq('id', id)
-      .select(`
-        *,
-        category:taxonomy_nodes(*),
-        attributes:product_attributes(*)
-      `)
-      .single()
-
-    if (error) throw error
-    return data
-  }
-
-  // Similarity Matches
   static async getSimilarityMatches(productId?: string): Promise<SimilarityMatch[]> {
     let query = supabase
       .from('similarity_matches')
@@ -712,30 +782,8 @@ export class DatabaseService {
     if (error) throw error
   }
 
-  // Review History
-  static async createReviewHistory(historyData: Partial<ReviewHistory>): Promise<ReviewHistory> {
-    const { data, error } = await supabase
-      .from('review_history')
-      .insert({
-        ...historyData,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  }
-
   // Dashboard Statistics
-  static async getDashboardStats(): Promise<{
-    totalCategories: number
-    totalSynonyms: number
-    pendingProducts: number
-    approvedProducts: number
-    duplicateMatches: number
-    reviewsToday: number
-  }> {
+  static async getDashboardStats(): Promise<DashboardStats> {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const todayIso = today.toISOString()
@@ -743,27 +791,61 @@ export class DatabaseService {
     const [
       { count: catCount },
       { count: synCount },
-      { count: pendingCount },
+      { count: pendingDedupCount },
+      { count: pendingCategoryCount },
       { count: approvedCount },
       { count: rejectedCount },
-      { count: reviewedTodayCount }
+      { count: duplicatePairCount },
+      { count: duplicatePairReviewedCount },
+      { count: reviewedTodayCount },
+      agreement
     ] = await Promise.all([
       supabase.from('taxonomy_nodes').select('*', { count: 'exact', head: true }),
       supabase.from('synonym_lemmas').select('*', { count: 'exact', head: true }),
-      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending_review_dedup'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending_review_category'),
       supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
       supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
-      supabase.from('products').select('*', { count: 'exact', head: true }).gte('updated_at', todayIso)
+      supabase.from('similarity_matches').select('*', { count: 'exact', head: true }),
+      supabase.from('similarity_matches').select('*', { count: 'exact', head: true }).eq('reviewed', true),
+      supabase.from('review_history').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
+      this.getRecheckAgreement()
     ])
+
+    const pendingDedup = pendingDedupCount || 0
+    const pendingCategory = pendingCategoryCount || 0
 
     return {
       totalCategories: catCount || 0,
       totalSynonyms: synCount || 0,
-      pendingProducts: pendingCount || 0,
+      pendingDedup,
+      pendingCategory,
+      pendingProducts: pendingDedup + pendingCategory,
       approvedProducts: approvedCount || 0,
-      duplicateMatches: rejectedCount || 0,
-      reviewsToday: reviewedTodayCount || 0
+      rejectedProducts: rejectedCount || 0,
+      duplicatePairs: duplicatePairCount || 0,
+      duplicatePairsReviewed: duplicatePairReviewedCount || 0,
+      reviewsToday: reviewedTodayCount || 0,
+      recheckAgreement: agreement
     }
+  }
+
+  /**
+   * สัดส่วนที่ AI ตรวจซ้ำแล้วเห็นตรงกับหมวดที่คนจัดไว้ — คำนวณในฐานข้อมูล
+   * (`recheck_agreement_stats()`) เพราะต้องเทียบสินค้า 3,000+ แถว
+   * คืน null เมื่อยังไม่มีข้อมูลตรวจซ้ำ เพื่อให้หน้าเว็บเลือกที่จะไม่แสดงตัวเลขได้
+   */
+  static async getRecheckAgreement(): Promise<{ total: number; agreed: number } | null> {
+    const { data, error } = await supabase.rpc('recheck_agreement_stats')
+
+    if (error) {
+      console.error('recheck_agreement_stats failed:', error)
+      return null
+    }
+
+    const row = Array.isArray(data) ? data[0] : data
+    if (!row || !row.total) return null
+    return { total: Number(row.total), agreed: Number(row.agreed) }
   }
 
   // Helper method to build taxonomy tree
