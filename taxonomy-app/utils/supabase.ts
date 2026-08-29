@@ -217,6 +217,13 @@ export interface ReviewHistory {
   new_category?: TaxonomyNode
 }
 
+/**
+ * ตัวกรอง `or(...)` ของ PostgREST คั่นเงื่อนไขด้วยจุลภาคและใช้วงเล็บจัดกลุ่ม
+ * ถ้าปล่อยอักขระพวกนี้ติดไปกับคำค้น ตัวกรองจะเพี้ยนหรือ error ทั้งชุด
+ */
+const sanitizeSearchTerm = (term?: string): string =>
+  (term || '').replace(/[,()*\\%]/g, ' ').trim()
+
 // Database Operations
 export class DatabaseService {
   // Taxonomy Nodes
@@ -471,6 +478,71 @@ export class DatabaseService {
   }
 
   // Products
+  /**
+   * ค้นและแบ่งหน้าที่ฝั่งฐานข้อมูล — สตอกมี 3,000+ แถว การดึงมากรองในเบราว์เซอร์
+   * (แบบที่ `getProducts` ทำ) จะเห็นแค่หน้าแรกเท่านั้นและค้นไม่เจอของที่เหลือ
+   */
+  static async searchProducts(options: {
+    status?: ProductStatus | ProductStatus[]
+    categoryId?: string
+    search?: string
+    limit?: number
+    offset?: number
+  } = {}): Promise<{ products: Product[]; total: number }> {
+    const limit = options.limit ?? 50
+    const offset = options.offset ?? 0
+
+    let query = supabase
+      .from('products')
+      .select('*, category:taxonomy_nodes(*)', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (options.status) {
+      query = Array.isArray(options.status)
+        ? query.in('status', options.status)
+        : query.eq('status', options.status)
+    }
+
+    if (options.categoryId) {
+      query = query.eq('category_id', options.categoryId)
+    }
+
+    const term = sanitizeSearchTerm(options.search)
+    if (term) {
+      query = query.or(
+        `name_th.ilike.%${term}%,name_en.ilike.%${term}%,brand.ilike.%${term}%,sku.ilike.%${term}%`
+      )
+    }
+
+    const { data, count, error } = await query
+    if (error) throw error
+    return { products: data || [], total: count || 0 }
+  }
+
+  /** นับแยกรายสถานะด้วย head query — ไม่ดึงแถวจริงมาเลย */
+  static async getProductStatusCounts(): Promise<Record<ProductStatus, number>> {
+    const statuses: ProductStatus[] = [
+      'pending_review_dedup',
+      'pending_review_category',
+      'approved',
+      'rejected',
+      'draft'
+    ]
+
+    const counts = await Promise.all(
+      statuses.map(async status => {
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', status)
+        return [status, count || 0] as const
+      })
+    )
+
+    return Object.fromEntries(counts) as Record<ProductStatus, number>
+  }
+
   static async getProducts(status?: ProductStatus | ProductStatus[], limit = 50): Promise<Product[]> {
     let query = supabase
       .from('products')

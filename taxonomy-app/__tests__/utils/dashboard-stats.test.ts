@@ -4,10 +4,13 @@
  * pending_review_category เท่านั้น เทสต์ชุดนี้ล็อกไว้ว่าการนับต้องอ้างอิงสองค่านั้น
  */
 
-type Filter = { op: 'eq' | 'in' | 'gte'; column: string; value: unknown }
-type Query = { table: string; filters: Filter[] }
+type Filter = { op: 'eq' | 'in' | 'gte' | 'or'; column: string; value: unknown }
+type Query = { table: string; filters: Filter[]; range?: [number, number] }
 
 const queries: Query[] = []
+
+/** แถวตัวอย่างที่ query ไหนก็ตามจะได้กลับไป */
+const ROWS = [{ id: 'p-1', name_th: 'ปากกาลูกลื่น', status: 'approved' }]
 
 /** จำนวนแถวปลอมที่ตอบกลับตามชุดเงื่อนไขที่ query นั้นใช้ */
 const countFor = (query: Query): number => {
@@ -38,7 +41,14 @@ jest.mock('@supabase/supabase-js', () => ({
         select: () => chain,
         order: () => chain,
         limit: () => chain,
-        range: () => chain,
+        range: (from: number, to: number) => {
+          query.range = [from, to]
+          return chain
+        },
+        or: (expression: string) => {
+          query.filters.push({ op: 'or', column: 'or', value: expression })
+          return chain
+        },
         eq: (column: string, value: unknown) => {
           query.filters.push({ op: 'eq', column, value })
           return chain
@@ -52,7 +62,7 @@ jest.mock('@supabase/supabase-js', () => ({
           return chain
         },
         then: (resolve: (v: unknown) => unknown) =>
-          Promise.resolve({ data: [], count: countFor(query), error: null }).then(resolve)
+          Promise.resolve({ data: ROWS, count: countFor(query), error: null }).then(resolve)
       }
       return chain
     }
@@ -105,5 +115,49 @@ describe('getProducts', () => {
 
     const statusFilters = productQueries()[0].filters.filter(f => f.column === 'status')
     expect(statusFilters).toEqual([{ op: 'eq', column: 'status', value: 'approved' }])
+  })
+})
+
+describe('searchProducts', () => {
+  it('ค้นหาที่ฝั่งฐานข้อมูล ไม่ใช่ดึงมากรองในเบราว์เซอร์', async () => {
+    await DatabaseService.searchProducts({ search: 'ปากกา' })
+
+    const orFilter = productQueries()[0].filters.find(f => f.op === 'or')
+    expect(orFilter).toBeDefined()
+    expect(String(orFilter!.value)).toContain('ปากกา')
+  })
+
+  it('ตัดอักขระที่ทำให้ตัวกรองของ PostgREST เพี้ยนออกจากคำค้น', async () => {
+    await DatabaseService.searchProducts({ search: 'ปากกา,ลูกลื่น(แดง)' })
+
+    // จุลภาคใน expression เป็นตัวคั่นเงื่อนไขของ PostgREST เอง ที่ต้องไม่มีคือใน "คำค้น"
+    const orFilter = productQueries()[0].filters.find(f => f.op === 'or')
+    const terms = String(orFilter!.value).match(/%[^%]*%/g) ?? []
+    expect(terms).not.toHaveLength(0)
+    terms.forEach(term => expect(term).not.toMatch(/[,()]/))
+  })
+
+  it('ขอข้อมูลทีละหน้าตาม offset ที่ส่งมา', async () => {
+    await DatabaseService.searchProducts({ limit: 25, offset: 50 })
+
+    expect(productQueries()[0].range).toEqual([50, 74])
+  })
+
+  it('คืนจำนวนทั้งหมดมาด้วย เพื่อให้หน้าเว็บรู้ว่ามีกี่หน้า', async () => {
+    const result = await DatabaseService.searchProducts({ status: 'approved' })
+
+    expect(result.total).toBe(3103)
+    expect(result.products).toHaveLength(1)
+  })
+})
+
+describe('getProductStatusCounts', () => {
+  it('นับแยกรายสถานะโดยไม่ต้องดึงแถวจริงมาทั้งหมด', async () => {
+    const counts = await DatabaseService.getProductStatusCounts()
+
+    expect(counts.approved).toBe(3103)
+    expect(counts.pending_review_dedup).toBe(147)
+    expect(counts.pending_review_category).toBe(221)
+    expect(counts.rejected).toBe(37)
   })
 })
