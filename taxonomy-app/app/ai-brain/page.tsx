@@ -422,13 +422,16 @@ export default function AIBrainDashboard() {
                       <div className="text-sm text-blue-700 dark:text-blue-500 thai-text font-medium mb-1">ประสบการณ์คู่</div>
                       <div className="text-3xl font-black text-blue-700 dark:text-blue-400">{status?.total_samples || 0}</div>
                     </div>
-                    <div className="col-span-2 bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800/30 flex items-center justify-between">
-                      <div>
-                        <div className="text-sm text-purple-700 dark:text-purple-500 thai-text font-medium mb-1">ความมั่นใจในการปัดตก</div>
-                        <div className="text-3xl font-black text-purple-700 dark:text-purple-400">{status?.average_confidence || 0}%</div>
+                    {/* ซ่อนไปเลยถ้าโมเดลยังไม่มีค่านี้ (เทรนไว้ก่อนจะเริ่มเก็บ) ดีกว่าโชว์ 0% หรือเลขเดา */}
+                    {status?.average_confidence != null && (
+                      <div className="col-span-2 bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800/30 flex items-center justify-between">
+                        <div>
+                          <div className="text-sm text-purple-700 dark:text-purple-500 thai-text font-medium mb-1">ความมั่นใจเฉลี่ยตอนทดสอบ</div>
+                          <div data-testid="average-confidence" className="text-3xl font-black text-purple-700 dark:text-purple-400">{status.average_confidence}%</div>
+                        </div>
+                        <ActivityIcon className="w-10 h-10 text-purple-300 dark:text-purple-700 opacity-50" />
                       </div>
-                      <ActivityIcon className="w-10 h-10 text-purple-300 dark:text-purple-700 opacity-50" />
-                    </div>
+                    )}
                   </motion.div>
 
                   {/* Training History Section */}
