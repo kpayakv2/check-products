@@ -29,6 +29,8 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock matchMedia
+// เทสต์ของ API route รันบน environment 'node' ซึ่งไม่มี window — ข้ามส่วนนี้ไป
+if (typeof window !== 'undefined') {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -42,6 +44,7 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 })
+}
 
 // Mock next/router
 jest.mock('next/router', () => ({
@@ -165,4 +168,16 @@ global.testUtils = {
     email: 'test@example.com',
     user_metadata: { name: 'Test User' },
   },
+}
+
+// jsdom ที่ใช้อยู่ยังไม่มี AbortSignal.timeout แต่โค้ดจริงเรียกใช้ (เช่น DeduplicationStep)
+// ถ้าไม่เติมให้ fetch จะโยน error ทิ้งตั้งแต่ยังไม่ได้ยิง แล้วคอมโพเนนต์จะตกไปทาง
+// fallback ที่ใช้คะแนนสุ่ม ทำให้เทสต์ผ่านบ้างไม่ผ่านบ้างโดยไม่เกี่ยวกับสิ่งที่กำลังทดสอบ
+if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout !== 'function') {
+  AbortSignal.timeout = (ms) => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), ms)
+    if (typeof timer.unref === 'function') timer.unref()
+    return controller.signal
+  }
 }
