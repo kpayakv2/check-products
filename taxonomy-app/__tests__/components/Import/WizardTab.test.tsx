@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import WizardTab from '@/components/Import/WizardTab'
 import type { WizardItem } from '@/types/import'
 
@@ -87,6 +87,11 @@ const runToDedup = async () => {
   fireEvent.click(screen.getByText('stub-clean'))
   fireEvent.click(screen.getByText('stub-dedup'))
   await waitFor(() => expect(commitCalls().length).toBeGreaterThan(0))
+  // รอแค่ "ยิงคำขอแล้ว" ยังไม่พอ — ผลลัพธ์ยังไม่ถูกเก็บลง saveResult ขั้นจัดหมวดที่กดต่อ
+  // จึงบ่นว่ายังไม่ได้บันทึกขั้นตรวจของซ้ำแบบสุ่ม ๆ ปล่อยให้ microtask ที่ค้างอยู่จบก่อน
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  })
 }
 
 describe('WizardTab — กันบันทึกซ้ำและรายงานผลตามจริง', () => {

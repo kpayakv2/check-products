@@ -150,28 +150,30 @@
 
 #### **STEP 1: Frontend Upload** 📤
 ```typescript
-// File: ProcessingStep.tsx
+// File: components/Import/UploadAndMappingStep.tsx (ขั้นที่ 1 ของ WizardTab)
 
 Input:
-  • CSV file จาก user
-  • Column mapping (ระบุว่าคอลัมน์ไหนคือชื่อสินค้า)
+  • CSV/Excel file จาก user
+  • Column mapping (ชื่อสินค้า / SKU / ราคาขาย)
 
 Process:
-  1. อัปโหลดไฟล์ไปยัง Supabase Storage
-  2. สร้างรอบ import ใน table `imports`
-  3. เรียก API: POST /api/import/process
+  1. อ่านไฟล์ในเบราว์เซอร์ (ยังไม่แตะฐานข้อมูล)
+  2. ให้ผู้ใช้จับคู่คอลัมน์ แล้วส่งต่อเป็น state ให้ขั้นถัดไป
 
 Output:
-  • import_batch_id (UUID)
-  • File path in storage
+  • rawRows[] + columnMapping (อยู่ใน state ของ WizardTab)
 ```
 
-#### **STEP 2: Next.js API - Text Processing** 🔤
+> **หมายเหตุ (29 ส.ค. 2569):** ก่อนหน้านี้ขั้นตอนนี้อยู่ใน `ProcessingStep.tsx` ที่ยิง
+> `POST /api/import/process` — ทั้งคอมโพเนนต์และ route ถูกลบไปแล้ว ของจริงตอนนี้คือ
+> วิซาร์ด 5 ขั้นใน `WizardTab.tsx` ที่บันทึกครั้งเดียวตอนจบผ่าน `/api/import/commit`
+
+#### **STEP 2: ทำความสะอาดข้อความ** 🔤
 ```typescript
-// File: taxonomy-app/app/api/import/process/route.ts
+// File: components/Import/DataCleaningStep.tsx → POST {FASTAPI}/api/v1/clean
 
 Input:
-  • CSV file (FormData)
+  • rawRows[] + columnMapping จากขั้นที่ 1
 
 Process (สำหรับแต่ละสินค้า):
   1. Clean Text:
@@ -246,33 +248,30 @@ Output:
 
 #### **STEP 5: Database Save** 💾
 ```typescript
-// File: ProcessingStep.tsx → saveProductsToDatabase()
+// File: app/api/import/commit/route.ts (เรียกจาก WizardTab ขั้นสุดท้าย)
 
 Input:
-  • ProcessedProduct[] (จาก AI)
-  • import_batch_id
+  • items[] (ผ่านการทำความสะอาด + เทียบซ้ำ + จัดหมวดมาแล้ว)
+  • run_id — กันกดบันทึกซ้ำ (unique index บน imports)
 
 Process:
-  For each product:
-    1. INSERT INTO products (...)
-       → สร้างสินค้า
-    
-    2. INSERT INTO product_category_suggestions (...)
-       → บันทึกคำแนะนำของ AI
-    
-    3. INSERT INTO product_attributes (...)
-       → บันทึกคุณสมบัติ (สี, ขนาด, หน่วย)
-  
-  Update imports SET 
-    processed_records = 296,
-    success_records = 290,
-    status = 'completed'
+  1. สร้างรอบ import ใน `imports` (status='processing')
+  2. INSERT INTO products แบบเป็นชุด พร้อม embedding และ metadata
+     (clean_name / similarity_score / duplicate_of — ชื่อ key ต้องตรงกับที่ VerifyTab อ่าน)
+     status ตั้งตามผลเทียบซ้ำ:
+       duplicate → 'rejected'
+       review    → 'pending_review_dedup'   (ไปด่าน 1 ในหน้า /data-quality)
+       new       → 'pending_review_category' (ไปด่าน 2)
+  3. INSERT INTO product_category_suggestions — เก็บหมวดที่ AI เสนอ
+  4. UPDATE imports SET processed/success/error records, status='completed'
 
 Output:
-  • products table มีข้อมูลใหม่
-  • product_category_suggestions มีคำแนะนำ
-  • imports.status = 'completed'
+  • products มีของใหม่รอคนตรวจที่ /data-quality
+  • imports.status = 'completed' (โชว์ในแท็บประวัติของหน้า /import)
 ```
+
+> **หมายเหตุ (29 ส.ค. 2569):** งานตรวจของคนอยู่ที่ `/data-quality` ที่เดียว และบันทึกผ่าน
+> `POST /api/verify` (service role) — เขียนตรงจากเบราว์เซอร์ด้วย anon key ไม่ได้ RLS จะกรองทิ้งเงียบๆ
 
 #### **STEP 6: User Review** 👤
 ```typescript
@@ -333,53 +332,19 @@ User Actions:
 
 ---
 
-### **2. Next.js API Route** (ต้องแก้)
+### **2. การจัดหมวดหมู่ตอนนำเข้า** (แก้แล้ว)
 
-#### **File: taxonomy-app/app/api/import/process/route.ts**
+เอกสารเดิมตรงนี้เป็นรายการสิ่งที่ต้องแก้ใน `app/api/import/process/route.ts` ซึ่ง
+**ลบทิ้งไปแล้ว** พร้อม `ProcessingStep.tsx` และสิ่งที่มันขอให้ทำก็ทำเสร็จแล้วเช่นกัน:
+ขั้นจัดหมวดของวิซาร์ดเรียก hybrid classifier ของ FastAPI ตรงๆ
 
-**ปัญหา:**
 ```typescript
-// ❌ ปัจจุบัน: ใช้ keyword matching แบบง่าย
-async function suggestCategory(tokens, attributes, embedding) {
-  // Simple keyword matching only
-  // Confidence ไม่แม่นยำ
-  // ไม่ได้ใช้ hybrid algorithm
-}
-```
-
-**ต้องแก้เป็น:**
-```typescript
-// ✅ ใหม่: เรียก Python API (Hybrid Algorithm)
-async function suggestCategory(
-  productName: string,
-  tokens: string[], 
-  attributes: Record<string, any>, 
-  embedding: number[]
-) {
-  // Call FastAPI Category Classifier
-  const response = await fetch('http://127.0.0.1:8000/api/classify/category', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      product_name: productName,
-      method: 'hybrid',
-      top_k: 5
-    })
-  })
-  
-  return response.json()
-}
-```
-
-**ตำแหน่งที่ต้องแก้:**
-```typescript
-// บรรทัดที่ ~295 ใน route.ts
-const suggestion = await suggestCategory(
-  productName,  // ← เพิ่ม parameter นี้
-  tokens, 
-  attributes, 
-  embedding
-)
+// File: components/Import/CategorizationStep.tsx
+const res = await fetch(`${apiBase}/api/classify/category`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ product_name: name, method: 'hybrid', top_k: 5 })
+})
 ```
 
 ---
