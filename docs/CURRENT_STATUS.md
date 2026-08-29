@@ -18,6 +18,45 @@
 
 ---
 
+## ✅ Session 29 ส.ค. 2569 (รอบสี่) — งานตรวจใน /data-quality บันทึกไม่ลงเลย
+
+ตรวจผลกระทบจากรอบสามแล้วเจอว่ารากเดียวกัน (anon key ชน RLS) ยังเหลืออยู่ในจุดที่หนักที่สุด
+คือแท็บ Verify ซึ่งเป็นที่ทำงานของงานค้าง 368 รายการที่รอบสองย้ายมารวมไว้ตรงนี้
+
+**สิ่งที่พัง**
+- `VerifyTab` เขียน `products` ตรงด้วย anon key — ยิงจริงได้ `PATCH 200` พร้อม `[]` และ `DELETE 204`
+  โดยไม่มีแถวไหนเปลี่ยน ไม่มี error ให้จับ กดตรวจแล้วรีเฟรชก็เจอรายการเดิมค้างที่เดิม
+- `human_feedback` ยิ่งไปกว่านั้น: คอลัมน์ที่โค้ดส่งไป (`product_id` / `category_id` / `is_correct` /
+  `comment`) **ไม่มีอยู่ในตารางเลย** ต่อให้ใช้ service role ก็ insert ไม่ผ่าน
+  ของจริงคือ `old_product` / `new_product` / `similarity_score` / `human_decision` (NOT NULL ทั้งชุด)
+  ซึ่งคือ "คู่ที่คนตัดสินว่าซ้ำ/ไม่ซ้ำ" — ตรงกับด่าน 1 พอดี ส่วนการยืนยันหมวดต้องลง `review_history`
+- `AutoLearnTab.deleteRule` ลบด้วย anon key แล้วตัดการ์ดออกจากจอทันที ดูเหมือนลบสำเร็จจนกว่าจะรีเฟรช
+
+**สิ่งที่แก้**
+- เพิ่ม `POST /api/verify` (keep / discard / confirm_category) และ `DELETE /api/keyword-rules/[id]`
+  ทั้งคู่ใช้ service role และตอบ 404 เมื่อไม่มีแถวไหนเปลี่ยนจริง
+- ด่าน 1 บันทึก `human_feedback` **ก่อน** ลบของซ้ำ เพราะ `review_history` ผูก FK แบบ CASCADE
+  จะหายไปพร้อมสินค้า ส่วน `human_feedback` ไม่มี FK ถึง `products` จึงอยู่ต่อได้
+- ด่าน 2 เขียน `review_history` แล้วเรียก `/api/v1/learn/verify` แบบเดียวกับ `/api/recheck`
+- หน้าเว็บทั้งสองแท็บอัปเดตตัวเองเฉพาะตอน route ยืนยันว่าเขียนจริง และแสดงข้อความจาก route เมื่อพลาด
+- `VerifyTab` เคยโหลดรายการซ้ำสองรอบทุกครั้งที่เข้าหน้า เพราะ `fetchData` มี `taxonomy.length`
+  เป็น dependency — แยกการโหลดหมวดหมู่ออกเป็น effect ของตัวเอง
+
+**ยืนยันกับฐานข้อมูลจริง** (คืนค่าข้อมูลทดสอบกลับหมดแล้ว)
+- keep → สินค้าเปลี่ยนเป็น `pending_review_category` และเกิดแถวแรกใน `human_feedback` (ตารางนี้เคยว่างมาตลอด)
+- confirm_category → `status='approved'` + `reviewed_at` + แถวใน `review_history` + `learned: true`
+  (FastAPI สร้างกฎ `auto_learned` ให้จริง)
+- ลบกฎนั้นผ่าน route → หายจาก DB จริง · id ที่ไม่มีอยู่ → 404 ทั้งสองเส้น
+- เทสต์: jest 186 ผ่าน 0 ตก (เหลือ 4 suite ที่ล้มเพราะไม่มี env เหมือนเดิม) · tsc 9 error ตาม baseline
+
+**ยังเหลือ (ยังไม่ได้แก้ รอเจ้าของงานตัดสิน)**
+- `/api/products/[id]/review` ยังใช้ anon client อยู่ (ไม่มี UI ไหนเรียกแล้ว)
+- `GET /api/settings` และ `GET /api/import/history` ไม่ถูก middleware กั้น (middleware ปล่อย GET ทั้งหมด)
+- `docs/SYSTEM_OVERVIEW_TH.md` ยังอ้างถึง `ProcessingStep.tsx` ที่ลบไปแล้ว
+- ชุด Playwright ยังผุอยู่ (ผ่าน 2 จาก 20) ต้องเขียนใหม่ก่อนใช้เป็นด่านตรวจ
+
+---
+
 ## ✅ Session 29 ส.ค. 2569 (รอบสาม) — บั๊กหน้า /taxonomy และ /ai-brain
 
 เจ้าของงานแจ้งว่าสองหน้านี้มีปัญหา ตรวจแล้วเจอของจริง 3 เรื่อง (ไม่ใช่ของใหม่จากรอบสอง)
