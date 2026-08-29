@@ -65,7 +65,7 @@
 
 **ยังเหลือ (รอเจ้าของงานตัดสิน)**
 - ชุด Playwright ยังผุอยู่ (ผ่าน 2 จาก 20) ต้องเขียนใหม่ก่อนใช้เป็นด่านตรวจ
-- สาขา `fix/status-mismatch-and-page-cleanup` สะสม 20 commit แล้ว ยังไม่ได้ merge เข้า main
+- สาขา `fix/status-mismatch-and-page-cleanup` merge เข้า `main` แล้ว (30 ส.ค. 2569) ยังไม่ได้ push ขึ้น origin
 - เซิร์ฟเวอร์ dev ที่รันอยู่เสิร์ฟ chunk เก่าค้าง (ผลจาก `npm run build` ทับ `.next` ในรอบก่อน)
   API ใช้งานได้ปกติ แต่หน้าเว็บต้อง restart `npm run dev` ก่อนถึงจะเปิดดูได้
 
