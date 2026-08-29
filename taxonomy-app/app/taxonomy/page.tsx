@@ -24,6 +24,27 @@ import {
   ActivityIcon
 } from 'lucide-react'
 
+/**
+ * ทุกการเขียนต้องผ่าน API route ที่ใช้ service role — เขียนตรงด้วย anon key
+ * จะถูก RLS ปฏิเสธ (เพิ่มไม่ได้) หรือ "สำเร็จ" แบบไม่แตะข้อมูล (แก้/ลบ)
+ */
+const callApi = async (url: string, init: RequestInit) => {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init
+  })
+  const body = await response.json().catch(() => ({}))
+
+  if (!response.ok || body?.success === false) {
+    throw new Error(body?.error || `คำขอล้มเหลว (${response.status})`)
+  }
+  return body
+}
+
+/** นับทั้งต้นไม้ ไม่ใช่เฉพาะโหนดบนสุดที่ `categories` เก็บไว้ */
+const countNodes = (nodes: TaxonomyNode[]): number =>
+  nodes.reduce((total, node) => total + 1 + countNodes(node.children || []), 0)
+
 export default function TaxonomyManager() {
   const [activeTab, setActiveTab] = useState<'tree' | 'synonyms'>('tree')
   const [categories, setCategories] = useState<TaxonomyNode[]>([])
@@ -74,12 +95,12 @@ export default function TaxonomyManager() {
     }
 
     try {
-      await DatabaseService.deleteTaxonomyNode(category.id)
+      await callApi(`/api/taxonomy/${category.id}`, { method: 'DELETE' })
       toast.success('ลบหมวดหมู่เรียบร้อยแล้ว')
       loadCategories()
     } catch (error) {
       console.error('Error deleting category:', error)
-      toast.error('เกิดข้อผิดพลาดในการลบหมวดหมู่')
+      toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลบหมวดหมู่')
     }
   }
 
@@ -92,19 +113,22 @@ export default function TaxonomyManager() {
     }
 
     try {
+      // ช่องเลือกหมวดแม่ที่ไม่ได้เลือกจะเป็นสตริงว่าง ซึ่งคอลัมน์ uuid รับไม่ได้
+      const payload = {
+        ...formData,
+        parent_id: formData.parent_id || undefined
+      }
+
       if (editingCategory) {
-        await DatabaseService.updateTaxonomyNode(editingCategory.id, formData)
+        await callApi(`/api/taxonomy/${editingCategory.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        })
         toast.success('แก้ไขหมวดหมู่เรียบร้อยแล้ว')
       } else {
-        // Generate a unique code for the new category
-        const uniqueCode = `CAT-${Date.now().toString().slice(-6)}${Math.random().toString(36).substring(2, 5).toUpperCase()}`
-        
-        await DatabaseService.createTaxonomyNode({
-          ...formData,
-          code: uniqueCode,
-          level: 0,
-          sort_order: 0,
-          is_active: true
+        await callApi('/api/taxonomy', {
+          method: 'POST',
+          body: JSON.stringify(payload)
         })
         toast.success('เพิ่มหมวดหมู่เรียบร้อยแล้ว')
       }
@@ -121,7 +145,7 @@ export default function TaxonomyManager() {
       loadCategories()
     } catch (error) {
       console.error('Error saving category:', error)
-      toast.error('เกิดข้อผิดพลาดในการบันทึกหมวดหมู่')
+      toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการบันทึกหมวดหมู่')
     }
   }
 
@@ -170,6 +194,7 @@ export default function TaxonomyManager() {
                 <EditIcon className="h-5 w-5" />
               </button>
               <button
+                data-testid="delete-node"
                 onClick={() => handleCategoryDelete(node)}
                 className="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 rounded-2xl shadow-sm transition-all"
               >
@@ -263,7 +288,7 @@ export default function TaxonomyManager() {
                  <div className="px-8 py-3 bg-white border border-slate-100 rounded-3xl flex items-center gap-4 shadow-sm">
                     <div className="flex flex-col items-end">
                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Global Nodes</span>
-                       <span className="text-xl font-black text-slate-900">{categories.length}</span>
+                       <span data-testid="node-count" className="text-xl font-black text-slate-900">{countNodes(categories)}</span>
                     </div>
                     <div className="w-[1px] h-8 bg-slate-100" />
                     <ActivityIcon className="w-5 h-5 text-emerald-500" />

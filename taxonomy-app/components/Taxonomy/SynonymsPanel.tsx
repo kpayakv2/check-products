@@ -41,6 +41,23 @@ interface SynonymFormData {
   }>
 }
 
+/**
+ * งานเขียน synonym ต้องผ่าน API route ที่ใช้ service role — เขียนตรงด้วย anon key
+ * จะถูก RLS ของ synonym_lemmas / synonym_terms ปฏิเสธ หรือเงียบแบบไม่แตะข้อมูล
+ */
+const callApi = async (url: string, init: RequestInit) => {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init
+  })
+  const body = await response.json().catch(() => ({}))
+
+  if (!response.ok || body?.success === false) {
+    throw new Error(body?.error || `คำขอล้มเหลว (${response.status})`)
+  }
+  return body
+}
+
 export default function SynonymsPanel() {
   const [synonyms, setSynonyms] = useState<Synonym[]>([])
   const [categories, setCategories] = useState<TaxonomyNode[]>([])
@@ -129,7 +146,7 @@ export default function SynonymsPanel() {
   const handleSynonymDelete = async (synonym: Synonym) => {
     if (!confirm('คุณแน่ใจหรือไม่ที่จะลบ synonym นี้?')) return
     try {
-      await DatabaseService.deleteSynonym(synonym.id)
+      await callApi(`/api/synonyms/${synonym.id}`, { method: 'DELETE' })
       toast.success('ลบ synonym เรียบร้อยแล้ว')
       loadData()
     } catch (error) {
@@ -141,35 +158,31 @@ export default function SynonymsPanel() {
     e.preventDefault()
     try {
       if (editingSynonym) {
-        await DatabaseService.updateSynonym(editingSynonym.id, {
-          code: formData.code || `SYN-${Date.now()}`,
-          name_th: formData.name_th,
-          description: formData.description,
-          category_id: formData.category_id || undefined
+        await callApi(`/api/synonyms/${editingSynonym.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            code: formData.code || `SYN-${Date.now()}`,
+            name_th: formData.name_th,
+            description: formData.description,
+            category_id: formData.category_id || undefined
+          })
         })
         toast.success('อัปเดต synonym เรียบร้อยแล้ว')
       } else {
-        const generatedCode = formData.code || `SYN-${Math.floor(Math.random() * 1000000)}`
-        const newSynonym = await DatabaseService.createSynonym({
-          code: generatedCode,
-          name_th: formData.name_th,
-          description: formData.description,
-          category_id: formData.category_id || undefined,
-          is_active: true
-        })
-        for (const termData of formData.terms) {
-          await DatabaseService.createSynonymTerm({
-            lemma_id: newSynonym.id,
-            term: termData.term,
-            is_primary: termData.is_primary,
-            confidence_score: termData.confidence_score,
-            source: termData.source,
-            language: termData.language,
-            is_verified: termData.source === 'manual'
+        // route เดียวจบ — สร้าง lemma พร้อม terms ในคำขอเดียว
+        await callApi('/api/synonyms', {
+          method: 'POST',
+          body: JSON.stringify({
+            code: formData.code || undefined,
+            name_th: formData.name_th,
+            description: formData.description,
+            category_id: formData.category_id || undefined,
+            terms: formData.terms
           })
-        }
+        })
         toast.success('สร้าง synonym เรียบร้อยแล้ว')
       }
+
       setShowForm(false)
       loadData()
     } catch (error) {
