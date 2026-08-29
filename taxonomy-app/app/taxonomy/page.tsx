@@ -250,7 +250,8 @@ export default function TaxonomyManager() {
               <FolderTreeIcon className="w-4 h-4" />
               โครงสร้างหมวดหมู่ (Taxonomy Tree)
             </button>
-            <button 
+            <button
+              data-testid="tab-synonyms"
               onClick={() => setActiveTab('synonyms')}
               className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
                 activeTab === 'synonyms' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
