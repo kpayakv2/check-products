@@ -87,7 +87,10 @@ This repo already has Playwright configured (`taxonomy-app/e2e/*.spec.ts`). Afte
 ## Testing
 - Python: `.venv/Scripts/python.exe -m pytest` (repo's venv only — system Python lacks pytest). Full suite ~2 min.
 - Frontend: `npx jest --ci` in `taxonomy-app/` (~90s); typecheck with `npx tsc --noEmit`
-- Expected non-regressions as of 2026-08-29: 6 pytest failures needing a live FastAPI on `:8000`; **4 jest suite failures** (`__tests__/integration/*` and `__tests__/setup/database-setup.ts`) that throw because jest doesn't load `.env.local`; **9 `tsc` errors** confined to `e2e/` and `__tests__/integration/`
+- Measured on 2026-08-30 (branch `fix/status-mismatch-and-page-cleanup` merged into `main`):
+  - pytest **163 passed / 7 skipped / 0 failed** — but only with FastAPI live on `:8000`; without it 6 integration tests fail
+  - jest **195 passed / 0 failed**, plus **4 suite-level failures** (`__tests__/integration/*` and `__tests__/setup/database-setup.ts`) that throw at import because jest doesn't load `.env.local`
+  - `tsc` **9 errors**, all confined to `e2e/` and `__tests__/integration/`
 - **The Playwright suite is rotted, not a regression signal** — only 2 of 20 tests pass. Most specs assert UI text that no longer exists (e.g. `เลือกวิธีการ Import`), and `e2e/real-user-workflows.spec.ts` fails to collect at all because it imports `__tests__/setup/database-setup.ts`, which throws without env vars. Rewrite it before trusting it as a gate
 
 ## Key Directories

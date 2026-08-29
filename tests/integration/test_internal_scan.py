@@ -37,7 +37,9 @@ def test_internal_scan():
     
     # Poll status
     status = "pending"
-    max_polls = 30
+    # สแกนของจริงใช้เวลา ~58 วิ ตอนรันเดี่ยว (วัด 30 ส.ค. 2569) เพดานเดิม 30x2 วิ = 60 วิ
+    # จึงตกแบบสุ่มเมื่อรันทั้งชุดพร้อมกัน เพราะ FastAPI ตัวเดียวกันรับงานจากเทสต์อื่นด้วย
+    max_polls = 90
     poll_interval = 2.0
     body = {}
     for _ in range(max_polls):
