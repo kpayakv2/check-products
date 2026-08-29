@@ -16,6 +16,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-hot-toast'
 import { supabase } from '@/utils/supabase'
 
 
@@ -35,6 +36,7 @@ export default function VerifyTab() {
   const [loading, setLoading] = useState(true)
   const [taxonomy, setTaxonomy] = useState<any[]>([])
   const [stats, setStats] = useState({ dedup: 0, category: 0, approved: 0 })
+  const [busyId, setBusyId] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -76,60 +78,72 @@ export default function VerifyTab() {
         .limit(20)
       
       setProducts(data || [])
-
-      // 3. Fetch Taxonomy for dropdown
-      if (taxonomy.length === 0) {
-        const { data: taxData } = await supabase.from('taxonomy_nodes').select('id, name_th')
-        setTaxonomy(taxData || [])
-      }
     } catch (err) {
       console.error('Error fetching data:', err)
     } finally {
       setLoading(false)
     }
-  }, [activeTab, taxonomy.length])
+  }, [activeTab])
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
-  const handleDedupDecision = async (id: string, decision: 'keep' | 'discard') => {
+  // แยกออกมาเป็น effect ของตัวเอง — เดิมอยู่ใน fetchData ที่มี taxonomy.length เป็น dependency
+  // พอโหลดหมวดหมู่เสร็จ dependency ก็เปลี่ยน ทำให้โหลดรายการใหม่ทั้งชุดซ้ำอีกรอบทุกครั้งที่เข้าหน้า
+  useEffect(() => {
+    supabase
+      .from('taxonomy_nodes')
+      .select('id, name_th')
+      .then(({ data }) => setTaxonomy(data || []))
+  }, [])
+
+  /**
+   * ทุกคำตัดสินต้องผ่าน /api/verify ที่ใช้ service role
+   * เขียนตรงด้วย anon key ไม่ได้ — RLS กรองแถวทิ้งก่อน แล้วคืน 200 พร้อมของว่าง
+   * หน้าเว็บจึงเคยขึ้นว่าเรียบร้อยทั้งที่ไม่มีอะไรถูกบันทึกเลย
+   */
+  const submitDecision = async (
+    id: string,
+    action: 'keep' | 'discard' | 'confirm_category',
+    categoryId?: string
+  ) => {
+    setBusyId(id)
     try {
-      if (decision === 'keep') {
-        // อัปเดตให้ไปด่านตรวจหมวดหมู่ต่อ
-        await supabase.from('products').update({ status: 'pending_review_category' }).eq('id', id)
-      } else {
-        // ลบทิ้ง
-        await supabase.from('products').delete().eq('id', id)
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: id, action, category_id: categoryId }),
+      })
+      const payload = await response.json()
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || 'บันทึกไม่สำเร็จ')
       }
-      fetchData()
+
+      // เอารายการที่ตัดสินแล้วออกเมื่อ route ยืนยันว่าบันทึกจริง ไม่ใช่ตัดออกไปก่อน
+      setProducts(current => current.filter(p => p.id !== id))
+      setStats(current => ({
+        ...current,
+        [activeTab]: Math.max(current[activeTab] - 1, 0),
+        approved: action === 'confirm_category' ? current.approved + 1 : current.approved,
+      }))
+      toast.success('บันทึกเรียบร้อย')
     } catch (err) {
-      console.error('Decision failed:', err)
+      toast.error(err instanceof Error ? err.message : 'บันทึกไม่สำเร็จ')
+    } finally {
+      setBusyId(null)
     }
   }
 
-  const handleCategoryConfirm = async (id: string, categoryId: string) => {
-    try {
-      await supabase.from('products').update({ 
-        category_id: categoryId, 
-        status: 'approved' 
-      }).eq('id', id)
-      
-      // บันทึกเข้า Human Feedback
-      const product = products.find(p => p.id === id)
-      if (product) {
-        await supabase.from('human_feedback').insert({
-          product_id: id,
-          category_id: categoryId,
-          is_correct: true,
-          comment: 'User verified via UI'
-        })
-      }
-      
-      fetchData()
-    } catch (err) {
-      console.error('Category confirmation failed:', err)
+  const handleDedupDecision = (id: string, decision: 'keep' | 'discard') =>
+    submitDecision(id, decision)
+
+  const handleCategoryConfirm = (id: string, categoryId: string) => {
+    if (!categoryId) {
+      toast.error('กรุณาเลือกหมวดหมู่ก่อนยืนยัน')
+      return
     }
+    return submitDecision(id, 'confirm_category', categoryId)
   }
 
   return (
@@ -164,8 +178,9 @@ export default function VerifyTab() {
                 <Layers className="w-4 h-4" />
                 ด่าน 1: ตรวจของซ้ำ ({stats.dedup})
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('category')}
+                data-testid="tab-verify-category"
                 className={`px-8 py-3 rounded-[20px] text-sm font-black transition-all flex items-center gap-2 ${
                   activeTab === 'category' ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                 }`}
@@ -222,16 +237,20 @@ export default function VerifyTab() {
                               </div>
                             </div>
                             <div className="flex flex-col gap-3 ml-8">
-                              <button 
+                              <button
                                 onClick={() => handleDedupDecision(p.id, 'discard')}
-                                className="p-4 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                                disabled={busyId === p.id}
+                                data-testid="discard-btn"
+                                className="p-4 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm disabled:opacity-40"
                                 title="ซ้ำจริง - ลบทิ้ง"
                               >
                                 <Trash2 className="w-6 h-6" />
                               </button>
-                              <button 
+                              <button
                                 onClick={() => handleDedupDecision(p.id, 'keep')}
-                                className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                disabled={busyId === p.id}
+                                data-testid="keep-btn"
+                                className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm disabled:opacity-40"
                                 title="ไม่ซ้ำ - ไปด่านต่อไป"
                               >
                                 <CheckCircle className="w-6 h-6" />
@@ -259,8 +278,10 @@ export default function VerifyTab() {
                                   <span className="text-sm font-black text-slate-700">AI แนะนำ: {p.metadata?.suggested_category}</span>
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-slate-300" />
-                                <select 
-                                  className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                <select
+                                  data-testid="category-select"
+                                  disabled={busyId === p.id}
+                                  className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none disabled:opacity-40"
                                   defaultValue={p.category_id}
                                   onChange={(e) => handleCategoryConfirm(p.id, e.target.value)}
                                 >
@@ -272,9 +293,11 @@ export default function VerifyTab() {
                               </div>
                             </div>
                             <div className="ml-8">
-                              <button 
+                              <button
                                 onClick={() => handleCategoryConfirm(p.id, p.category_id || '')}
-                                className="px-8 py-4 bg-emerald-600 text-white rounded-[20px] font-black text-sm shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+                                disabled={busyId === p.id}
+                                data-testid="confirm-category-btn"
+                                className="px-8 py-4 bg-emerald-600 text-white rounded-[20px] font-black text-sm shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-40"
                               >
                                 <Save className="w-5 h-5" />
                                 ยืนยันหมวดนี้

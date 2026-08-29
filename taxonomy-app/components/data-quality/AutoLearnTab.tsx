@@ -10,6 +10,7 @@ import {
   RefreshCcwIcon
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { toast } from 'react-hot-toast'
 import { supabase } from '@/utils/supabase'
 
 interface KeywordRule {
@@ -29,6 +30,7 @@ export default function AutoLearnTab() {
   const [rules, setRules] = useState<KeywordRule[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAutoLearnedRules()
@@ -52,19 +54,27 @@ export default function AutoLearnTab() {
     }
   }
 
+  /**
+   * ลบผ่าน route ที่ใช้ service role — ลบด้วย anon key ได้ 204 กลับมาโดยไม่มีแถวไหนหาย
+   * (RLS กรองแถวทิ้งก่อน) แล้วการ์ดก็หายจากจอไปทั้งที่กฎยังอยู่ในฐานข้อมูล
+   */
   const deleteRule = async (id: string) => {
     if (!confirm('คุณแน่ใจหรือไม่ที่จะลบ Keyword Rule นี้?')) return
-    
-    try {
-      const { error } = await supabase
-        .from('keyword_rules')
-        .delete()
-        .eq('id', id)
 
-      if (error) throw error
-      setRules(rules.filter(r => r.id !== id))
+    setDeletingId(id)
+    try {
+      const response = await fetch(`/api/keyword-rules/${id}`, { method: 'DELETE' })
+      const payload = await response.json()
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || 'ลบไม่สำเร็จ')
+      }
+
+      setRules(current => current.filter(r => r.id !== id))
+      toast.success('ลบกฎเรียบร้อย')
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการลบ')
+      toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลบ')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -157,9 +167,11 @@ export default function AutoLearnTab() {
                       </h3>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">{rule.code}</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => deleteRule(rule.id)}
-                      className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                      disabled={deletingId === rule.id}
+                      data-testid="delete-rule"
+                      className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100 disabled:opacity-40"
                     >
                       <Trash2Icon className="w-5 h-5" />
                     </button>
