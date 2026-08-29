@@ -26,6 +26,7 @@ import {
   ArrowRightIcon
 } from 'lucide-react'
 import type { ParsedCSV } from '@/utils/csv-parser'
+import type { SaveResult, WizardItem } from '@/types/import'
 
 const wizardSteps: WizardStep[] = [
   {
@@ -60,6 +61,24 @@ const wizardSteps: WizardStep[] = [
   }
 ]
 
+/**
+ * ไอดีประจำหนึ่งรอบการนำเข้า — ฝั่งเซิร์ฟเวอร์ใช้กันไม่ให้บันทึกซ้ำ
+ *
+ * crypto.randomUUID มีเฉพาะใน secure context เครื่อง LAN ที่เข้าผ่าน http://192.168.x.x
+ * จะได้ undefined ซึ่งเป็นวิธีใช้งานจริงของระบบนี้ จึงต้องมีทางสำรองเสมอ
+ */
+const newRunId = () =>
+  globalThis.crypto?.randomUUID?.() ??
+  `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`
+
+/** ชื่อที่ใช้อ้างอิงสินค้าหนึ่งรายการ ต้องเรียงลำดับให้ตรงกับตอนบันทึกใน commitDedup */
+const itemName = (item: WizardItem): string => {
+  for (const value of [item.name_th, item.name, item._cleaned_name]) {
+    if (typeof value === 'string' && value) return value
+  }
+  return ''
+}
+
 export default function WizardTab() {
   const [currentStep, setCurrentStep] = useState(0)
   const [importMode, setImportMode] = useState<'upload' | 'storage'>('upload')
@@ -68,13 +87,16 @@ export default function WizardTab() {
   
   // Pipeline State
   const [parsedData, setParsedData] = useState<ParsedCSV | null>(null)
-  const [cleanedData, setCleanedData] = useState<any[]>([])
-  const [dedupedData, setDedupedData] = useState<any[]>([])
-  const [categorizedData, setCategorizedData] = useState<any[]>([])
+  const [cleanedData, setCleanedData] = useState<WizardItem[]>([])
+  const [dedupedData, setDedupedData] = useState<WizardItem[]>([])
+  const [categorizedData, setCategorizedData] = useState<WizardItem[]>([])
   // ผลการบันทึกจริงจาก /api/import/commit — ขั้นสุดท้ายต้องแสดงตัวเลขจากตรงนี้
   // ไม่ใช่เดาจาก state ในเบราว์เซอร์ ไม่งั้นจะบอกว่าสำเร็จทั้งที่ยังไม่ได้บันทึก
-  const [saveResult, setSaveResult] = useState<any | null>(null)
+  const [saveResult, setSaveResult] = useState<SaveResult | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  // ค่าเดิมตลอดหนึ่งรอบ wizard และเปลี่ยนใหม่เมื่อกดเริ่มใหม่เท่านั้น
+  // ทำให้กดย้อน step แล้วเดินหน้าซ้ำก็ยังเป็นการบันทึกครั้งเดิม ไม่เกิด batch ใหม่
+  const [runId, setRunId] = useState(newRunId)
 
   const handleNext = () => {
     if (currentStep < wizardSteps.length - 1) {
@@ -83,7 +105,7 @@ export default function WizardTab() {
   }
 
   /** บันทึกผลตรวจของซ้ำลงฐานข้อมูล แล้วจำ id ของแต่ละสินค้าไว้ให้ขั้นจัดหมวดใช้ต่อ */
-  const commitDedup = async (deduped: any[]) => {
+  const commitDedup = async (deduped: WizardItem[]) => {
     // ห้ามบันทึกข้อมูลจำลองเด็ดขาด — fallback ของขั้นตรวจของซ้ำใช้คะแนนสุ่ม
     // ถ้า backend ล่มแล้วเผลอบันทึก จะได้สินค้าที่จัดกลุ่มมั่วเข้าฐานข้อมูลจริง
     if (deduped.some((item) => item._source === 'mock')) {
@@ -98,9 +120,10 @@ export default function WizardTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'dedup',
+          wizard_run_id: runId,
           file_name: file?.name,
           items: deduped.map((item) => ({
-            name_th: item.name_th || item.name || item._cleaned_name,
+            name_th: itemName(item),
             cleaned_name: item._cleaned_name,
             bucket: item._bucket ?? 'new',
             similarity: item._similarity_score ?? 0,
@@ -118,16 +141,22 @@ export default function WizardTab() {
   }
 
   /** เติมหมวดหมู่ให้สินค้าที่บันทึกไว้แล้ว — จับคู่ด้วยชื่อเพราะ id อยู่ในผลลัพธ์ของขั้นก่อน */
-  const commitCategories = async (categorized: any[]) => {
-    if (!saveResult?.import_batch_id) return
+  const commitCategories = async (categorized: WizardItem[]) => {
+    // เดิมทั้งสองกรณีนี้ `return` เงียบ ๆ ผู้ใช้จึงเห็นหน้าจอ "บันทึกเข้าฐานข้อมูลแล้ว"
+    // ทั้งที่หมวดหมู่ไม่เคยลงฐานข้อมูลเลย — ต้องรายงานออกไปเสมอ
+    if (!saveResult?.import_batch_id) {
+      setSaveError('ยังไม่ได้บันทึกรายการจากขั้นตรวจของซ้ำ จึงบันทึกหมวดหมู่ไม่ได้')
+      return
+    }
 
     const idByName = new Map<string, string>(
-      (saveResult.products ?? []).map((p: any) => [p.name_th, p.id])
+      (saveResult.products ?? []).map((p) => [p.name_th, p.id] as [string, string])
     )
     const assignments = categorized
       .map((item) => {
         // ชื่อที่ใช้บันทึกตอน commitDedup คือ _cleaned_name (ข้อมูลจาก CSV ไม่มี name_th)
-        const productId = idByName.get(item.name_th || item.name || item._cleaned_name)
+        // คอลัมน์ดิบจาก CSV เป็น unknown จึงต้องกรองเอาเฉพาะที่เป็นข้อความก่อน
+        const productId = idByName.get(itemName(item))
         // CategorizationStep เก็บผลไว้ในคีย์ที่ขึ้นต้นด้วย _ ไม่ใช่ object suggested_category
         const categoryId = item._suggested_category_id
         if (!productId || !categoryId) return null
@@ -140,7 +169,10 @@ export default function WizardTab() {
       })
       .filter(Boolean)
 
-    if (assignments.length === 0) return
+    if (assignments.length === 0) {
+      setSaveError('จับคู่สินค้ากับรายการที่บันทึกไว้ไม่ได้ หมวดหมู่จึงยังไม่ถูกบันทึก')
+      return
+    }
 
     try {
       const response = await fetch('/api/import/commit', {
@@ -148,6 +180,7 @@ export default function WizardTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'categorize',
+          wizard_run_id: runId,
           import_batch_id: saveResult.import_batch_id,
           assignments,
         }),
@@ -202,7 +235,7 @@ export default function WizardTab() {
             <DataCleaningStep
               parsedData={parsedData}
               columnMapping={columnMapping}
-              onComplete={(cleaned: any) => {
+              onComplete={(cleaned) => {
                 setCleanedData(cleaned)
                 handleNext()
               }}
@@ -219,7 +252,7 @@ export default function WizardTab() {
           return cleanedData.length > 0 ? (
             <DeduplicationStep
               cleanedData={cleanedData}
-              onComplete={(deduped: any) => {
+              onComplete={(deduped) => {
                 setDedupedData(deduped)
                 // บันทึกตั้งแต่ตรงนี้ ไม่รอขั้นสุดท้าย — ถ้าปิดเบราว์เซอร์กลางคัน
                 // รายการก้ำกึ่งที่ยังตรวจไม่จบต้องยังอยู่ให้ไปทำต่อที่หน้า Verify ได้
@@ -239,11 +272,11 @@ export default function WizardTab() {
           // เฉพาะของใหม่ (_bucket === 'new') เท่านั้นที่ต้องจัดหมวด — รายการซ้ำแน่นอน
           // ('duplicate') ถูก reject ไปแล้ว และรายการก้ำกึ่ง ('review') ยังไม่รู้ว่าจะกลาย
           // เป็นสินค้าจริงหรือถูกรวมเป็นตัวซ้ำ จึงจัดหมวดตอนนี้ไปก็อาจเสียเปล่า
-          const newItems = dedupedData.filter((item: any) => item._bucket === 'new')
+          const newItems = dedupedData.filter((item) => item._bucket === 'new')
           return newItems.length > 0 ? (
             <CategorizationStep
               dedupedData={newItems}
-              onComplete={(categorized: any) => {
+              onComplete={(categorized) => {
                 setCategorizedData(categorized)
                 commitCategories(categorized)
                 handleNext()
@@ -272,7 +305,12 @@ export default function WizardTab() {
                 setCleanedData([])
                 setDedupedData([])
                 setCategorizedData([])
-              }} 
+                // ต้องล้างผลบันทึกด้วย ไม่งั้นรอบถัดไปที่บันทึกไม่สำเร็จจะยังชี้ batch เก่าอยู่
+                // แล้วหมวดหมู่จะไปแปะสินค้าของรอบก่อน และหน้าสรุปจะโชว์ตัวเลขของรอบก่อน
+                setSaveResult(null)
+                setSaveError(null)
+                setRunId(newRunId())
+              }}
             />
           )
   
