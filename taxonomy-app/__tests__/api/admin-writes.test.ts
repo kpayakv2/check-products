@@ -12,7 +12,8 @@
  */
 import { NextRequest } from 'next/server'
 
-type Call = { table: string; op: string; payload?: unknown }
+type Filter = { kind: string; column?: string; value?: unknown }
+type Call = { table: string; op: string; payload?: unknown; filters: Filter[] }
 
 const calls: Call[] = []
 /** ผลลัพธ์ต่อ `<table>.<op>` กำหนดจากในเทสต์ */
@@ -22,12 +23,22 @@ const resultFor = (table: string, op: string) =>
   results[`${table}.${op}`] ?? { data: null, error: null }
 
 const makeChain = (table: string, op: string, payload?: unknown) => {
-  calls.push({ table, op, payload })
+  const call: Call = { table, op, payload, filters: [] }
+  calls.push(call)
   const chain: any = {
     select: () => chain,
-    eq: () => chain,
-    is: () => chain,
-    order: () => chain,
+    eq: (column: string, value: unknown) => {
+      call.filters.push({ kind: 'eq', column, value })
+      return chain
+    },
+    is: (column: string, value: unknown) => {
+      call.filters.push({ kind: 'is', column, value })
+      return chain
+    },
+    order: (column: string) => {
+      call.filters.push({ kind: 'order', column })
+      return chain
+    },
     limit: () => chain,
     single: async () => resultFor(table, op),
     maybeSingle: async () => resultFor(table, op),
@@ -149,21 +160,45 @@ describe('POST /api/synonyms', () => {
 
 describe('/api/settings', () => {
   it('อ่านค่าตั้งค่าผ่าน service role (anon อ่านตารางนี้ไม่ได้)', async () => {
-    results['system_settings.select'] = { data: { id: 's-1', ai_provider: 'local' }, error: null }
+    results['system_settings.select'] = { data: { id: 's-1', ai: { apiProvider: 'openai' } }, error: null }
 
     const response = await readSettings()
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(body.data.ai_provider).toBe('local')
+    expect(body.data.ai.apiProvider).toBe('openai')
   })
 
-  it('บันทึกค่าตั้งค่าผ่าน service role', async () => {
-    results['system_settings.upsert'] = { data: { id: 's-1', ai_provider: 'openai' }, error: null }
+  it('เจาะจงแถวคอนฟิกเสมอ — ตารางนี้มีแถว key/value ปนอยู่ด้วย', async () => {
+    // ในฐานข้อมูลจริงมี 4 แถว: แถวคอนฟิก (setting_key เป็น null) กับ taxonomy_version /
+    // total_categories / last_updated ถ้าไม่เจาะจงและไม่เรียงลำดับ จะได้แถวไหนก็ได้
+    results['system_settings.select'] = { data: { id: 's-1' }, error: null }
 
-    const response = await writeSettings(put('/api/settings', { ai_provider: 'openai' }))
+    await readSettings()
+
+    const [read] = callsTo('system_settings', 'select')
+    expect(read.filters).toContainEqual({ kind: 'is', column: 'setting_key', value: null })
+    expect(read.filters.some(f => f.kind === 'order')).toBe(true)
+  })
+
+  it('บันทึกทับแถวคอนฟิกเดิม ไม่สร้างแถวใหม่ซ้อน', async () => {
+    results['system_settings.select'] = { data: { id: 's-1' }, error: null }
+    results['system_settings.update'] = { data: { id: 's-1', ai: { apiProvider: 'local' } }, error: null }
+
+    const response = await writeSettings(put('/api/settings', { ai: { apiProvider: 'local' } }))
 
     expect(response.status).toBe(200)
-    expect(callsTo('system_settings', 'upsert')).toHaveLength(1)
+    expect(callsTo('system_settings', 'update')).toHaveLength(1)
+    expect(callsTo('system_settings', 'insert')).toHaveLength(0)
+  })
+
+  it('สร้างแถวคอนฟิกให้เมื่อยังไม่มีเลย', async () => {
+    results['system_settings.select'] = { data: null, error: null }
+    results['system_settings.insert'] = { data: { id: 's-new' }, error: null }
+
+    const response = await writeSettings(put('/api/settings', { ai: { apiProvider: 'local' } }))
+
+    expect(response.status).toBe(200)
+    expect(callsTo('system_settings', 'insert')).toHaveLength(1)
   })
 })

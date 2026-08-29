@@ -66,10 +66,20 @@ export async function insertRows<T = Row>(table: string, rows: Row[]): Promise<T
   return (data as T[]) ?? []
 }
 
-export async function readSingleRow<T = Row>(table: string): Promise<T | null> {
+/**
+ * แถวคอนฟิกของระบบ
+ *
+ * `system_settings` ปนสองแบบอยู่ในตารางเดียว: แถวคอนฟิกที่เก็บเป็น JSONB
+ * (`setting_key` เป็น null) กับแถว key/value อย่าง taxonomy_version /
+ * total_categories / last_updated — ตอนนี้มี 4 แถวในฐานข้อมูลจริง
+ * ถ้าอ่านแบบ `limit(1)` เฉย ๆ Postgres ไม่การันตีว่าจะได้แถวไหน
+ */
+export async function readSettingsRow<T = Row>(): Promise<T | null> {
   const { data, error } = await supabaseAdmin
-    .from(table)
+    .from('system_settings')
     .select('*')
+    .is('setting_key', null)
+    .order('updated_at', { ascending: true })
     .limit(1)
     .maybeSingle()
 
@@ -77,10 +87,19 @@ export async function readSingleRow<T = Row>(table: string): Promise<T | null> {
   return (data as T) ?? null
 }
 
-export async function upsertRow<T = Row>(table: string, input: Row): Promise<T> {
+/** เขียนทับแถวคอนฟิกเดิมเสมอ สร้างใหม่เฉพาะตอนที่ยังไม่มีแถวนั้นจริง ๆ */
+export async function writeSettingsRow<T = Row>(input: Row): Promise<T> {
+  const current = await readSettingsRow<{ id?: string }>()
+  const payload = { ...input, updated_at: new Date().toISOString() }
+
+  if (!current?.id) {
+    return createRow<T>('system_settings', payload)
+  }
+
   const { data, error } = await supabaseAdmin
-    .from(table)
-    .upsert(input)
+    .from('system_settings')
+    .update(payload)
+    .eq('id', current.id)
     .select()
     .single()
 
