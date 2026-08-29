@@ -20,15 +20,20 @@ import {
   ChevronRightIcon
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DatabaseService } from '@/utils/supabase'
+import { DatabaseService, type DashboardStats } from '@/utils/supabase'
 
-interface DashboardStats {
-  totalCategories: number
-  totalSynonyms: number
-  pendingProducts: number
-  approvedProducts: number
-  duplicateMatches: number
-  reviewsToday: number
+const EMPTY_STATS: DashboardStats = {
+  totalCategories: 0,
+  totalSynonyms: 0,
+  pendingDedup: 0,
+  pendingCategory: 0,
+  pendingProducts: 0,
+  approvedProducts: 0,
+  rejectedProducts: 0,
+  duplicatePairs: 0,
+  duplicatePairsReviewed: 0,
+  reviewsToday: 0,
+  recheckAgreement: null
 }
 
 const quickActions = [
@@ -41,20 +46,20 @@ const quickActions = [
     thaiTitle: 'จัดการ Taxonomy'
   },
   {
-    title: 'Semantic Synonyms',
-    description: 'Linguistic Rules',
+    title: 'Review Centre',
+    description: 'Dedup & Category Review',
     icon: BookOpenIcon,
     color: 'bg-emerald-600',
-    href: '/synonyms',
-    thaiTitle: 'จัดการ Synonym'
+    href: '/data-quality',
+    thaiTitle: 'ศูนย์ตรวจสอบข้อมูล'
   },
   {
-    title: 'Inbound Audit',
-    description: 'Manual Verification',
+    title: 'Stock Browser',
+    description: 'Search The Catalogue',
     icon: ShoppingBagIcon,
     color: 'bg-violet-600',
     href: '/products',
-    thaiTitle: 'ตรวจสอบสินค้า'
+    thaiTitle: 'ดูสินค้าในสตอก'
   },
   {
     title: 'Data Ingestion',
@@ -66,13 +71,15 @@ const quickActions = [
   },
 ]
 
-function StatCard({ title, value, change, icon: Icon, color, index }: {
+function StatCard({ title, value, hint, icon: Icon, color, index, testId }: {
   title: string
   value: number
-  change?: string
+  /** ที่มาหรือรายละเอียดของตัวเลข — ไม่ใช่แนวโน้มที่ไม่มีใครคำนวณ */
+  hint?: string
   icon: any
   color: string
   index: number
+  testId?: string
 }) {
   return (
     <motion.div
@@ -88,23 +95,19 @@ function StatCard({ title, value, change, icon: Icon, color, index }: {
         <div className={`p-3 md:p-4 rounded-3xl ${color} bg-opacity-10 text-opacity-100 shadow-sm border border-white group-hover:scale-110 transition-all duration-500`}>
           <Icon className="h-5 w-5 md:h-6 md:w-6" />
         </div>
-        {change && (
-          <div className="flex flex-col items-end">
-            <span className="flex items-center gap-1 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black border border-emerald-100/50 uppercase tracking-tighter">
-              <ArrowUpRightIcon className="w-2.5 h-2.5 md:w-3 md:h-3" /> {change}
-            </span>
-          </div>
-        )}
+
       </div>
       
       <div className="relative z-10">
         <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1 truncate">{title}</p>
         <div className="flex items-baseline gap-1 md:gap-2 overflow-hidden">
-          <p className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter truncate">
+          <p data-testid={testId} className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter truncate">
             {value.toLocaleString()}
           </p>
-          <span className="text-[9px] md:text-[11px] font-bold text-slate-300 uppercase tracking-widest italic shrink-0">Units</span>
         </div>
+        {hint && (
+          <p className="text-[10px] md:text-[11px] font-bold text-slate-400 thai-text mt-2 truncate">{hint}</p>
+        )}
       </div>
     </motion.div>
   )
@@ -112,15 +115,13 @@ function StatCard({ title, value, change, icon: Icon, color, index }: {
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState<DashboardStats>({
-    totalCategories: 0,
-    totalSynonyms: 0,
-    pendingProducts: 0,
-    approvedProducts: 0,
-    duplicateMatches: 0,
-    reviewsToday: 0
-  })
+  const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS)
   const router = useRouter()
+
+  /** null = ยังไม่เคยรันตรวจซ้ำ จึงไม่มีตัวเลขจริงให้แสดง (ไม่เดา ไม่ใส่ค่าแทน) */
+  const agreementPercent = stats.recheckAgreement
+    ? ((stats.recheckAgreement.agreed / stats.recheckAgreement.total) * 100).toFixed(1)
+    : null
 
   useEffect(() => {
     loadDashboardData()
@@ -133,15 +134,7 @@ export default function Dashboard() {
       setStats(dashboardStats)
     } catch (error) {
       console.error('Error loading dashboard data:', error)
-      // Fallback to zeros on error
-      setStats({
-        totalCategories: 0,
-        totalSynonyms: 0,
-        pendingProducts: 0,
-        approvedProducts: 0,
-        duplicateMatches: 0,
-        reviewsToday: 0
-      })
+      setStats(EMPTY_STATS)
     } finally {
       setIsLoading(false)
     }
@@ -192,17 +185,20 @@ export default function Dashboard() {
                    ควบคุมและตรวจสอบระบบจัดการข้อมูลสินค้าอัตโนมัติแบบเรียลไทม์ พร้อมการวิเคราะห์ความถูกต้องผ่าน AI Engine
                  </p>
               </div>
+              {/* ตัวเลขสองตัวนี้มาจากฐานข้อมูลทั้งคู่ ไม่มีค่าที่ฝังไว้ในโค้ด */}
               <div className="hidden lg:flex items-center gap-6 p-6 bg-white/40 backdrop-blur-md rounded-[40px] border border-white shadow-xl">
                  <div className="flex flex-col items-center px-4">
-                    <ActivityIcon className="w-6 h-6 text-indigo-500 mb-2" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Latency</span>
-                    <span className="text-sm font-black text-slate-900">12ms</span>
+                    <BarChartIcon className="w-6 h-6 text-emerald-500 mb-2" />
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest thai-text">AI ตรงกับคน</span>
+                    <span data-testid="recheck-agreement" className="text-sm font-black text-slate-900">
+                      {agreementPercent === null ? 'ยังไม่มีข้อมูล' : `${agreementPercent}%`}
+                    </span>
                  </div>
                  <div className="w-[1px] h-10 bg-slate-100" />
                  <div className="flex flex-col items-center px-4">
-                    <BarChartIcon className="w-6 h-6 text-emerald-500 mb-2" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Accuracy</span>
-                    <span className="text-sm font-black text-slate-900">99.8%</span>
+                    <ActivityIcon className="w-6 h-6 text-indigo-500 mb-2" />
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest thai-text">ตรวจแล้ววันนี้</span>
+                    <span className="text-sm font-black text-slate-900">{stats.reviewsToday.toLocaleString()}</span>
                  </div>
               </div>
             </div>
@@ -211,48 +207,57 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-16">
               <StatCard
                 index={0}
-                title="Taxonomy Nodes"
-                value={stats.totalCategories}
-                change="8.2%"
-                icon={FolderTreeIcon}
-                color="bg-indigo-600 text-indigo-600"
-              />
-              <StatCard
-                index={1}
-                title="Semantic Sets"
-                value={stats.totalSynonyms}
-                change="4.1%"
-                icon={BookOpenIcon}
-                color="bg-sky-600 text-sky-600"
-              />
-              <StatCard
-                index={2}
-                title="Awaiting Audit"
+                title="รอตรวจทั้งหมด"
                 value={stats.pendingProducts}
+                hint="งานที่ค้างอยู่ที่ศูนย์ตรวจสอบข้อมูล"
+                testId="pending-total"
                 icon={ClockIcon}
                 color="bg-amber-600 text-amber-600"
               />
               <StatCard
+                index={1}
+                title="ด่าน 1 · ของซ้ำ"
+                value={stats.pendingDedup}
+                hint="รอตัดสินว่าซ้ำกับของในสตอกไหม"
+                testId="pending-dedup"
+                icon={AlertTriangleIcon}
+                color="bg-rose-600 text-rose-600"
+              />
+              <StatCard
+                index={2}
+                title="ด่าน 2 · หมวดหมู่"
+                value={stats.pendingCategory}
+                hint="ของใหม่ที่รอยืนยันหมวด"
+                testId="pending-category"
+                icon={UsersIcon}
+                color="bg-violet-600 text-violet-600"
+              />
+              <StatCard
                 index={3}
-                title="Verified Index"
+                title="สินค้าในสตอก"
                 value={stats.approvedProducts}
-                change="12.5%"
+                hint={`ปฏิเสธไปแล้ว ${stats.rejectedProducts.toLocaleString()} รายการ`}
+                testId="approved-total"
                 icon={CheckCircleIcon}
                 color="bg-emerald-600 text-emerald-600"
               />
               <StatCard
                 index={4}
-                title="Conflict Alerts"
-                value={stats.duplicateMatches}
-                icon={AlertTriangleIcon}
-                color="bg-rose-600 text-rose-600"
+                title="คู่ที่คล้ายกัน"
+                value={stats.duplicatePairs}
+                hint={`คนตัดสินแล้ว ${stats.duplicatePairsReviewed.toLocaleString()} คู่`}
+                testId="duplicate-pairs"
+                icon={BarChartIcon}
+                color="bg-sky-600 text-sky-600"
               />
               <StatCard
                 index={5}
-                title="Review Velocity"
-                value={stats.reviewsToday}
-                icon={UsersIcon}
-                color="bg-violet-600 text-violet-600"
+                title="หมวดหมู่ในระบบ"
+                value={stats.totalCategories}
+                hint={`ชุดคำพ้อง ${stats.totalSynonyms.toLocaleString()} ชุด`}
+                testId="taxonomy-total"
+                icon={FolderTreeIcon}
+                color="bg-indigo-600 text-indigo-600"
               />
             </div>
 

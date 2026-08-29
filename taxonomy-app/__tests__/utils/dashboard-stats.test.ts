@@ -14,6 +14,10 @@ const ROWS = [{ id: 'p-1', name_th: 'ปากกาลูกลื่น', stat
 
 /** จำนวนแถวปลอมที่ตอบกลับตามชุดเงื่อนไขที่ query นั้นใช้ */
 const countFor = (query: Query): number => {
+  if (query.table === 'similarity_matches') {
+    const reviewed = query.filters.find(f => f.column === 'reviewed')
+    return reviewed ? 1381 : 1781
+  }
   if (query.table !== 'products') return 0
   const status = query.filters.find(f => f.column === 'status')
   if (!status) return 0
@@ -32,8 +36,14 @@ const STATUS_COUNTS: Record<string, number> = {
   pending: 0
 }
 
+const rpcCalls: string[] = []
+
 jest.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
+    rpc: async (name: string) => {
+      rpcCalls.push(name)
+      return { data: [{ total: 3103, agreed: 2469 }], error: null }
+    },
     from: (table: string) => {
       const query: Query = { table, filters: [] }
       queries.push(query)
@@ -75,6 +85,7 @@ const productQueries = () => queries.filter(q => q.table === 'products')
 
 beforeEach(() => {
   queries.length = 0
+  rpcCalls.length = 0
 })
 
 describe('getDashboardStats', () => {
@@ -97,6 +108,27 @@ describe('getDashboardStats', () => {
     const stats = await DatabaseService.getDashboardStats()
 
     expect(stats.approvedProducts).toBe(3103)
+  })
+
+  it('แยกงานค้างเป็นรายด่าน เพื่อให้หน้าแรกบอกได้ว่าต้องไปตรวจอะไร', async () => {
+    const stats = await DatabaseService.getDashboardStats()
+
+    expect(stats.pendingDedup).toBe(147)
+    expect(stats.pendingCategory).toBe(221)
+  })
+
+  it('นับคู่ซ้ำจากตารางคู่ซ้ำจริง ไม่ใช่จำนวนสินค้าที่ถูกปฏิเสธ', async () => {
+    const stats = await DatabaseService.getDashboardStats()
+
+    expect(stats.duplicatePairs).toBe(1781)
+    expect(stats.duplicatePairsReviewed).toBe(1381)
+  })
+
+  it('อ่านสัดส่วนที่ AI ตรงกับคนจากฐานข้อมูล ไม่ใช่ค่าที่ฝังไว้ในโค้ด', async () => {
+    const stats = await DatabaseService.getDashboardStats()
+
+    expect(rpcCalls).toContain('recheck_agreement_stats')
+    expect(stats.recheckAgreement).toEqual({ total: 3103, agreed: 2469 })
   })
 })
 
