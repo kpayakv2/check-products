@@ -6,11 +6,12 @@ import { SparklesIcon, CheckCircleIcon, ArrowRightIcon, BrainIcon } from 'lucide
 import { ParsedCSV } from '@/utils/csv-parser'
 import { ColumnMapping } from './ColumnMappingStep'
 import { parsePrice } from '@/utils/price'
+import type { WizardItem } from '@/types/import'
 
 interface DataCleaningStepProps {
   parsedData: ParsedCSV
   columnMapping: ColumnMapping
-  onComplete: (cleanedData: any[]) => void
+  onComplete: (cleanedData: WizardItem[]) => void
   onBack: () => void
 }
 
@@ -21,7 +22,7 @@ export default function DataCleaningStep({
   onBack
 }: DataCleaningStepProps) {
   const [isCleaning, setIsCleaning] = useState(true)
-  const [cleanedResults, setCleanedResults] = useState<any[]>([])
+  const [cleanedResults, setCleanedResults] = useState<WizardItem[]>([])
   const [stats, setStats] = useState({ total: 0, changed: 0 })
 
   useEffect(() => {
