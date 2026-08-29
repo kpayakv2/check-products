@@ -24,7 +24,7 @@ AI-powered Thai product taxonomy management + similarity/dedup matching.
 Original audit: `docs/reports/REPO_AUDIT_2026-08-19.md`. Current status:
 1. ~~Edge Function `exec-sql` unauthenticated~~ — **fixed**: function removed, `verify_jwt` lines commented out, migration `20260822000003_drop_exec_sql_function.sql`
 2. ~~No `middleware.ts`~~ — **fixed**: `taxonomy-app/middleware.ts` gates every non-GET `/api/*` behind a session cookie
-3. `taxonomy-app/jest.config.js` — **still broken**: key misspelled `moduleNameMapping` (line 12) so `@/...` aliases aren't mapped in tests
+3. ~~`taxonomy-app/jest.config.js` key misspelled `moduleNameMapping`~~ — **fixed**: line 39 now reads `moduleNameMapper`, `@/...` aliases resolve in tests
 4. ~~`requirements.txt` lists `sqlite3`~~ — **fixed**
 
 ## Legacy Data Workflow (added 2026-08-26)
@@ -87,7 +87,8 @@ This repo already has Playwright configured (`taxonomy-app/e2e/*.spec.ts`). Afte
 ## Testing
 - Python: `.venv/Scripts/python.exe -m pytest` (repo's venv only — system Python lacks pytest). Full suite ~2 min.
 - Frontend: `npx jest --ci` in `taxonomy-app/` (~90s); typecheck with `npx tsc --noEmit`
-- Expected non-regressions as of 2026-08-19 (see `docs/reports/REPO_AUDIT_2026-08-19.md`): 6 pytest failures needing a live FastAPI on `:8000`, 8 jest suite failures needing live Supabase + the `jest.config.js` typo above, 11 `tsc` errors confined to `e2e/` test code
+- Expected non-regressions as of 2026-08-29: 6 pytest failures needing a live FastAPI on `:8000`; **4 jest suite failures** (`__tests__/integration/*` and `__tests__/setup/database-setup.ts`) that throw because jest doesn't load `.env.local`; **9 `tsc` errors** confined to `e2e/` and `__tests__/integration/`
+- **The Playwright suite is rotted, not a regression signal** — only 2 of 20 tests pass. Most specs assert UI text that no longer exists (e.g. `เลือกวิธีการ Import`), and `e2e/real-user-workflows.spec.ts` fails to collect at all because it imports `__tests__/setup/database-setup.ts`, which throws without env vars. Rewrite it before trusting it as a gate
 
 ## Key Directories
 | Path | Purpose |
