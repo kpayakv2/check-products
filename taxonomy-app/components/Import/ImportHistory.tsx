@@ -64,13 +64,12 @@ export default function ImportHistory() {
   const loadHistory = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('imports')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20)
-      if (error) throw error
-      setRecords(data || [])
+      // ต้องผ่าน API route ที่ใช้ service role — RLS ของตาราง imports
+      // ไม่ให้ anon key อ่าน และจะคืนรายการว่างแบบเงียบๆ ถ้าเรียกตรงจากเบราว์เซอร์
+      const response = await fetch('/api/import/history?limit=20')
+      if (!response.ok) throw new Error(`โหลดประวัติไม่สำเร็จ (${response.status})`)
+      const body = await response.json()
+      setRecords(body.data || [])
     } catch (err) {
       console.error('Error loading import history:', err)
     } finally {
