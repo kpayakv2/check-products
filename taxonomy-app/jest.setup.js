@@ -111,18 +111,29 @@ jest.mock('@supabase/supabase-js', () => ({
 }))
 
 // Mock framer-motion
+// เดิมเป็นรายการแท็กแบบตายตัว พอเจอ motion.tr / motion.section ที่ไม่ได้อยู่ในรายการ
+// จะได้ undefined แล้วพังด้วย "Element type is invalid" — ใช้ Proxy รองรับทุกแท็กแทน
+const MOTION_ONLY_PROPS = new Set([
+  'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId',
+  'whileHover', 'whileTap', 'whileFocus', 'whileDrag', 'whileInView', 'viewport',
+  'drag', 'dragConstraints', 'onAnimationStart', 'onAnimationComplete',
+])
+
 jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-    span: ({ children, ...props }) => <span {...props}>{children}</span>,
-    button: ({ children, ...props }) => <button {...props}>{children}</button>,
-    form: ({ children, ...props }) => <form {...props}>{children}</form>,
-    input: ({ children, ...props }) => <input {...props}>{children}</input>,
-    textarea: ({ children, ...props }) => <textarea {...props}>{children}</textarea>,
-    select: ({ children, ...props }) => <select {...props}>{children}</select>,
-    ul: ({ children, ...props }) => <ul {...props}>{children}</ul>,
-    li: ({ children, ...props }) => <li {...props}>{children}</li>,
-  },
+  motion: new Proxy(
+    {},
+    {
+      get: (_target, tag) => {
+        const Tag = tag
+        return ({ children, ...props }) => {
+          const domProps = Object.fromEntries(
+            Object.entries(props).filter(([key]) => !MOTION_ONLY_PROPS.has(key))
+          )
+          return <Tag {...domProps}>{children}</Tag>
+        }
+      },
+    }
+  ),
   AnimatePresence: ({ children }) => children,
   useAnimation: () => ({
     start: jest.fn(),

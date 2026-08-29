@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
             original_text: suggestion.name_th,
             cleaned_text: suggestion.cleaned_name
           },
-          status: 'pending',
+          status: 'pending_review_category',
           confidence_score: suggestion.suggested_category.confidence_score,
           import_batch_id: importBatch.id
         })

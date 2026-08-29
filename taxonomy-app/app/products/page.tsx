@@ -7,6 +7,7 @@ import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import { 
   DatabaseService, 
+  PENDING_REVIEW_STATUSES,
   Product, 
   TaxonomyNode, 
   SimilarityMatch 
@@ -53,7 +54,7 @@ export default function ProductsPage() {
   const [showProductDetail, setShowProductDetail] = useState(false)
   
   const [filters, setFilters] = useState<ProductFilters>({
-    status: 'pending',
+    status: '',
     category: '',
     search: '',
     dateRange: ''
@@ -131,11 +132,18 @@ export default function ProductsPage() {
 
   const getStatusBadge = (status: Product['status']) => {
     switch (status) {
-      case 'pending':
+      case 'pending_review_dedup':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm">
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm thai-text">
             <ClockIcon className="mr-2 h-3.5 w-3.5" />
-            Pending Action
+            รอตรวจของซ้ำ
+          </span>
+        )
+      case 'pending_review_category':
+        return (
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-sky-50 text-sky-600 border border-sky-100/50 shadow-sm thai-text">
+            <ClockIcon className="mr-2 h-3.5 w-3.5" />
+            รอตรวจหมวดหมู่
           </span>
         )
       case 'approved':
@@ -203,7 +211,7 @@ export default function ProductsPage() {
                <div className="flex items-center gap-8 bg-white/40 backdrop-blur-md p-6 rounded-[40px] border border-white shadow-xl">
                   <div className="flex flex-col items-center">
                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending</span>
-                     <span className="text-xl font-black text-amber-500">{products.filter(p=>p.status==='pending').length}</span>
+                     <span data-testid="pending-count" className="text-xl font-black text-amber-500">{products.filter(p=>PENDING_REVIEW_STATUSES.includes(p.status)).length}</span>
                   </div>
                   <div className="w-[1px] h-10 bg-slate-100" />
                   <div className="flex flex-col items-center uppercase text-[10px] font-black text-slate-400 tracking-widest">
@@ -236,7 +244,8 @@ export default function ProductsPage() {
                          className="w-full pl-14 pr-10 py-5 bg-white border border-slate-100 rounded-[32px] appearance-none font-black text-[11px] text-slate-600 uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
                        >
                          <option value="">Status: All</option>
-                         <option value="pending">🟡 Pending</option>
+                         <option value="pending_review_dedup">🟡 รอตรวจของซ้ำ</option>
+                        <option value="pending_review_category">🔵 รอตรวจหมวดหมู่</option>
                          <option value="approved">🟢 Verified</option>
                          <option value="rejected">🔴 Rejected</option>
                        </select>
@@ -410,7 +419,7 @@ export default function ProductsPage() {
                          </div>
                       </section>
 
-                      {selectedProduct.status === 'pending' && (
+                      {PENDING_REVIEW_STATUSES.includes(selectedProduct.status) && (
                         <section className="space-y-4">
                            <button 
                              onClick={()=>handleProductReview(selectedProduct.id, 'approved')}

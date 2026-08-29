@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
       model,
       sku,
       price,
-      status: 'pending'
+      // สินค้าที่สร้างผ่าน API ยังไม่ผ่านสายตาคน จึงเข้าคิวรอตรวจหมวดหมู่
+      status: 'pending_review_category'
     })
 
     // Add attributes if provided

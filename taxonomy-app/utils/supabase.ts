@@ -1,4 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
+import { ProductStatus, PENDING_REVIEW_STATUSES } from './product-status'
+
+export type { ProductStatus }
+export { PENDING_REVIEW_STATUSES }
 
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -106,7 +110,7 @@ export interface Product {
   embedding?: number[]
   keywords?: string[]
   metadata?: any
-  status: 'pending' | 'approved' | 'rejected' | 'draft'
+  status: ProductStatus
   confidence_score?: number
   import_batch_id?: string
   reviewed_by?: string
@@ -467,7 +471,7 @@ export class DatabaseService {
   }
 
   // Products
-  static async getProducts(status?: Product['status'], limit = 50): Promise<Product[]> {
+  static async getProducts(status?: ProductStatus | ProductStatus[], limit = 50): Promise<Product[]> {
     let query = supabase
       .from('products')
       .select(`
@@ -479,7 +483,7 @@ export class DatabaseService {
       .limit(limit)
 
     if (status) {
-      query = query.eq('status', status)
+      query = Array.isArray(status) ? query.in('status', status) : query.eq('status', status)
     }
 
     const { data, error } = await query
@@ -750,7 +754,7 @@ export class DatabaseService {
     ] = await Promise.all([
       supabase.from('taxonomy_nodes').select('*', { count: 'exact', head: true }),
       supabase.from('synonym_lemmas').select('*', { count: 'exact', head: true }),
-      supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).in('status', PENDING_REVIEW_STATUSES),
       supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
       supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('updated_at', todayIso)
