@@ -242,6 +242,7 @@ export default function TaxonomyManager() {
         <div className="bg-white border-b border-slate-200 px-8 py-4 z-20 relative shadow-sm">
           <div className="max-w-7xl mx-auto flex gap-4 p-1.5 bg-slate-100/80 rounded-[20px] w-fit">
             <button 
+              data-testid="tab-tree"
               onClick={() => setActiveTab('tree')}
               className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
                 activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
@@ -251,6 +252,7 @@ export default function TaxonomyManager() {
               โครงสร้างหมวดหมู่ (Taxonomy Tree)
             </button>
             <button 
+              data-testid="tab-synonyms"
               onClick={() => setActiveTab('synonyms')}
               className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
                 activeTab === 'synonyms' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'

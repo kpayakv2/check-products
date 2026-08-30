@@ -1,5 +1,5 @@
 # 📊 Current Project Status (Compact Context)
-*Last Updated: 2026-08-29 (รอบสาม)*
+*Last Updated: 2026-08-30*
 
 ## 🎯 Current Focus
 - **งานจริงของระบบ:** รับไฟล์รายการสินค้าใหม่ → เทียบกับสินค้าในสตอก 3,103 รายการ → **เอาเฉพาะตัวที่ยังไม่เคยมี**
@@ -15,6 +15,79 @@
 | ไฟล์สินค้าใหม่ 405 รายการ | มีในสตอกแล้ว 37 / ก้ำกึ่ง 146-147 / **ของใหม่ 221-222** (wizard ขั้นจัดหมวดตอนนี้ทำเฉพาะกลุ่มนี้แล้ว ไม่ทำทั้ง 405) |
 
 > ⚠️ ตัวเลข "72%" ที่เคยอ้างในเอกสารเก่า**ไม่เคยถูกวัดจริง** มาจาก `tests/benchmark_similarity.py` ที่ print ค่า hardcode (ลบไฟล์นั้นแล้ว) ตัวเลขข้างบนมาจาก `tests/integration/test_classification_accuracy.py` ที่วัดของจริง
+
+---
+
+## ✅ Session 30 ส.ค. 2569 — กู้ชุด Playwright ที่ผุ (ขั้น 1-3)
+
+ชุด e2e เดิมไม่ใช่ด่านกันของเสีย มันเป็นด่านหลอก — วัดจริงแล้วเป็นแบบนี้
+
+**สิ่งที่ลบ (3 ไฟล์ 744 บรรทัด)**
+- `antigravity-specialist.spec.ts` — **ไม่มี `expect()` สักบรรทัด** เก็บ failure ใส่ array แล้ว `console.log` ทิ้ง ผ่านเสมอไม่ว่าหน้าจอจะพังแค่ไหน และเป็นต้นเหตุ 6 ใน 9 tsc error
+- `real-user-workflows.spec.ts` — collect ไม่ผ่าน เพราะ import `__tests__/setup/database-setup.ts` ที่ throw เมื่อไม่มี env / อ้าง testid 54 ตัว มีจริง 6
+- `product-review.spec.ts` — 13 เทสต์กด approve/reject บน `/products` ที่กลายเป็นหน้าอ่านอย่างเดียวไปแล้ว / testid 20 ตัว มีจริง 2
+
+ผลทันที: **`tsc --noEmit` จาก 9 error เหลือ 2** (ที่เหลืออยู่ใน `__tests__/integration/synonym.integration.test.ts` ไม่เกี่ยวกับ e2e)
+
+**สิ่งที่แก้ในคอนฟิก**
+- ตัด 5 browser projects เหลือ chromium ตัวเดียว และตั้ง `workers: 1` + `fullyParallel: false`
+  — ไม่ใช่เรื่องความเร็ว แต่เพราะรันขนานแล้ว **พังจริง 6/6** สองสาเหตุ: ทุกเทสต์ใช้ DB จริงตัวเดียวกัน และ dev server คอมไพล์หน้าเว็บตอนถูกเรียกครั้งแรก ปุ่มถูกวาดออกมาก่อนที่ React จะผูก `onClick` คลิกที่ลงไปก่อนหน้านั้นหายเงียบไม่มี error ให้จับ
+- เพิ่ม `playwright.setup.ts` (globalSetup) ปลดล็อกเซสชันครั้งเดียวก่อนทั้งชุด แล้วเก็บคุกกี้ไว้ที่ `e2e/.auth/state.json`
+  — ถ้าไม่มีตัวนี้ `middleware.ts` จะตอบ 401 ให้ทุกคำขอที่ไม่ใช่ GET ทุกเทสต์ที่กดบันทึกจะล้มโดยไม่เกี่ยวกับ UI เลย
+  — **ต้องวางไว้นอก `testDir`** ถ้าวางใน `e2e/` Playwright จะฟ้อง "test.describe() called in a file imported by the configuration file"
+  — `e2e/.auth/` เข้า `.gitignore` แล้ว เพราะ token คือ sha256 ของ `INTERNAL_API_SECRET`
+
+**`synonym-management.spec.ts` เขียนใหม่ — ผ่าน 6/6 สามรอบติด**
+- หน้า `/synonyms` ถูกยุบเป็นแท็บใน `/taxonomy` ไปแล้ว สเปกเดิมจึงตกตั้งแต่ `beforeEach`
+- เพิ่ม `data-testid="tab-tree"` / `tab-synonyms` ใน `app/taxonomy/page.tsx` เพื่อไม่ต้องเกาะข้อความไทยบนปุ่ม
+- เดิมเทสต์ **แก้ชื่อและลบ synonym แถวแรกที่บังเอิญเจอ** = ทำลายข้อมูลจริงทุกรอบที่รัน ตอนนี้ทุกเทสต์สร้างข้อมูลของตัวเองแล้วเก็บกวาดใน `finally`
+- ยืนยันด้วยการนับแถวก่อน-หลัง: `synonym_lemmas` 28 / `synonym_terms` 97 เท่าเดิมเป๊ะหลังรัน 3 รอบ
+
+**บั๊กจริงที่เจอระหว่างทาง (ยังไม่แก้)**
+`POST /api/synonyms` ตอบ 400 ถ้า `terms` ว่าง แต่ฟอร์มใน `SynonymsPanel.tsx` ไม่ได้บังคับข้อนี้ — ผู้ใช้กดบันทึกได้ แล้วได้แค่ toast แดงลอย ๆ ไม่บอกว่าต้องใส่คำพ้องอย่างน้อย 1 คำ
+
+**ตัวเลขที่วัดได้จริงหลังจบขั้น 1-3 (รันเต็มชุด 18.7 นาที)**
+| ไฟล์ | ผล |
+|---|---|
+| `synonym-management.spec.ts` | ✅ 6/6 |
+| `recheck-legacy.spec.ts` | ✅ 3/3 (ต้นแบบของชุดนี้ testid ตรงกับแอปครบ) |
+| `taxonomy-management.spec.ts` | ❌ 0/11 — testid ตรงแค่ 2 จาก 14 |
+| `import-workflow.spec.ts` | ❌ 0/2 — ยิงไป `/import/wizard` ที่ไม่มีแล้ว |
+| `import-validation.spec.ts` | ❌ 0/1 — เหมือนกัน |
+| `import-single-column.spec.ts` | ❌ 0/1 — เหมือนกัน |
+| **รวม** | **9 ผ่าน / 15 ตก จาก 24** |
+
+เทียบของเดิม: 46 เทสต์ใน 9 ไฟล์ × 5 browser = 230 การรัน โดยที่ไฟล์ที่ "ผ่าน" ตัวหนึ่งไม่ได้ตรวจอะไรเลย
+
+**ยังเหลือ (ขั้น 4-6)**
+- [ ] เขียน `taxonomy-management.spec.ts` ใหม่ให้ตรงกับ `TaxonomyTree` ตัวจริง (หรือลบทิ้งถ้าไม่คุ้ม)
+- [ ] ยุบ 3 ไฟล์ import ให้เหลือไฟล์เดียวที่ยิงไป `/import` แล้วเดินผ่าน wizard 5 ขั้นจริง
+- [ ] เพิ่มสเปกคลุม `/data-quality → Verify` (`keep-btn` `discard-btn` `tab-verify-category` `category-select` `confirm-category-btn` `delete-rule`) — เส้นทางที่พังเงียบนานที่สุดและเพิ่งซ่อมเสร็จ ยังไม่มีตาข่ายรับเลย
+
+### 🔓 ตรวจเรื่องระบบล็อกอิน — ไม่มี และไม่เคยมี
+
+ตรวจ 4 ทาง: `supabase.auth.*` ไม่ถูกเรียกเลยสักจุดใน `app/` `components/` `utils/` · ไม่มีหน้า login/signin มีแต่ `/unlock` · `auth.users` มี **0 แถว** · ไฟล์ที่แตะคุกกี้มี 3 ไฟล์เท่านั้น (`middleware.ts`, `api/unlock/route.ts`, `utils/internal-auth.ts`)
+
+`/unlock` คือ **รหัสผ่านตัวเดียวที่ทั้งออฟฟิศใช้ร่วมกัน** ไม่ใช่การล็อกอิน — token คือ `sha256(INTERNAL_API_SECRET)` ตรง ๆ จึงเป็นค่าเดียวกันทุกคนทุกเบราว์เซอร์ตลอดไป, `maxAge` 30 วันเป็นข้อตกลงฝั่งเบราว์เซอร์เท่านั้น (เซิร์ฟเวอร์ไม่ได้จำว่าออกใบไหนไป คุกกี้ที่ก๊อปไปใช้ได้ไม่มีวันหมดอายุ), เพิกถอนทีละคนไม่ได้ และไม่มี flag `secure` เพราะรันบน HTTP ธรรมดาใน LAN
+
+**ผลต่อ RLS: 42 จาก 56 policy ไม่มีทางเป็นจริงได้เลย** (นับจาก `pg_policies`)
+
+| เงื่อนไขที่ policy ขอ | จำนวน | เป็นจริงได้ไหม |
+|---|---|---|
+| `auth.role()` เป็น `taxonomy_editor`/`taxonomy_admin` — INSERT/UPDATE/DELETE อย่างละ 12 | 36 | **ไม่** Supabase ออกให้แค่ `anon`/`authenticated` |
+| เงื่อนไขเดียวกันบน SELECT (`audit_logs`, `imports`, `product_attributes`, `system_settings`) | 4 | **ไม่** — สี่ตารางนี้อ่านด้วย anon key แล้วได้ค่าว่าง |
+| `auth.uid() = reviewer_id` | 2 | **ไม่** — ไม่มี user id ให้จับคู่ |
+| `false` ตรง ๆ (`ml_training_history` INSERT/DELETE) | 2 | ไม่ โดยตั้งใจ |
+| SELECT ที่เปิด (`true` หรือ `auth.role() IS NOT NULL` ซึ่ง `anon` ผ่าน) | 11 | ได้ |
+| INSERT ที่เปิด (`true`) | 1 | ได้ |
+
+แปลว่า **ด่านกันจริงมีชั้นเดียว คือ `middleware.ts`** ส่วน policy ที่อ้าง `auth.*` เขียนไว้เผื่อระบบล็อกอินที่ไม่เคยมี — อย่านับเป็นชั้นที่สอง และอย่าแก้ปัญหาเขียนข้อมูลไม่ได้ด้วยการเพิ่ม policy เพราะไม่มีอะไรทำให้มันเป็นจริงได้
+
+นี่คือคำอธิบายรากของอาการ silent failure ที่ไล่ปิดมาตลอด 28-30 ส.ค. — anon key `UPDATE` ได้ 200 พร้อม array ว่าง, `DELETE` ได้ 204 ที่ไม่ลบอะไร ไม่มี error ให้จับ หน้าเว็บจึงเดินเข้าทางสำเร็จแล้วขึ้น toast เขียวหลอก
+
+บันทึกไว้ใน `CLAUDE.md` → Authentication พร้อมคอมเมนต์ใน `utils/internal-auth.ts` และ `middleware.ts` แล้ว **ยังไม่ได้แก้พฤติกรรมอะไร** — ถ้าจะทำ Supabase Auth จริงคืองานใหญ่ที่กระทบทุก route ที่ตอนนี้ใช้ service role
+
+**หมายเหตุสำหรับคนรันต่อ:** ถ้า dev server ค้างอยู่ในสภาพเสีย (`.next` โดนทับด้วยผลของ `npm run build`) Playwright จะเกาะเซิร์ฟเวอร์ตัวนั้นเพราะ `reuseExistingServer: !CI` แล้วรายงานว่าทุกอย่างตก ซึ่งไม่ได้บอกอะไรเลย — ปิดเซิร์ฟเวอร์ ลบ `.next` แล้วปล่อยให้ Playwright เปิดเอง
 
 ---
 

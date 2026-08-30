@@ -2,6 +2,14 @@
  * Internal shared-secret auth helpers.
  * Uses only Web Crypto (crypto.subtle) so this module works identically
  * in both the Edge middleware runtime and Node API route handlers.
+ *
+ * NOT a session system, despite the cookie name. There is no login in this
+ * project (`auth.users` is empty and nothing calls `supabase.auth.*`), so the
+ * token below is a pure function of the shared secret: the same value for every
+ * person, every browser, every unlock, with no server-side record of what was
+ * issued. A copied cookie therefore works forever, and the only revocation is
+ * rotating INTERNAL_API_SECRET, which signs everyone out at once.
+ * Treat the cookie value as the password itself. See CLAUDE.md → Authentication.
  */
 
 export const SESSION_COOKIE_NAME = 'internal_session'

@@ -49,7 +49,8 @@
   * ใช้ relative URL สำหรับ Supabase connection เสมอ เพื่อไม่ให้ติดปัญหา CORS เมื่อเข้าใช้งานผ่าน LAN
 * **Primary Backend & Orchestrator (Supabase Local):**
   * รันผ่าน Docker Compose ของ Supabase Local (Port 54331)
-  * จัดการสิทธิ์การเข้าถึงข้อมูลผ่าน Row Level Security (RLS) ทั้งหมด 18 policies
+  * ~~จัดการสิทธิ์การเข้าถึงข้อมูลผ่าน Row Level Security (RLS) ทั้งหมด 18 policies~~
+    > ⚠️ **แก้ข้อมูล 2026-08-30:** ตอนนี้มี 56 policies ไม่ใช่ 18 และ **42 ข้อไม่มีทางเป็นจริงได้** เพราะอ้าง `auth.role()` / `auth.uid()` ของระบบล็อกอินที่ไม่เคยถูกสร้าง (`auth.users` มี 0 แถว) ด่านกันสิทธิ์จริงคือ `taxonomy-app/middleware.ts` ชั้นเดียว และการเขียนข้อมูลทั้งหมดผ่าน service role ซึ่งข้าม RLS — รายละเอียดใน `CLAUDE.md` → Authentication
   * รัน Edge Function `hybrid-classification-local` สำหรับรันโค้ดไฮบริดและประสานงานระหว่าง FastAPI และ PostgreSQL
 * **AI Worker (FastAPI Python Engine):**
   * รันที่โฟลเดอร์ `/src/api` (Port 8000)

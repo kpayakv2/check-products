@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SESSION_COOKIE_NAME, isValidSessionCookie } from '@/utils/internal-auth'
 
+/**
+ * This is the *only* real access gate in the project. The 42 RLS policies that
+ * reference auth.role()/auth.uid() can never be satisfied — nobody logs in — and
+ * every write goes through the service role, which bypasses RLS outright.
+ * So a route that slips past this file is unprotected. See CLAUDE.md → Authentication.
+ */
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 
 // Requests that must remain reachable without an unlocked session.

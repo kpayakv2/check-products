@@ -62,9 +62,37 @@ Before editing any function, class, or shared module: check callers first. Use t
 ## LAN Access
 `NEXT_PUBLIC_*` env vars are bundled into the browser, so `127.0.0.1` in them breaks other LAN machines. Use Next.js rewrites as a reverse proxy and relative paths (`/api/fastapi`, `/api/supabase`) for `NEXT_PUBLIC_*` values; keep absolute `127.0.0.1` URLs only in server-side env vars. Full checklist and firewall commands: `.agents/rules/rules-windows.md`.
 
+## Authentication — there is none (verified 2026-08-30)
+
+There is no login system in this project. Not "not finished" — never built. Verified four ways: zero `supabase.auth.*` calls anywhere in `app/`, `components/`, `utils/`; no login/signin/auth page (only `/unlock`); `auth.users` has **0 rows**; and exactly three files touch the session cookie (`middleware.ts`, `app/api/unlock/route.ts`, `utils/internal-auth.ts`).
+
+`/unlock` is **one shared password for the whole office**, not a login. `computeSessionToken()` returns `sha256(INTERNAL_API_SECRET)`, so:
+- the cookie value is identical for every person, every browser, every unlock, forever
+- the 30-day `maxAge` is a browser-side convention only — the server keeps no record of issued cookies, so a copied token works indefinitely
+- there is no per-person revocation; rotating `INTERNAL_API_SECRET` logs everyone out at once
+- treat the cookie value as the password itself. This is why `taxonomy-app/e2e/.auth/` is gitignored
+- no `secure` flag (plain HTTP on the office LAN) — the token crosses the wire in clear text
+
+**Consequence for RLS: 42 of the 56 policies can never be satisfied.** Breakdown measured from `pg_policies`:
+
+| What the policy requires | Count | Can it ever pass? |
+|---|---|---|
+| `auth.role()` is `taxonomy_editor`/`taxonomy_admin` (INSERT/UPDATE/DELETE ×12 each) | 36 | **No** — Supabase only ever issues `anon`/`authenticated` |
+| same, on SELECT (`audit_logs`, `imports`, `product_attributes`, `system_settings`) | 4 | **No** — these four tables read back empty with the anon key |
+| `auth.uid() = reviewer_id` | 2 | **No** — there is no user id to match |
+| literal `false` (`ml_training_history` INSERT/DELETE) | 2 | No, deliberately |
+| open SELECT (`true`, or `auth.role() IS NOT NULL` which `anon` satisfies) | 11 | Yes |
+| open INSERT (`true`) | 1 | Yes |
+
+So the security model is **one layer, not two**: `middleware.ts` gates every non-GET `/api/*` plus the two service-role reads, and everything that writes goes through `supabaseAdmin`, which bypasses RLS entirely. The `auth.*` policies are aspirational — written for a login system that does not exist. Do not treat them as a second line of defence, and do not "fix" a write path by adding a policy: nothing will satisfy it.
+
+This also explains the whole class of silent failures chased through 2026-08-28…30: with the anon key an `UPDATE` returns HTTP 200 with `[]` and a `DELETE` returns 204 having deleted nothing. No error is raised, so the UI takes the success path and shows a false success toast.
+
+Adding real auth (Supabase Auth + per-user identity) would make those 42 policies meaningful and give `review_history` a real reviewer, but it touches every route that currently uses the service role. It is a project, not a patch.
+
 ## Supabase / Database
 - Use the Supabase client with TypeScript generics — no raw SQL in application code, no untyped queries
-- RLS must be enabled on every table with an explicit policy
+- RLS must be enabled on every table with an explicit policy — but read the Authentication section above first: a policy that references `auth.role()` or `auth.uid()` is unsatisfiable in this project, so it locks the table rather than protecting it. New writes belong in a service-role route behind `middleware.ts`, not behind a new policy
 - Vector similarity: cosine distance (`<=>`)
 - See `.agents/rules/rules-supabase.md` for query examples
 
@@ -90,8 +118,11 @@ This repo already has Playwright configured (`taxonomy-app/e2e/*.spec.ts`). Afte
 - Measured on 2026-08-30 (branch `fix/status-mismatch-and-page-cleanup` merged into `main`):
   - pytest **163 passed / 7 skipped / 0 failed** — but only with FastAPI live on `:8000`; without it 6 integration tests fail
   - jest **195 passed / 0 failed**, plus **4 suite-level failures** (`__tests__/integration/*` and `__tests__/setup/database-setup.ts`) that throw at import because jest doesn't load `.env.local`
-  - `tsc` **9 errors**, all confined to `e2e/` and `__tests__/integration/`
-- **The Playwright suite is rotted, not a regression signal** — only 2 of 20 tests pass. Most specs assert UI text that no longer exists (e.g. `เลือกวิธีการ Import`), and `e2e/real-user-workflows.spec.ts` fails to collect at all because it imports `__tests__/setup/database-setup.ts`, which throws without env vars. Rewrite it before trusting it as a gate
+  - `tsc` **2 errors** (was 9 until the dead e2e specs were deleted on 2026-08-30), both in `__tests__/integration/synonym.integration.test.ts`
+- **Playwright is half-recovered** (measured 2026-08-30): `npx playwright test` in `taxonomy-app/` runs **24 tests in 6 files, 9 pass / 15 fail** (~19 min, chromium only, `workers: 1`). Green and trustworthy: `synonym-management.spec.ts` (6) and `recheck-legacy.spec.ts` (3) — use either as the template. Still rotted: `taxonomy-management.spec.ts` and the three `import-*.spec.ts`, which assert testids the app no longer has and navigate to `/import/wizard` and `/synonyms`, both deleted routes
+- Three specs were removed on 2026-08-30 rather than repaired — `antigravity-specialist` (no `expect()` at all, so it always passed), `real-user-workflows` (failed to collect), `product-review` (drove approve/reject on a `/products` page that is now read-only). That dropped `tsc --noEmit` from 9 errors to 2
+- **e2e writes to the real database.** `playwright.setup.ts` unlocks a session once (without it `middleware.ts` 401s every non-GET), and any spec that saves or deletes must create its own rows and clean them up — never mutate whatever row happens to be first
+- The suite runs serially on purpose: it shares one database, and the dev server compiles pages on first request, so a click can land before React hydrates and vanish with no error
 
 ## Key Directories
 | Path | Purpose |

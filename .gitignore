@@ -235,3 +235,9 @@ scratch/
 
 # artifacts จาก Playwright MCP (snapshot/console log ระหว่างตรวจงาน)
 .playwright-mcp/
+
+# เซสชันปลดล็อกของ Playwright (มี token = sha256 ของ INTERNAL_API_SECRET ห้ามคอมมิต)
+taxonomy-app/e2e/.auth/
+
+# curl cookie jar ที่หลุดมาจากการตรวจงานด้วยมือ (มี session token)
+cookies.txt
