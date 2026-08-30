@@ -1,12 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { toast } from 'react-hot-toast'
 import { LockIcon } from 'lucide-react'
+
+/**
+ * next มาจาก query string ที่ผู้ใช้พิมพ์เอง — ต้องเป็น path ภายในแอปเท่านั้น
+ * ('/xxx' ที่ไม่ใช่ '//xxx' ซึ่งเบราว์เซอร์ตีความเป็น protocol-relative URL ออกนอกโดเมนได้)
+ * ไม่งั้นเป็นช่องโหว่ open redirect: ลิงก์ /unlock?next=https://evil.com หลอกให้กรอกรหัส
+ * แล้วพาออกนอกแอปไปเว็บปลอมได้
+ */
+function safeNextPath(next: string | null): string {
+  if (!next || !next.startsWith('/') || next.startsWith('//')) return '/'
+  return next
+}
 
 export default function UnlockPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [secret, setSecret] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -28,7 +40,7 @@ export default function UnlockPage() {
       }
 
       toast.success('ปลดล็อกสำเร็จ')
-      router.push('/')
+      router.push(safeNextPath(searchParams.get('next')))
       router.refresh()
     } catch {
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่')

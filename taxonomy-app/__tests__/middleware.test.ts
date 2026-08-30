@@ -55,3 +55,34 @@ describe('middleware', () => {
     expect(response.status).toBe(200)
   })
 })
+
+/**
+ * เดิมหน้าเว็บ (ต่างจาก /api/*) เข้าได้เสมอไม่ว่าจะปลดล็อกหรือยัง เพราะ matcher
+ * ครอบแค่ /api/:path* — ผลคือเปิดเว็บครั้งแรกแล้วเห็นข้อมูลได้เลยโดยไม่ต้องกรอกรหัส
+ * ตอนนี้เปลี่ยนให้หน้าเว็บก็ต้องปลดล็อกก่อนเหมือน API ยกเว้นหน้า /unlock เอง
+ */
+describe('middleware — หน้าเว็บ (ไม่ใช่ API)', () => {
+  it('เด้งไป /unlock เมื่อเข้าหน้าเว็บโดยยังไม่ได้ปลดล็อก', async () => {
+    const response = await middleware(request('/'))
+    expect(response.status).toBe(307)
+    const location = new URL(response.headers.get('location')!)
+    expect(location.pathname).toBe('/unlock')
+    expect(location.searchParams.get('next')).toBe('/')
+  })
+
+  it('จำหน้าที่ตั้งใจจะไปไว้ใน ?next เพื่อพากลับไปที่เดิมหลังปลดล็อก', async () => {
+    const response = await middleware(request('/data-quality'))
+    const location = new URL(response.headers.get('location')!)
+    expect(location.searchParams.get('next')).toBe('/data-quality')
+  })
+
+  it('ปล่อยหน้าเว็บผ่านเมื่อปลดล็อกแล้ว', async () => {
+    const response = await middleware(request('/', { cookie: 'good-cookie' }))
+    expect(response.status).toBe(200)
+  })
+
+  it('เข้าหน้า /unlock เองได้เสมอ ไม่งั้นปลดล็อกไม่ได้เลย (วนลูปเด้งไม่รู้จบ)', async () => {
+    const response = await middleware(request('/unlock'))
+    expect(response.status).toBe(200)
+  })
+})
