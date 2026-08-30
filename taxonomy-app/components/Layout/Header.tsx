@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { BellIcon, SearchIcon, UserIcon, LogOutIcon, SettingsIcon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -10,8 +11,17 @@ interface HeaderProps {
 }
 
 export default function Header({ title = 'แดชบอร์ด', subtitle }: HeaderProps) {
+  const router = useRouter()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+
+  // ระบบนี้ไม่มีบัญชีผู้ใช้ — "ออกจากระบบ" แปลว่าลบคุกกี้ปลดล็อกที่ทุกคนใช้ร่วมกันทิ้ง
+  // แล้วพากลับไปหน้ากรอกรหัส ดู CLAUDE.md → Authentication
+  const handleLogout = async () => {
+    await fetch('/api/lock', { method: 'POST' })
+    router.push('/unlock')
+    router.refresh()
+  }
 
   const notifications = [
     {
@@ -174,7 +184,10 @@ export default function Header({ title = 'แดชบอร์ด', subtitle }:
                         <SettingsIcon className="h-4 w-4 mr-3 text-gray-400" />
                         <span className="thai-text">ตั้งค่าบัญชี</span>
                       </button>
-                      <button className="flex items-center w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors duration-150">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors duration-150"
+                      >
                         <LogOutIcon className="h-4 w-4 mr-3 text-error-500" />
                         <span className="thai-text">ออกจากระบบ</span>
                       </button>

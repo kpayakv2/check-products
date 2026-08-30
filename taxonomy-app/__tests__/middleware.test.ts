@@ -49,4 +49,9 @@ describe('middleware', () => {
     const response = await middleware(request('/api/unlock', { method: 'POST' }))
     expect(response.status).toBe(200)
   })
+
+  it('ปล่อย /api/lock ผ่านเสมอ แม้คุกกี้จะหมดอายุไปแล้ว ไม่งั้นกด "ออกจากระบบ" ไม่ได้', async () => {
+    const response = await middleware(request('/api/lock', { method: 'POST' }))
+    expect(response.status).toBe(200)
+  })
 })

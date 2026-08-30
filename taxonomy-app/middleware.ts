@@ -10,7 +10,8 @@ import { SESSION_COOKIE_NAME, isValidSessionCookie } from '@/utils/internal-auth
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 
 // Requests that must remain reachable without an unlocked session.
-const UNGATED_PATHS = new Set(['/api/unlock'])
+// /api/lock ต้องอยู่ในนี้ด้วย — ไม่งั้นคุกกี้ที่หมดอายุไปแล้วจะกันปุ่ม "ออกจากระบบ" เองไม่ให้ทำงาน
+const UNGATED_PATHS = new Set(['/api/unlock', '/api/lock'])
 
 // Reads that go through the service role and therefore bypass RLS. A GET here
 // hands out exactly the rows the anon key is denied, so it needs the session too.
