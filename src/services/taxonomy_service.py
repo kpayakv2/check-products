@@ -172,7 +172,7 @@ class TaxonomyService:
     def load_taxonomy_nodes(self) -> bool:
         """Load category nodes and their embeddings."""
         try:
-            print("📚 Loading Taxonomy Nodes...")
+            logger.info("Loading Taxonomy Nodes...")
             res = self.supabase.table("taxonomy_nodes").select("id, name_th, embedding, keywords").execute()
             
             self.category_names = {node['id']: node['name_th'] for node in res.data}
@@ -184,7 +184,7 @@ class TaxonomyService:
                         emb = json.loads(emb)
                     self.category_embeddings[node['id']] = np.array(emb)
             
-            print(f"✅ Loaded {len(self.category_names)} categories.")
+            logger.info(f"Loaded {len(self.category_names)} categories.")
             return True
         except Exception as e:
             logger.error(f"Failed to load taxonomy nodes: {e}")
@@ -193,10 +193,10 @@ class TaxonomyService:
     def load_keyword_rules(self) -> bool:
         """Load keyword classification rules."""
         try:
-            print("📚 Loading Keyword Rules...")
+            logger.info("Loading Keyword Rules...")
             res = self.supabase.table("keyword_rules").select("*").execute()
             self.keyword_rules = res.data
-            print(f"✅ Loaded {len(self.keyword_rules)} keyword rules.")
+            logger.info(f"Loaded {len(self.keyword_rules)} keyword rules.")
             return True
         except Exception as e:
             logger.error(f"Failed to load keyword rules: {e}")

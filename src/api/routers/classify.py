@@ -81,23 +81,27 @@ def _classify_keyword_based(product_name: str, keyword_rules: list, category_nam
             continue
 
         keywords = rule.get("keywords") or []
-        priority = rule.get("priority", 5)  # 1=highest, 10=lowest
+        priority = rule.get("priority", 5)  # 10=highest priority, 1=lowest
 
-        # score per rule = จำนวน keyword ที่ match / priority
+        # score per rule = (จำนวน keyword ที่ match + ความเฉพาะเจาะจงของคำ) * priority_scale
         match_count = 0
-        first_match = None
+        best_match = None
+        max_kw_len = 0
         for kw in keywords:
             if kw and tokens_contain_phrase(product_tokens, kw):
                 match_count += 1
-                if first_match is None:
-                    first_match = kw
+                if len(kw) > max_kw_len:
+                    max_kw_len = len(kw)
+                    best_match = kw
 
         if match_count > 0:
-            rule_score = match_count / max(priority, 1)
+            # คำที่มีความยาว/เฉพาะเจาะจงสูง (เช่น 'ฟองน้ำฉาบปูน') จะได้ค่าน้ำหนักมากกว่าคำเดี่ยวกว้างๆ (เช่น 'ฟองน้ำ')
+            specificity = max_kw_len / 5.0
+            rule_score = (match_count + specificity) * (max(priority, 1) / 10.0)
             current = scores.get(cat_id, 0.0)
             if rule_score > current:
                 scores[cat_id] = rule_score
-                matched_kw[cat_id] = first_match or ""
+                matched_kw[cat_id] = best_match or ""
 
     if not scores:
         return []

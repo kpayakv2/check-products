@@ -42,9 +42,9 @@ load_dotenv(BASE_DIR / "taxonomy-app" / ".env.local")
 
 MATCH_TYPE = "mined_legacy"
 
-# กฎที่คนเขียนไว้เดิมมี priority 6-10 และคะแนนคิดจาก match_count / priority
-# ให้ค่าต่ำกว่าเพื่อให้กฎที่มาจากข้อมูลจริงชนะเมื่อขัดกัน (ตามที่ตกลงไว้)
-MINED_PRIORITY = 4
+# กฎที่คนเขียนไว้เดิมมี priority 6-10 และคะแนนคิดจาก (match_count + specificity) * (priority / 10)
+# ให้ค่าเป็น 10 เพื่อให้กฎที่มาจากข้อมูลจริงชนะเมื่อขัดกัน (ตามที่ตกลงไว้)
+MINED_PRIORITY = 10
 
 # ต่อท้ายชื่อกฎเพื่อให้รู้ว่าสกัดจากข้อมูลชุดไหน
 # `tests/integration/test_classification_accuracy.py` อ่านค่านี้แล้ว skip ถ้าเป็น all
