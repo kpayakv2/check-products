@@ -1,7 +1,7 @@
 # 🏗️ Modern System Architecture & Module Design (Updated v3.0)
 
 **สถานะปัจจุบัน:** ใช้งานจริง (Verified 16 เมษายน 2569)
-**กฎเหล็ก:** ต้องรักษาความแม่นยำ (Accuracy) ไม่ต่ำกว่า 72% ตาม [GEMINI.md](../../GEMINI.md)
+**กฎเหล็ก:** ห้ามให้ความแม่นยำ (Accuracy) regress จาก baseline ที่วัดได้จริงในเทสต์ — ตัวเลขปัจจุบันและเกณฑ์อยู่ที่ [AGENTS.md](../../AGENTS.md) กฎเหล็กข้อ 6 (ไม่ใช่ "72%" คงที่แบบที่เขียนไว้เดิม ซึ่งเป็น hardcode ปลอม)
 
 ---
 

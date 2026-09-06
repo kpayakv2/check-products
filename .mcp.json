@@ -11,7 +11,7 @@
     "socraticode": {
       "command": "node",
       "args": [
-        "D:\\SocratiCode-main\\dist\\index.js"
+        "C:\\nvm4w\\nodejs\\node_modules\\socraticode\\dist\\index.js"
       ]
     },
     "sequential-thinking": {
@@ -20,16 +20,6 @@
         "-y",
         "@modelcontextprotocol/server-sequential-thinking"
       ]
-    },
-    "memory": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ],
-      "env": {
-        "MEMORY_FILE_PATH": "D:\\product_checker\\check-products\\.mcp-memory\\memory.jsonl"
-      }
     }
   }
 }

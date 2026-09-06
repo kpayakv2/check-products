@@ -59,7 +59,7 @@ npm install
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| **Web UI** | `http://127.0.0.1:3000` | หน้าจอหลักสำหรับใช้งานระบบ |
+| **Web UI** | `http://localhost:3000` | หน้าจอหลักสำหรับใช้งานระบบ (ต้องใช้ `localhost` ไม่ใช่ `127.0.0.1` — ดู [AGENTS.md](AGENTS.md#windows--powershell)) |
 | **AI Engine** | `http://127.0.0.1:8000` | REST API สำหรับ Embeddings |
 | **Supabase Studio** | `http://127.0.0.1:54323` | จัดการฐานข้อมูลและ Edge Functions |
 | **Supabase API** | `http://127.0.0.1:54331` | REST API Gateway (ใช้โดย Backend/Scripts) |
@@ -68,11 +68,5 @@ npm install
 
 ## 📚 Documentation (เอกสารเพิ่มเติม)
 
-*   [📖 Architecture Detail](docs/development/architecture.md)
-*   [🔌 API Reference](docs/api/api-reference.md)
-*   [🚀 Quick Start Guide](docs/guides/quick-start.md)
-*   [⚖️ Project Constitution (GEMINI.md)](GEMINI.md)
-
----
-
-**พัฒนาโดย:** พยัคฆ์ (Gemini CLI Agent) | **สถานะ:** ใช้งานได้ (Stable)
+*   [📂 เอกสารทั้งหมด (Documentation Index)](docs/INDEX.md) — จุดเริ่มต้นสำหรับเอกสารเชิงลึกทุกประเภท
+*   [⚖️ Project Constitution (AGENTS.md)](AGENTS.md) — กฎของโปรเจกต์ทั้งหมดอยู่ที่นี่ที่เดียว

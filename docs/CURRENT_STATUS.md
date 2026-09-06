@@ -537,10 +537,10 @@ migration ที่ apply ลง local DB แล้วและ commit แล้
 ---
 
 ## 💡 System State Summary
-- **Frontend (Next.js):** http://127.0.0.1:3000 — **8 เมนู** (เพิ่ม AI Brain), Build ✅
+- **Frontend (Next.js):** http://localhost:3000 — **8 เมนู** (เพิ่ม AI Brain), Build ✅ (browser URL ต้องเป็น `localhost` ไม่ใช่ `127.0.0.1` กัน CORS/cookie พัง — ดู AGENTS.md § Windows/PowerShell)
 - **Backend (FastAPI):** http://127.0.0.1:8000
 - **ML Model:** `RandomForestClassifier` (15 features) — เทรนจาก `similarity_matches` ใน Supabase
-- **Hybrid Algorithm:** Keyword 60% + Embedding 40% → Target Accuracy ≥ 72%
+- **Hybrid Algorithm:** Keyword 60% + Embedding 40% — accuracy วัดจริงล่าสุดอยู่ในตารางด้านบน (ห้าม regress จากค่านั้น — ดู AGENTS.md กฎเหล็กข้อ 6)
 - **Embedding Model:** `paraphrase-multilingual-MiniLM-L12-v2` (384-dim)
 - **Model File:** `feedback_model.joblib` (root dir ของ Backend)
 - **LAN Access:** http://192.168.1.80:3000

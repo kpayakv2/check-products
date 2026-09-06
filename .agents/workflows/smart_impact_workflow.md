@@ -64,7 +64,7 @@ codebase_impact {
 - **Project Artifacts:** ใช้ `codebase_context` ดู `DATABASE_SCHEMA.md` และ `API_ARCHITECTURE.md`
 - **Living Documentation:** อ้างอิงและอัปเดตเอกสารเหล่านั้นเมื่อ schema เปลี่ยน
 - **Session Continuity:** บันทึกความคืบหน้าใน `CURRENT_STATUS.md` เพื่อให้เอเจนต์ตัวถัดไปทำงานต่อได้ทันที
-- **Fact Storage:** บันทึกบทเรียนจาก Bug ลงใน Memory MCP
+- **Fact Storage:** บันทึกบทเรียนจาก Bug ลงใน Team Memory (`.agents/memory/`) — Memory MCP ถูกถอดไปแล้ว 2026-09-06 (0 ไบต์มา 2.5 สัปดาห์ ดู [CONTEXT.md](../../CONTEXT.md))
 
 ---
 
@@ -72,5 +72,5 @@ codebase_impact {
 
 - **Circular Dependency Check:** `codebase_graph_circular { projectPath }` → ตรวจก่อน commit
 - **Hybrid Scoring Check:** ตรวจสอบว่าผลลัพธ์ของ Hybrid Algorithm (60/40) ยังอยู่ในเกณฑ์ที่รับได้
-- **Visual Integrity:** ใช้ Puppeteer/Domscribe ตรวจสอบ UI ภาษาไทยตามกฎ Antigravity
+- **Visual Integrity:** ใช้ Playwright ตรวจสอบ UI ภาษาไทยตามกฎ Antigravity — Puppeteer/Domscribe ไม่เคยถูกติดตั้งจริง (ดู `.mcp.json`)
 - **Regression Testing:** รัน Pytest/Jest เพื่อยืนยันว่าการแก้ไขไม่ทำให้ส่วนอื่นพัง

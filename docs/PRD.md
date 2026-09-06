@@ -9,7 +9,7 @@
 
 ## 1. ภาพรวมโครงการ (Project Overview)
 วัตถุประสงค์เพื่อสร้างระบบจัดการโครงสร้างหมวดหมู่สินค้าไทย (Thai Product Taxonomy) และการจับคู่ความคล้ายคลึงของสินค้า (Deduplication / Similarity Matching) เพื่อตรวจหาความซ้ำซ้อนในคลังข้อมูลเดิม (Internal Catalog Audit) รองรับการประมวลผลขนาดใหญ่สูงสุด 10,000 SKU
-* **ความแม่นยำเป้าหมาย (Accuracy / F1-score):** ไม่ต่ำกว่า 72% บนชุดทดสอบ Benchmark
+* **ความแม่นยำเป้าหมาย (Accuracy / F1-score):** ห้าม regress จาก baseline ที่วัดได้จริงในเทสต์ — ตัวเลขปัจจุบันและเกณฑ์อยู่ที่ [AGENTS.md](../AGENTS.md) กฎเหล็กข้อ 6 (เดิมเอกสารนี้เขียน "≥72%" ซึ่งเป็นตัวเลข hardcode ปลอมที่ไม่เคยวัดจริง)
 * **สถาปัตยกรรมการประมวลผล:** ไฮบริด (Hybrid Algorithm) แบ่งเป็น Keyword Match 60% และ Embedding Semantic Match 40%
 * **รูปแบบการติดตั้ง:** รันเป็นระบบ Local Production บน Windows (Win32) รองรับการเข้าถึงผ่าน LAN ในออฟฟิศ (IP Server: `192.168.1.80`)
 
@@ -82,7 +82,7 @@
 
 ## 5. ความต้องการที่ไม่ใช่ฟังก์ชัน (Non-Functional Requirements - NFR)
 * **NFR1 (Windows Local Network Support):**
-  * ห้ามระบุ `localhost` ในโค้ดหรือการเชื่อมต่อเครือข่าย ให้ใช้ IP `127.0.0.1` เสมอ เพื่อลดปัญหาระบบ LAN/Socket บน Windows (Win32)
+  * ฝั่ง Python/FastAPI bind/connect ผ่าน `127.0.0.1` เสมอ ไม่ใช่ `localhost` (ปัญหา socket บน Win32) — แต่ URL ฝั่ง browser (`.env.local` ของ Next.js) ต้องเป็น `localhost:3000` ไม่ใช่ `127.0.0.1` เพราะเบราว์เซอร์ถือเป็นคนละ origin กัน (คุกกี้/CORS พังถ้าสลับ) รายละเอียดเต็มดู `AGENTS.md` § Windows/PowerShell — **ไม่ใช่กฎเดียวกันทั้งหมด อย่าใช้ 127.0.0.1 ทุกที่แบบเหมารวม**
   * หน้าจอ Next.js ต้องเชื่อมโยงแบบ Relative Path (ไม่มีการระบุโดเมนตรงๆ) เพื่อเปิดให้ผู้ใช้ในวง LAN เข้าถึงผ่าน `http://192.168.1.80:3000` ได้ทันที
 * **NFR2 (Resource Management):**
   * จำกัดการประมวลผลและการใช้ RAM โลคอลให้เหมาะสม (RAM ของ database docker container ไม่เกิน 1GB และ FastAPI Python Engine ไม่เกิน 512MB)

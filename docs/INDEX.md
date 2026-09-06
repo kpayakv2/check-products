@@ -15,7 +15,7 @@
 
 ### 🔧 [API Documentation](api/)
 - **[API Reference](api/api-reference.md)** - รายละเอียด API Endpoints ทั้ง FastAPI และ Edge Functions
-- **[API Architecture](../API_ARCHITECTURE.md)** - สถาปัตยกรรมการเชื่อมต่อระหว่าง Service ต่างๆ
+- **[API Architecture](api/API_ARCHITECTURE.md)** - สถาปัตยกรรมการเชื่อมต่อระหว่าง Service ต่างๆ
 
 ### 👩‍💻 [Development](development/)
 - **[Architecture Overview](development/architecture.md)** - รายละเอียดโครงสร้างโมดูลและ Data Pipeline
@@ -37,8 +37,7 @@
 
 ### **สำหรับนักพัฒนา:**
 1. ศึกษา [`Architecture Overview`](development/architecture.md)
-2. ตรวจสอบกฎเหล็กใน [`GEMINI.md`](../GEMINI.md)
-3. ศึกษาสถาปัตยกรรม Supabase ใน [`SUPABASE_SYSTEM_ARCHITECTURE.md`](../SUPABASE_SYSTEM_ARCHITECTURE.md)
+2. ตรวจสอบกฎของโปรเจกต์ใน [`AGENTS.md`](../AGENTS.md) — ไฟล์เดียวที่ทั้ง Claude Code และ Antigravity IDE ใช้ร่วมกัน
 
 ---
 
@@ -47,8 +46,6 @@
 ### **✅ ปรับปรุงล่าสุด (เมษายน 2569):**
 - 🎯 เอกสารทุกฉบับถูกปรับปรุงให้รองรับสถาปัตยกรรม **Next.js + Supabase**
 - 🧹 นำเนื้อหาที่ล้าสมัย (Port 5000, 8000/web) ออกจากเอกสารหลัก
-- 📋 อ้างอิงความแม่นยำมาตรฐานที่ **72%** ตามการทดสอบจริง
+- 📋 ตัวเลขความแม่นยำวัดจริงและเกณฑ์ไม่ regress อยู่ที่ [`AGENTS.md`](../AGENTS.md) กฎเหล็กข้อ 6 และ [`CURRENT_STATUS.md`](CURRENT_STATUS.md) — ไม่ใช่ "72%" คงที่แบบที่เคยเขียนไว้ที่นี่ (ตัวเลขนั้นเป็น hardcode ปลอม)
 
 ---
-
-**🏗️ เอกสารนี้ได้รับการดูแลโดย พยัคฆ์ (Gemini CLI Agent)**
