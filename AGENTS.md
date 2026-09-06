@@ -140,10 +140,10 @@ This repo already has Playwright configured (`taxonomy-app/e2e/*.spec.ts`). Afte
 | `docs` | Architecture, API docs, DB schema, reports |
 | `taxonomy-app/supabase` | Edge Functions, migrations |
 | `tests` | Pytest unit/integration tests |
-| `.agents` | Original Gemini CLI rules/skills/workflows (reference) |
+| `.agents` | `rules/` and `skills/` read live by Antigravity IDE; `workflows/` is reference-only (GEMINI CLI predecessor, deprecated by Antigravity itself in favor of skills) |
 
 ## Reference: Original Agent Config
 - `.agents/rules/` — rules-ai-agent, rules-supabase, rules-thai-product, rules-git-hygiene, rules-windows, rules-antigravity
-- `.agents/skills/` — thai-taxonomy-expert, data-cleaner, pgvector-semantic-search, vercel-react-best-practices
+- `.agents/skills/` — 15 skills, read live by Antigravity IDE, and the only copy committed to git for 11 of them. Those 11 are marketplace skills installed via `npx skills add` (tracked in `skills-lock.json`), symlinked from `.claude/skills/` for Claude Code — `.agents/skills/` is the real files. The symlinks aren't committed (`.gitignore`'d): this checkout has `core.symlinks=false`, so `git add` would store a dereferenced copy instead of a symlink, silently reintroducing the duplication this section used to have — run `npx skills update` after cloning to (re)materialize them. The other 4 skills are project-specific and hand-written: `thai-taxonomy-expert`, `data-cleaner`, `pgvector-semantic-search`, `vercel-react-best-practices` — plain-copied (not symlinked, both copies committed) into `.claude/skills/` too so Claude Code can use them; edit both copies if you change one (see [ticket 06](.scratch/rules-workflows-memory-conflicts/issues/06-duplicate-skills.md))
 - `.agents/workflows/` — smart_impact_workflow, workflow-new-feature, workflow-analyze-db, workflow-antigravity-verification
 - `.agents/memory/` — logged bugs/lessons (bug_numpy_feature_names, dedup_refactor_lessons)

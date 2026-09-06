@@ -9,7 +9,7 @@
 
 ## 1. ภาพรวมโครงการ (Project Overview)
 วัตถุประสงค์เพื่อสร้างระบบจัดการโครงสร้างหมวดหมู่สินค้าไทย (Thai Product Taxonomy) และการจับคู่ความคล้ายคลึงของสินค้า (Deduplication / Similarity Matching) เพื่อตรวจหาความซ้ำซ้อนในคลังข้อมูลเดิม (Internal Catalog Audit) รองรับการประมวลผลขนาดใหญ่สูงสุด 10,000 SKU
-* **ความแม่นยำเป้าหมาย (Accuracy / F1-score):** ไม่ต่ำกว่า 72% บนชุดทดสอบ Benchmark
+* **ความแม่นยำเป้าหมาย (Accuracy / F1-score):** ห้าม regress จาก baseline ที่วัดได้จริงในเทสต์ — ตัวเลขปัจจุบันและเกณฑ์อยู่ที่ [AGENTS.md](../AGENTS.md) กฎเหล็กข้อ 6 (เดิมเอกสารนี้เขียน "≥72%" ซึ่งเป็นตัวเลข hardcode ปลอมที่ไม่เคยวัดจริง)
 * **สถาปัตยกรรมการประมวลผล:** ไฮบริด (Hybrid Algorithm) แบ่งเป็น Keyword Match 60% และ Embedding Semantic Match 40%
 * **รูปแบบการติดตั้ง:** รันเป็นระบบ Local Production บน Windows (Win32) รองรับการเข้าถึงผ่าน LAN ในออฟฟิศ (IP Server: `192.168.1.80`)
 

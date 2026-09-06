@@ -233,6 +233,25 @@ gha-creds-*.json
 # Scratch folder (temporary AI agent files)
 scratch/
 
+# Claude Code local settings — has absolute paths and permission history specific to this machine
+.claude/settings.local.json
+
+# Marketplace skills managed by `npx skills` — symlinked from .agents/skills/, not real files here.
+# core.symlinks=false on this checkout means `git add` would store a dereferenced COPY instead of
+# the symlink, silently reintroducing the duplication ticket 06 removed. Run `npx skills update` to
+# (re)materialize these; .agents/skills/ (the real files) is committed normally.
+.claude/skills/code-review/
+.claude/skills/diagnosing-bugs/
+.claude/skills/domain-modeling/
+.claude/skills/find-skills/
+.claude/skills/grill-me/
+.claude/skills/grill-with-docs/
+.claude/skills/grilling/
+.claude/skills/implement/
+.claude/skills/to-spec/
+.claude/skills/to-tickets/
+.claude/skills/wayfinder/
+
 # artifacts จาก Playwright MCP (snapshot/console log ระหว่างตรวจงาน)
 .playwright-mcp/
 

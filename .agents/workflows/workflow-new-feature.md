@@ -43,7 +43,7 @@
 6. **Testing**:
    - สร้าง Unit Test ไฟล์ใหม่
    - รัน `npm test` หรือ `pytest` (ตามภาษาที่ใช้)
-   - ตรวจสอบค่า F1-score/Accuracy ≥ 72%
+   - ถ้าแก้ hybrid classification: รัน `tests/integration/test_classification_accuracy.py` ห้าม regress จาก baseline เดิม — ดู [AGENTS.md](../../AGENTS.md) กฎเหล็กข้อ 6
 
 7. **Browser Verification (Antigravity)**:
    - ตรวจสอบ UI ผ่านเบราว์เซอร์ตาม `.agents/workflows/workflow-antigravity-verification.md`
