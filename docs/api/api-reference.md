@@ -1,6 +1,6 @@
 # 🔌 API Reference & Testing Guide (v4.0 — Modular Architecture)
 
-> 📖 **Project Constitution**: ระบบนี้ทำงานบนฐานของ FastAPI และใช้ Hybrid Algorithm (Keyword 60% + Embedding 40%) ตามที่ระบุใน [GEMINI.md](../../GEMINI.md)
+> 📖 **Project Constitution**: ระบบนี้ทำงานบนฐานของ FastAPI และใช้ Hybrid Algorithm (Keyword 60% + Embedding 40%) ตามที่ระบุใน [AGENTS.md](../../AGENTS.md)
 
 ## 🚀 **API Server Setup**
 

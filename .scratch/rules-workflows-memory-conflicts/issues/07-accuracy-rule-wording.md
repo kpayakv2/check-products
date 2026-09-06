@@ -2,7 +2,7 @@
 
 **Labels:** `wayfinder:grilling`
 **Parent:** [แผนที่](../map.md)
-**Blocked by:** ~~[01: ลำดับศักดิ์ของแหล่งความจริง](01-precedence-order.md)~~ (ปิดแล้ว 2026-09-06) · [03: ทะเบียนข้อขัดแย้งฉบับสมบูรณ์](03-conflict-register.md)
+**Blocked by:** ~~[01: ลำดับศักดิ์ของแหล่งความจริง](01-precedence-order.md)~~ · ~~[03: ทะเบียนข้อขัดแย้งฉบับสมบูรณ์](03-conflict-register.md)~~ — ทั้งคู่ปิดแล้ว 2026-09-06 ตั๋วนี้ไม่ติดบล็อกแล้ว (ดู [conflict-register.md](../conflict-register.md) รายการ #12, #18-21 สำหรับจุดที่ต้องแก้)
 **Assignee:** (ว่าง — ยังไม่มีใครจอง)
 **Status:** open
 

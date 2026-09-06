@@ -3,8 +3,8 @@
 **Labels:** `wayfinder:grilling`
 **Parent:** [แผนที่](../map.md)
 **Blocked by:** ไม่มี — เริ่มได้ทันที
-**Assignee:** (ว่าง — ยังไม่มีใครจอง)
-**Status:** open
+**Assignee:** Claude (จองแล้ว 2026-09-06)
+**Status:** closed (resolved 2026-09-06)
 
 ## Question
 
@@ -40,6 +40,26 @@
 
 ## เกณฑ์ว่าตอบครบ
 
-- [ ] ตัดสินแล้วว่าเหลือคลังไหนบ้าง และแต่ละคลังเก็บอะไร
-- [ ] ถ้า memory MCP ถูกถอด ต้องถอดจาก `.mcp.json` และ `.claude/settings.local.json` พร้อมกัน
-- [ ] มีวิธีที่ทำให้ความทรงจำที่เน่าถูกจับได้ ไม่ใช่รอให้บังเอิญเจอ
+- [x] ตัดสินแล้วว่าเหลือคลังไหนบ้าง และแต่ละคลังเก็บอะไร
+- [x] ถ้า memory MCP ถูกถอด ต้องถอดจาก `.mcp.json` และ `.claude/settings.local.json` พร้อมกัน
+- [x] มีวิธีที่ทำให้ความทรงจำที่เน่าถูกจับได้ ไม่ใช่รอให้บังเอิญเจอ
+
+## Resolution (2026-09-06)
+
+**คำตอบ:** เหลือ 2 คลัง ไม่ใช่ 3 — ถอด memory MCP server ทิ้ง
+
+- **Personal Memory** (auto-memory `MEMORY.md` + ไฟล์ย่อย) — นอกรีโป เห็นคนเดียว ฉีดทุกเซสชัน มีน้ำหนักสูงสุดเพราะถูกอ่านบ่อยที่สุด
+- **Team Memory** (`.agents/memory/`) — ในรีโป เห็นได้ทุกคน/ทุกเครื่องมือ ไม่ auto-inject ต้องเปิดอ่านเอง — ตรวจแล้วเนื้อหา 2 ไฟล์ยังจริงอยู่ (อ้างอิงโค้ดที่มีอยู่จริง) แค่ไม่มีใครโหลดอัตโนมัติ ไม่ต้องยุบรวมหรือเลื่อนสถานะ
+- **Memory MCP** (`.mcp-memory/memory.jsonl`) — **ถอดทิ้ง** เขียน 0 ไบต์มา 2.5 สัปดาห์ ซ้ำซ้อนกับ Personal Memory ที่ทำงานอยู่แล้ว เหตุผลที่เคยอ้างว่าบังคับ (GEMINI.md Smart Testing Matrix) หมดความหมายไปแล้วตั้งแต่ตั๋ว 01
+
+ทั้งสามหมวดนี้ยังอยู่ใน "Memory" ตามนิยามเดิมของ [CONTEXT.md](../../../CONTEXT.md) (ผิดพลาดได้ ไม่ใช่แหล่งอำนาจ) — แค่แยกย่อยเป็น Personal/Team ให้ชัดขึ้น
+
+**กันเน่าซ้ำ:** ปัญหาจริงไม่ใช่ไม่มีกฎ (แพลตฟอร์มเองก็บอกอยู่แล้วว่าต้องตรวจก่อนเชื่อ) แต่คือพอเจอว่าผิดกลางบทสนทนาแล้วไม่มีใครย้อนไปแก้ไฟล์ — บันทึกเป็นความทรงจำแบบ feedback ใหม่ `feedback-fix-stale-memory-immediately.md` ใน Personal Memory (อยู่นอกรีโป จึงลิงก์ตรงจากที่นี่ไม่ได้)
+
+**สิ่งที่ทำไปแล้ว:**
+1. ถอด `memory` server ออกจาก `.mcp.json` และ `enabledMcpjsonServers` ใน `.claude/settings.local.json`
+2. ลบโฟลเดอร์ `.mcp-memory/` ทิ้ง (ว่างเปล่า ไม่มีอะไรเสีย)
+3. แก้ `AGENTS.md` § MCP Tools — เอาบรรทัด `memory` ออก บันทึกไว้ว่าทำไมถอด
+4. แก้ `CONTEXT.md` — แตก "Memory" เป็น "Personal Memory" / "Team Memory"
+5. แก้ auto-memory ที่รู้แล้วว่าผิด: `repo-audit-2026-08-19.md` (jest.config ปิดครบ 4/4), `project-state-2026-08-28.md` (branch merge แล้ว), และดัชนี `MEMORY.md` ทั้งสองบรรทัด
+6. เขียนความทรงจำแบบ feedback ใหม่ `feedback-fix-stale-memory-immediately.md` + เพิ่มลงดัชนี `MEMORY.md`

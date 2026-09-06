@@ -71,7 +71,7 @@ npm install
 *   [📖 Architecture Detail](docs/development/architecture.md)
 *   [🔌 API Reference](docs/api/api-reference.md)
 *   [🚀 Quick Start Guide](docs/guides/quick-start.md)
-*   [⚖️ Project Constitution (GEMINI.md)](GEMINI.md)
+*   [⚖️ Project Constitution (AGENTS.md)](AGENTS.md)
 
 ---
 

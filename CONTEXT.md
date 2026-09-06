@@ -17,5 +17,13 @@ A document whose only job is pointing a reader — human or agent — to where t
 _Avoid_: onboarding doc (once it starts asserting requirements or numbers, it has stopped being this)
 
 **Memory**:
-A fallible, per-session or per-user observation about the project's past state. Never authoritative over a Rule or Status document, regardless of what it claims — verify against current reality before acting on it. Includes Claude Code's auto-memory (`MEMORY.md` and its linked files) and `.agents/memory/`.
+A fallible observation about the project's past state — never authoritative over a Rule or Status document, regardless of what it claims. Verify against current reality before acting on it. Splits into Personal Memory and Team Memory below.
 _Avoid_: source of truth, canonical (memory is never either)
+
+**Personal Memory**:
+Claude Code's own auto-memory (`MEMORY.md` + linked files), stored outside the repo, visible only to you, injected into every session. The most-read Memory, so a stale claim here does the most damage — fix it the moment you find it wrong, in the same turn.
+_Avoid_: shared memory, team notes
+
+**Team Memory**:
+Hand-written lessons in `.agents/memory/`, checked into the repo. Visible to anyone who opens the repo, in any agent tool — not auto-injected, has to be read on purpose.
+_Avoid_: personal notes, session log

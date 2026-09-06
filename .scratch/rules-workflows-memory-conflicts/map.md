@@ -17,7 +17,7 @@
 **โดเมน:** เอกสารกฎ / คอนฟิกเอเจนต์ / คลังความทรงจำ — ไม่ใช่โค้ดแอป
 
 **ขอบเขต (ผู้ใช้ยืนยัน 2026-09-05):** ครอบคลุมทั้งสี่ชั้น
-1. ชั้นคอนฟิกเอเจนต์ — `AGENTS.md` (ใหม่ 2026-09-06 — หัวโต๊ะของหมวด Rule), `CLAUDE.md` (ตอนนี้เป็นแค่ stub import), `GEMINI.md`, `START_HERE.md`, `CONTEXT.md` (ใหม่ — ศัพท์), `docs/adr/` (ใหม่ — เหตุผลการตัดสินใจ), `.agents/rules/`, `.agents/workflows/`, `.agents/skills/`, `.claude/skills/`, `.mcp.json`
+1. ชั้นคอนฟิกเอเจนต์ — `AGENTS.md` (ใหม่ 2026-09-06 — หัวโต๊ะของหมวด Rule), `CLAUDE.md` (ตอนนี้เป็นแค่ stub import), `GEMINI.md`, `START_HERE.md`, `CONTEXT.md` (ใหม่ — ศัพท์), `docs/adr/` (ใหม่ — เหตุผลการตัดสินใจ), `.agents/rules/`, `.agents/workflows/`, `.agents/skills/`, `.agents/memory/` (= Team Memory), `.claude/skills/`, `.mcp.json` (memory server ถูกถอดแล้ว 2026-09-06)
 2. ความทรงจำ auto-memory — `C:\Users\minds\.claude\projects\d--product-checker-check-products\memory\` (10 ไฟล์ + `MEMORY.md`)
 3. เอกสารใน `docs/`
 4. `README.md` ที่ผู้ใช้อ่าน
@@ -33,12 +33,15 @@
 ## Decisions so far
 
 - [01: ลำดับศักดิ์ของแหล่งความจริง](issues/01-precedence-order.md): เอกสารแบ่งเป็น 4 หมวดไม่แข่งกันข้ามหมวด — Rule/Status/Wayfinding/Memory (นิยามใน [CONTEXT.md](../../CONTEXT.md)) หัวโต๊ะหมวด Rule คือ **`AGENTS.md`** ใหม่ (ไม่ใช่ CLAUDE.md อีกต่อไป — Antigravity อ่าน AGENTS.md ตรง, Claude Code อ่านผ่าน `@AGENTS.md` import ใน CLAUDE.md) เหตุผลเต็มใน [ADR 0001](../../docs/adr/0001-single-canonical-rule-file.md) ห้ามพิมพ์ซ้ำเนื้อกฎ ต้องลิงก์กลับเท่านั้น ยกเว้นไฟล์ลูกน้องที่ AGENTS.md ชี้ไปหาเอง — ยังไม่ได้ยืนยันจริงว่า `@AGENTS.md` import ทำงาน ต้องเปิดเซสชันใหม่เช็ก
+- [02: คลังความทรงจำสามที่ ควรเหลือกี่ที่](issues/02-memory-stores.md): เหลือ 2 คลัง ไม่ใช่ 3 — แตกหมวด Memory เดิมเป็น **Personal Memory** (auto-memory, นอกรีโป, น้ำหนักสูงสุด) กับ **Team Memory** (`.agents/memory/`, ในรีโป) ถอด **memory MCP server** ทิ้ง (0 ไบต์มา 2.5 สัปดาห์) ออกจาก `.mcp.json`/`settings.local.json`/`AGENTS.md` แล้ว และแก้ auto-memory ที่รู้แล้วว่าผิด 2 ไฟล์ + บันทึก feedback-memory ใหม่กันเน่าซ้ำ
+- [03: ทะเบียนข้อขัดแย้งฉบับสมบูรณ์](issues/03-conflict-register.md): กวาดครบ 4 ชั้น พบ 23 จุด — [ทะเบียนเต็มอยู่ที่ conflict-register.md](conflict-register.md) แก้ไปแล้ว 11 จุด (3 จุดใหม่จากการกวาด) เหลือเปิด 12 จุดมีตั๋วรออยู่แล้วทุกจุด ตัดสินว่า docs/reports/ ที่ลงวันที่ไม่นับขัดแย้ง และพบกองเอกสารสถาปัตยกรรมเก่า ~25 ไฟล์ที่ไม่มีใครเดินผ่าน (ยังไม่มีตั๋วตัดสินชะตากรรม — อยู่ใน Not yet specified) — **ปลดบล็อกตั๋ว 07 แล้ว**
+- [04: ชะตากรรมของ GEMINI.md](issues/04-gemini-md-fate.md): ลบทั้ง `GEMINI.md` (ราก) และ `.gemini/GEMINI.md` (ไฟล์คนละไฟล์ที่เพิ่งพบระหว่างทำ — ไม่ใช่ยุบเหลือ stub) ตั้งค่า Gemini CLI ให้อ่าน `AGENTS.md` ตรงผ่าน `.gemini/settings.json` → `context.fileName` แทน กฎข้อ 7-8 เดิม (Smart Testing Matrix, MCP มาตรฐาน 6 ตัว) ทิ้งเพราะซ้ำกับหัวข้อที่มีอยู่แล้วใน AGENTS.md พบว่า `.gemini/settings.json` มี `mcpServers` จริงที่ยังตั้งค่าตามกฎข้อ 8 เดิมอยู่ (ใช้งานจริง ไม่ใช่แค่เอกสาร) — แก้ให้เหลือ 3 ตัวตรงกับ `.mcp.json` แล้ว
 
 ## Not yet specified
 
 - **เอกสารใน `docs/` ที่ยังพูด "72%"** — พบอย่างน้อย 12 จุด (`PRD.md`, `INDEX.md`, `docs/development/architecture.md`, `docs/api/analyze-capabilities.md`, `docs/README_CLASSIFIER.md`, `docs/reports/*`) จะลบ/แก้/ปล่อยไว้ ขึ้นกับว่าลำดับศักดิ์อนุญาตให้ `docs/` พูดกฎซ้ำได้ไหม และถ้อยคำใหม่ที่มาแทนคืออะไร
 - **รายงานลงวันที่ใน `docs/reports/`** — รายงานที่บันทึกว่า "72%" เมื่อ ส.ค. 2026 นับเป็นข้อขัดแย้ง หรือนับเป็นบันทึกประวัติศาสตร์ที่ถูกต้อง ณ เวลานั้น ยังไม่ชัดว่าต้องแยกเกณฑ์
-- **จุดที่ `AGENTS.md` เองเก่า** (เนื้อหาย้ายมาจาก CLAUDE.md เดิมทั้งดุ้นโดยตั๋ว 01 — ความเก่ายังติดมาด้วย) — ตาราง Key Directories อ้างโฟลเดอร์ `supabase/` ที่ระดับรากซึ่ง**ไม่มีอยู่จริง** (ของจริงคือ `taxonomy-app/supabase/`) และบรรยาย `.agents/skills/` ว่ามี 4 สกิลทั้งที่ตอนนี้มี 13 — จะกวาดรวมไปในรอบเดียวหรือต้องแยกรอบ ขึ้นกับขนาดทะเบียนที่ได้ (ข้อสองนี้ตอนนี้มี[ตั๋ว 06](issues/06-duplicate-skills.md)ดูแลอยู่แล้ว)
+- **`docs/` มีกองเอกสารสถาปัตยกรรมเก่า ~25 ไฟล์** (`docs/development/`, `docs/architecture/`, `docs/reports/`) ที่บรรยายระบบรุ่นก่อน Supabase/Next.js ทั้งดุ้น — ตรวจแล้วว่า `docs/INDEX.md` ไม่ได้ชี้เข้าไปเลย (ดู[ทะเบียนข้อขัดแย้ง](conflict-register.md) หมวด C) จึงไม่ใช่ข้อขัดแย้งที่ต้องแก้ตอนนี้ แต่ยังไม่มีตั๋วตัดสินชะตากรรมของกองนี้ทั้งก้อน (เก็บไว้เป็นประวัติศาสตร์ในที่ที่ชัดเจนกว่านี้ / ย้ายเข้า archive/ / ลบทิ้ง)
 - **กันไม่ให้ข้อขัดแย้งงอกใหม่** — เช็กใน CI, ธรรมเนียมวันหมดอายุของเอกสาร, หรือแค่ระบุลำดับศักดิ์ให้ชัดแล้วพอ ยังตอบไม่ได้จนกว่าจะรู้ว่าลำดับศักดิ์หน้าตาเป็นอย่างไร
 - **ชะตากรรมของ `.agents/` ทั้งก้อน** — ถ้า `GEMINI.md` ถูกปลด และสกิลซ้ำถูกยุบ อาจเหลือแค่ `rules/` กับ `workflows/` ที่ยังมีคุณค่า หรืออาจไม่เหลืออะไรเลย
 

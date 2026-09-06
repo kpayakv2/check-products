@@ -4,7 +4,7 @@
 
 Three agent tools work on this repo — Claude Code, Antigravity IDE, and (less often) Gemini CLI — and each looks for its own file (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`). Keeping the actual rule content in `CLAUDE.md` meant Antigravity never saw it, and copying rules into multiple files is exactly what let the fake "72% accuracy" benchmark survive in a dozen documents after it was retracted in one of them (see `docs/CURRENT_STATUS.md`).
 
-We moved the substance of `CLAUDE.md` into `AGENTS.md` — the file Antigravity IDE reads natively (confirmed: Antigravity ≥1.20.5 reads root `AGENTS.md` directly) — and left `CLAUDE.md` as a single `@AGENTS.md` import line, which is Claude Code's documented way to pull in another file's content (Claude Code has no native AGENTS.md support as of mid-2026). `GEMINI.md`'s fate is a separate decision: Gemini CLI can be pointed at `AGENTS.md` too via its own `settings.json`, but that hasn't been done yet.
+We moved the substance of `CLAUDE.md` into `AGENTS.md` — the file Antigravity IDE reads natively (confirmed: Antigravity ≥1.20.5 reads root `AGENTS.md` directly) — and left `CLAUDE.md` as a single `@AGENTS.md` import line, which is Claude Code's documented way to pull in another file's content (Claude Code has no native AGENTS.md support as of mid-2026). `GEMINI.md`'s fate was a separate decision, resolved 2026-09-06 in [ticket 04](../../.scratch/rules-workflows-memory-conflicts/issues/04-gemini-md-fate.md): both `GEMINI.md` and `.gemini/GEMINI.md` were deleted, and `.gemini/settings.json` now points Gemini CLI at `AGENTS.md` via `context.fileName`.
 
 ## Considered options
 

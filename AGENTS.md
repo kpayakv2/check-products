@@ -1,6 +1,6 @@
 # AGENTS.md — Thai Product Taxonomy Manager & Similarity Checker
 
-This is the canonical rule file for the repo — the one place project rules live. Three agent tools have worked on this codebase: Antigravity IDE reads this file directly (it's the cross-tool context file Antigravity's own docs point to); Claude Code reads it through the single `@AGENTS.md` import line in `CLAUDE.md` (Claude Code has no native AGENTS.md support as of mid-2026, so the import is the documented workaround); Gemini CLI still defaults to `GEMINI.md`, which predates this file and is no longer a live rule source — pointing Gemini CLI at this file too is unfinished work, not a decision made here.
+This is the canonical rule file for the repo — the one place project rules live. Three agent tools have worked on this codebase: Antigravity IDE reads this file directly (it's the cross-tool context file Antigravity's own docs point to); Claude Code reads it through the single `@AGENTS.md` import line in `CLAUDE.md` (Claude Code has no native AGENTS.md support as of mid-2026, so the import is the documented workaround); Gemini CLI reads it directly too, via `context.fileName` in `.gemini/settings.json` — `GEMINI.md` (both the root copy and `.gemini/GEMINI.md`) predated this file, duplicated or contradicted it, and was deleted 2026-09-06 (see [ticket 04](.scratch/rules-workflows-memory-conflicts/issues/04-gemini-md-fate.md)).
 
 If you're an agent reading this: this file **is** the constitution. See [ADR 0001](docs/adr/0001-single-canonical-rule-file.md) for why the project is shaped this way.
 
@@ -51,9 +51,8 @@ Configured in `.mcp.json` (ported from the old `.gemini/settings.json`, minus se
 - **postgres** — direct query access to the local Supabase Postgres DB (`127.0.0.1:54325`). Use for real DB inspection instead of guessing schema.
 - **socraticode** — codebase impact/symbol/search tools (`codebase_impact`, `codebase_symbol`, `codebase_search`, `codebase_graph_circular`). Use before editing any shared function/module to see blast radius and callers.
 - **sequential-thinking** — structured multi-step reasoning for complex logic (e.g. changes to the hybrid classification algorithm).
-- **memory** — knowledge-graph memory server (separate from Claude Code's own file-based memory system). Storage pinned via `MEMORY_FILE_PATH` in `.mcp.json` to `.mcp-memory/memory.jsonl` (gitignored) so it survives `npx` cache changes — by default this server writes next to wherever `npx` happens to cache the package, which is not stable across installs.
 
-Not ported: `filesystem` (redundant with Read/Edit/Write/Glob), `puppeteer` (redundant — this repo already has Playwright configured in `taxonomy-app/e2e/`), `domscribe` (unclear purpose, skipped).
+Not ported: `filesystem` (redundant with Read/Edit/Write/Glob), `puppeteer` (redundant — this repo already has Playwright configured in `taxonomy-app/e2e/`), `domscribe` (unclear purpose, skipped). Also removed 2026-09-06: `memory`, a knowledge-graph MCP server — it wrote 0 bytes in the 2.5 weeks since it was added, fully redundant with Claude Code's own auto-memory which was already active. See [CONTEXT.md](CONTEXT.md) for how Memory (Personal vs Team) actually works in this repo.
 
 ## Blast-Radius Rule
 Before editing any function, class, or shared module: check callers first. Use the `socraticode` MCP tools if available, otherwise `Grep`/`Glob` or the `Explore` agent for broader searches. Don't assume a change is isolated without checking.
@@ -139,7 +138,7 @@ This repo already has Playwright configured (`taxonomy-app/e2e/*.spec.ts`). Afte
 | `scripts` | CLI data-management scripts |
 | `taxonomy-app` | Next.js app, UI, Supabase client |
 | `docs` | Architecture, API docs, DB schema, reports |
-| `supabase` | Edge Functions, migrations |
+| `taxonomy-app/supabase` | Edge Functions, migrations |
 | `tests` | Pytest unit/integration tests |
 | `.agents` | Original Gemini CLI rules/skills/workflows (reference) |
 
