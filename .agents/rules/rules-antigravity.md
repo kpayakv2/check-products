@@ -35,7 +35,7 @@ triggers:
 
 ### ✅ Good: การตรวจสอบหลังแก้ UI
 1. แก้ไขโค้ดใน `components/ProductCard.tsx`
-2. รัน `npx playwright test e2e/antigravity-specialist.spec.ts`
+2. รัน spec ที่เกี่ยวข้อง — ดูรายชื่อ spec ที่ยังเขียวจริงใน `AGENTS.md` § Testing (`antigravity-specialist.spec.ts` ถูกลบไปแล้วเมื่อ 2026-08-30 เพราะไม่มี `expect()` เลย จึงผ่านเสมอโดยไม่ได้ตรวจอะไร)
 3. แคปภาพหน้าจอมาเปรียบเทียบกับดีไซน์
 
 ### ❌ Bad: การแก้โค้ดโดยไม่รันเซิร์ฟเวอร์ดูผลลัพธ์

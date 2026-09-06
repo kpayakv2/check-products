@@ -15,7 +15,7 @@
 
 ### 🔧 [API Documentation](api/)
 - **[API Reference](api/api-reference.md)** - รายละเอียด API Endpoints ทั้ง FastAPI และ Edge Functions
-- **[API Architecture](../API_ARCHITECTURE.md)** - สถาปัตยกรรมการเชื่อมต่อระหว่าง Service ต่างๆ
+- **[API Architecture](api/API_ARCHITECTURE.md)** - สถาปัตยกรรมการเชื่อมต่อระหว่าง Service ต่างๆ
 
 ### 👩‍💻 [Development](development/)
 - **[Architecture Overview](development/architecture.md)** - รายละเอียดโครงสร้างโมดูลและ Data Pipeline
@@ -37,8 +37,7 @@
 
 ### **สำหรับนักพัฒนา:**
 1. ศึกษา [`Architecture Overview`](development/architecture.md)
-2. ตรวจสอบกฎเหล็กใน [`GEMINI.md`](../GEMINI.md)
-3. ศึกษาสถาปัตยกรรม Supabase ใน [`SUPABASE_SYSTEM_ARCHITECTURE.md`](../SUPABASE_SYSTEM_ARCHITECTURE.md)
+2. ตรวจสอบกฎของโปรเจกต์ใน [`AGENTS.md`](../AGENTS.md) — ไฟล์เดียวที่ทั้ง Claude Code และ Antigravity IDE ใช้ร่วมกัน
 
 ---
 
@@ -50,5 +49,3 @@
 - 📋 อ้างอิงความแม่นยำมาตรฐานที่ **72%** ตามการทดสอบจริง
 
 ---
-
-**🏗️ เอกสารนี้ได้รับการดูแลโดย พยัคฆ์ (Gemini CLI Agent)**
