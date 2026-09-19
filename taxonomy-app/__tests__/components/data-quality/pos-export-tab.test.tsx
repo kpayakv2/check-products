@@ -83,6 +83,47 @@ it('ปิดปุ่มโหลดเมื่อไม่มีอะไร�
   expect(screen.getByTestId('pos-export-download')).toBeDisabled()
 })
 
+it('โหลดพรีวิวไม่สำเร็จ ต้องไม่บอกว่าคิวว่าง', async () => {
+  global.fetch = jest.fn().mockRejectedValue(new Error('Failed to fetch')) as unknown as typeof fetch
+  render(<PosExportTab />)
+
+  expect(await screen.findByTestId('pos-export-load-failed')).toBeInTheDocument()
+  // ติ๊กถูกเขียว "ส่งออกครบแล้ว" ขัดกับ error ที่อยู่เหนือมัน — ห้ามขึ้นตอนไม่รู้สถานะจริง
+  expect(screen.queryByTestId('pos-export-empty')).not.toBeInTheDocument()
+  expect(screen.getByText('Failed to fetch')).toBeInTheDocument()
+})
+
+it('ตัวเลขบนการ์ดสรุปมาจากไฟล์จริง ไม่ใช่ตัวเลขที่พรีวิวไว้ก่อนกด', async () => {
+  // ลำดับคอลัมน์ตาม POS_EXPORT_HEADERS: กลุ่ม, กลุ่มย่อย1, รหัส, บาร์โค้ด, ชื่อ, หน่วย, ราคา, vat, กลุ่มย่อย2
+  const line = (price: string) =>
+    ['ของใช้ในบ้าน', 'ตะกร้า', 'HH001', 'HH001', 'ตะกร้ากลม', 'ใบ', price, 'V', ''].join('\t')
+  const fileText = ['หัวตาราง', line('45'), line(''), line('10')].join('\r\n') + '\r\n'
+
+  const fetchMock = jest.fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      // คิวตอนเปิดหน้าเหลือรายการเดียว แต่ระหว่างนั้นมีของเข้ามาเพิ่ม
+      json: async () => ({ success: true, total: 1, issues: EMPTY_ISSUES, preview: [previewRow] }),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      blob: async () => ({ text: async () => fileText }) as unknown as Blob,
+    })
+  global.fetch = fetchMock as unknown as typeof fetch
+  global.URL.createObjectURL = jest.fn(() => 'blob:fake')
+  global.URL.revokeObjectURL = jest.fn()
+
+  render(<PosExportTab />)
+  await waitFor(() => expect(screen.getByTestId('pos-export-total')).toBeInTheDocument())
+  await userEvent.click(screen.getByTestId('pos-export-download'))
+  await userEvent.click(await screen.findByTestId('pos-export-confirm'))
+
+  const success = await screen.findByTestId('pos-export-success')
+  expect(success).toHaveTextContent('ส่งออกเรียบร้อย 3 รายการ')
+  // ราคาว่าง 1 แถวในไฟล์จริง ทั้งที่ตอนพรีวิวบอกว่าครบ
+  expect(success).toHaveTextContent('กรอกราคาให้ 1 แถวที่ยังว่าง')
+})
+
 it('กดโหลดแล้วยิง POST ไปที่ /api/pos-export', async () => {
   const fetchMock = jest.fn()
     .mockResolvedValueOnce({

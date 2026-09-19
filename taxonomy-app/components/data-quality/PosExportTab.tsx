@@ -13,7 +13,7 @@ import {
   RefreshCcw,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { PosExportIssues, PosExportRow } from '@/utils/pos-export'
+import { POS_EXPORT_HEADERS, type PosExportIssues, type PosExportRow } from '@/utils/pos-export'
 
 interface ExportPreview {
   total: number
@@ -40,9 +40,32 @@ const MANDATORY_FIELDS: { key: keyof PosExportIssues; label: string }[] = [
   { key: 'missingPrice', label: 'ราคาขาย' },
 ]
 
-const NO_ISSUES: PosExportIssues = {
-  missingItemId: 0, missingBarcode: 0, missingItemName: 0,
-  missingUnitName: 0, missingItemGroup: 0, missingPrice: 0,
+/** ตำแหน่งคอลัมน์ราคาในไฟล์ — อ่านจากหัวตารางจริง จะได้ไม่ค้างถ้าลำดับคอลัมน์เปลี่ยน */
+const PRICE_COLUMN = POS_EXPORT_HEADERS.findIndex((header) => header.startsWith('Price('))
+
+/**
+ * นับแถวจากไฟล์ที่ได้จริง ไม่ใช่จากตัวเลขที่ preview ไว้ก่อนกด
+ *
+ * ระหว่าง GET (ตอนเปิดหน้า) กับ POST (ตอนกดยืนยัน) คิวอาจเปลี่ยนไปแล้ว
+ * การ์ดสรุปต้องบอกว่าส่งออกไปกี่แถวจริง ๆ ไม่ใช่ตัวเลขเก่าที่ค้างอยู่บนจอ
+ *
+ * คืน null เมื่ออ่านไฟล์ไม่ได้ (jsdom ไม่มี Blob.text) ผู้เรียกค่อยถอยไปใช้ค่าจาก preview
+ */
+async function summarizeExportFile(
+  blob: Blob
+): Promise<{ total: number; missingPrice: number } | null> {
+  if (typeof blob.text !== 'function') return null
+
+  try {
+    const lines = (await blob.text()).split('\r\n').filter(Boolean)
+    const rows = lines.slice(1) // บรรทัดแรกคือหัวตาราง
+    return {
+      total: rows.length,
+      missingPrice: rows.filter((line) => !(line.split('\t')[PRICE_COLUMN] ?? '').trim()).length,
+    }
+  } catch {
+    return null
+  }
 }
 
 /** คนเดิมกดส่งออกหลายรอบติดกัน ไม่ต้องถามซ้ำทุกรอบในแท็บเบราว์เซอร์เดียวกัน */
@@ -194,13 +217,16 @@ export default function PosExportTab() {
       const fileName = resolveFileName(response, now)
       triggerDownload(blob, fileName)
 
+      // ตัวเลขบนการ์ดสรุปมาจากไฟล์ที่เพิ่งได้ ถอยไปใช้ค่าจาก preview เฉพาะตอนอ่านไฟล์ไม่ได้
+      const summary = await summarizeExportFile(blob)
+
       // ไม่โหลดใหม่ทันที — การ์ดสรุปต้องค้างให้อ่าน ไม่ใช่เด้งไปหน้าว่างเปล่า
       setResult({
-        total: data?.total ?? 0,
+        total: summary?.total ?? data?.total ?? 0,
         fileName,
         exportedAt: now,
         blob,
-        missingPrice: data?.issues.missingPrice ?? 0,
+        missingPrice: summary?.missingPrice ?? data?.issues.missingPrice ?? 0,
       })
       setData(null)
       return true
@@ -377,12 +403,6 @@ export default function PosExportTab() {
     )
   }
 
-  const total = data?.total ?? 0
-  const issues = data?.issues ?? NO_ISSUES
-  const preview = data?.preview ?? []
-  const gaps = MANDATORY_FIELDS.filter(({ key }) => issues[key] > 0)
-  const readyCount = MANDATORY_FIELDS.length - gaps.length
-
   const header = (
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
@@ -408,6 +428,42 @@ export default function PosExportTab() {
       {error}
     </div>
   )
+
+  // ---------- โหลดไม่สำเร็จ: ยังไม่รู้ว่าคิวว่างหรือไม่ ----------
+  // ห้ามตกไปที่ state "ส่งออกครบแล้ว" — ติ๊กถูกสีเขียวขัดกับข้อความ error ที่อยู่เหนือมัน
+  // และทำให้คนเข้าใจว่าไม่มีอะไรต้องทำ ทั้งที่ของอาจค้างอยู่เป็นร้อยรายการ
+  if (data === null) {
+    return (
+      <div data-testid="pos-export-tab" className="thai-text space-y-4">
+        {header}
+        {errorBox}
+        <div
+          data-testid="pos-export-load-failed"
+          className="flex flex-col items-center gap-3 py-14 px-4 bg-white border border-slate-200 rounded-xl text-center"
+        >
+          <AlertCircle className="w-9 h-9 text-rose-500" />
+          <p className="font-black text-slate-700">โหลดข้อมูลไม่สำเร็จ</p>
+          <p className="text-xs text-slate-400">
+            ยังไม่รู้ว่ามีรายการค้างอยู่กี่รายการ — กดโหลดใหม่อีกครั้ง
+          </p>
+          <button
+            onClick={() => void fetchPreview()}
+            className={`flex items-center gap-2 px-4 py-2 mt-1 text-sm font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 ${FOCUS_RING}`}
+            data-testid="pos-export-retry"
+          >
+            <RefreshCcw className="w-4 h-4" />
+            โหลดใหม่
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const total = data.total
+  const issues = data.issues
+  const preview = data.preview
+  const gaps = MANDATORY_FIELDS.filter(({ key }) => issues[key] > 0)
+  const readyCount = MANDATORY_FIELDS.length - gaps.length
 
   // ---------- State 2: ไม่มีอะไรค้าง ----------
   if (total === 0) {
@@ -722,7 +778,7 @@ export default function PosExportTab() {
                 <h4 id="pos-export-confirm-title" className="text-base font-black text-slate-800">
                   ยืนยันส่งออก {total.toLocaleString()} รายการ
                 </h4>
-                <p className="text-xs text-slate-500">ตรวจ 3 ข้อนี้ก่อนกด</p>
+                <p className="text-xs text-slate-500">ตรวจ {2 + gaps.length} ข้อนี้ก่อนกด</p>
               </div>
             </div>
 
