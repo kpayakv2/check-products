@@ -261,8 +261,10 @@ taxonomy-app/e2e/.auth/
 # curl cookie jar ที่หลุดมาจากการตรวจงานด้วยมือ (มี session token)
 cookies.txt
 
-# Git worktrees for isolated feature work (manual fallback — .claude/worktrees/
-# breaks Jest's Windows glob handling in taxonomy-app: any path segment starting
-# with a dot corrupts next/jest's <rootDir> substitution into a mixed-slash
-# pattern that matches zero tests)
-.worktrees/
+# Git worktrees for isolated feature work — MUST be a non-dot path.
+# Any dot-prefixed segment anywhere in the absolute path (.claude/worktrees/,
+# .worktrees/, ...) breaks Jest's Windows glob handling in taxonomy-app:
+# next/jest's <rootDir> substitution leaves one backslash unconverted right
+# before the dot-segment, corrupting testMatch into a mixed-slash pattern
+# that matches zero files while testPathIgnorePatterns matches everything.
+worktrees/
