@@ -100,7 +100,7 @@ function formatPrice(price: number | null | undefined): string {
 
 /**
  * ไล่จากโหนดขึ้นไปหาราก แล้วคืนสายชื่อเรียงจากรากลงมา
- * \seen\ กันไว้เผื่อ parent_id วนกลับมาหาตัวเอง — ข้อมูลเสียไม่ควรทำให้เว็บแฮงก์
+ * `seen` กันไว้เผื่อ parent_id วนกลับมาหาตัวเอง — ข้อมูลเสียไม่ควรทำให้เว็บแฮงก์
  */
 export function buildCategoryChain(
   categoryId: string | null | undefined,
@@ -122,7 +122,7 @@ export function buildCategoryChain(
 }
 
 /**
- * วางหมวดหมู่ตามความลึกจริง ไม่ใช่ตามคอลัมน์ \level\
+ * วางหมวดหมู่ตามความลึกจริง ไม่ใช่ตามคอลัมน์ `level`
  * ตอนนี้ taxonomy มีแค่ 2 ชั้น Sub Group2 จึงว่าง
  * วันไหนเพิ่มชั้น 3 เข้ามา คอลัมน์นั้นจะเติมเองโดยไม่ต้องแก้โค้ด
  */

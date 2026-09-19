@@ -14,8 +14,11 @@ type Call = { table: string; op: string; payload?: unknown; filters: Filter[] }
 const calls: Call[] = []
 
 /**
- * คิวผลลัพธ์ต่อ `table.op` เพราะ route ยิง products สองครั้ง:
- * ครั้งแรกเอารายการที่จะส่งออก ครั้งที่สองเอา sku ทั้งหมดไปคำนวณรหัสใหม่
+ * คิวผลลัพธ์ต่อ `table.op` เพราะ route ยิง products หลายครั้ง:
+ * ครั้งแรกเอารายการที่จะส่งออก ที่เหลือเอา sku ทั้งหมดไปคำนวณรหัสใหม่
+ *
+ * ทุกการอ่านไล่ทีละหน้าด้วย .range() — หนึ่งหน้าคือหนึ่ง select หนึ่งคิว
+ * หน้าที่ได้แถวไม่ครบ 1,000 คือหน้าสุดท้าย
  */
 let queues: Record<string, Array<{ data?: unknown; error?: unknown }>> = {}
 
@@ -30,8 +33,11 @@ const makeChain = (table: string, op: string, payload?: unknown) => {
   const self = () => chain
   Object.assign(chain, {
     select: self,
-    order: self,
     not: self,
+    order: (column: string) => {
+      call.filters.push({ kind: 'order', column })
+      return chain
+    },
     eq: (column: string, value: unknown) => {
       call.filters.push({ kind: 'eq', column, value })
       return chain
@@ -42,6 +48,10 @@ const makeChain = (table: string, op: string, payload?: unknown) => {
     },
     in: (column: string, value: unknown) => {
       call.filters.push({ kind: 'in', column, value })
+      return Promise.resolve(settled)
+    },
+    range: (from: number, to: number) => {
+      call.filters.push({ kind: 'range', value: [from, to] })
       return Promise.resolve(settled)
     },
     then: (resolve: (v: unknown) => unknown) => Promise.resolve(settled).then(resolve),
@@ -174,6 +184,95 @@ describe('GET /api/pos-export', () => {
   })
 })
 
+/**
+ * PostgREST ตัดผลลัพธ์ที่ไม่ใส่ range ทิ้งที่ max_rows (1000 ในรีโปนี้) แล้วตอบ 206
+ * โดยที่ supabase-js ไม่ยก error ขึ้นมาเลย — ต้องไล่หน้าเอง ไม่งั้นข้อมูลขาดแบบเงียบ ๆ
+ */
+describe('ไล่ดึงทีละหน้า (max_rows = 1000)', () => {
+  const PAGE_SIZE = 1000
+
+  /** สินค้าปลอมจำนวนมาก สำหรับทดสอบว่าหน้าเต็มแล้วยิงหน้าถัดไปจริง */
+  const makeProducts = (count: number, withSku: boolean) =>
+    Array.from({ length: count }, (_, index) => ({
+      id: `bulk-${String(index).padStart(4, '0')}`,
+      name_th: `สินค้าชุดใหญ่ ${String(index).padStart(4, '0')}`,
+      sku: withSku ? `HH${index + 1}` : null,
+      barcode: null,
+      unit_name: 'ชิ้น',
+      vat_flag: 'V',
+      price: 10,
+      category_id: 'sub',
+    }))
+
+  const selectsOn = (table: string) =>
+    calls.filter((c) => c.table === table && c.op === 'select')
+
+  const rangeOf = (call: Call) =>
+    call.filters.find((f) => f.kind === 'range')?.value
+
+  it('ต่อทุกหน้าของ sku ที่ใช้ไปแล้วเข้าด้วยกัน ไม่ใช่หยุดที่หน้าแรก', async () => {
+    // เลขสูงสุดของ prefix ST อยู่หน้าที่สอง — ถ้าอ่านแค่หน้าแรกจะออกรหัสชนของเดิม
+    queues['products.select'] = [
+      { data: PRODUCTS, error: null },
+      { data: Array.from({ length: PAGE_SIZE }, (_, i) => ({ sku: `ZZ${i + 1}` })), error: null },
+      { data: [{ sku: 'ST900' }], error: null },
+    ]
+
+    const { GET } = await import('@/app/api/pos-export/route')
+    const response = await GET(new NextRequest('http://127.0.0.1:3000/api/pos-export'))
+    const body = await response.json()
+
+    const selects = selectsOn('products')
+    expect(selects).toHaveLength(3) // 1 หน้าของรายการ + 2 หน้าของ sku
+    expect(rangeOf(selects[1])).toEqual([0, PAGE_SIZE - 1])
+    expect(rangeOf(selects[2])).toEqual([PAGE_SIZE, PAGE_SIZE * 2 - 1])
+
+    expect(body.preview.map((r: { itemId: string }) => r.itemId)).toContain('ST901')
+  })
+
+  it('ต่อทุกหน้าของรายการที่รอส่งออก ไม่ใช่รายงานแค่ 1,000 แถวแรก', async () => {
+    queues['products.select'] = [
+      { data: makeProducts(PAGE_SIZE, true), error: null },
+      { data: [PRODUCTS[1]], error: null }, // หน้าสุดท้ายไม่เต็ม
+      { data: EXISTING_SKUS, error: null },
+    ]
+
+    const { GET } = await import('@/app/api/pos-export/route')
+    const response = await GET(new NextRequest('http://127.0.0.1:3000/api/pos-export'))
+    const body = await response.json()
+
+    expect(body.total).toBe(PAGE_SIZE + 1)
+
+    const selects = selectsOn('products')
+    expect(rangeOf(selects[0])).toEqual([0, PAGE_SIZE - 1])
+    expect(rangeOf(selects[1])).toEqual([PAGE_SIZE, PAGE_SIZE * 2 - 1])
+  })
+
+  it('ทุก query ที่ไล่หน้ามี .order() กำกับ ไม่งั้นแถวข้ามหรือซ้ำระหว่างหน้า', async () => {
+    const { GET } = await import('@/app/api/pos-export/route')
+    await GET(new NextRequest('http://127.0.0.1:3000/api/pos-export'))
+
+    const paged = calls.filter(
+      (c) => c.op === 'select' && c.filters.some((f) => f.kind === 'range')
+    )
+    expect(paged.length).toBeGreaterThan(0)
+    for (const call of paged) {
+      expect(call.filters.some((f) => f.kind === 'order')).toBe(true)
+    }
+  })
+
+  it('หน้าไหน error ก็โยนออกไป ไม่กลืนแล้วคำนวณต่อด้วยข้อมูลครึ่ง ๆ', async () => {
+    queues['products.select'] = [
+      { data: null, error: { message: 'boom' } },
+    ]
+
+    const { GET } = await import('@/app/api/pos-export/route')
+    const response = await GET(new NextRequest('http://127.0.0.1:3000/api/pos-export'))
+
+    expect(response.status).toBeGreaterThanOrEqual(400)
+  })
+})
+
 describe('POST /api/pos-export', () => {
   const post = async (body: unknown) => {
     const { POST } = await import('@/app/api/pos-export/route')
@@ -253,6 +352,70 @@ describe('POST /api/pos-export', () => {
     )
     // ถ้าเขียนรหัสพลาด ต้องยังไม่มีอะไรถูกตีว่าส่งออกแล้ว ของจะได้ค้างในคิว
     expect(skuAt).toBeLessThan(markAt)
+  })
+
+  /**
+   * .in() ยัด uuid ทุกตัวลง query string ของ URL — ของจริง 221 รายการก็ทะลุ
+   * บัฟเฟอร์ ~8KB ของ gateway แล้วได้ 414 กลับมา รหัสถูกเขียนแต่ไม่มีอะไรถูกตี
+   * ว่าส่งออก คิวจึงค้างวนชนรหัสซ้ำทุกรอบ
+   */
+  it('ตีว่าส่งออกแล้วทีละก้อน ไม่ยัด id ทั้งหมดลง .in() ครั้งเดียว', async () => {
+    const MANY = 60
+    const BATCH = 25
+    const bulk = Array.from({ length: MANY }, (_, index) => ({
+      id: `bulk-${String(index).padStart(4, '0')}`,
+      name_th: `สินค้าชุดใหญ่ ${String(index).padStart(4, '0')}`,
+      sku: null,
+      barcode: null,
+      unit_name: 'ชิ้น',
+      vat_flag: 'V',
+      price: 10,
+      category_id: 'sub',
+    }))
+    queues['products.select'] = [
+      { data: bulk, error: null },
+      { data: EXISTING_SKUS, error: null },
+    ]
+
+    await post({})
+
+    const updates = calls.filter((c) => c.op === 'update')
+    const marks = updates.filter(
+      (c) => (c.payload as Record<string, unknown>)?.pos_exported_at !== undefined
+    )
+
+    expect(marks).toHaveLength(Math.ceil(MANY / BATCH)) // 60 → 3 ก้อน
+    for (const mark of marks) {
+      const ids = mark.filters.find((f) => f.kind === 'in')?.value as string[]
+      expect(ids.length).toBeLessThanOrEqual(BATCH)
+    }
+
+    // ครบทุกตัว ไม่มีแถวไหนตกหล่นจากการแบ่งก้อน
+    const marked = marks.flatMap(
+      (mark) => mark.filters.find((f) => f.kind === 'in')?.value as string[]
+    )
+    expect(marked).toEqual(bulk.map((product) => product.id))
+
+    // รหัสต้องเขียนครบทุกก้อนก่อน ค่อยเริ่มตีว่าส่งออก
+    const lastSkuWrite = updates.map((c) =>
+      (c.payload as Record<string, unknown>)?.sku !== undefined
+    ).lastIndexOf(true)
+    const firstMark = updates.findIndex(
+      (c) => (c.payload as Record<string, unknown>)?.pos_exported_at !== undefined
+    )
+    expect(lastSkuWrite).toBeLessThan(firstMark)
+    expect(updates.filter((c) => (c.payload as Record<string, unknown>)?.sku !== undefined))
+      .toHaveLength(MANY)
+  })
+
+  it('ก้อนไหนพัง โยน error ออกไป ไม่ตอบว่าสำเร็จ', async () => {
+    queues['products.update'] = [
+      { data: null, error: null },
+      { data: null, error: { message: 'update failed' } },
+    ]
+
+    const response = await post({})
+    expect(response.status).toBeGreaterThanOrEqual(400)
   })
 
   it('mark_exported=false โหลดไฟล์ได้โดยไม่แตะฐานข้อมูล', async () => {

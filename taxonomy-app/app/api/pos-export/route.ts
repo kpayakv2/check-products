@@ -23,6 +23,46 @@ interface ExportProductRow extends ExportableProduct {
 }
 
 /**
+ * ขนาดหน้าที่ไล่ดึงทีละรอบ — เท่ากับ `max_rows` ใน supabase/config.toml
+ *
+ * PostgREST ตัดผลลัพธ์ที่ไม่ใส่ range ทิ้งที่ max_rows แล้วตอบ 206 เฉย ๆ
+ * supabase-js ไม่ถือว่านั่นเป็น error ด้วย (error เป็น null) โค้ดจึงเดินต่อ
+ * ด้วยข้อมูลที่ขาดหายโดยไม่มีสัญญาณอะไรเลย
+ */
+const FETCH_PAGE_SIZE = 1000
+
+/** query ที่ยังรับ .range() ได้ — พอสำหรับ helper นี้ ไม่ต้องลาก type ของ supabase-js มาทั้งก้อน */
+interface RangeableQuery {
+  range(from: number, to: number): PromiseLike<{ data: unknown[] | null; error: unknown }>
+}
+
+/**
+ * ดึงทุกแถวที่ตรงเงื่อนไข โดยไล่ทีละหน้าจนกว่าจะได้หน้าที่ไม่เต็ม
+ *
+ * รับเป็นฟังก์ชันสร้าง query ไม่ใช่ตัว query เพราะ builder ของ supabase-js
+ * ใช้ซ้ำหลายรอบไม่ได้ — ต้องประกอบใหม่ทุกหน้า
+ *
+ * ผู้เรียกต้องใส่ .order() ที่เสถียรมาด้วย ไม่งั้นลำดับของแต่ละหน้าไม่แน่นอน
+ * แล้วบางแถวจะถูกข้ามหรือซ้ำ (ถ้ามีคนแทรกแถวคั่นกลางระหว่างหน้า ยังคลาดได้อยู่
+ * แต่นั่นเป็นการแข่งกันเขียนจริง ๆ ไม่ใช่ความไม่แน่นอนของตัวคำสั่งเอง)
+ */
+async function fetchAllRows<T>(buildQuery: () => RangeableQuery): Promise<T[]> {
+  const all: T[] = []
+
+  for (let page = 0; ; page += 1) {
+    const from = page * FETCH_PAGE_SIZE
+    const { data, error } = await buildQuery().range(from, from + FETCH_PAGE_SIZE - 1)
+    if (error) throw error
+
+    const batch = (data ?? []) as T[]
+    all.push(...batch)
+    if (batch.length < FETCH_PAGE_SIZE) break
+  }
+
+  return all
+}
+
+/**
  * ดึงสินค้าที่ยังไม่ได้ส่งเข้า POS พร้อมแปลงเป็นแถวของไฟล์
  *
  * คัดด้วย metadata ไม่ใช่ status เพราะ /api/verify เซ็ต status เป็น 'approved'
@@ -34,38 +74,38 @@ async function loadExportRows(): Promise<{
   rows: PosExportRow[]
   assignedSkus: Map<string, string>
 }> {
-  const { data: products, error: productsError } = await supabaseAdmin
-    .from('products')
-    .select('id, name_th, sku, barcode, unit_name, vat_flag, price, category_id')
-    .eq('metadata->>source', 'import_wizard')
-    .eq('metadata->>dedup_bucket', 'new')
-    .is('pos_exported_at', null)
-    .order('name_th')
+  // ต้องไล่ทีละหน้า ไม่ใช่ยิงรวดเดียว — คิวเกิน 1,000 เมื่อไหร่ ไฟล์จะขาดแถว
+  // และ total ที่โชว์บนหน้าจอจะน้อยกว่าของจริงโดยไม่มี error ให้จับ
+  const list = await fetchAllRows<ExportProductRow>(() =>
+    supabaseAdmin
+      .from('products')
+      .select('id, name_th, sku, barcode, unit_name, vat_flag, price, category_id')
+      .eq('metadata->>source', 'import_wizard')
+      .eq('metadata->>dedup_bucket', 'new')
+      .is('pos_exported_at', null)
+      .order('name_th')
+      .order('id')
+  )
 
-  if (productsError) throw productsError
-
-  // taxonomy มีแค่ 134 โหนด ดึงมาทั้งก้อนแล้วไล่สายในหน่วยความจำ
-  // ถูกกว่ายิงหา parent ทีละรายการ และเลี่ยง raw SQL ตามกฎรีโป
-  const { data: nodes, error: nodesError } = await supabaseAdmin
-    .from('taxonomy_nodes')
-    .select('id, name_th, parent_id')
-
-  if (nodesError) throw nodesError
+  // taxonomy มีแค่ 134 โหนด แต่ไล่ทีละหน้าเหมือนกัน เผื่อวันหนึ่งโตเกิน max_rows
+  // ดึงมาทั้งก้อนแล้วไล่สายในหน่วยความจำ ถูกกว่ายิงหา parent ทีละรายการ
+  // และเลี่ยง raw SQL ตามกฎรีโป
+  const nodes = await fetchAllRows<TaxonomyNodeLite>(() =>
+    supabaseAdmin.from('taxonomy_nodes').select('id, name_th, parent_id').order('id')
+  )
 
   // ต้องรู้ sku ทั้งหมดที่ใช้ไปแล้ว ไม่ใช่แค่เลขสูงสุด — products.sku มี UNIQUE
   // constraint ถ้าเลขในฐานข้อมูลขาดช่วง การเดินจาก max อย่างเดียวยังชนได้
-  const { data: usedSkus, error: skuError } = await supabaseAdmin
-    .from('products')
-    .select('sku')
-    .not('sku', 'is', null)
-
-  if (skuError) throw skuError
-
-  const nodesById = new Map<string, TaxonomyNodeLite>(
-    ((nodes ?? []) as TaxonomyNodeLite[]).map((node) => [node.id, node])
+  //
+  // สตอกเดิมมี 3,103 แถวอยู่แล้ว การยิงรวดเดียวจึงได้มาแค่ 1,000 แถวแรกเสมอ
+  // prefix ที่เลขสูงสุดอยู่นอกหน้าต่างนั้นจะถูกคำนวณต่ำเกินจริง แล้วออกรหัสชนของเดิม
+  const usedSkus = await fetchAllRows<{ sku: string | null }>(() =>
+    supabaseAdmin.from('products').select('sku').not('sku', 'is', null).order('sku')
   )
 
-  const list = (products ?? []) as ExportProductRow[]
+  const nodesById = new Map<string, TaxonomyNodeLite>(
+    nodes.map((node) => [node.id, node])
+  )
 
   // แจกรหัสทั้งใน GET และ POST ด้วยข้อมูลชุดเดียวกัน ต่างกันแค่ POST เขียนลงฐานข้อมูล
   // ตัวแจกเรียงตามชื่อเสมอ รหัสที่เห็นในหน้าตัวอย่างจึงตรงกับไฟล์ที่โหลดจริง
@@ -76,9 +116,7 @@ async function loadExportRows(): Promise<{
       sku: product.sku,
       mainCategory: buildCategoryChain(product.category_id, nodesById)[0] ?? null,
     })),
-    ((usedSkus ?? []) as { sku: string | null }[])
-      .map((row) => row.sku ?? '')
-      .filter(Boolean)
+    usedSkus.map((row) => row.sku ?? '').filter(Boolean)
   )
 
   return {
@@ -92,8 +130,6 @@ async function loadExportRows(): Promise<{
     assignedSkus,
   }
 }
-
-export { loadExportRows }
 
 /**
  * GET /api/pos-export
@@ -117,7 +153,7 @@ const ExportRequestSchema = z.object({
   mark_exported: z.boolean().optional().default(true),
 })
 
-/** จำนวน update ที่ยิงพร้อมกันตอนเขียนรหัสใหม่ */
+/** ขนาดก้อนของ update — ทั้งตอนเขียนรหัสใหม่ และตอนตีว่าส่งออกแล้วด้วย .in() */
 const SKU_UPDATE_BATCH = 25
 
 /** ชื่อไฟล์ตามวันที่ เพื่อให้เก็บหลายรอบไว้ในโฟลเดอร์เดียวกันได้ */
@@ -167,13 +203,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         if (failed?.error) throw failed.error
       }
 
-      // ทำเครื่องหมายเป็นขั้นสุดท้าย — ต้องแน่ใจก่อนว่าทุกแถวมีรหัสแล้ว
-      const { error } = await supabaseAdmin
-        .from('products')
-        .update({ pos_exported_at: new Date().toISOString() })
-        .in('id', ids)
+      // ทำเครื่องหมายเป็นขั้นสุดท้าย — ต้องแน่ใจก่อนว่าทุกแถวมีรหัสครบทุกก้อนแล้ว
+      //
+      // แบ่งก้อนเหมือนตอนเขียนรหัส เพราะ .in() ยัด uuid ทุกตัวลง query string
+      // ของ URL — 221 ตัวก็ทะลุบัฟเฟอร์ ~8KB ของ gateway แล้วได้ 414 กลับมา
+      // ผลคือรหัสถูกเขียนไปแล้วแต่ไม่มีอะไรถูกตีว่าส่งออก คิวจึงค้างวนซ้ำ
+      const exportedAt = new Date().toISOString()
+      for (let start = 0; start < ids.length; start += SKU_UPDATE_BATCH) {
+        const { error } = await supabaseAdmin
+          .from('products')
+          .update({ pos_exported_at: exportedAt })
+          .in('id', ids.slice(start, start + SKU_UPDATE_BATCH))
 
-      if (error) throw error
+        if (error) throw error
+      }
     }
 
     return new NextResponse(fileText, {
