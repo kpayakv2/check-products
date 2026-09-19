@@ -133,9 +133,9 @@ export function toPosExportRow(
   const chain = buildCategoryChain(product.category_id, nodesById)
 
   return {
-    itemGroup: chain[0] ?? '',
-    subGroup1: chain[1] ?? '',
-    subGroup2: chain[2] ?? '',
+    itemGroup: formatGroupName(chain[0]),
+    subGroup1: formatGroupName(chain[1]),
+    subGroup2: formatGroupName(chain[2]),
     itemId: product.sku ?? '',
     barcode: product.barcode ?? '',
     itemName: product.name_th,
