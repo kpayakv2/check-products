@@ -260,3 +260,9 @@ taxonomy-app/e2e/.auth/
 
 # curl cookie jar ที่หลุดมาจากการตรวจงานด้วยมือ (มี session token)
 cookies.txt
+
+# Git worktrees for isolated feature work (manual fallback — .claude/worktrees/
+# breaks Jest's Windows glob handling in taxonomy-app: any path segment starting
+# with a dot corrupts next/jest's <rootDir> substitution into a mixed-slash
+# pattern that matches zero tests)
+.worktrees/
