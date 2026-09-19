@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { supabaseAdmin } from '@/utils/supabase-admin'
 import { withErrorHandling } from '@/utils/error-handler'
 import {
   buildCategoryChain,
+  buildPosExportFile,
   countPosExportIssues,
   toPosExportRow,
   type ExportableProduct,
@@ -106,6 +108,81 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
       total: rows.length,
       issues: countPosExportIssues(rows),
       preview: rows.slice(0, PREVIEW_LIMIT),
+    })
+  })
+}
+
+const ExportRequestSchema = z.object({
+  // ปิดไว้เพื่อลองโหลดดูก่อนโดยไม่กินโควตา "ส่งออกแล้ว"
+  mark_exported: z.boolean().optional().default(true),
+})
+
+/** จำนวน update ที่ยิงพร้อมกันตอนเขียนรหัสใหม่ */
+const SKU_UPDATE_BATCH = 25
+
+/** ชื่อไฟล์ตามวันที่ เพื่อให้เก็บหลายรอบไว้ในโฟลเดอร์เดียวกันได้ */
+function exportFileName(): string {
+  const today = new Date().toISOString().slice(0, 10)
+  return `pos-import-${today}.txt`
+}
+
+/**
+ * POST /api/pos-export
+ * สร้างไฟล์ แล้วทำเครื่องหมายว่าสินค้าชุดนี้ส่งเข้า POS ไปแล้ว
+ *
+ * เป็น POST ไม่ใช่ GET เพราะเขียนฐานข้อมูล และ middleware กัน non-GET ไว้อยู่แล้ว
+ */
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  return withErrorHandling(async () => {
+    const raw = await request.json().catch(() => ({}))
+    const { mark_exported: markExported } = ExportRequestSchema.parse(raw)
+
+    const { ids, rows, assignedSkus } = await loadExportRows()
+
+    if (rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'ไม่มีสินค้าที่รอส่งเข้า POS' },
+        { status: 409 }
+      )
+    }
+
+    const fileText = buildPosExportFile(rows)
+
+    // เขียนฐานข้อมูลหลังสร้างไฟล์สำเร็จเท่านั้น
+    // ถ้า build พังก่อนหน้านี้ ของจะยังค้างรอส่งออกอยู่ ไม่หายไปเงียบ ๆ
+    if (markExported) {
+      // แต่ละแถวได้คนละรหัส อัปเดตรวดเดียวด้วย .in() ไม่ได้
+      // ยิงทีละก้อนเพื่อไม่ให้เปิดคอนเนกชันพร้อมกันเป็นร้อย
+      //
+      // ถ้าพังกลางคัน บางรายการจะมีรหัสแล้วแต่ยังไม่ถูกตีว่าส่งออก — กดใหม่ได้
+      // ตัวแจกรหัสข้ามรายการที่มี sku แล้ว รหัสเดิมจึงไม่ถูกเปลี่ยน
+      const entries = [...assignedSkus.entries()]
+      for (let start = 0; start < entries.length; start += SKU_UPDATE_BATCH) {
+        const results = await Promise.all(
+          entries.slice(start, start + SKU_UPDATE_BATCH).map(([productId, sku]) =>
+            supabaseAdmin.from('products').update({ sku }).eq('id', productId)
+          )
+        )
+        const failed = results.find((result) => result.error)
+        if (failed?.error) throw failed.error
+      }
+
+      // ทำเครื่องหมายเป็นขั้นสุดท้าย — ต้องแน่ใจก่อนว่าทุกแถวมีรหัสแล้ว
+      const { error } = await supabaseAdmin
+        .from('products')
+        .update({ pos_exported_at: new Date().toISOString() })
+        .in('id', ids)
+
+      if (error) throw error
+    }
+
+    return new NextResponse(fileText, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${exportFileName()}"`,
+        'Cache-Control': 'no-store',
+      },
     })
   })
 }

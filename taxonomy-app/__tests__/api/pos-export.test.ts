@@ -174,6 +174,108 @@ describe('GET /api/pos-export', () => {
   })
 })
 
+describe('POST /api/pos-export', () => {
+  const post = async (body: unknown) => {
+    const { POST } = await import('@/app/api/pos-export/route')
+    return POST(
+      new NextRequest('http://127.0.0.1:3000/api/pos-export', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    )
+  }
+
+  it('คืนไฟล์เป็นข้อความ ไม่ใช่ JSON', async () => {
+    const response = await post({})
+    expect(response.headers.get('content-type')).toContain('text/plain')
+    expect(response.headers.get('content-type')).toContain('charset=utf-8')
+    expect(response.headers.get('content-disposition')).toContain('attachment')
+  })
+
+  it('เนื้อไฟล์มีหัวตารางและครบทุกแถว', async () => {
+    const response = await post({})
+    const text = await response.text()
+    const lines = text.split('\r\n').filter(Boolean)
+
+    expect(lines).toHaveLength(3) // หัวตาราง + 2 สินค้า
+    expect(lines[0].split('\t')).toHaveLength(9)
+    expect(text.endsWith('\r\n')).toBe(true)
+    expect(text.charCodeAt(0)).not.toBe(0xfeff)
+  })
+
+  it('เขียนรหัสที่ออกใหม่ลง products.sku', async () => {
+    await post({})
+
+    const skuUpdate = calls.find(
+      (c) => c.op === 'update' && (c.payload as Record<string, unknown>)?.sku !== undefined
+    )
+    expect(skuUpdate).toBeDefined()
+    expect(skuUpdate!.payload).toEqual({ sku: 'ST134' })
+    expect(skuUpdate!.filters).toContainEqual({ kind: 'eq', column: 'id', value: 'p2' })
+  })
+
+  it('ไม่เขียนทับรหัสของรายการที่มีอยู่แล้ว', async () => {
+    await post({})
+
+    const skuUpdates = calls.filter(
+      (c) => c.op === 'update' && (c.payload as Record<string, unknown>)?.sku !== undefined
+    )
+    expect(skuUpdates).toHaveLength(1) // p1 มี HH001 อยู่แล้ว ไม่ถูกแตะ
+  })
+
+  it('รหัสในไฟล์ตรงกับรหัสที่เขียนลงฐานข้อมูล', async () => {
+    const response = await post({})
+    const text = await response.text()
+
+    expect(text).toContain('ST134')
+  })
+
+  it('ทำเครื่องหมาย pos_exported_at ให้แถวที่ส่งออกไป', async () => {
+    await post({})
+
+    const marked = calls.find(
+      (c) => c.op === 'update' && (c.payload as Record<string, unknown>)?.pos_exported_at !== undefined
+    )
+    expect(marked).toBeDefined()
+    expect(marked!.filters).toContainEqual({
+      kind: 'in', column: 'id', value: ['p1', 'p2'],
+    })
+  })
+
+  it('เขียนรหัสก่อนแล้วค่อยทำเครื่องหมายส่งออก', async () => {
+    await post({})
+
+    const updates = calls.filter((c) => c.op === 'update')
+    const skuAt = updates.findIndex((c) => (c.payload as Record<string, unknown>)?.sku !== undefined)
+    const markAt = updates.findIndex(
+      (c) => (c.payload as Record<string, unknown>)?.pos_exported_at !== undefined
+    )
+    // ถ้าเขียนรหัสพลาด ต้องยังไม่มีอะไรถูกตีว่าส่งออกแล้ว ของจะได้ค้างในคิว
+    expect(skuAt).toBeLessThan(markAt)
+  })
+
+  it('mark_exported=false โหลดไฟล์ได้โดยไม่แตะฐานข้อมูล', async () => {
+    await post({ mark_exported: false })
+
+    expect(calls.some((c) => c.op === 'update')).toBe(false)
+  })
+
+  it('ไม่มีอะไรให้ส่งออกก็ตอบ 409 พร้อมข้อความไทย ไม่ใช่ไฟล์เปล่า', async () => {
+    queues['products.select'] = [
+      { data: [], error: null },
+      { data: [], error: null },
+    ]
+
+    const response = await post({})
+    expect(response.status).toBe(409)
+
+    const body = await response.json()
+    expect(body.success).toBe(false)
+    expect(body.error).toContain('ไม่มีสินค้า')
+  })
+})
+
 describe('middleware', () => {
   it('กัน GET /api/pos-export ไว้ เพราะอ่านด้วย service role', () => {
     const source = readFileSync(
