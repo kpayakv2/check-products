@@ -110,4 +110,36 @@ describe('allocateItemIds', () => {
   it('ไม่มีรายการที่ต้องแจกก็คืน map ว่าง', () => {
     expect(allocateItemIds([], ['HH695']).size).toBe(0)
   })
+
+  it('ชื่อซ้ำใจเดียวกัน ต้องใช้ id เป็น tie-breaker เพื่อให้ผลตรงกันไม่ว่าลำดับ input อย่างไร', () => {
+    const sameName = 'สินค้าเดียวกัน'
+    const listA = [
+      candidate({ id: 'z', name_th: sameName }),
+      candidate({ id: 'a', name_th: sameName }),
+      candidate({ id: 'm', name_th: sameName }),
+    ]
+    const listB = [
+      candidate({ id: 'a', name_th: sameName }),
+      candidate({ id: 'm', name_th: sameName }),
+      candidate({ id: 'z', name_th: sameName }),
+    ]
+    const listC = [
+      candidate({ id: 'm', name_th: sameName }),
+      candidate({ id: 'z', name_th: sameName }),
+      candidate({ id: 'a', name_th: sameName }),
+    ]
+
+    const assignedA = allocateItemIds(listA, ['HH695'])
+    const assignedB = allocateItemIds(listB, ['HH695'])
+    const assignedC = allocateItemIds(listC, ['HH695'])
+
+    // ต้องได้รหัสตรงกันทั้งสามแบบ แม้ input array มีลำดับต่างกัน
+    expect([...assignedA.entries()].sort()).toEqual([...assignedB.entries()].sort())
+    expect([...assignedB.entries()].sort()).toEqual([...assignedC.entries()].sort())
+
+    // และสั่งตามอักษร a < m < z
+    expect(assignedA.get('a')).toBe('HH696')
+    expect(assignedA.get('m')).toBe('HH697')
+    expect(assignedA.get('z')).toBe('HH698')
+  })
 })

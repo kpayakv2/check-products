@@ -91,7 +91,10 @@ export function allocateItemIds(
   const pending = candidates
     .filter((item) => !(item.sku ?? '').trim())
     .slice()
-    .sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'))
+    .sort((a, b) => {
+      const nameCmp = a.name_th.localeCompare(b.name_th, 'th')
+      return nameCmp !== 0 ? nameCmp : a.id.localeCompare(b.id)
+    })
 
   for (const item of pending) {
     const prefix = prefixForMainCategory(item.mainCategory)
