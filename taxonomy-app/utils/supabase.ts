@@ -107,6 +107,10 @@ export interface Product {
   model?: string
   sku?: string
   price?: number
+  barcode?: string
+  unit_name?: string
+  vat_flag?: string
+  pos_exported_at?: string
   embedding?: number[]
   keywords?: string[]
   metadata?: any
