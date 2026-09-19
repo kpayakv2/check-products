@@ -146,6 +146,13 @@ export default function PosExportTab() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const downloadButtonRef = useRef<HTMLButtonElement | null>(null)
   const dialogRef = useRef<HTMLDivElement | null>(null)
+  const successHeadingRef = useRef<HTMLHeadingElement | null>(null)
+
+  // ส่งออกสำเร็จแล้วปุ่มดาวน์โหลดถูกถอดออกจาก DOM คืนโฟกัสไปที่นั่นไม่ได้
+  // ย้ายไปไว้ที่หัวการ์ดสรุปแทน คนใช้คีย์บอร์ดจะได้ไม่ตกไปอยู่ที่ body
+  useEffect(() => {
+    if (result) successHeadingRef.current?.focus()
+  }, [result])
 
   const fetchPreview = useCallback(async () => {
     setLoading(true)
@@ -166,7 +173,8 @@ export default function PosExportTab() {
     void fetchPreview()
   }, [fetchPreview])
 
-  const runExport = useCallback(async () => {
+  /** คืน true เมื่อได้ไฟล์จริง — ผู้เรียกใช้ตัดสินใจเรื่องโฟกัสต่อจากนี้ */
+  const runExport = useCallback(async (): Promise<boolean> => {
     setDownloading(true)
     setError(null)
     try {
@@ -195,8 +203,10 @@ export default function PosExportTab() {
         missingPrice: data?.issues.missingPrice ?? 0,
       })
       setData(null)
+      return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'สร้างไฟล์ไม่สำเร็จ')
+      return false
     } finally {
       setDownloading(false)
     }
@@ -215,10 +225,13 @@ export default function PosExportTab() {
     setConfirmOpen(true)
   }, [runExport])
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
     writeSkipConfirm(dontAskAgain)
     setConfirmOpen(false)
-    void runExport()
+    const exported = await runExport()
+    // สำเร็จ: effect ด้านบนย้ายโฟกัสไปที่หัวการ์ดสรุปแล้ว
+    // ล้มเหลว: หน้ายังเป็นหน้าเดิม ปุ่มดาวน์โหลดยังอยู่ คืนโฟกัสให้ปุ่มนั้น
+    if (!exported) downloadButtonRef.current?.focus()
   }, [dontAskAgain, runExport])
 
   // Escape ปิดกล่อง และ Tab วนอยู่ในกล่องเท่านั้น
@@ -274,7 +287,11 @@ export default function PosExportTab() {
               <CheckCircle2 className="w-7 h-7 text-emerald-600" />
             </span>
             <div className="min-w-0">
-              <h3 className="text-lg font-black text-slate-800">
+              <h3
+                ref={successHeadingRef}
+                tabIndex={-1}
+                className={`text-lg font-black text-slate-800 rounded-lg ${FOCUS_RING}`}
+              >
                 ส่งออกเรียบร้อย {result.total.toLocaleString()} รายการ
               </h3>
               <p className="text-sm text-slate-500">
@@ -590,7 +607,7 @@ export default function PosExportTab() {
         {/* จอกว้าง: ตารางเต็ม 9 คอลัมน์ เลื่อนแนวนอนในกรอบของตัวเองเท่านั้น */}
         <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-lg">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400">
+            <thead className="bg-slate-50 text-xs font-black uppercase text-slate-400">
               <tr>
                 <th className="whitespace-nowrap px-3 py-2.5">หมวดสินค้า</th>
                 <th className="whitespace-nowrap px-3 py-2.5">หมวดย่อย 1</th>
@@ -629,7 +646,7 @@ export default function PosExportTab() {
                   </td>
                   <td className="px-3 py-2.5 whitespace-nowrap">
                     {row.price === null ? (
-                      <span className="px-2 py-0.5 text-[10px] font-black rounded-lg bg-amber-100 text-amber-800">
+                      <span className="px-2 py-0.5 text-xs font-black rounded-lg bg-amber-100 text-amber-800">
                         ว่าง
                       </span>
                     ) : (
@@ -658,11 +675,11 @@ export default function PosExportTab() {
                   {row.itemId || '—'}
                 </span>
                 {row.price === null ? (
-                  <span className="shrink-0 px-2 py-0.5 text-[10px] font-black rounded-lg bg-amber-100 text-amber-800">
+                  <span className="shrink-0 px-2 py-1 text-xs font-black rounded-lg bg-amber-100 text-amber-800">
                     ราคาว่าง
                   </span>
                 ) : (
-                  <span className="shrink-0 px-2 py-0.5 text-[10px] font-black rounded-lg bg-emerald-100 text-emerald-700 tabular-nums">
+                  <span className="shrink-0 px-2 py-1 text-xs font-black rounded-lg bg-emerald-100 text-emerald-700 tabular-nums">
                     ครบ · {row.price.toLocaleString()}
                   </span>
                 )}
@@ -753,7 +770,7 @@ export default function PosExportTab() {
               </button>
               <button
                 autoFocus
-                onClick={handleConfirm}
+                onClick={() => void handleConfirm()}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 ${FOCUS_RING}`}
                 data-testid="pos-export-confirm"
               >
