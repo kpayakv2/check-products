@@ -7,10 +7,11 @@ import VerifyTab from '@/components/data-quality/VerifyTab'
 import DeduplicationTab from '@/components/data-quality/DeduplicationTab'
 import AutoLearnTab from '@/components/data-quality/AutoLearnTab'
 import RecheckTab from '@/components/data-quality/RecheckTab'
-import { LayersIcon, TagIcon, SparklesIcon, DatabaseIcon, ScanSearchIcon } from 'lucide-react'
+import PosExportTab from '@/components/data-quality/PosExportTab'
+import { LayersIcon, TagIcon, SparklesIcon, DatabaseIcon, ScanSearchIcon, UploadIcon } from 'lucide-react'
 
 export default function DataQualityCenter() {
-  const [activeTab, setActiveTab] = useState<'dedup' | 'verify' | 'recheck' | 'autolearn'>('dedup')
+  const [activeTab, setActiveTab] = useState<'dedup' | 'verify' | 'recheck' | 'autolearn' | 'posexport'>('dedup')
 
   return (
     <div className="flex h-screen bg-[#F8FAFC]">
@@ -68,6 +69,16 @@ export default function DataQualityCenter() {
                 <SparklesIcon className="w-4 h-4" />
                 ระบบเรียนรู้ AI (Auto-learn)
               </button>
+              <button
+                onClick={() => setActiveTab('posexport')}
+                className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase whitespace-nowrap shrink-0 ${
+                  activeTab === 'posexport' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                }`}
+                data-testid="tab-pos-export"
+              >
+                <UploadIcon className="w-4 h-4" />
+                ส่งออก POS
+              </button>
             </div>
           </div>
         </div>
@@ -84,6 +95,13 @@ export default function DataQualityCenter() {
             </div>
           )}
           {activeTab === 'autolearn' && <AutoLearnTab />}
+          {activeTab === 'posexport' && (
+            <div className="h-full overflow-y-auto px-8 py-6">
+              <div className="max-w-5xl mx-auto">
+                <PosExportTab />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

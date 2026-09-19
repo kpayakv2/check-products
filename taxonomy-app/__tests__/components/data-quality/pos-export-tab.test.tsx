@@ -1,0 +1,116 @@
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import PosExportTab from '@/components/data-quality/PosExportTab'
+
+const previewRow = {
+  itemGroup: 'ของใช้ในบ้าน',
+  subGroup1: 'ตะกร้า/กระจาด',
+  subGroup2: '',
+  itemId: 'HH001',
+  barcode: 'HH001',
+  itemName: 'ตะกร้ากลม 9899',
+  unitName: 'ใบ',
+  price: 45,
+  vat: 'V',
+}
+
+const EMPTY_ISSUES = {
+  missingItemId: 0, missingBarcode: 0, missingItemName: 0,
+  missingUnitName: 0, missingItemGroup: 0, missingPrice: 0,
+}
+
+const mockGet = (body: unknown) => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => body,
+  }) as unknown as typeof fetch
+}
+
+afterEach(() => jest.resetAllMocks())
+
+it('แสดงยอดรวมที่รอส่งออก', async () => {
+  mockGet({ success: true, total: 221, issues: EMPTY_ISSUES, preview: [previewRow] })
+  render(<PosExportTab />)
+
+  await waitFor(() =>
+    expect(screen.getByTestId('pos-export-total')).toHaveTextContent('221')
+  )
+})
+
+it('เตือนเฉพาะช่องบังคับที่ยังขาดจริง', async () => {
+  mockGet({
+    success: true,
+    total: 221,
+    issues: { ...EMPTY_ISSUES, missingPrice: 221 },
+    preview: [previewRow],
+  })
+  render(<PosExportTab />)
+
+  const warning = await screen.findByTestId('pos-export-warning')
+  expect(warning).toHaveTextContent('221')
+  expect(warning).toHaveTextContent('ราคาขาย')
+  // รหัสสินค้าถูกออกให้อัตโนมัติแล้ว ไม่ควรขึ้นเตือน
+  expect(warning).not.toHaveTextContent('รหัสสินค้า')
+})
+
+it('เตือนได้หลายช่องพร้อมกัน', async () => {
+  mockGet({
+    success: true,
+    total: 10,
+    issues: { ...EMPTY_ISSUES, missingPrice: 10, missingUnitName: 3 },
+    preview: [previewRow],
+  })
+  render(<PosExportTab />)
+
+  const warning = await screen.findByTestId('pos-export-warning')
+  expect(warning).toHaveTextContent('ราคาขาย')
+  expect(warning).toHaveTextContent('ชื่อหน่วย')
+})
+
+it('ไม่เตือนเมื่อข้อมูลครบ', async () => {
+  mockGet({ success: true, total: 5, issues: EMPTY_ISSUES, preview: [previewRow] })
+  render(<PosExportTab />)
+
+  await waitFor(() => expect(screen.getByTestId('pos-export-total')).toBeInTheDocument())
+  expect(screen.queryByTestId('pos-export-warning')).not.toBeInTheDocument()
+})
+
+it('ปิดปุ่มโหลดเมื่อไม่มีอะไรให้ส่งออก', async () => {
+  mockGet({ success: true, total: 0, issues: EMPTY_ISSUES, preview: [] })
+  render(<PosExportTab />)
+
+  expect(await screen.findByTestId('pos-export-empty')).toBeInTheDocument()
+  expect(screen.getByTestId('pos-export-download')).toBeDisabled()
+})
+
+it('กดโหลดแล้วยิง POST ไปที่ /api/pos-export', async () => {
+  const fetchMock = jest.fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, total: 1, issues: EMPTY_ISSUES, preview: [previewRow] }),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      blob: async () => new Blob(['header\r\nrow\r\n'], { type: 'text/plain' }),
+    })
+  global.fetch = fetchMock as unknown as typeof fetch
+  global.URL.createObjectURL = jest.fn(() => 'blob:fake')
+  global.URL.revokeObjectURL = jest.fn()
+
+  render(<PosExportTab />)
+  await waitFor(() => expect(screen.getByTestId('pos-export-total')).toBeInTheDocument())
+
+  await userEvent.click(screen.getByTestId('pos-export-download'))
+
+  // ส่วนที่เพิ่มจากแผนเดิม: POST เขียนฐานข้อมูลถาวร (ออกรหัสสินค้า + ตีว่าส่งออกแล้ว)
+  // ดีไซน์สุดท้ายจึงบังคับให้ยืนยันอีกชั้นก่อน ปุ่ม pos-export-download เปิดกล่องยืนยัน
+  // ส่วนปุ่มที่ยิง POST จริงคือ pos-export-confirm — assertion ด้านล่างยังเป็นของเดิมทุกตัว
+  await userEvent.click(await screen.findByTestId('pos-export-confirm'))
+
+  await waitFor(() => {
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      '/api/pos-export',
+      expect.objectContaining({ method: 'POST' })
+    )
+  })
+})
