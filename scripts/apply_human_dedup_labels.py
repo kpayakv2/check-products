@@ -31,12 +31,18 @@ sys.path.insert(0, str(BASE_DIR))
 from dotenv import load_dotenv  # noqa: E402
 from supabase import create_client  # noqa: E402
 
+from src.core.product_identity import PairVerdict, classify_pair  # noqa: E402
+
 load_dotenv(BASE_DIR / "taxonomy-app" / ".env.local")
 
 LABELS_FILE = BASE_DIR / "tests" / "fixtures" / "dedup_human_labels_v1.json"
 
 DUPLICATE = "สินค้าซ้ำ"
 DIFFERENT = "คนละสินค้า"
+
+# คำตอบของกฎไม่ถูกเก็บในไฟล์ชุดวัดผล (มันเปลี่ยนได้ ถ้าเก็บไว้จะค้าง) จึงรันสดทุกครั้ง
+# กฎที่เงียบ (NEEDS_JUDGMENT) ไม่มีใน dict นี้ และไม่นับเป็นการไม่เห็นด้วยกับคน
+RULE_ANSWER = {PairVerdict.DIFFERENT: DIFFERENT, PairVerdict.DUPLICATE: DUPLICATE}
 
 
 def main() -> int:
@@ -59,10 +65,12 @@ def main() -> int:
     if unsure:
         print(f"   ไม่แน่ใจ (ไม่บันทึก) {len(unsure):>4} คู่")
 
-    disagreed = [r for r in decided if r["rule_verdict"] != r["human_verdict"]]
-    print(f"\nคู่ที่คนไม่เห็นด้วยกับกฎ: {len(disagreed)}")
-    for r in disagreed:
-        print(f"   กฎว่า {r['rule_verdict']} / คนว่า {r['human_verdict']}: {r['name_a']} || {r['name_b']}")
+    spoken = [(r, RULE_ANSWER.get(classify_pair(r["name_a"], r["name_b"]))) for r in decided]
+    disagreed = [(r, rule) for r, rule in spoken if rule is not None and rule != r["human_verdict"]]
+    answered = sum(1 for _, rule in spoken if rule)
+    print(f"\nกฎตอบ {answered} คู่ จากที่คนตัดสิน {len(decided)} คู่ — คนไม่เห็นด้วย {len(disagreed)}")
+    for r, rule in disagreed:
+        print(f"   กฎว่า {rule} / คนว่า {r['human_verdict']}: {r['name_a']} || {r['name_b']}")
 
     if not args.apply:
         print("\n(โหมดดูก่อน ไม่ได้เขียนอะไร — ใส่ --apply เพื่อเขียนจริง)")
