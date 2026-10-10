@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { isPriceMismatch, classifyDedupBucket } from '@/utils/price'
 import type { DedupBucket, DedupResults, WizardItem } from '@/types/import'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 type DedupItem = WizardItem
 
@@ -231,15 +232,22 @@ export default function DeduplicationStep({
 
   if (isProcessing) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 space-y-6">
+      <div className="flex flex-col items-center justify-center py-32 space-y-6" role="status" aria-live="polite">
         <div className="relative">
-          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-          <CopyIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full motion-safe:animate-spin"></div>
+          <CopyIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 motion-safe:animate-pulse" aria-hidden="true" />
         </div>
         <div className="text-center space-y-3 w-80">
           <h3 className="text-xl font-bold text-slate-800 thai-text">กำลังค้นหาสินค้าซ้ำด้วยระบบประมวลผลอัจฉริยะ...</h3>
-          <p className="text-slate-500 thai-text text-sm">{statusMsg}</p>
-          <div className="w-full bg-slate-100 rounded-full h-2">
+          <p className="text-slate-600 thai-text text-sm">{statusMsg}</p>
+          <div 
+            className="w-full bg-slate-100 rounded-full h-2"
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ความคืบหน้าการค้นหาสินค้าซ้ำ"
+          >
             <motion.div 
               className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
               initial={{ width: 0 }}
@@ -247,7 +255,7 @@ export default function DeduplicationStep({
               transition={{ duration: 0.5 }}
             />
           </div>
-          <p className="text-xs text-slate-400">{progress}%</p>
+          <p className="text-xs font-bold text-slate-600">{progress}%</p>
         </div>
       </div>
     )
@@ -258,16 +266,16 @@ export default function DeduplicationStep({
       {/* Source Badge */}
       {isMock && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
-          <WifiOffIcon className="w-5 h-5 text-amber-600 shrink-0" />
+          <WifiOffIcon className="w-5 h-5 text-amber-700 shrink-0" aria-hidden="true" />
           <div className="flex-1">
-            <p className="font-bold text-amber-800 thai-text text-sm">ระบบประมวลผลอัจฉริยะไม่พร้อมใช้งาน</p>
-            <p className="text-amber-600 text-xs thai-text">{error} — แสดงผลจำลองเท่านั้น</p>
+            <p className="font-bold text-amber-900 thai-text text-sm">ระบบประมวลผลอัจฉริยะไม่พร้อมใช้งาน</p>
+            <p className="text-amber-800 text-xs thai-text">{error} — แสดงผลจำลองเท่านั้น</p>
           </div>
           <button 
             onClick={runDeduplication}
-            className="flex items-center gap-1 text-amber-700 text-sm font-bold hover:text-amber-900 transition-colors"
+            className={`flex items-center gap-1 text-amber-900 text-sm font-bold hover:text-amber-950 transition-colors px-2 py-1 rounded-lg ${FOCUS_RING}`}
           >
-            <RefreshCwIcon className="w-4 h-4" /> ลองใหม่
+            <RefreshCwIcon className="w-4 h-4" aria-hidden="true" /> ลองใหม่
           </button>
         </div>
       )}
@@ -276,10 +284,10 @@ export default function DeduplicationStep({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight font-noto-sans-thai mb-2 flex items-center gap-3">
-            <CopyIcon className="w-8 h-8 text-indigo-600" />
+            <CopyIcon className="w-8 h-8 text-indigo-600" aria-hidden="true" />
             จัดการสินค้าชื่อคล้าย (Deduplication)
           </h2>
-          <p className="text-slate-500 font-medium thai-text">
+          <p className="text-slate-600 font-medium thai-text">
             ระบบได้จัดกลุ่มสินค้าตามความคล้ายคลึงเชิงความหมาย{!isMock && ' — ข้อมูลจากระบบวิเคราะห์จริง'} เพื่อลดภาระการตรวจสอบของคุณ
           </p>
         </div>
@@ -289,23 +297,23 @@ export default function DeduplicationStep({
       <div className="grid grid-cols-3 gap-6">
         <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
-          <h4 className="text-emerald-800 font-bold thai-text mb-1">รวมเป็นของชิ้นเดียวกันอัตโนมัติ</h4>
-          <p className="text-emerald-600/70 text-xs font-bold uppercase tracking-wider mb-4">มั่นใจ &gt; 95%</p>
-          <div className="text-4xl font-black text-emerald-600">{dedupResults.autoMerged.length}</div>
+          <h4 className="text-emerald-900 font-bold thai-text mb-1">รวมเป็นของชิ้นเดียวกันอัตโนมัติ</h4>
+          <p className="text-emerald-800 text-xs font-bold uppercase tracking-wider mb-4">มั่นใจ &gt; 95%</p>
+          <div className="text-4xl font-black text-emerald-800">{dedupResults.autoMerged.length}</div>
         </div>
-        <div className="bg-amber-50 border border-amber-100 rounded-3xl p-6 relative overflow-hidden ring-4 ring-amber-500/20">
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 relative overflow-hidden ring-4 ring-amber-500/20">
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
-          <h4 className="text-amber-800 font-bold thai-text mb-1 flex items-center gap-2">
-            รอการตรวจสอบ <AlertTriangleIcon className="w-4 h-4" />
+          <h4 className="text-amber-900 font-bold thai-text mb-1 flex items-center gap-2">
+            รอการตรวจสอบ <AlertTriangleIcon className="w-4 h-4 text-amber-700" aria-hidden="true" />
           </h4>
-          <p className="text-amber-600/70 text-xs font-bold uppercase tracking-wider mb-4">ก้ำกึ่ง 80-94%</p>
-          <div className="text-4xl font-black text-amber-600">{dedupResults.reviewZone.length}</div>
+          <p className="text-amber-800 text-xs font-bold uppercase tracking-wider mb-4">ก้ำกึ่ง 80-94%</p>
+          <div className="text-4xl font-black text-amber-800">{dedupResults.reviewZone.length}</div>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-3xl p-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
-          <h4 className="text-blue-800 font-bold thai-text mb-1">สร้างเป็นของใหม่</h4>
-          <p className="text-blue-600/70 text-xs font-bold uppercase tracking-wider mb-4">ความเหมือน &lt; 80%</p>
-          <div className="text-4xl font-black text-blue-600">{dedupResults.autoCreated.length}</div>
+          <h4 className="text-blue-900 font-bold thai-text mb-1">สร้างเป็นของใหม่</h4>
+          <p className="text-blue-800 text-xs font-bold uppercase tracking-wider mb-4">ความเหมือน &lt; 80%</p>
+          <div className="text-4xl font-black text-blue-800">{dedupResults.autoCreated.length}</div>
         </div>
       </div>
 
@@ -316,7 +324,7 @@ export default function DeduplicationStep({
             รายการที่ต้องตรวจสอบ ({dedupResults.reviewZone.length})
           </h3>
           {dedupResults.reviewZone.length > 0 && (
-            <span className="px-5 py-2 bg-indigo-500 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-100">
+            <span className="px-5 py-2 bg-indigo-600 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-100">
               {Math.min(reviewIndex + 1, dedupResults.reviewZone.length)} / {dedupResults.reviewZone.length}
             </span>
           )}
@@ -326,43 +334,43 @@ export default function DeduplicationStep({
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 relative">
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex w-16 h-16 rounded-full bg-white shadow-2xl border border-slate-100 items-center justify-center">
-                <div className="text-xs font-black text-amber-500">
+                <div className="text-xs font-black text-amber-800">
                   {((currentReviewItem._similarity_score ?? 0) * 100).toFixed(0)}%
                 </div>
               </div>
 
               <div className="border border-slate-100 rounded-3xl overflow-hidden">
-                <div className="px-6 py-3 bg-indigo-600 text-white">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] thai-text">สินค้าที่อัปโหลด</span>
+                <div className="px-6 py-3 bg-indigo-700 text-white">
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] thai-text">สินค้าที่อัปโหลด</span>
                 </div>
                 <div className="p-8 min-h-[140px] flex flex-col justify-between">
                   <p className="text-lg font-black text-slate-800 thai-text leading-relaxed">
                     {currentReviewItem._cleaned_name}
                   </p>
                   {currentReviewItem._new_price != null && (
-                    <p className="text-sm font-bold text-slate-500 mt-4">฿{currentReviewItem._new_price}</p>
+                    <p className="text-sm font-bold text-slate-700 mt-4">฿{currentReviewItem._new_price}</p>
                   )}
                 </div>
               </div>
 
               <div className="border border-slate-100 rounded-3xl overflow-hidden">
-                <div className="px-6 py-3 bg-emerald-600 text-white">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] thai-text">สินค้าในระบบ (อาจจะซ้ำ)</span>
+                <div className="px-6 py-3 bg-emerald-700 text-white">
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] thai-text">สินค้าในระบบ (อาจจะซ้ำ)</span>
                 </div>
                 <div className="p-8 min-h-[140px] flex flex-col justify-between">
-                  <p className="text-lg font-black text-slate-700 thai-text leading-relaxed">
+                  <p className="text-lg font-black text-slate-800 thai-text leading-relaxed">
                     {currentReviewItem._matched_with}
                   </p>
                   {currentReviewItem._old_price != null && (
-                    <p className="text-sm font-bold text-slate-500 mt-4">฿{currentReviewItem._old_price}</p>
+                    <p className="text-sm font-bold text-slate-700 mt-4">฿{currentReviewItem._old_price}</p>
                   )}
                 </div>
               </div>
             </div>
 
             {currentReviewItem._price_mismatch && (
-              <div className="flex items-center gap-2 text-xs font-bold text-rose-600 bg-rose-50 px-4 py-2.5 rounded-xl w-fit mx-auto thai-text">
-                <AlertTriangleIcon className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-4 py-2.5 rounded-xl w-fit mx-auto thai-text" role="alert">
+                <AlertTriangleIcon className="w-4 h-4 text-rose-700" aria-hidden="true" />
                 ราคาต่างกันมาก (฿{currentReviewItem._old_price} → ฿{currentReviewItem._new_price}) อาจเป็นคนละสินค้า
               </div>
             )}
@@ -371,38 +379,38 @@ export default function DeduplicationStep({
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
               <div className="relative z-10">
                 <h4 className="text-base font-black text-white thai-text mb-2">สินค้าชิ้นนี้ซ้ำกับของในสตอกหรือไม่</h4>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8 thai-text">
+                <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mb-8 thai-text">
                   ใช้ปุ่มลัด [A] [S] [D] หรือปุ่มลูกศร [←] [↓] [→] เพื่อทำงานได้เร็วขึ้น
                 </p>
 
                 <div className="flex flex-col md:flex-row justify-center items-stretch gap-4">
                   <button
                     onClick={() => decideCurrent('duplicate')}
-                    className="flex-1 px-6 py-4 bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                    className={`flex-1 px-6 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text ${FOCUS_RING}`}
                   >
                     ซ้ำ — มีอยู่แล้วในสตอก
-                    <span className="block text-[10px] font-bold text-emerald-100 mt-1 tracking-widest">[A] / [←]</span>
+                    <span className="block text-xs font-bold text-emerald-100 mt-1 tracking-widest">[A] / [←]</span>
                   </button>
                   <button
                     onClick={() => decideCurrent('review')}
-                    className="flex-1 px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                    className={`flex-1 px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text ${FOCUS_RING}`}
                   >
                     ยังไม่ตัดสิน — ไว้ดูที่หน้า Verify
-                    <span className="block text-[10px] font-bold text-slate-400 mt-1 tracking-widest">[S] / [↓]</span>
+                    <span className="block text-xs font-bold text-slate-300 mt-1 tracking-widest">[S] / [↓]</span>
                   </button>
                   <button
                     onClick={() => decideCurrent('new')}
-                    className="flex-1 px-6 py-4 bg-blue-500 hover:bg-blue-400 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text"
+                    className={`flex-1 px-6 py-4 bg-blue-700 hover:bg-blue-800 text-white rounded-2xl font-black text-sm transition-all active:scale-95 thai-text ${FOCUS_RING}`}
                   >
                     คนละตัว — เป็นของใหม่
-                    <span className="block text-[10px] font-bold text-blue-100 mt-1 tracking-widest">[D] / [→]</span>
+                    <span className="block text-xs font-bold text-blue-100 mt-1 tracking-widest">[D] / [→]</span>
                   </button>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="p-12 text-center text-slate-500 thai-text">
+          <div className="p-12 text-center text-slate-600 thai-text">
             {dedupResults.reviewZone.length === 0
               ? 'ไม่มีรายการที่ต้องตรวจสอบเพิ่มเติม ยอดเยี่ยมมาก!'
               : `ตรวจครบทั้ง ${dedupResults.reviewZone.length} รายการแล้ว — กดดำเนินการต่อได้เลย`}
@@ -411,9 +419,9 @@ export default function DeduplicationStep({
 
         {reviewDecidedCount > 0 && (
           <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center gap-6 text-xs font-bold thai-text">
-            <span className="text-emerald-700">ตัดสินว่าซ้ำ {reviewDecidedCounts.duplicate}</span>
-            <span className="text-blue-700">ตัดสินว่าของใหม่ {reviewDecidedCounts.new}</span>
-            <span className="text-slate-500">
+            <span className="text-emerald-800">ตัดสินว่าซ้ำ {reviewDecidedCounts.duplicate}</span>
+            <span className="text-blue-800">ตัดสินว่าของใหม่ {reviewDecidedCounts.new}</span>
+            <span className="text-slate-700">
               ยังไม่ตัดสิน {dedupResults.reviewZone.length - reviewDecidedCount} — จะไปรอที่หน้า Data Quality → Verify
             </span>
           </div>
@@ -424,7 +432,7 @@ export default function DeduplicationStep({
       <div className="flex items-center justify-between pt-8">
         <button
           onClick={onBack}
-          className="px-8 py-4 text-slate-500 hover:text-slate-900 font-bold text-sm transition-all thai-text"
+          className={`px-8 py-4 text-slate-700 hover:text-slate-900 font-bold text-sm rounded-xl transition-all thai-text ${FOCUS_RING}`}
         >
           ← ย้อนกลับ
         </button>
@@ -438,10 +446,10 @@ export default function DeduplicationStep({
             ...dedupResults.reviewZone,
             ...dedupResults.autoCreated,
           ])}
-          className="px-10 py-4 bg-slate-900 hover:bg-black text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 thai-text"
+          className={`px-10 py-4 bg-slate-900 hover:bg-black text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 thai-text ${FOCUS_RING}`}
         >
           ดำเนินการต่อ: จัดหมวดหมู่
-          <ArrowRightIcon className="w-5 h-5" />
+          <ArrowRightIcon className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
     </div>

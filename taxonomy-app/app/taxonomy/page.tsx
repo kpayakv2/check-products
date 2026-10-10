@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import SynonymsPanel from '@/components/Taxonomy/SynonymsPanel'
+import Modal, { FOCUS_RING } from '@/components/ui/Modal'
 import { TaxonomyNode, DatabaseService } from '@/utils/supabase'
 import { 
   PlusIcon, 
@@ -186,19 +187,23 @@ export default function TaxonomyManager() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0 duration-300">
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0 group-focus-within:translate-x-0 duration-300">
               <button
+                type="button"
+                aria-label={`แก้ไขหมวดหมู่ ${node.name_th}`}
                 onClick={() => handleCategoryEdit(node)}
-                className="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 rounded-2xl shadow-sm transition-all"
+                className={`w-12 h-12 flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 rounded-2xl shadow-sm transition-all ${FOCUS_RING}`}
               >
-                <EditIcon className="h-5 w-5" />
+                <EditIcon className="h-5 w-5" aria-hidden="true" />
               </button>
               <button
+                type="button"
                 data-testid="delete-node"
+                aria-label={`ลบหมวดหมู่ ${node.name_th}`}
                 onClick={() => handleCategoryDelete(node)}
-                className="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 rounded-2xl shadow-sm transition-all"
+                className={`w-12 h-12 flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 rounded-2xl shadow-sm transition-all ${FOCUS_RING}`}
               >
-                <TrashIcon className="h-5 w-5" />
+                <TrashIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -240,36 +245,78 @@ export default function TaxonomyManager() {
         
         {/* Taxonomy Tabs Header */}
         <div className="bg-white border-b border-slate-200 px-8 py-4 z-20 relative shadow-sm">
-          <div className="max-w-7xl mx-auto flex gap-4 p-1.5 bg-slate-100/80 rounded-[20px] w-fit">
+          <div 
+            role="tablist"
+            aria-label="การจัดการโครงสร้างหมวดหมู่"
+            className="max-w-7xl mx-auto flex gap-4 p-1.5 bg-slate-100/90 rounded-[20px] w-fit"
+          >
             <button 
+              id="taxonomy-tab-tree"
+              role="tab"
+              type="button"
               data-testid="tab-tree"
+              aria-selected={activeTab === 'tree'}
+              aria-controls="taxonomy-panel-tree"
+              tabIndex={activeTab === 'tree' ? 0 : -1}
               onClick={() => setActiveTab('tree')}
-              className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
-                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  setActiveTab('synonyms')
+                  document.getElementById('taxonomy-tab-synonyms')?.focus()
+                }
+              }}
+              className={`px-8 py-3 rounded-[16px] text-sm font-bold transition-all flex items-center gap-2 thai-text uppercase ${FOCUS_RING} ${
+                activeTab === 'tree' ? 'bg-white text-indigo-700 shadow-md border border-slate-200/80' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
-              <FolderTreeIcon className="w-4 h-4" />
+              <FolderTreeIcon className="w-4 h-4" aria-hidden="true" />
               โครงสร้างหมวดหมู่ (Taxonomy Tree)
             </button>
             <button 
+              id="taxonomy-tab-synonyms"
+              role="tab"
+              type="button"
               data-testid="tab-synonyms"
+              aria-selected={activeTab === 'synonyms'}
+              aria-controls="taxonomy-panel-synonyms"
+              tabIndex={activeTab === 'synonyms' ? 0 : -1}
               onClick={() => setActiveTab('synonyms')}
-              className={`px-8 py-3 rounded-[16px] text-sm font-black transition-all flex items-center gap-2 thai-text uppercase ${
-                activeTab === 'synonyms' ? 'bg-white text-indigo-600 shadow-md border border-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  setActiveTab('tree')
+                  document.getElementById('taxonomy-tab-tree')?.focus()
+                }
+              }}
+              className={`px-8 py-3 rounded-[16px] text-sm font-bold transition-all flex items-center gap-2 thai-text uppercase ${FOCUS_RING} ${
+                activeTab === 'synonyms' ? 'bg-white text-indigo-700 shadow-md border border-slate-200/80' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
-              <LayersIcon className="w-4 h-4" />
+              <LayersIcon className="w-4 h-4" aria-hidden="true" />
               คำพ้องความหมาย (Synonyms)
             </button>
           </div>
         </div>
 
         {activeTab === 'synonyms' ? (
-          <div className="flex-1 overflow-hidden relative bg-gray-50/50">
+          <div 
+            role="tabpanel"
+            id="taxonomy-panel-synonyms"
+            aria-labelledby="taxonomy-tab-synonyms"
+            tabIndex={0}
+            className="flex-1 overflow-hidden relative bg-gray-50/50 focus:outline-none"
+          >
             <SynonymsPanel />
           </div>
         ) : (
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10">
+          <main 
+            role="tabpanel"
+            id="taxonomy-panel-tree"
+            aria-labelledby="taxonomy-tab-tree"
+            tabIndex={0}
+            className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10 focus:outline-none"
+          >
           <div className="max-w-7xl mx-auto">
             {/* Page Header Area */}
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16 gap-8">
@@ -344,99 +391,78 @@ export default function TaxonomyManager() {
         )}
       </div>
 
-      {/* Form Modal Overhaul */}
-      <AnimatePresence>
-        {showForm && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
-            <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.9, rotateX: 10 }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-              exit={{ opacity: 0, y: 50, scale: 0.9, rotateX: -10 }}
-              className="bg-white rounded-[56px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] p-12 w-full max-w-2xl border border-white relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none opacity-50" />
-              
-              <div className="flex justify-between items-start mb-12 relative z-10">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-3 h-3 rounded-full bg-indigo-600 animate-pulse" />
-                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[.3em]">Neural Interface</span>
-                  </div>
-                  <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase thai-text">
-                    {editingCategory ? 'Edit Node' : 'Provison Node'}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="w-14 h-14 flex items-center justify-center bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-3xl transition-all"
-                >
-                  <XIcon className="h-6 w-6" />
-                </button>
-              </div>
+      {/* Category Form Modal */}
+      <Modal
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        title={editingCategory ? 'แก้ไขหมวดหมู่ (Edit Node)' : 'สร้างหมวดหมู่ใหม่ (Create Node)'}
+        titleId="taxonomy-modal-title"
+        maxWidth="max-w-2xl"
+        className="rounded-[36px]"
+      >
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label htmlFor="taxonomy-name-th" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                ชื่อหมวดหมู่ภาษาไทย (TH) *
+              </label>
+              <input
+                id="taxonomy-name-th"
+                type="text"
+                value={formData.name_th}
+                onChange={(e) => setFormData({ ...formData, name_th: e.target.value })}
+                className={`w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl thai-text font-bold text-slate-800 placeholder:text-slate-400 text-sm ${FOCUS_RING}`}
+                placeholder="เช่น อุปกรณ์เครื่องเขียน"
+                required
+              />
+            </div>
 
-              <form onSubmit={handleFormSubmit} className="space-y-10 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-3">
-                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-[.2em] pl-2">
-                      Local Identity (TH) *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name_th}
-                      onChange={(e) => setFormData({ ...formData, name_th: e.target.value })}
-                      className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all thai-text font-black text-slate-800 placeholder:text-slate-300"
-                      placeholder="เช่น อุปกรณ์เครื่องเขียน"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-[.2em] pl-2">
-                      Global Identity (EN)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name_en}
-                      onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
-                      className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-black text-slate-800 placeholder:text-slate-300"
-                      placeholder="e.g. Stationery"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-[.2em] pl-2">
-                    Scope & Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[40px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all thai-text font-black text-slate-800 h-40 resize-none placeholder:text-slate-300"
-                    placeholder="Describe the category scope..."
-                  />
-                </div>
-
-                <div className="flex gap-6 pt-10">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="flex-1 py-6 bg-white border border-slate-200 rounded-[32px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-600 transition-all"
-                  >
-                    Cancel Action
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 btn-premium py-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl shadow-indigo-200"
-                  >
-                    <SaveIcon className="h-5 w-5 mr-3" />
-                    Commit Node
-                  </button>
-                </div>
-              </form>
-            </motion.div>
+            <div className="space-y-2">
+              <label htmlFor="taxonomy-name-en" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                ชื่อภาษาอังกฤษ (EN)
+              </label>
+              <input
+                id="taxonomy-name-en"
+                type="text"
+                value={formData.name_en}
+                onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+                className={`w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 placeholder:text-slate-400 text-sm ${FOCUS_RING}`}
+                placeholder="e.g. Stationery"
+              />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          <div className="space-y-2">
+            <label htmlFor="taxonomy-desc" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              คำอธิบายและขอบเขตหมวดหมู่ (Description)
+            </label>
+            <textarea
+              id="taxonomy-desc"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className={`w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl thai-text font-medium text-slate-800 h-32 resize-none placeholder:text-slate-400 text-sm ${FOCUS_RING}`}
+              placeholder="ระบุรายละเอียดหรือขอบเขตของหมวดหมู่นี้..."
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className={`flex-1 py-3.5 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-50 transition-all text-xs ${FOCUS_RING}`}
+            >
+              ยกเลิก (Cancel)
+            </button>
+            <button
+              type="submit"
+              className={`flex-1 btn-premium py-3.5 rounded-2xl font-bold uppercase tracking-wider shadow-lg shadow-indigo-100 text-xs ${FOCUS_RING}`}
+            >
+              <SaveIcon className="h-4 w-4 mr-2" aria-hidden="true" />
+              บันทึกหมวดหมู่ (Commit Node)
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

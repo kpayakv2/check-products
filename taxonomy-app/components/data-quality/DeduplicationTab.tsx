@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 interface WorkflowStep {
   id: number
@@ -391,19 +392,24 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                        {/* Threshold slider */}
                        <div className="space-y-2">
                           <div className="flex justify-between items-baseline">
-                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Similarity Threshold</label>
+                             <label htmlFor="dedup-threshold-slider" className="text-xs font-bold text-slate-700 uppercase tracking-wider">Similarity Threshold</label>
                              <span className="text-sm font-black text-indigo-600">{(scanThreshold * 100).toFixed(0)}%</span>
                           </div>
                           <input 
+                             id="dedup-threshold-slider"
                              type="range" 
                              min="0.80" 
                              max="1.00" 
                              step="0.01" 
                              value={scanThreshold} 
                              onChange={(e) => setScanThreshold(parseFloat(e.target.value))}
-                             className="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                             aria-valuemin={0.80}
+                             aria-valuemax={1.00}
+                             aria-valuenow={scanThreshold}
+                             aria-valuetext={`${(scanThreshold * 100).toFixed(0)}%`}
+                             className={`w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 ${FOCUS_RING}`}
                           />
-                          <p className="text-[10px] text-slate-400 font-bold leading-normal thai-text">
+                          <p className="text-xs text-slate-600 font-medium leading-normal thai-text">
                              ค่าความเหมือนของเวกเตอร์ที่ยอมให้จับเป็นคู่ซ้ำ (แนะนำ 95% ขึ้นไป)
                           </p>
                        </div>
@@ -411,19 +417,24 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                        {/* Limit Input */}
                        <div className="space-y-2">
                           <div className="flex justify-between items-baseline">
-                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Audit Limit</label>
+                             <label htmlFor="dedup-limit-slider" className="text-xs font-bold text-slate-700 uppercase tracking-wider">Audit Limit</label>
                              <span className="text-sm font-black text-indigo-600">{scanLimit} คู่</span>
                           </div>
                           <input 
+                             id="dedup-limit-slider"
                              type="range" 
                              min="10" 
                              max="500" 
                              step="10" 
                              value={scanLimit} 
                              onChange={(e) => setScanLimit(parseInt(e.target.value))}
-                             className="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                             aria-valuemin={10}
+                             aria-valuemax={500}
+                             aria-valuenow={scanLimit}
+                             aria-valuetext={`${scanLimit} คู่`}
+                             className={`w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 ${FOCUS_RING}`}
                           />
-                          <p className="text-[10px] text-slate-400 font-bold leading-normal thai-text">
+                          <p className="text-xs text-slate-600 font-medium leading-normal thai-text">
                              จำนวนคู่สูงสุดที่จะนำขึ้นมาตรวจสอบในรอบการรันนี้
                           </p>
                        </div>
@@ -433,20 +444,28 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                  {/* Right Scan Action Panel */}
                  <div className="lg:col-span-2 premium-card p-12 bg-white/40 border-white text-center flex flex-col items-center justify-center">
                     <div className="w-20 h-20 rounded-3xl bg-indigo-600 text-white flex items-center justify-center mb-8 shadow-2xl shadow-indigo-100">
-                       <ScaleIcon className="w-10 h-10 animate-pulse" />
+                       <ScaleIcon className="w-10 h-10 motion-safe:animate-pulse" aria-hidden="true" />
                     </div>
                     <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase tracking-tight thai-text">เริ่มสแกนตรวจสอบความซ้ำซ้อนภายในคลังสินค้า</h3>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-10 leading-relaxed max-w-md">
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-10 leading-relaxed max-w-md">
                        ระบบจะคำนวณเวกเตอร์ความคล้ายคลึงเชิงความหมายแบบคู่ขนานบน NumPy กับสินค้า 3,103 รายการทั้งหมดในชั่วพริบตา
                     </p>
 
-                    <button onClick={scanInternalCatalog} className="btn-premium w-full max-w-sm px-16 py-6 text-lg group h-auto mb-4">
-                       <Zap className="w-5 h-5 mr-3 group-hover:animate-bounce" />
+                    <button 
+                      type="button"
+                      onClick={scanInternalCatalog} 
+                      className={`btn-premium w-full max-w-sm px-16 py-6 text-lg group h-auto mb-4 ${FOCUS_RING}`}
+                    >
+                       <Zap className="w-5 h-5 mr-3 motion-safe:group-hover:animate-bounce" aria-hidden="true" />
                        <span className="thai-text uppercase tracking-widest font-black">เริ่มการสแกนหาของซ้ำเชิงลึก</span>
                     </button>
                     
-                    <button onClick={triggerMLRetrain} className="btn-premium-secondary w-full max-w-sm px-10 py-4 text-sm group h-auto bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300">
-                       <SparklesIcon className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                    <button 
+                      type="button"
+                      onClick={triggerMLRetrain} 
+                      className={`btn-premium-secondary w-full max-w-sm px-10 py-4 text-sm group h-auto bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400 ${FOCUS_RING}`}
+                    >
+                       <SparklesIcon className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" aria-hidden="true" />
                        <span className="thai-text uppercase tracking-widest font-black">เริ่มสอน AI จากประวัติ (Retrain Model)</span>
                     </button>
                  </div>
@@ -454,10 +473,14 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
             )}
 
             {currentStep === 2 && (
-              <div className="premium-card p-24 text-center flex flex-col items-center justify-center bg-white/40 border-white">
+              <div 
+                aria-live="polite"
+                aria-atomic="true"
+                className="premium-card p-24 text-center flex flex-col items-center justify-center bg-white/40 border-white"
+              >
                 <div className="w-24 h-24 relative flex items-center justify-center mb-8">
-                  <div className="absolute inset-0 border-4 border-indigo-100 rounded-full animate-pulse" />
-                  <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 border-4 border-indigo-100 rounded-full motion-safe:animate-pulse" />
+                  <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent motion-safe:animate-spin" />
                   <span className="absolute text-base font-black text-indigo-700">{scanProgress}%</span>
                 </div>
                 
@@ -466,56 +489,70 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                 </h3>
                 
                 {/* Progress Bar Container */}
-                <div className="w-full max-w-md bg-slate-100/80 rounded-full h-4 overflow-hidden p-0.5 border border-slate-200 shadow-inner mb-3">
+                <div 
+                  role="progressbar"
+                  aria-valuenow={scanProgress}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="ความคืบหน้าการสแกนหาสินค้าซ้ำ"
+                  className="w-full max-w-md bg-slate-200 rounded-full h-4 overflow-hidden p-0.5 border border-slate-300 shadow-inner mb-3"
+                >
                   <div 
                     className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-500 ease-out shadow-lg"
                     style={{ width: `${scanProgress}%` }}
                   />
                 </div>
                 
-                <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">
-                  Scanning and computing pairwise similarities dynamically...
+                <p className="text-xs font-bold text-slate-600 mt-2 uppercase tracking-wider">
+                  กำลังสแกนและประมวลผลความคล้ายคลึงของข้อมูลสินค้า...
                 </p>
               </div>
             )}
 
             {currentStep === 3 && fallbackWarning?.active && (
-              <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div 
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="fallback-modal-title"
+                className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+              >
                  <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-amber-200 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
                     
                     <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 border border-amber-200">
-                       <AlertCircle className="w-8 h-8 text-amber-600" />
+                       <AlertCircle className="w-8 h-8 text-amber-700" aria-hidden="true" />
                     </div>
                     
-                    <h3 className="text-2xl font-black text-slate-900 mb-2 thai-text uppercase tracking-tight">ระบบ AI ไม่พร้อมใช้งาน</h3>
-                    <p className="text-slate-600 thai-text text-sm mb-4 leading-relaxed font-medium">
+                    <h3 id="fallback-modal-title" className="text-2xl font-black text-slate-900 mb-2 thai-text uppercase tracking-tight">ระบบ AI ไม่พร้อมใช้งาน</h3>
+                    <p className="text-slate-700 thai-text text-sm mb-4 leading-relaxed font-medium">
                        ระบบพบปัญหาในการเชื่อมต่อกับ Machine Learning Model หลัก (Batch Inference) หรือโมเดลยังไม่ได้รับการเทรน
                     </p>
                     
-                    <div className="bg-amber-50 rounded-xl p-4 mb-8">
-                       <p className="text-xs font-black text-amber-800 uppercase tracking-widest mb-2">ข้อความจากระบบ (System Warning):</p>
-                       <ul className="list-disc list-inside text-sm text-amber-700 thai-text">
+                    <div className="bg-amber-50 rounded-xl p-4 mb-8 border border-amber-200">
+                       <p className="text-xs font-black text-amber-900 uppercase tracking-wider mb-2">ข้อความจากระบบ (System Warning):</p>
+                       <ul className="list-disc list-inside text-sm text-amber-800 thai-text">
                           {fallbackWarning.messages.map((msg, i) => (
                              <li key={i}>{msg}</li>
                           ))}
                        </ul>
                     </div>
                     
-                    <p className="text-sm font-bold text-slate-700 thai-text mb-8 text-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p className="text-sm font-bold text-slate-800 thai-text mb-8 text-center bg-slate-50 p-4 rounded-xl border border-slate-200">
                        ระบบเปลี่ยนไปใช้ <strong>ระบบสำรอง (Cosine Similarity พื้นฐาน)</strong> อัตโนมัติ ผลลัพธ์อาจมีความแม่นยำลดลงเล็กน้อย คุณต้องการดำเนินการตรวจสอบต่อไปหรือไม่?
                     </p>
                     
                     <div className="flex gap-4">
                        <button 
+                          type="button"
                           onClick={() => { setFallbackWarning(null); setCurrentStep(1); setInternalPairs([]); }}
-                          className="flex-1 px-6 py-4 rounded-2xl font-black text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors thai-text uppercase text-sm"
+                          className={`flex-1 px-6 py-3.5 rounded-2xl font-bold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors thai-text text-sm ${FOCUS_RING}`}
                        >
                           ยกเลิก (รอ AI พร้อม)
                        </button>
                        <button 
+                          type="button"
                           onClick={() => setFallbackWarning({ ...fallbackWarning, active: false })}
-                          className="flex-1 px-6 py-4 rounded-2xl font-black text-amber-900 bg-amber-400 hover:bg-amber-500 transition-colors thai-text uppercase shadow-lg shadow-amber-500/20 text-sm"
+                          className={`flex-1 px-6 py-3.5 rounded-2xl font-bold text-amber-950 bg-amber-400 hover:bg-amber-500 transition-colors thai-text shadow-md text-sm ${FOCUS_RING}`}
                        >
                           ยอมรับและทำต่อ
                        </button>
@@ -569,16 +606,17 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                 <div className="premium-card p-0 overflow-hidden bg-white border-slate-100 shadow-xl">
                    <div className="px-8 py-5 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
                       <span className="text-sm font-black text-white uppercase tracking-wider thai-text">ตารางสรุปคู่ซ้ำจากการตรวจของระบบ (Algorithm Output)</span>
-                      <span className="text-[10px] font-black text-slate-400 uppercase">กรองความถูกต้องด้วย ML Classifier</span>
+                      <span className="text-xs font-medium text-slate-300 uppercase">กรองความถูกต้องด้วย ML Classifier</span>
                    </div>
                    <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
+                         <caption className="sr-only">ตารางสรุปคู่ซ้ำจากการตรวจของระบบ</caption>
                          <thead>
-                            <tr className="bg-slate-50 border-b border-slate-100">
-                               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider w-[35%]">สินค้าฝั่ง A</th>
-                               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider w-[35%]">สินค้าฝั่ง B</th>
-                               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center w-[10%]">ความคล้ายเวกเตอร์</th>
-                               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center w-[10%]">ML ประเมิน</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                               <th scope="col" className="px-8 py-4 text-xs font-bold text-slate-700 uppercase tracking-wider w-[35%]">สินค้าฝั่ง A</th>
+                               <th scope="col" className="px-8 py-4 text-xs font-bold text-slate-700 uppercase tracking-wider w-[35%]">สินค้าฝั่ง B</th>
+                               <th scope="col" className="px-6 py-4 text-xs font-bold text-slate-700 uppercase tracking-wider text-center w-[10%]">ความคล้ายเวกเตอร์</th>
+                               <th scope="col" className="px-6 py-4 text-xs font-bold text-slate-700 uppercase tracking-wider text-center w-[10%]">ML ประเมิน</th>
                             </tr>
                          </thead>
                          <tbody className="divide-y divide-slate-100">
@@ -588,26 +626,26 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                                   <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
                                      <td className="px-8 py-4">
                                         <p className="text-sm font-black text-slate-800 thai-text">{pair.name_a}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">SKU: {pair.sku_a || 'N/A'} • {pair.category_a}</p>
+                                        <p className="text-xs text-slate-500 font-medium mt-1 uppercase">SKU: {pair.sku_a || 'N/A'} • {pair.category_a}</p>
                                      </td>
                                      <td className="px-8 py-4">
                                         <p className="text-sm font-black text-slate-800 thai-text">{pair.name_b}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">SKU: {pair.sku_b || 'N/A'} • {pair.category_b}</p>
+                                        <p className="text-xs text-slate-500 font-medium mt-1 uppercase">SKU: {pair.sku_b || 'N/A'} • {pair.category_b}</p>
                                      </td>
                                      <td className="px-6 py-4 text-center">
                                         <span className="text-sm font-black text-slate-700 font-mono">{(pair.similarity * 100).toFixed(1)}%</span>
                                      </td>
                                      <td className="px-6 py-4 text-center">
                                         <div className="flex flex-col items-center gap-1">
-                                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border ${
+                                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
                                               isSimilar 
-                                                ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' 
-                                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                                ? 'bg-rose-100 text-rose-800 border-rose-300' 
+                                                : 'bg-amber-100 text-amber-900 border-amber-300'
                                            }`}>
                                               {isSimilar ? '⚠️ อาจซ้ำกัน' : '💡 อาจแตกต่าง'}
                                            </span>
                                            {pair.confidence && (
-                                              <span className="text-[9px] text-slate-400 font-bold">มั่นใจ {(pair.confidence * 100).toFixed(0)}%</span>
+                                              <span className="text-xs text-slate-600 font-medium">มั่นใจ {(pair.confidence * 100).toFixed(0)}%</span>
                                            )}
                                         </div>
                                      </td>
@@ -622,16 +660,18 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                 {/* Navigation Actions */}
                 <div className="flex justify-end items-center gap-4">
                    <button 
+                      type="button"
                       onClick={() => { setCurrentStep(1); setInternalPairs([]); setAuditList([]); }}
-                      className="px-8 py-4 rounded-2xl font-black text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors thai-text uppercase text-xs tracking-wider"
+                      className={`px-8 py-4 rounded-2xl font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors thai-text uppercase text-xs tracking-wider ${FOCUS_RING}`}
                    >
                       ยกเลิกและตั้งค่าใหม่
                    </button>
                    <button 
+                      type="button"
                       onClick={startAudit}
-                      className="btn-premium px-10 py-4 text-xs group"
+                      className={`btn-premium px-10 py-4 text-xs group ${FOCUS_RING}`}
                    >
-                      <SparklesIcon className="w-4 h-4 mr-2 group-hover:animate-bounce" />
+                      <SparklesIcon className="w-4 h-4 mr-2 motion-safe:group-hover:animate-bounce" aria-hidden="true" />
                       <span className="thai-text uppercase tracking-widest font-black">เริ่มกระบวนการสะสางข้อมูลรายคู่ (Proceed to Audit)</span>
                    </button>
                 </div>
@@ -644,7 +684,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                 <div className="flex items-center justify-between">
                    <div>
                       <h3 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Audit Database Duplicates</h3>
-                      <p className="text-indigo-500 text-xs font-black uppercase tracking-[0.2em] mt-1">คลังข้อมูลสินค้าซ้ำในฐานข้อมูลหลัก</p>
+                      <p className="text-indigo-600 text-xs font-bold uppercase tracking-wider mt-1">คลังข้อมูลสินค้าซ้ำในฐานข้อมูลหลัก</p>
                    </div>
                    <div className="px-6 py-2 bg-indigo-500 rounded-2xl text-white font-black text-sm shadow-lg shadow-indigo-100 tracking-tighter italic">
                       {internalCurrentIndex + 1} / {auditList.length} คู่
@@ -653,7 +693,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 relative">
                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden lg:flex w-20 h-20 rounded-full bg-white shadow-2xl border border-slate-50 items-center justify-center">
-                      <ScaleIcon className="w-8 h-8 text-indigo-500 animate-pulse" />
+                      <ScaleIcon className="w-8 h-8 text-indigo-500 motion-safe:animate-pulse" aria-hidden="true" />
                    </div>
 
                    {[
@@ -684,8 +724,8 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                               {item.name_th}
                            </p>
                            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                              <span className="flex items-center gap-1.5 text-xs font-black text-slate-400 uppercase tracking-widest">
-                                 <Tag className="w-3.5 h-3.5 text-slate-400" />
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                 <Tag className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
                                  {item.category}
                               </span>
                            </div>
@@ -696,19 +736,19 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
                 {/* Symmetric Control Center below the cards */}
                 <div className="bg-slate-950 p-10 rounded-[48px] text-center shadow-2xl relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
                    
                    <div className="flex flex-col items-center gap-4 mb-8">
                       <div className="inline-flex gap-2 items-center bg-white/5 border border-white/10 px-6 py-2 rounded-full">
-                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Semantic Match:</span>
-                         <span className="text-sm font-black text-white italic tracking-widest">{(auditList[internalCurrentIndex].similarity * 100).toFixed(1)}% Match</span>
+                         <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Semantic Match:</span>
+                         <span className="text-sm font-black text-white italic tracking-wider">{(auditList[internalCurrentIndex].similarity * 100).toFixed(1)}% Match</span>
                       </div>
 
                       {auditList[internalCurrentIndex].reason && (
                          <div className="max-w-xl w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left">
                             <div className="flex items-center gap-2 mb-1">
-                               <span className={`w-2 h-2 rounded-full ${auditList[internalCurrentIndex].ml_prediction === 'similar' ? 'bg-rose-500 animate-ping' : 'bg-amber-500 animate-pulse'}`} />
-                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ผลการประเมินวิเคราะห์โดยระบบ (AI Reason)</span>
+                               <span className={`w-2 h-2 rounded-full ${auditList[internalCurrentIndex].ml_prediction === 'similar' ? 'bg-rose-500 motion-safe:animate-ping' : 'bg-amber-500 motion-safe:animate-pulse'}`} aria-hidden="true" />
+                               <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">ผลการประเมินวิเคราะห์โดยระบบ (AI Reason)</span>
                             </div>
                             <p className="text-xs font-bold text-slate-200 thai-text leading-relaxed">
                                {auditList[internalCurrentIndex].reason}
@@ -718,15 +758,17 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                    </div>
 
                    <h4 className="text-lg font-black text-white thai-text mb-2 uppercase tracking-tight">การตัดสินใจสะสางข้อมูลซ้ำซ้อน</h4>
-                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">
+                   <p className="text-xs text-slate-300 font-medium uppercase tracking-wider mb-8">
                      สามารถใช้ปุ่มลัดคีย์บอร์ด [A] [S] [D] หรือปุ่มลูกศร [←] [↓] [→] เพื่อทำงานได้รวดเร็วยิ่งขึ้น
                    </p>
 
                    <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                       {/* Merge A (Keep Left) */}
                       <button 
+                         type="button"
+                         aria-label="ยุบรวมโดยเก็บฝั่งซ้าย สินค้า A"
                          onClick={() => resolveInternalPair('merge', 'a')}
-                         className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3"
+                         className={`w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
                          <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
                             <span>A</span>
@@ -738,8 +780,10 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
                       {/* Keep Both / Different */}
                       <button 
+                         type="button"
+                         aria-label="ระบุว่าเป็นคนละสินค้า เก็บทั้งสองรายการ"
                          onClick={() => resolveInternalPair('keep_both')}
-                         className="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3"
+                         className={`w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
                          <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
                             <span>S</span>
@@ -751,8 +795,10 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
 
                       {/* Merge B (Keep Right) */}
                       <button 
+                         type="button"
+                         aria-label="ยุบรวมโดยเก็บฝั่งขวา สินค้า B"
                          onClick={() => resolveInternalPair('merge', 'b')}
-                         className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3"
+                         className={`w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
                          <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
                             <span>D</span>
@@ -766,38 +812,39 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
               </div>
             )}
 
-            {/* Step 5: Audit Complete Summary */}
-            {currentStep === 5 && (
-              <div className="premium-card p-16 bg-white/40 border-white text-center flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
-                 <div className="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center mb-8 shadow-xl shadow-emerald-100">
-                    <CheckIcon className="w-10 h-10 text-emerald-600" />
-                 </div>
+             {/* Step 5: Audit Complete Summary */}
+             {currentStep === 5 && (
+               <div className="premium-card p-16 bg-white/40 border-white text-center flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
+                  <div className="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-500 flex items-center justify-center mb-8 shadow-xl shadow-emerald-100">
+                     <CheckIcon className="w-10 h-10 text-emerald-600" aria-hidden="true" />
+                  </div>
 
-                 <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight thai-text">เสร็จสิ้นภารกิจตรวจสอบคุณภาพ!</h3>
-                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-10 leading-relaxed max-w-md">
-                    คุณกานสะสางความซ้ำซ้อนของข้อมูลคลังสอนระบบ baseline ปัจจุบันเรียบร้อยแล้ว
-                 </p>
+                  <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight thai-text">เสร็จสิ้นภารกิจตรวจสอบคุณภาพ!</h3>
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-10 leading-relaxed max-w-md">
+                     คุณได้ทำการสะสางความซ้ำซ้อนของข้อมูลคลังสอนระบบ baseline ปัจจุบันเรียบร้อยแล้ว
+                  </p>
 
-                 <div className="grid grid-cols-2 gap-8 w-full max-w-md mb-12 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                    <div className="text-center">
-                       <p className="text-sm font-black text-indigo-600">{resolvedCount.merged} รายการ</p>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1">สินค้าที่กดยุบรวม (Merged)</p>
-                    </div>
-                    <div className="text-center">
-                       <p className="text-sm font-black text-emerald-600">{resolvedCount.kept} คู่</p>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1">คู่อลุ่มอล่วย (Kept Both)</p>
-                    </div>
-                 </div>
+                  <div className="grid grid-cols-2 gap-8 w-full max-w-md mb-12 p-6 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                     <div className="text-center">
+                        <p className="text-sm font-black text-indigo-600">{resolvedCount.merged} รายการ</p>
+                        <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">สินค้าที่กดยุบรวม (Merged)</p>
+                     </div>
+                     <div className="text-center">
+                        <p className="text-sm font-black text-emerald-600">{resolvedCount.kept} คู่</p>
+                        <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">คู่อลุ่มอล่วย (Kept Both)</p>
+                     </div>
+                  </div>
 
-                 <button 
-                    onClick={() => { setCurrentStep(1); setInternalPairs([]); }}
-                    className="btn-premium px-16 py-6 group h-auto"
-                 >
-                    <RefreshCcwIcon className="w-5 h-5 mr-3 group-hover:rotate-180 transition-transform duration-700" />
-                    <span className="thai-text uppercase tracking-widest font-black">สแกนตรวจสอบใหม่อีกครั้ง</span>
-                 </button>
-              </div>
-            )}
+                  <button 
+                     type="button"
+                     onClick={() => { setCurrentStep(1); setInternalPairs([]); }}
+                     className={`btn-premium px-16 py-6 group h-auto ${FOCUS_RING}`}
+                  >
+                     <RefreshCcwIcon className="w-5 h-5 mr-3 motion-safe:group-hover:rotate-180 transition-transform duration-700" aria-hidden="true" />
+                     <span className="thai-text uppercase tracking-widest font-black">สแกนตรวจสอบใหม่อีกครั้ง</span>
+                  </button>
+               </div>
+             )}
           </div>
         </div>
       </div>

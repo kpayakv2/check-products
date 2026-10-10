@@ -15,6 +15,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon
 } from 'lucide-react'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 interface ImportRecord {
   id: string
@@ -33,10 +34,10 @@ interface ImportRecord {
 }
 
 const STATUS_CONFIG = {
-  completed: { label: 'สำเร็จ', icon: CheckCircleIcon, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-  processing: { label: 'กำลังทำ', icon: ClockIcon, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-  pending:    { label: 'รอดำเนินการ', icon: ClockIcon, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-  failed:     { label: 'ล้มเหลว', icon: AlertCircleIcon, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
+  completed: { label: 'สำเร็จ', icon: CheckCircleIcon, color: 'text-emerald-900', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+  processing: { label: 'กำลังทำ', icon: ClockIcon, color: 'text-blue-900', bg: 'bg-blue-50', border: 'border-blue-200' },
+  pending:    { label: 'รอดำเนินการ', icon: ClockIcon, color: 'text-amber-900', bg: 'bg-amber-50', border: 'border-amber-200' },
+  failed:     { label: 'ล้มเหลว', icon: AlertCircleIcon, color: 'text-rose-900', bg: 'bg-rose-50', border: 'border-rose-200' },
 }
 
 function formatBytes(bytes: number | null): string {
@@ -111,19 +112,19 @@ export default function ImportHistory() {
   }
 
   if (loading) return (
-    <div className="flex items-center justify-center py-16 gap-3 text-slate-400">
-      <RefreshCwIcon className="w-5 h-5 animate-spin" />
+    <div className="flex items-center justify-center py-16 gap-3 text-slate-600" role="status" aria-live="polite">
+      <RefreshCwIcon className="w-5 h-5 motion-safe:animate-spin text-slate-500" aria-hidden="true" />
       <span className="font-medium thai-text">กำลังโหลดประวัติ...</span>
     </div>
   )
 
   if (error) return (
-    <div className="text-center py-16" data-testid="history-error">
-      <AlertCircleIcon className="w-12 h-12 mx-auto mb-3 text-rose-200" />
-      <p className="text-rose-500 font-medium thai-text">{error}</p>
+    <div className="text-center py-16" data-testid="history-error" role="alert">
+      <AlertCircleIcon className="w-12 h-12 mx-auto mb-3 text-rose-300" aria-hidden="true" />
+      <p className="text-rose-700 font-medium thai-text">{error}</p>
       <button
         onClick={loadHistory}
-        className="mt-4 px-5 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50"
+        className={`mt-4 px-5 py-2 rounded-xl border border-slate-300 text-sm font-bold text-slate-700 hover:bg-slate-50 ${FOCUS_RING}`}
       >
         ลองใหม่
       </button>
@@ -132,8 +133,8 @@ export default function ImportHistory() {
 
   if (records.length === 0) return (
     <div className="text-center py-16">
-      <DatabaseIcon className="w-12 h-12 mx-auto mb-3 text-slate-200" />
-      <p className="text-slate-400 font-medium thai-text">ยังไม่มีประวัติการนำเข้า</p>
+      <DatabaseIcon className="w-12 h-12 mx-auto mb-3 text-slate-300" aria-hidden="true" />
+      <p className="text-slate-600 font-medium thai-text">ยังไม่มีประวัติการนำเข้า</p>
     </div>
   )
 
@@ -158,34 +159,44 @@ export default function ImportHistory() {
             >
               {/* Header Row */}
               <div
-                className="flex items-center gap-4 p-4 cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                aria-label={`ดูรายละเอียดการนำเข้าไฟล์ ${displayName}`}
+                className={`flex items-center gap-4 p-4 cursor-pointer rounded-2xl ${FOCUS_RING}`}
                 onClick={() => setExpanded(isExpanded ? null : rec.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setExpanded(isExpanded ? null : rec.id)
+                  }
+                }}
               >
                 {/* File icon */}
                 <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
-                  <FileTextIcon className="w-5 h-5 text-slate-400" />
+                  <FileTextIcon className="w-5 h-5 text-slate-500" aria-hidden="true" />
                 </div>
 
                 {/* Name + date */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-slate-800 text-sm thai-text truncate" title={displayName}>
+                  <p className="font-bold text-slate-900 text-sm thai-text truncate" title={displayName}>
                     {displayName}
                   </p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">
+                  <p className="text-xs text-slate-600 font-medium mt-0.5">
                     {formatDate(rec.created_at)} · {formatBytes(rec.file_size)}
                   </p>
                 </div>
 
                 {/* Status badge */}
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-black ${cfg.color} ${cfg.bg} ${cfg.border} flex-shrink-0`}>
-                  <StatusIcon className="w-3.5 h-3.5" />
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold ${cfg.color} ${cfg.bg} ${cfg.border} flex-shrink-0`}>
+                  <StatusIcon className="w-3.5 h-3.5" aria-hidden="true" />
                   {cfg.label}
                 </div>
 
                 {/* Stats */}
-                <div className="hidden md:flex items-center gap-1 text-xs text-slate-400 flex-shrink-0">
-                  <PackageIcon className="w-3.5 h-3.5" />
-                  <span className="font-bold text-slate-600">{rec.success_records ?? 0}</span>
+                <div className="hidden md:flex items-center gap-1 text-xs text-slate-600 flex-shrink-0">
+                  <PackageIcon className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
+                  <span className="font-bold text-slate-800">{rec.success_records ?? 0}</span>
                   <span>/ {rec.total_records} รายการ</span>
                 </div>
 
@@ -195,17 +206,18 @@ export default function ImportHistory() {
                     onClick={(e) => { e.stopPropagation(); downloadFile(rec) }}
                     disabled={downloading === rec.id}
                     title={`ดาวน์โหลด: ${displayName}`}
-                    className="p-2 rounded-xl hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors flex-shrink-0 disabled:opacity-40"
+                    aria-label={`ดาวน์โหลด: ${displayName}`}
+                    className={`p-2 rounded-xl hover:bg-indigo-50 text-slate-600 hover:text-indigo-800 transition-colors flex-shrink-0 disabled:opacity-40 ${FOCUS_RING}`}
                   >
                     {downloading === rec.id
-                      ? <RefreshCwIcon className="w-4 h-4 animate-spin" />
-                      : <DownloadIcon className="w-4 h-4" />
+                      ? <RefreshCwIcon className="w-4 h-4 motion-safe:animate-spin" aria-hidden="true" />
+                      : <DownloadIcon className="w-4 h-4" aria-hidden="true" />
                     }
                   </button>
                 )}
 
                 {/* Expand toggle */}
-                <div className="text-slate-300 flex-shrink-0">
+                <div className="text-slate-400 flex-shrink-0" aria-hidden="true">
                   {isExpanded
                     ? <ChevronUpIcon className="w-4 h-4" />
                     : <ChevronDownIcon className="w-4 h-4" />}
@@ -222,25 +234,25 @@ export default function ImportHistory() {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 pb-4 pt-0 border-t border-slate-50 bg-slate-50/50">
+                    <div className="px-4 pb-4 pt-0 border-t border-slate-100 bg-slate-50/50">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
                         <div className="bg-white rounded-xl p-3 border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ชื่อไฟล์ต้นฉบับ</p>
-                          <p className="text-xs font-bold text-slate-700 thai-text break-all">{displayName}</p>
+                          <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">ชื่อไฟล์ต้นฉบับ</p>
+                          <p className="text-xs font-bold text-slate-800 thai-text break-all">{displayName}</p>
                         </div>
                         <div className="bg-white rounded-xl p-3 border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Storage Path</p>
-                          <p className="text-xs font-mono text-slate-500 break-all">{rec.metadata?.storage_path ?? '-'}</p>
+                          <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Storage Path</p>
+                          <p className="text-xs font-mono text-slate-700 break-all">{rec.metadata?.storage_path ?? '-'}</p>
                         </div>
                         <div className="bg-white rounded-xl p-3 border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">สำเร็จ / ทั้งหมด</p>
-                          <p className="text-sm font-black text-emerald-600">{rec.success_records ?? 0}
-                            <span className="text-slate-400 font-medium text-xs"> / {rec.total_records}</span>
+                          <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">สำเร็จ / ทั้งหมด</p>
+                          <p className="text-sm font-black text-emerald-800">{rec.success_records ?? 0}
+                            <span className="text-slate-600 font-medium text-xs"> / {rec.total_records}</span>
                           </p>
                         </div>
                         <div className="bg-white rounded-xl p-3 border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ข้อผิดพลาด</p>
-                          <p className={`text-sm font-black ${(rec.error_records ?? 0) > 0 ? 'text-rose-500' : 'text-slate-300'}`}>
+                          <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">ข้อผิดพลาด</p>
+                          <p className={`text-sm font-black ${(rec.error_records ?? 0) > 0 ? 'text-rose-800' : 'text-slate-500'}`}>
                             {rec.error_records ?? 0} รายการ
                           </p>
                         </div>

@@ -18,6 +18,7 @@ import {
   BrainIcon
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 const navigation = [
   {
@@ -118,7 +119,9 @@ export default function Sidebar({ className = '' }: SidebarProps) {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-6 left-6 z-50 p-3 rounded-2xl bg-white shadow-2xl border border-slate-100"
+        aria-label="เปิดเมนูนำทาง"
+        aria-expanded={isOpen}
+        className={`lg:hidden fixed top-6 left-6 z-50 p-3 rounded-2xl bg-white shadow-2xl border border-slate-100 ${FOCUS_RING}`}
       >
         <MenuIcon className="h-6 w-6 text-slate-600" />
       </button>
@@ -158,10 +161,10 @@ export default function Sidebar({ className = '' }: SidebarProps) {
                 <SparklesIcon className="h-6 w-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                <div className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">
                   Neural
-                </h1>
-                <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest leading-relaxed mt-1">
+                </div>
+                <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest leading-relaxed mt-1" lang="en">
                   Taxonomy Engine
                 </p>
               </div>
@@ -169,15 +172,16 @@ export default function Sidebar({ className = '' }: SidebarProps) {
             
             <button
               onClick={() => setIsOpen(false)}
-              className="lg:hidden p-2 rounded-xl hover:bg-slate-100 transition-colors"
+              aria-label="ปิดเมนูนำทาง"
+              className={`lg:hidden p-2 rounded-xl hover:bg-slate-100 transition-colors ${FOCUS_RING}`}
             >
               <XIcon className="h-5 w-5 text-slate-500" />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-6 py-8 space-y-2 overflow-y-auto relative z-10 custom-scrollbar">
-             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 px-4">Core Orchestration</p>
+          <nav className="flex-1 px-6 py-8 space-y-2 overflow-y-auto relative z-10 custom-scrollbar" aria-label="เมนูหลัก">
+             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 px-4" lang="en">Core Orchestration</p>
             {navigation.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -188,7 +192,7 @@ export default function Sidebar({ className = '' }: SidebarProps) {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={`
-                    group flex items-center px-4 py-4 rounded-[24px] transition-all duration-500 relative
+                    group flex items-center px-4 py-4 rounded-[24px] transition-all duration-500 relative ${FOCUS_RING}
                     ${isActive 
                       ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-200' 
                       : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
@@ -207,12 +211,13 @@ export default function Sidebar({ className = '' }: SidebarProps) {
                     />
                   </div>
                   <div className="flex-1">
-                    <p className={`text-[11px] font-bold uppercase tracking-wider leading-relaxed mb-1 transition-all ${isActive ? 'text-indigo-100' : 'text-slate-400'}`}>
+                    <div className={`font-black text-sm tracking-tight transition-all ${isActive ? 'text-white' : 'text-slate-700'}`}>
+                      <span className="thai-text font-black">{item.thai}</span>
+                      <span className="text-xs opacity-75 ml-1.5 font-bold" lang="en">({item.name})</span>
+                    </div>
+                    <p className={`text-xs font-bold uppercase tracking-wider leading-relaxed mt-0.5 transition-all ${isActive ? 'text-indigo-100' : 'text-slate-400'}`} lang="en">
                        {item.description}
                     </p>
-                    <div className={`font-black text-sm tracking-tight transition-all ${isActive ? 'text-white' : 'text-slate-700'}`}>
-                      {item.name} <span className="thai-text opacity-70 ml-1 font-bold group-hover:opacity-100 transition-opacity">({item.thai})</span>
-                    </div>
                   </div>
                   
                   {isActive && (
@@ -232,20 +237,20 @@ export default function Sidebar({ className = '' }: SidebarProps) {
                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all" />
                <div className="flex items-center gap-4 relative z-10">
                   <div className="w-10 h-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                    <ZapIcon className="w-5 h-5 text-indigo-400 animate-pulse" />
+                    <ZapIcon className="w-5 h-5 text-indigo-400 motion-safe:animate-pulse" />
                   </div>
                   <div>
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Service Status</p>
-                    <p className="text-xs font-black text-white italic tracking-widest leading-none">All Systems Green</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1" lang="en">Service Status</p>
+                    <p className="text-xs font-black text-white italic tracking-widest leading-none" lang="en">All Systems Green</p>
                   </div>
                </div>
                
                <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between gap-2 overflow-hidden">
                   <div className="flex flex-col min-w-0">
-                     <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest truncate">Build Signature</span>
-                     <span className="text-[10px] font-bold text-slate-400 italic truncate">phayak-nexus-v1.2</span>
+                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest truncate" lang="en">Build Signature</span>
+                     <span className="text-xs font-bold text-slate-300 italic truncate" lang="en">phayak-nexus-v1.2</span>
                   </div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping shrink-0" />
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full motion-safe:animate-ping shrink-0" aria-hidden="true" />
                </div>
             </div>
           </div>

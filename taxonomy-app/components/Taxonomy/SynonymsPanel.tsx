@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import Modal, { FOCUS_RING } from '@/components/ui/Modal'
 import { 
   DatabaseService, 
   Synonym, 
@@ -225,8 +226,8 @@ export default function SynonymsPanel() {
                   บริหารจัดการคลังคำพ้องความหมายเพื่อเพิ่มความแม่นยำในการค้นหาและจัดหมวดหมู่ด้วย AI
                 </p>
               </div>
-              <button data-testid="add-synonym-btn" onClick={handleSynonymAdd} className="btn-premium px-10 h-14 group">
-                <PlusIcon className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+              <button data-testid="add-synonym-btn" onClick={handleSynonymAdd} className={`btn-premium px-10 h-14 group ${FOCUS_RING}`}>
+                <PlusIcon className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" aria-hidden="true" />
                 <span className="thai-text">Add New Synonym</span>
               </button>
             </div>
@@ -235,33 +236,33 @@ export default function SynonymsPanel() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
                <div className="premium-card p-6 flex items-center gap-6 bg-white/60">
                   <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100/50">
-                     <BookOpenIcon className="w-6 h-6" />
+                     <BookOpenIcon className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-slate-900 leading-none">{synonyms.length}</h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Total Sets</p>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">Total Sets</p>
                   </div>
                </div>
                <div className="premium-card p-6 flex items-center gap-6 bg-white/60">
                   <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100/50">
-                     <SparklesIcon className="w-6 h-6" />
+                     <SparklesIcon className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-slate-900 leading-none">
                       {synonyms.reduce((acc, s) => acc + (s.terms?.length || 0), 0)}
                     </h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Bound Terms</p>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">Bound Terms</p>
                   </div>
                </div>
                <div className="premium-card p-6 flex items-center gap-6 bg-white/60">
-                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-100/50">
-                     <ShieldCheckIcon className="w-6 h-6" />
+                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-700 shadow-sm border border-amber-100/50">
+                     <ShieldCheckIcon className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-3xl font-black text-slate-900 leading-none">
                       {synonyms.filter(s => s.is_active).length}
                     </h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Active Rules</p>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">Active Rules</p>
                   </div>
                </div>
             </div>
@@ -270,32 +271,38 @@ export default function SynonymsPanel() {
             <div className="p-2.5 bg-white/40 backdrop-blur-md rounded-3xl border border-white/80 shadow-sm mb-10">
               <div className="flex flex-col lg:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full lg:w-auto">
-                  <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                  <label htmlFor="synonym-search-input" className="sr-only">ค้นหาคำพ้องความหมาย</label>
+                  <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5 pointer-events-none" aria-hidden="true" />
                   <input
+                    id="synonym-search-input"
                     type="text"
                     data-testid="search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search synonym library..."
-                    className="w-full pl-12 pr-4 py-3 bg-white/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white transition-all text-sm font-black text-slate-700 uppercase tracking-widest"
+                    className={`w-full pl-12 pr-4 py-3 bg-white/70 border border-slate-200 rounded-2xl focus:outline-none focus:bg-white transition-all text-sm font-bold text-slate-800 placeholder:text-slate-500 uppercase tracking-wider ${FOCUS_RING}`}
                   />
                 </div>
                 
                 <div className="flex gap-4 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0">
+                  <label htmlFor="synonym-category-filter" className="sr-only">กรองตามหมวดหมู่</label>
                   <select
+                    id="synonym-category-filter"
                     value={selectedCategory}
                     data-testid="category-filter"
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="select-premium text-xs font-bold tracking-wider uppercase min-w-[180px]"
+                    className={`select-premium text-xs font-bold tracking-wider uppercase min-w-[180px] ${FOCUS_RING}`}
                   >
                     <option value="">All Categories</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name_th}</option>)}
                   </select>
 
+                  <label htmlFor="synonym-source-filter" className="sr-only">กรองตามแหล่งที่มา</label>
                   <select
+                    id="synonym-source-filter"
                     value={sourceFilter}
                     onChange={(e) => setSourceFilter(e.target.value)}
-                    className="select-premium text-[10px] font-black tracking-widest uppercase"
+                    className={`select-premium text-xs font-bold tracking-wider uppercase ${FOCUS_RING}`}
                   >
                     <option value="">Any Source</option>
                     <option value="manual">Manual</option>
@@ -310,13 +317,14 @@ export default function SynonymsPanel() {
             <div className="premium-card overflow-hidden bg-white/60 backdrop-blur-xl border-white translate-z-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
+                  <caption className="sr-only">ตารางกลุ่มคำพ้องความหมาย (Synonyms)</caption>
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/30">
-                      <th className="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Synonym Group</th>
-                      <th className="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Connected Nodes</th>
-                      <th className="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Taxonomy Alignment</th>
-                      <th className="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                      <th className="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Management</th>
+                    <tr className="border-b border-slate-200 bg-slate-50/80">
+                      <th scope="col" className="px-10 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Synonym Group</th>
+                      <th scope="col" className="px-10 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Connected Nodes</th>
+                      <th scope="col" className="px-10 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Taxonomy Alignment</th>
+                      <th scope="col" className="px-10 py-6 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Status</th>
+                      <th scope="col" className="px-10 py-6 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Management</th>
                     </tr>
                   </thead>
                   <tbody data-testid="synonym-list" className="divide-y divide-slate-100">
@@ -334,25 +342,25 @@ export default function SynonymsPanel() {
                           <td className="px-10 py-7">
                             <div className="flex items-center gap-5">
                               <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 border border-indigo-100/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                                <LayersIcon className="w-6 h-6" />
+                                <LayersIcon className="w-6 h-6" aria-hidden="true" />
                               </div>
                               <div>
                                 <div data-testid="synonym-lemma" className="text-base font-black text-slate-800 thai-text tracking-tight">{synonym.name_th}</div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">CODE: {synonym.code}</div>
+                                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">CODE: {synonym.code}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-10 py-7">
                             <div className="flex flex-wrap gap-2">
                               {synonym.terms?.slice(0, 4).map((term, i) => (
-                                <span key={i} className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                                  term.is_primary ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-100 group-hover:border-indigo-100'
+                                <span key={i} className={`px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${
+                                  term.is_primary ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-700 border-slate-300 group-hover:border-indigo-200'
                                 }`}>
                                   {term.term}
                                 </span>
                               ))}
                               {synonym.terms && synonym.terms.length > 4 && (
-                                <span className="text-[10px] font-black text-slate-300 p-1">+ {synonym.terms.length - 4} Others</span>
+                                <span className="text-xs font-bold text-slate-500 p-1">+ {synonym.terms.length - 4} Others</span>
                               )}
                             </div>
                           </td>
@@ -360,28 +368,40 @@ export default function SynonymsPanel() {
                             <div className="flex items-center gap-2">
                               {synonym.category ? (
                                 <>
-                                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-                                  <span data-testid="synonym-category" className="text-xs font-black text-slate-600 thai-text">{synonym.category.name_th}</span>
+                                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" aria-hidden="true" />
+                                  <span data-testid="synonym-category" className="text-xs font-black text-slate-700 thai-text">{synonym.category.name_th}</span>
                                 </>
                               ) : (
-                                <span className="text-xs font-bold text-slate-300 italic">Unmapped</span>
+                                <span className="text-xs font-medium text-slate-500 italic">Unmapped</span>
                               )}
                             </div>
                           </td>
                           <td className="px-10 py-7">
-                             <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] border ${
-                               synonym.is_active ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-300 border-slate-100'
+                             <div className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                               synonym.is_active ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-slate-100 text-slate-700 border-slate-300'
                              }`}>
                                 {synonym.is_active ? 'Active Sync' : 'Offline'}
                              </div>
                           </td>
                           <td className="px-10 py-7 text-right">
-                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                              <button data-testid={`edit-synonym-${synonym.id}`} onClick={() => handleSynonymEdit(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-indigo-600 border border-slate-100 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-100/20 transition-all">
-                                <EditIcon className="w-4 h-4" />
+                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-all">
+                              <button 
+                                type="button"
+                                data-testid={`edit-synonym-${synonym.id}`} 
+                                aria-label={`แก้ไขคำพ้อง ${synonym.name_th}`}
+                                onClick={() => handleSynonymEdit(synonym)} 
+                                className={`p-3 bg-white rounded-xl text-slate-600 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/20 transition-all ${FOCUS_RING}`}
+                              >
+                                <EditIcon className="w-4 h-4" aria-hidden="true" />
                               </button>
-                              <button data-testid={`delete-synonym-${synonym.id}`} onClick={() => handleSynonymDelete(synonym)} className="p-3 bg-white rounded-xl text-slate-400 hover:text-rose-600 border border-slate-100 hover:border-rose-100 hover:shadow-xl hover:shadow-rose-100/20 transition-all">
-                                <TrashIcon className="w-4 h-4" />
+                              <button 
+                                type="button"
+                                data-testid={`delete-synonym-${synonym.id}`} 
+                                aria-label={`ลบคำพ้อง ${synonym.name_th}`}
+                                onClick={() => handleSynonymDelete(synonym)} 
+                                className={`p-3 bg-white rounded-xl text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 hover:shadow-xl hover:shadow-rose-100/20 transition-all ${FOCUS_RING}`}
+                              >
+                                <TrashIcon className="w-4 h-4" aria-hidden="true" />
                               </button>
                             </div>
                           </td>
@@ -397,140 +417,161 @@ export default function SynonymsPanel() {
       </div>
 
       {/* Form Modal */}
-      <AnimatePresence>
-        {showForm && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-lg flex items-center justify-center p-6 z-[100]">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="bg-white rounded-[56px] shadow-2xl max-w-4xl w-full border border-white overflow-hidden max-h-[90vh] flex flex-col"
+      <Modal
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        title={editingSynonym ? 'Configure Synonym' : 'Provision New Group'}
+        maxWidth="max-w-4xl"
+      >
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label htmlFor="synonym-code" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Infrastructure Code (Unique)
+              </label>
+              <input
+                id="synonym-code"
+                type="text"
+                data-testid="code-input"
+                value={formData.code}
+                onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                className={`input-premium w-full text-base font-bold uppercase tracking-wider ${FOCUS_RING}`}
+                placeholder="e.g. SMARTPHONE_001"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="synonym-name-th" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Identifier Name (TH) <span className="text-rose-600">*</span>
+              </label>
+              <input
+                id="synonym-name-th"
+                type="text"
+                required
+                data-testid="lemma-input"
+                value={formData.name_th}
+                onChange={(e) => setFormData(prev => ({ ...prev, name_th: e.target.value }))}
+                className={`input-premium w-full text-base font-bold thai-text ${FOCUS_RING}`}
+                placeholder="e.g. สมาร์ทโฟน"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="synonym-category-select" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Taxonomy Mapping
+            </label>
+            <select
+              id="synonym-category-select"
+              value={formData.category_id}
+              data-testid="category-select"
+              onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
+              className={`select-premium w-full text-base font-bold thai-text ${FOCUS_RING}`}
             >
-              <div className="p-10 border-b border-slate-50 flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight thai-text uppercase">
-                    {editingSynonym ? 'Configure Synonym' : 'Provision New Group'}
-                  </h2>
-                  <p className="text-sm font-bold text-indigo-500 uppercase tracking-widest mt-1">Rule Definition Interface</p>
-                </div>
-                <button onClick={() => setShowForm(false)} className="p-5 text-slate-300 hover:text-slate-600 hover:bg-slate-50 rounded-3xl transition-all">
-                  <XIcon className="w-8 h-8" />
-                </button>
-              </div>
+              <option value="">Select Anchor Category</option>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.name_th}</option>)}
+            </select>
+          </div>
 
-              <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Infrastructure Code (Unique)</label>
-                    <input
-                      type="text"
-                      data-testid="code-input"
-                      value={formData.code}
-                      onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                      className="input-premium w-full text-base font-black uppercase tracking-widest"
-                      placeholder="e.g. SMARTPHONE_001"
-                    />
+          <div className="space-y-2">
+            <label htmlFor="synonym-description" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Administrative Note
+            </label>
+            <textarea
+              id="synonym-description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className={`input-premium w-full h-28 text-sm font-medium thai-text resize-none ${FOCUS_RING}`}
+              placeholder="Describe the logic or context for this synonym group..."
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Expansion Terms (Variations)
+              </label>
+              <button 
+                type="button" 
+                data-testid="add-term-btn" 
+                onClick={addTerm} 
+                className={`btn-premium-secondary py-2 px-4 text-xs font-bold ${FOCUS_RING}`}
+              >
+                <PlusIcon className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                Add Variant
+              </button>
+            </div>
+            
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+              {formData.terms.map((term, index) => (
+                <div key={index} className="flex gap-3 items-center p-4 bg-slate-50 rounded-2xl border border-slate-200 group/term hover:bg-white hover:border-indigo-200 transition-all">
+                  <div className="p-2.5 bg-white rounded-xl text-slate-500 border border-slate-200 group-hover/term:text-indigo-600 transition-colors">
+                    <LanguagesIcon className="w-4 h-4" aria-hidden="true" />
                   </div>
-                  <div className="space-y-4">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Identifier Name (TH) *</label>
-                    <input
-                      type="text" required
-                      data-testid="lemma-input"
-                      value={formData.name_th}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name_th: e.target.value }))}
-                      className="input-premium w-full text-base font-black thai-text"
-                      placeholder="e.g. สมาร์ทโฟน"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Taxonomy Mapping</label>
-                  <select
-                    value={formData.category_id}
-                    data-testid="category-select"
-                    onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
-                    className="select-premium w-full text-base font-black thai-text"
-                  >
-                    <option value="">Select Anchor Category</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.name_th}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Administrative Note</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="input-premium w-full h-32 text-sm font-bold thai-text resize-none"
-                    placeholder="Describe the logic or context for this synonym group..."
+                  <label htmlFor={`term-input-${index}`} className="sr-only">รูปแบบคำที่ {index + 1}</label>
+                  <input
+                    id={`term-input-${index}`}
+                    type="text"
+                    data-testid={`term-input-${index}`}
+                    value={term.term}
+                    onChange={(e) => {
+                      const newTerms = [...formData.terms];
+                      newTerms[index].term = e.target.value;
+                      setFormData(p => ({ ...p, terms: newTerms }));
+                    }}
+                    placeholder="Term Variation"
+                    className={`flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-800 thai-text ${FOCUS_RING}`}
                   />
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-slate-50 pb-4">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Expansion Terms (Variations)</label>
-                    <button type="button" data-testid="add-term-btn" onClick={addTerm} className="btn-premium-secondary py-2 px-6">
-                      <PlusIcon className="w-4 h-4 mr-2" />
-                      Add Variant
+                  <div className="flex items-center gap-4 pr-1">
+                    <label className="flex items-center gap-2 cursor-pointer group/check">
+                      <input
+                        type="checkbox"
+                        id={`term-primary-${index}`}
+                        aria-label={`กำหนดให้คำรูปแบบที่ ${index + 1} เป็นคำหลัก (Primary)`}
+                        checked={term.is_primary}
+                        onChange={(e) => {
+                          const newTerms = formData.terms.map((t, i) => ({ 
+                            ...t, 
+                            is_primary: i === index ? e.target.checked : (e.target.checked ? false : t.is_primary) 
+                          }));
+                          setFormData(p => ({ ...p, terms: newTerms }));
+                        }}
+                        className={`w-4 h-4 text-indigo-600 rounded border-slate-300 ${FOCUS_RING}`}
+                      />
+                      <span className="text-xs font-bold text-slate-600 uppercase tracking-wider group-hover/check:text-indigo-600 transition-colors">Primary</span>
+                    </label>
+                    <button 
+                      type="button"
+                      aria-label={`ลบรูปแบบคำที่ ${index + 1}`}
+                      onClick={() => setFormData(p => ({ ...p, terms: p.terms.filter((_, i) => i !== index) }))} 
+                      className={`p-2 text-slate-400 hover:text-rose-600 rounded-lg transition-colors ${FOCUS_RING}`}
+                    >
+                      <XIcon className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
-                  
-                  <div className="grid grid-cols-1 gap-4">
-                    {formData.terms.map((term, index) => (
-                      <div key={index} className="flex gap-4 items-center p-6 bg-slate-50/50 rounded-3xl border border-slate-100 group/term hover:bg-white hover:border-indigo-100 transition-all">
-                        <div className="p-3 bg-white rounded-2xl text-slate-400 border border-slate-100 group-hover/term:text-indigo-600 transition-colors">
-                           <LanguagesIcon className="w-5 h-5" />
-                        </div>
-                        <input
-                          type="text"
-                          data-testid={`term-input-${index}`}
-                          value={term.term}
-                          onChange={(e) => {
-                             const newTerms = [...formData.terms];
-                             newTerms[index].term = e.target.value;
-                             setFormData(p => ({ ...p, terms: newTerms }));
-                          }}
-                          placeholder="Term Variation"
-                          className="flex-1 bg-transparent border-none focus:ring-0 text-base font-black text-slate-800 thai-text"
-                        />
-                        <div className="flex items-center gap-6 pr-2">
-                           <label className="flex items-center gap-3 cursor-pointer group/check">
-                              <div className="relative">
-                                 <input
-                                   type="checkbox"
-                                   checked={term.is_primary}
-                                   onChange={(e) => {
-                                      const newTerms = formData.terms.map((t, i) => ({ ...t, is_primary: i === index ? e.target.checked : (e.target.checked ? false : t.is_primary) }));
-                                      setFormData(p => ({ ...p, terms: newTerms }));
-                                   }}
-                                   className="sr-only peer"
-                                 />
-                                 <div className="w-10 h-5 bg-slate-200 rounded-full peer peer-checked:bg-indigo-600 transition-all after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-5" />
-                              </div>
-                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover/check:text-indigo-600 transition-colors">Primary</span>
-                           </label>
-                           <button onClick={() => setFormData(p => ({ ...p, terms: p.terms.filter((_, i) => i !== index) }))} className="p-2 text-slate-300 hover:text-rose-500 transition-colors">
-                              <XIcon className="w-5 h-5" />
-                           </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              </div>
-
-              <div className="p-10 bg-slate-50/50 border-t border-slate-100 flex gap-6">
-                <button onClick={() => setShowForm(false)} className="btn-premium-secondary flex-1 py-5 h-auto">Discard Config</button>
-                <button data-testid="save-synonym-btn" onClick={handleFormSubmit} className="btn-premium flex-1 py-5 h-auto justify-center group">
-                  <SaveIcon className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
-                  <span className="thai-text text-lg">Commit Infrastructure</span>
-                </button>
-              </div>
-            </motion.div>
+              ))}
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          <div className="pt-6 border-t border-slate-200 flex justify-end gap-4">
+            <button 
+              type="button" 
+              onClick={() => setShowForm(false)} 
+              className={`btn-premium-secondary py-3 px-6 ${FOCUS_RING}`}
+            >
+              Discard Config
+            </button>
+            <button 
+              type="submit" 
+              data-testid="save-synonym-btn" 
+              className={`btn-premium py-3 px-8 justify-center group ${FOCUS_RING}`}
+            >
+              <SaveIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
+              <span className="thai-text text-base">Commit Infrastructure</span>
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TagsIcon, CheckCircleIcon, ArrowRightIcon, AlertTriangleIcon, CheckIcon, XIcon, ChevronDownIcon, ChevronUpIcon, WifiOffIcon, RefreshCwIcon } from 'lucide-react'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 import type { WizardItem } from '@/types/import'
 
@@ -166,15 +167,22 @@ export default function CategorizationStep({
 
   if (isProcessing) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 space-y-6">
+      <div className="flex flex-col items-center justify-center py-32 space-y-6" role="status" aria-live="polite">
         <div className="relative">
-          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-          <TagsIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full motion-safe:animate-spin"></div>
+          <TagsIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 motion-safe:animate-pulse" aria-hidden="true" />
         </div>
         <div className="text-center space-y-3 w-80">
           <h3 className="text-xl font-bold text-slate-800 thai-text">กำลังวิเคราะห์จัดหมวดหมู่อัจฉริยะ...</h3>
-          <p className="text-slate-500 thai-text text-sm">{statusMsg}</p>
-          <div className="w-full bg-slate-100 rounded-full h-2">
+          <p className="text-slate-600 thai-text text-sm">{statusMsg}</p>
+          <div 
+            className="w-full bg-slate-100 rounded-full h-2"
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ความคืบหน้าการวิเคราะห์จัดหมวดหมู่อัจฉริยะ"
+          >
             <motion.div 
               className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
               initial={{ width: 0 }}
@@ -182,7 +190,7 @@ export default function CategorizationStep({
               transition={{ duration: 0.4 }}
             />
           </div>
-          <p className="text-xs text-slate-400">{progress}%</p>
+          <p className="text-xs font-bold text-slate-600">{progress}%</p>
         </div>
       </div>
     )
@@ -196,16 +204,16 @@ export default function CategorizationStep({
       {/* Source Badge */}
       {isMock && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
-          <WifiOffIcon className="w-5 h-5 text-amber-600 shrink-0" />
+          <WifiOffIcon className="w-5 h-5 text-amber-700 shrink-0" aria-hidden="true" />
           <div className="flex-1">
-            <p className="font-bold text-amber-800 thai-text text-sm">ระบบประมวลผลอัจฉริยะไม่พร้อมใช้งาน</p>
-            <p className="text-amber-600 text-xs thai-text">{error} — แสดงผลจำลองเท่านั้น</p>
+            <p className="font-bold text-amber-900 thai-text text-sm">ระบบประมวลผลอัจฉริยะไม่พร้อมใช้งาน</p>
+            <p className="text-amber-800 text-xs thai-text">{error} — แสดงผลจำลองเท่านั้น</p>
           </div>
           <button 
             onClick={runCategorization}
-            className="flex items-center gap-1 text-amber-700 text-sm font-bold hover:text-amber-900 transition-colors"
+            className={`flex items-center gap-1 text-amber-900 text-sm font-bold hover:text-amber-950 transition-colors px-2 py-1 rounded-lg ${FOCUS_RING}`}
           >
-            <RefreshCwIcon className="w-4 h-4" /> ลองใหม่
+            <RefreshCwIcon className="w-4 h-4" aria-hidden="true" /> ลองใหม่
           </button>
         </div>
       )}
@@ -214,23 +222,23 @@ export default function CategorizationStep({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight font-noto-sans-thai mb-2 flex items-center gap-3">
-            <TagsIcon className="w-8 h-8 text-indigo-600" />
+            <TagsIcon className="w-8 h-8 text-indigo-600" aria-hidden="true" />
             รีวิวการจัดหมวดหมู่ (Categorization Review)
           </h2>
-          <p className="text-slate-500 font-medium thai-text">ตรวจสอบและยืนยันหมวดหมู่ที่ระบบแนะนำ{!isMock && ' — ข้อมูลจากระบบวิเคราะห์จริง'}</p>
+          <p className="text-slate-600 font-medium thai-text">ตรวจสอบและยืนยันหมวดหมู่ที่ระบบแนะนำ{!isMock && ' — ข้อมูลจากระบบวิเคราะห์จริง'}</p>
         </div>
         <div className="flex gap-4">
-          <div className="bg-indigo-50 px-6 py-3 rounded-2xl text-center">
-            <div className="text-2xl font-black text-indigo-600">{suggestions.length}</div>
-            <div className="text-xs font-black text-indigo-900 uppercase tracking-widest thai-text">ทั้งหมด</div>
+          <div className="bg-indigo-50 border border-indigo-100 px-6 py-3 rounded-2xl text-center">
+            <div className="text-2xl font-black text-indigo-700">{suggestions.length}</div>
+            <div className="text-xs font-bold text-indigo-900 uppercase tracking-widest thai-text">ทั้งหมด</div>
           </div>
-          <div className="bg-emerald-50 px-6 py-3 rounded-2xl text-center">
-            <div className="text-2xl font-black text-emerald-600">{highConfidenceCount}</div>
-            <div className="text-xs font-black text-emerald-900 uppercase tracking-widest thai-text">มั่นใจสูง</div>
+          <div className="bg-emerald-50 border border-emerald-100 px-6 py-3 rounded-2xl text-center">
+            <div className="text-2xl font-black text-emerald-700">{highConfidenceCount}</div>
+            <div className="text-xs font-bold text-emerald-900 uppercase tracking-widest thai-text">มั่นใจสูง</div>
           </div>
-          <div className="bg-amber-50 px-6 py-3 rounded-2xl text-center">
-            <div className="text-2xl font-black text-amber-600">{pendingCount}</div>
-            <div className="text-xs font-black text-amber-900 uppercase tracking-widest thai-text">รอตรวจสอบ</div>
+          <div className="bg-amber-50 border border-amber-100 px-6 py-3 rounded-2xl text-center">
+            <div className="text-2xl font-black text-amber-700">{pendingCount}</div>
+            <div className="text-xs font-bold text-amber-900 uppercase tracking-widest thai-text">รอตรวจสอบ</div>
           </div>
         </div>
       </div>
@@ -242,6 +250,7 @@ export default function CategorizationStep({
             type="checkbox"
             checked={selectedIds.size === suggestions.length && suggestions.length > 0}
             onChange={toggleSelectAll}
+            aria-label="เลือกสินค้าทั้งหมด"
             className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           <span className="font-bold text-slate-700 thai-text">
@@ -259,17 +268,17 @@ export default function CategorizationStep({
             >
               <button
                 onClick={() => handleBatchAction('approve')}
-                className="px-6 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 font-bold transition-colors flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                className={`px-6 py-2 bg-emerald-700 text-white rounded-xl hover:bg-emerald-800 font-bold transition-colors flex items-center gap-2 shadow-lg shadow-emerald-700/20 ${FOCUS_RING}`}
               >
-                <CheckIcon className="w-5 h-5" />
+                <CheckIcon className="w-5 h-5" aria-hidden="true" />
                 <span className="thai-text">อนุมัติ ({selectedIds.size})</span>
               </button>
               
               <button
                 onClick={() => handleBatchAction('reject')}
-                className="px-6 py-2 bg-rose-500 text-white rounded-xl hover:bg-rose-600 font-bold transition-colors flex items-center gap-2 shadow-lg shadow-rose-500/20"
+                className={`px-6 py-2 bg-rose-700 text-white rounded-xl hover:bg-rose-800 font-bold transition-colors flex items-center gap-2 shadow-lg shadow-rose-700/20 ${FOCUS_RING}`}
               >
-                <XIcon className="w-5 h-5" />
+                <XIcon className="w-5 h-5" aria-hidden="true" />
                 <span className="thai-text">ปฏิเสธ ({selectedIds.size})</span>
               </button>
             </motion.div>
@@ -297,6 +306,7 @@ export default function CategorizationStep({
                 type="checkbox"
                 checked={selectedIds.has(index)}
                 onChange={() => toggleSelection(index)}
+                aria-label={`เลือก ${suggestion._cleaned_name}`}
                 className="w-6 h-6 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
               />
               
@@ -305,23 +315,23 @@ export default function CategorizationStep({
                   <h3 className="text-lg font-bold text-slate-800 truncate thai-text">
                     {suggestion._cleaned_name}
                   </h3>
-                  <p className="text-sm text-slate-500 truncate thai-text mt-1">{typeof suggestion.description === 'string' && suggestion.description ? suggestion.description : 'ไม่มีรายละเอียด'}</p>
+                  <p className="text-sm text-slate-600 truncate thai-text mt-1">{typeof suggestion.description === 'string' && suggestion.description ? suggestion.description : 'ไม่มีรายละเอียด'}</p>
                 </div>
                 
                 <div className="col-span-5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-400 thai-text">หมวดหมู่แนะนำ:</span>
-                    <span className="font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg thai-text">
+                    <span className="text-sm font-bold text-slate-700 thai-text">หมวดหมู่แนะนำ:</span>
+                    <span className="font-bold text-indigo-900 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg thai-text">
                       {suggestion._suggested_category}
                     </span>
                   </div>
                 </div>
 
                 <div className="col-span-2 text-right">
-                  <span className={`px-3 py-1.5 text-sm font-black rounded-full inline-block min-w-[70px] text-center ${
-                    suggestion._confidence >= 0.8 ? 'bg-emerald-100 text-emerald-700' :
-                    suggestion._confidence >= 0.6 ? 'bg-amber-100 text-amber-700' :
-                    'bg-rose-100 text-rose-700'
+                  <span className={`px-3 py-1.5 text-xs font-bold rounded-full inline-block min-w-[70px] text-center ${
+                    suggestion._confidence >= 0.8 ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' :
+                    suggestion._confidence >= 0.6 ? 'bg-amber-100 text-amber-900 border border-amber-200' :
+                    'bg-rose-100 text-rose-900 border border-rose-200'
                   }`}>
                     {Math.round(suggestion._confidence * 100)}%
                   </span>
@@ -331,12 +341,12 @@ export default function CategorizationStep({
               {suggestion._status !== 'pending' && (
                 <div className="pl-4 border-l-2 border-slate-100">
                   {suggestion._status === 'approve' ? (
-                    <div className="flex items-center gap-1 text-emerald-600 font-bold text-sm bg-emerald-50 px-3 py-1.5 rounded-xl">
-                      <CheckCircleIcon className="w-5 h-5" /> อนุมัติ
+                    <div className="flex items-center gap-1 text-emerald-900 font-bold text-sm bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                      <CheckCircleIcon className="w-5 h-5 text-emerald-700" aria-hidden="true" /> อนุมัติ
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-rose-600 font-bold text-sm bg-rose-50 px-3 py-1.5 rounded-xl">
-                      <XIcon className="w-5 h-5" /> ปฏิเสธ
+                    <div className="flex items-center gap-1 text-rose-900 font-bold text-sm bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+                      <XIcon className="w-5 h-5 text-rose-700" aria-hidden="true" /> ปฏิเสธ
                     </div>
                   )}
                 </div>
@@ -350,17 +360,17 @@ export default function CategorizationStep({
       <div className="flex items-center justify-between pt-8 border-t border-slate-100">
         <button
           onClick={onBack}
-          className="px-8 py-4 text-slate-500 hover:text-slate-900 font-bold text-sm transition-all thai-text"
+          className={`px-8 py-4 text-slate-700 hover:text-slate-900 font-bold text-sm rounded-xl transition-all thai-text ${FOCUS_RING}`}
         >
           ← ย้อนกลับ
         </button>
 
         <button
           onClick={handleComplete}
-          className="px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-indigo-600/30 transition-all active:scale-95 flex items-center gap-3 thai-text"
+          className={`px-10 py-4 bg-indigo-700 hover:bg-indigo-800 text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-indigo-700/30 transition-all active:scale-95 flex items-center gap-3 thai-text ${FOCUS_RING}`}
         >
           สรุปผลและนำเข้าคลังข้อมูล
-          <ArrowRightIcon className="w-5 h-5" />
+          <ArrowRightIcon className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
     </div>

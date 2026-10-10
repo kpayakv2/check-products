@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DatabaseService, type DashboardStats } from '@/utils/supabase'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 const EMPTY_STATS: DashboardStats = {
   totalCategories: 0,
@@ -93,20 +94,19 @@ function StatCard({ title, value, hint, icon: Icon, color, index, testId }: {
       
       <div className="flex items-start justify-between mb-4 md:mb-6 relative z-10">
         <div className={`p-3 md:p-4 rounded-3xl ${color} bg-opacity-10 text-opacity-100 shadow-sm border border-white group-hover:scale-110 transition-all duration-500`}>
-          <Icon className="h-5 w-5 md:h-6 md:w-6" />
+          <Icon className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
         </div>
-
       </div>
       
       <div className="relative z-10">
-        <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1 truncate">{title}</p>
+        <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mt-1">{title}</p>
         <div className="flex items-baseline gap-1 md:gap-2 overflow-hidden">
           <p data-testid={testId} className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter truncate">
             {value.toLocaleString()}
           </p>
         </div>
         {hint && (
-          <p className="text-[10px] md:text-[11px] font-bold text-slate-400 thai-text mt-2 truncate">{hint}</p>
+          <p className="text-xs font-medium text-slate-500 thai-text mt-2 leading-relaxed">{hint}</p>
         )}
       </div>
     </motion.div>
@@ -144,15 +144,15 @@ export default function Dashboard() {
     return (
       <div className="flex h-screen bg-white">
         <Sidebar />
-        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden" role="status" aria-label="กำลังโหลดแดชบอร์ด">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-50/50 rounded-full blur-[100px]" />
           <div className="relative z-10 flex flex-col items-center">
             <div className="w-20 h-20 relative flex items-center justify-center">
                <div className="absolute inset-0 border-4 border-indigo-100 rounded-full" />
-               <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin" />
-               <SparklesIcon className="w-8 h-8 text-indigo-600 animate-pulse" />
+               <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent motion-safe:animate-spin" />
+               <SparklesIcon className="w-8 h-8 text-indigo-600 motion-safe:animate-pulse" aria-hidden="true" />
             </div>
-            <p className="mt-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] thai-text">Initializing Neural Engine...</p>
+            <p className="mt-8 text-xs font-black text-slate-500 uppercase tracking-[0.3em] thai-text" lang="en">Initializing Neural Engine...</p>
           </div>
         </div>
       </div>
@@ -161,6 +161,14 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
+      {/* Skip to Main Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:font-bold focus:rounded-xl focus:shadow-xl focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 thai-text"
+      >
+        ข้ามไปยังเนื้อหาหลัก
+      </a>
+
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Decorative elements */}
@@ -169,35 +177,35 @@ export default function Dashboard() {
         
         <Header />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10">
+        <main id="main-content" className="flex-1 overflow-x-hidden overflow-y-auto p-10 relative z-10" tabIndex={-1}>
           <div className="max-w-7xl mx-auto">
             {/* Hero Section */}
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16 gap-8">
               <div>
                  <div className="flex items-center gap-3 mb-6">
-                    <span className="px-4 py-1.5 bg-indigo-600 rounded-full text-xs font-black text-white uppercase tracking-widest shadow-lg shadow-indigo-100">Neural Intelligence Suite</span>
-                    <span className="px-4 py-1.5 bg-white border border-slate-100 rounded-full text-xs font-bold text-slate-400 uppercase tracking-wider">v2.4.0 Engine</span>
+                    <span className="px-4 py-1.5 bg-indigo-600 rounded-full text-xs font-black text-white uppercase tracking-widest shadow-lg shadow-indigo-100" lang="en">Neural Intelligence Suite</span>
+                    <span className="px-4 py-1.5 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-600 uppercase tracking-wider" lang="en">v2.4.0 Engine</span>
                  </div>
                  <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight uppercase thai-text mb-6">
-                   System Dashboard
+                   แดชบอร์ดระบบ <span className="text-2xl lg:text-3xl text-slate-500 font-bold ml-2" lang="en">(System Dashboard)</span>
                  </h1>
-                 <p className="text-slate-500 font-medium text-lg thai-text leading-relaxed max-w-2xl mb-10">
+                 <p className="text-slate-600 font-medium text-lg thai-text leading-relaxed max-w-2xl mb-10">
                    ควบคุมและตรวจสอบระบบจัดการข้อมูลสินค้าอัตโนมัติแบบเรียลไทม์ พร้อมการวิเคราะห์ความถูกต้องผ่าน AI Engine
                  </p>
               </div>
               {/* ตัวเลขสองตัวนี้มาจากฐานข้อมูลทั้งคู่ ไม่มีค่าที่ฝังไว้ในโค้ด */}
-              <div className="hidden lg:flex items-center gap-6 p-6 bg-white/40 backdrop-blur-md rounded-[40px] border border-white shadow-xl">
+              <div className="hidden lg:flex items-center gap-6 p-6 bg-white/60 backdrop-blur-md rounded-[40px] border border-white shadow-xl">
                  <div className="flex flex-col items-center px-4">
-                    <BarChartIcon className="w-6 h-6 text-emerald-500 mb-2" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest thai-text">AI ตรงกับคน</span>
+                    <BarChartIcon className="w-6 h-6 text-emerald-600 mb-2" aria-hidden="true" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider thai-text">AI ตรงกับคน</span>
                     <span data-testid="recheck-agreement" className="text-sm font-black text-slate-900">
                       {agreementPercent === null ? 'ยังไม่มีข้อมูล' : `${agreementPercent}%`}
                     </span>
                  </div>
-                 <div className="w-[1px] h-10 bg-slate-100" />
+                 <div className="w-[1px] h-10 bg-slate-200" />
                  <div className="flex flex-col items-center px-4">
-                    <ActivityIcon className="w-6 h-6 text-indigo-500 mb-2" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest thai-text">ตรวจแล้ววันนี้</span>
+                    <ActivityIcon className="w-6 h-6 text-indigo-600 mb-2" aria-hidden="true" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider thai-text">ตรวจแล้ววันนี้</span>
                     <span className="text-sm font-black text-slate-900">{stats.reviewsToday.toLocaleString()}</span>
                  </div>
               </div>
@@ -273,13 +281,13 @@ export default function Dashboard() {
 
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between mb-10 md:mb-16 gap-6 overflow-hidden">
                   <div className="min-w-0">
-                    <h3 className="text-xl md:text-3xl font-black text-white tracking-tight uppercase truncate">
-                      Operational Portal
-                    </h3>
-                    <p className="text-slate-400 mt-2 font-bold uppercase tracking-[0.2em] text-[9px] md:text-[11px] truncate">Primary Administrative Interface</p>
+                    <h2 className="text-xl md:text-3xl font-black text-white tracking-tight uppercase truncate">
+                      เมนูดำเนินการหลัก <span className="text-lg md:text-xl text-slate-400 font-bold ml-2" lang="en">(Operational Portal)</span>
+                    </h2>
+                    <p className="text-slate-400 mt-2 font-bold uppercase tracking-[0.2em] text-xs truncate" lang="en">Primary Administrative Interface</p>
                   </div>
                   <div className="flex gap-2 shrink-0">
-                     <div className="px-4 py-1.5 md:px-6 md:py-2 bg-white/5 border border-white/10 rounded-full text-[8px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest animate-pulse whitespace-nowrap">Neural Optimized</div>
+                     <div className="px-4 py-1.5 md:px-6 md:py-2 bg-white/5 border border-white/10 rounded-full text-xs font-black text-indigo-400 uppercase tracking-widest motion-safe:animate-pulse whitespace-nowrap" lang="en">Neural Optimized</div>
                   </div>
                 </div>
 
@@ -290,25 +298,25 @@ export default function Dashboard() {
                       whileHover={{ scale: 1.02, y: -5 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => router.push(action.href)}
-                      className="group relative flex flex-col p-6 md:p-10 rounded-[32px] md:rounded-[48px] bg-white/5 border border-white/10 hover:bg-white hover:border-white hover:shadow-2xl transition-all duration-500 text-left overflow-hidden min-h-[280px] md:min-h-[320px] justify-between"
+                      className={`group relative flex flex-col p-6 md:p-10 rounded-[32px] md:rounded-[48px] bg-white/5 border border-white/10 hover:bg-white hover:border-white hover:shadow-2xl transition-all duration-500 text-left overflow-hidden min-h-[280px] md:min-h-[320px] justify-between ${FOCUS_RING}`}
                     >
                       {/* Decorative backdrop for hover state */}
                       <div className={`absolute top-0 right-0 w-24 h-24 ${action.color} opacity-0 group-hover:opacity-10 blur-2xl group-hover:blur-3xl transition-all duration-500`} />
                       
                       <div className={`${action.color} w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl shadow-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ring-4 ring-white/5 group-hover:ring-indigo-50`}>
-                        <action.icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                        <action.icon className="h-6 w-6 md:h-8 md:w-8 text-white" aria-hidden="true" />
                       </div>
                       
                       <div className="min-w-0">
-                        <p className="text-[8px] md:text-[10px] font-black text-slate-500 group-hover:text-indigo-400 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3 transition-colors truncate">
-                           {action.description}
+                        <h3 className="text-lg md:text-2xl font-black text-white group-hover:text-slate-900 tracking-tight mb-1 md:mb-2 transition-colors thai-text">
+                          {action.thaiTitle}
+                        </h3>
+                        <p className="text-xs font-bold text-slate-400 group-hover:text-indigo-600 uppercase tracking-wider mb-1 transition-colors" lang="en">
+                           {action.title}
                         </p>
-                        <h4 className="text-lg md:text-2xl font-black text-white group-hover:text-slate-900 tracking-tighter uppercase mb-1 md:mb-2 transition-colors truncate">
-                          {action.title}
-                        </h4>
                         <div className="flex items-center gap-2 group-hover:gap-4 transition-all">
-                           <span className="text-[10px] md:text-sm font-bold text-slate-400 group-hover:text-slate-600 thai-text transition-colors truncate">{action.thaiTitle}</span>
-                           <ChevronRightIcon className="w-4 h-4 md:w-5 md:h-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-all" />
+                           <span className="text-xs font-medium text-slate-400 group-hover:text-slate-600 transition-colors" lang="en">{action.description}</span>
+                           <ChevronRightIcon className="w-4 h-4 md:w-5 md:h-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-all shrink-0" aria-hidden="true" />
                         </div>
                       </div>
                     </motion.button>

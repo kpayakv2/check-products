@@ -7,6 +7,7 @@ import {
   CircleIcon,
   ArrowRightIcon 
 } from 'lucide-react'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 export interface WizardStep {
   id: string
@@ -84,9 +85,10 @@ export default function WizardLayout({
                       onClick={() => handleStepClick(index)}
                       disabled={!isClickable}
                       data-testid={`wizard-step-button-${index}`}
-                      className={`relative flex flex-col items-center group ${
+                      className={`relative flex flex-col items-center group rounded-full ${FOCUS_RING} ${
                         isClickable ? 'cursor-pointer' : 'cursor-default'
                       }`}
+                      aria-label={`ขั้นตอนที่ ${index + 1}: ${step.name} (${status === 'completed' ? 'เสร็จสิ้นแล้ว' : status === 'current' ? 'ขั้นตอนปัจจุบัน' : 'ยังไม่ถึง'})`}
                       aria-current={status === 'current' ? 'step' : undefined}
                     >
                       {/* Step Circle */}
@@ -114,11 +116,11 @@ export default function WizardLayout({
                         `}
                       >
                         {status === 'completed' ? (
-                          <CheckCircleIcon className="w-6 h-6 text-white" />
+                          <CheckCircleIcon className="w-6 h-6 text-white" aria-hidden="true" />
                         ) : status === 'current' ? (
                           <span className="text-white font-bold">{index + 1}</span>
                         ) : (
-                          <CircleIcon className="w-5 h-5 text-slate-500" />
+                          <CircleIcon className="w-5 h-5 text-slate-500" aria-hidden="true" />
                         )}
                       </motion.div>
 
@@ -132,7 +134,7 @@ export default function WizardLayout({
                                 ? '#c4b5fd' // purple-300
                                 : status === 'current'
                                 ? '#f8fafc' // slate-50
-                                : '#64748b', // slate-500
+                                : '#94a3b8', // slate-400
                             fontWeight: status === 'current' ? 700 : 500
                           }}
                           className="text-sm thai-text tracking-wide"
@@ -143,7 +145,7 @@ export default function WizardLayout({
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-purple-300/70 mt-1.5 thai-text"
+                            className="text-xs text-purple-300/80 mt-1.5 thai-text"
                           >
                             {step.description}
                           </motion.p>
@@ -157,7 +159,7 @@ export default function WizardLayout({
                           className="absolute -bottom-4 left-1/2 transform -translate-x-1/2"
                           transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         >
-                          <ArrowRightIcon className="w-4 h-4 text-purple-400 rotate-90" />
+                          <ArrowRightIcon className="w-4 h-4 text-purple-400 rotate-90" aria-hidden="true" />
                         </motion.div>
                       )}
                     </button>
@@ -177,7 +179,14 @@ export default function WizardLayout({
                 {Math.round(((currentStep + 1) / totalSteps) * 100)}% Complete
               </span>
             </div>
-            <div className="w-full bg-slate-800/50 rounded-full h-1.5 overflow-hidden">
+            <div 
+              role="progressbar"
+              aria-valuenow={Math.round(((currentStep + 1) / totalSteps) * 100)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`ความคืบหน้าการนำเข้าข้อมูล ขั้นตอนที่ ${currentStep + 1} จาก ${totalSteps}`}
+              className="w-full bg-slate-800/50 rounded-full h-1.5 overflow-hidden"
+            >
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ 

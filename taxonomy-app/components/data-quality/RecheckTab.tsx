@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { AlertCircle, ArrowRight, Check, RefreshCcw, User, Bot } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 interface RecheckItem {
   id: string
@@ -98,46 +99,48 @@ export default function RecheckTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16 text-slate-500" data-testid="recheck-loading">
-        <RefreshCcw className="w-5 h-5 animate-spin mr-2" />
+      <div className="flex items-center justify-center py-16 text-slate-600" data-testid="recheck-loading" aria-live="polite">
+        <RefreshCcw className="w-5 h-5 motion-safe:animate-spin mr-2" aria-hidden="true" />
         กำลังโหลดรายการที่ต้องตรวจ...
       </div>
     )
   }
 
   return (
-    <div data-testid="recheck-tab">
+    <div data-testid="recheck-tab" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
-          <h3 className="text-lg font-black text-slate-800">ตรวจซ้ำหมวดหมู่สินค้าเก่า</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-black text-slate-800 thai-text">ตรวจซ้ำหมวดหมู่สินค้าเก่า</h3>
+          <p className="text-sm text-slate-600 thai-text">
             แสดงเฉพาะรายการที่ AI เห็นต่างจากหมวดที่คนจัดไว้ —{' '}
-            <span className="font-bold text-slate-700" data-testid="recheck-total">
+            <span className="font-bold text-slate-800" data-testid="recheck-total">
               เหลือ {total.toLocaleString()} รายการ
             </span>
           </p>
         </div>
         <button
+          type="button"
+          aria-label="โหลดรายการใหม่"
           onClick={fetchItems}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200"
+          className={`flex items-center gap-2 px-3 py-2 text-sm font-bold text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors ${FOCUS_RING}`}
           data-testid="recheck-refresh"
         >
-          <RefreshCcw className="w-4 h-4" />
+          <RefreshCcw className="w-4 h-4" aria-hidden="true" />
           โหลดใหม่
         </button>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 mb-4 text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div role="alert" className="flex items-center gap-2 p-3 mb-4 text-sm font-bold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg">
+          <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
           {error}
         </div>
       )}
 
       {items.length === 0 ? (
-        <div className="py-16 text-center text-slate-500" data-testid="recheck-empty">
-          <Check className="w-10 h-10 mx-auto mb-3 text-emerald-500" />
-          <p className="font-bold">ตรวจครบแล้ว ไม่มีรายการค้าง</p>
+        <div className="py-16 text-center text-slate-600" data-testid="recheck-empty">
+          <Check className="w-10 h-10 mx-auto mb-3 text-emerald-600" aria-hidden="true" />
+          <p className="font-bold thai-text">ตรวจครบแล้ว ไม่มีรายการค้าง</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -153,10 +156,10 @@ export default function RecheckTab() {
                 data-testid={`recheck-row-${item.id}`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-                  <p className="font-bold text-slate-800 break-words min-w-0">
+                  <p className="font-bold text-slate-900 break-words min-w-0 thai-text">
                     {item.product.name_th}
                   </p>
-                  <span className="shrink-0 px-2 py-1 text-xs font-black rounded-md bg-slate-100 text-slate-600">
+                  <span className="shrink-0 px-2 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-700">
                     มั่นใจ {(item.confidence_score * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -164,29 +167,33 @@ export default function RecheckTab() {
                 {/* หมวดเดิมของคน คู่กับหมวดที่ AI เสนอ */}
                 <div className="flex flex-wrap items-center gap-2 mb-4 text-sm">
                   <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold">
-                    <User className="w-3.5 h-3.5 shrink-0" />
-                    <span className="break-words">{item.metadata.current_category ?? '—'}</span>
+                    <User className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="break-words thai-text">{item.metadata.current_category ?? '—'}</span>
                   </span>
-                  <ArrowRight className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 font-bold">
-                    <Bot className="w-3.5 h-3.5 shrink-0" />
-                    <span className="break-words">{item.suggested_category?.name_th ?? '—'}</span>
+                  <ArrowRight className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+                  <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-800 font-bold">
+                    <Bot className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="break-words thai-text">{item.suggested_category?.name_th ?? '—'}</span>
                   </span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <button
+                    type="button"
                     disabled={busyId === item.id}
                     onClick={() => decide(item.id, 'keep')}
-                    className="px-3 py-2 text-sm font-bold rounded-lg bg-slate-700 text-white hover:bg-slate-800 disabled:opacity-50"
+                    aria-label={`คงหมวดเดิมสำหรับ ${item.product.name_th}`}
+                    className={`px-3 py-2 text-sm font-bold rounded-lg bg-slate-700 text-white hover:bg-slate-800 disabled:opacity-50 transition-colors ${FOCUS_RING}`}
                     data-testid={`recheck-keep-${item.id}`}
                   >
                     คงหมวดเดิม
                   </button>
                   <button
+                    type="button"
                     disabled={busyId === item.id || !item.suggested_category_id}
                     onClick={() => decide(item.id, 'accept')}
-                    className="px-3 py-2 text-sm font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+                    aria-label={`ใช้หมวดหมู่ของ AI สำหรับ ${item.product.name_th}`}
+                    className={`px-3 py-2 text-sm font-bold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors ${FOCUS_RING}`}
                     data-testid={`recheck-accept-${item.id}`}
                   >
                     ใช้ของ AI
@@ -194,10 +201,11 @@ export default function RecheckTab() {
                   <select
                     disabled={busyId === item.id}
                     defaultValue=""
+                    aria-label={`เลือกหมวดอื่นสำหรับ ${item.product.name_th}`}
                     onChange={(event) => {
                       if (event.target.value) decide(item.id, 'override', event.target.value)
                     }}
-                    className="px-3 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white max-w-full"
+                    className={`px-3 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white max-w-full text-slate-800 cursor-pointer ${FOCUS_RING}`}
                     data-testid={`recheck-override-${item.id}`}
                   >
                     <option value="">เลือกหมวดอื่น...</option>

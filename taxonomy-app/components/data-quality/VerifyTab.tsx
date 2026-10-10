@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { supabase } from '@/utils/supabase'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 
 interface Product {
@@ -160,100 +161,160 @@ export default function VerifyTab() {
                 <p className="text-slate-500 font-medium mt-1">ศูนย์ตรวจสอบและยืนยันความถูกต้องของข้อมูล (Human-in-the-loop)</p>
               </div>
               <button 
+                type="button"
+                aria-label="รีเฟรชข้อมูล"
                 onClick={fetchData}
-                className="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
+                className={`p-3 bg-white rounded-2xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors ${FOCUS_RING}`}
               >
-                <RefreshCcw className={`w-5 h-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCcw className={`w-5 h-5 text-slate-600 ${loading ? 'motion-safe:animate-spin' : ''}`} aria-hidden="true" />
               </button>
             </div>
 
             {/* Main Tabs */}
-            <div className="flex gap-4 mb-8 p-1.5 bg-slate-200/50 rounded-[24px] w-fit">
+            <div 
+              role="tablist"
+              aria-label="ด่านการตรวจสอบข้อมูล"
+              className="flex gap-3 mb-8 p-1.5 bg-slate-200/60 rounded-[24px] w-fit max-w-full overflow-x-auto"
+            >
               <button 
+                id="verify-tab-dedup"
+                role="tab"
+                type="button"
+                aria-selected={activeTab === 'dedup'}
+                aria-controls="verify-panel-dedup"
+                tabIndex={activeTab === 'dedup' ? 0 : -1}
                 onClick={() => setActiveTab('dedup')}
-                className={`px-8 py-3 rounded-[20px] text-sm font-black transition-all flex items-center gap-2 ${
-                  activeTab === 'dedup' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight') {
+                    e.preventDefault()
+                    setActiveTab('category')
+                    document.getElementById('verify-tab-category')?.focus()
+                  }
+                }}
+                className={`px-8 py-3 rounded-[20px] text-sm font-bold transition-all flex items-center gap-2 ${FOCUS_RING} ${
+                  activeTab === 'dedup' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Layers className="w-4 h-4" />
+                <Layers className="w-4 h-4" aria-hidden="true" />
                 ด่าน 1: ตรวจของซ้ำ ({stats.dedup})
               </button>
               <button
+                id="verify-tab-category"
+                role="tab"
+                type="button"
+                aria-selected={activeTab === 'category'}
+                aria-controls="verify-panel-category"
+                tabIndex={activeTab === 'category' ? 0 : -1}
                 onClick={() => setActiveTab('category')}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight') {
+                    e.preventDefault()
+                    setActiveTab('approved')
+                    document.getElementById('verify-tab-approved')?.focus()
+                  } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault()
+                    setActiveTab('dedup')
+                    document.getElementById('verify-tab-dedup')?.focus()
+                  }
+                }}
                 data-testid="tab-verify-category"
-                className={`px-8 py-3 rounded-[20px] text-sm font-black transition-all flex items-center gap-2 ${
-                  activeTab === 'category' ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                className={`px-8 py-3 rounded-[20px] text-sm font-bold transition-all flex items-center gap-2 ${FOCUS_RING} ${
+                  activeTab === 'category' ? 'bg-white text-amber-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Tag className="w-4 h-4" />
+                <Tag className="w-4 h-4" aria-hidden="true" />
                 ด่าน 2: ตรวจหมวดหมู่ ({stats.category})
               </button>
               <button 
+                id="verify-tab-approved"
+                role="tab"
+                type="button"
+                aria-selected={activeTab === 'approved'}
+                aria-controls="verify-panel-approved"
+                tabIndex={activeTab === 'approved' ? 0 : -1}
                 onClick={() => setActiveTab('approved')}
-                className={`px-8 py-3 rounded-[20px] text-sm font-black transition-all flex items-center gap-2 ${
-                  activeTab === 'approved' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault()
+                    setActiveTab('category')
+                    document.getElementById('verify-tab-category')?.focus()
+                  }
+                }}
+                className={`px-8 py-3 rounded-[20px] text-sm font-bold transition-all flex items-center gap-2 ${FOCUS_RING} ${
+                  activeTab === 'approved' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <CheckCircle className="w-4 h-4" />
+                <CheckCircle className="w-4 h-4" aria-hidden="true" />
                 ผ่านฉลุย ({stats.approved})
               </button>
             </div>
 
             {loading ? (
               <div className="h-64 flex items-center justify-center">
-                <RefreshCcw className="w-10 h-10 text-indigo-200 animate-spin" />
+                <RefreshCcw className="w-10 h-10 text-indigo-400 motion-safe:animate-spin" aria-hidden="true" />
               </div>
             ) : (
-              <div className="space-y-6">
+              <div 
+                role="tabpanel"
+                id={`verify-panel-${activeTab}`}
+                aria-labelledby={`verify-tab-${activeTab}`}
+                aria-live="polite"
+                tabIndex={0}
+                className="space-y-6 focus:outline-none"
+              >
                 {products.length === 0 ? (
                   <div className="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-slate-200">
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle className="w-10 h-10 text-slate-200" />
+                      <CheckCircle className="w-10 h-10 text-slate-300" aria-hidden="true" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-400">ไม่มีรายการค้างตรวจสอบในด่านนี้</h3>
+                    <h3 className="text-xl font-bold text-slate-600">ไม่มีรายการค้างตรวจสอบในด่านนี้</h3>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-6">
                     {activeTab === 'dedup' ? (
                       products.map((p) => (
-                        <div key={p.id} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 hover:border-indigo-200 transition-all group">
+                        <div key={p.id} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200 hover:border-indigo-300 transition-all group">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-4">
-                                <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest rounded-lg">Potential Duplicate</span>
-                                <span className="text-slate-300 text-xs">•</span>
-                                <span className="text-slate-400 text-xs font-bold">Match Score: {(p.metadata?.similarity_score * 100).toFixed(1)}%</span>
+                                <span className="px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold uppercase tracking-wider rounded-lg">Potential Duplicate</span>
+                                <span className="text-slate-400 text-xs" aria-hidden="true">•</span>
+                                <span className="text-slate-600 text-xs font-bold">Match Score: {(p.metadata?.similarity_score * 100).toFixed(1)}%</span>
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                                 <div>
-                                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">ของใหม่ที่พบ</p>
-                                  <p className="text-xl font-black text-slate-900 leading-relaxed">{p.name_th}</p>
-                                  <p className="text-sm text-slate-400 mt-2 italic font-medium">Cleaned: {p.metadata?.clean_name}</p>
+                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ของใหม่ที่พบ</p>
+                                  <p className="text-xl font-black text-slate-900 leading-relaxed thai-text">{p.name_th}</p>
+                                  <p className="text-xs text-slate-500 mt-2 font-medium">Cleaned: {p.metadata?.clean_name}</p>
                                 </div>
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">คล้ายกับของเดิมชื่อ</p>
-                                  <p className="text-lg font-bold text-slate-600">{p.metadata?.duplicate_of}</p>
+                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">คล้ายกับของเดิมชื่อ</p>
+                                  <p className="text-lg font-bold text-slate-700 thai-text">{p.metadata?.duplicate_of}</p>
                                 </div>
                               </div>
                             </div>
                             <div className="flex flex-col gap-3 ml-8">
                               <button
+                                type="button"
                                 onClick={() => handleDedupDecision(p.id, 'discard')}
                                 disabled={busyId === p.id}
                                 data-testid="discard-btn"
-                                className="p-4 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm disabled:opacity-40"
+                                aria-label={`ซ้ำจริง ลบทิ้ง ${p.name_th}`}
+                                className={`p-4 bg-rose-50 text-rose-700 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm disabled:opacity-40 ${FOCUS_RING}`}
                                 title="ซ้ำจริง - ลบทิ้ง"
                               >
-                                <Trash2 className="w-6 h-6" />
+                                <Trash2 className="w-6 h-6" aria-hidden="true" />
                               </button>
                               <button
+                                type="button"
                                 onClick={() => handleDedupDecision(p.id, 'keep')}
                                 disabled={busyId === p.id}
                                 data-testid="keep-btn"
-                                className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm disabled:opacity-40"
+                                aria-label={`ไม่ซ้ำ ไปด่านต่อไป ${p.name_th}`}
+                                className={`p-4 bg-emerald-50 text-emerald-700 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm disabled:opacity-40 ${FOCUS_RING}`}
                                 title="ไม่ซ้ำ - ไปด่านต่อไป"
                               >
-                                <CheckCircle className="w-6 h-6" />
+                                <CheckCircle className="w-6 h-6" aria-hidden="true" />
                               </button>
                             </div>
                           </div>
@@ -261,27 +322,28 @@ export default function VerifyTab() {
                       ))
                     ) : (
                       products.map((p) => (
-                        <div key={p.id} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 hover:border-emerald-200 transition-all group">
+                        <div key={p.id} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-200 hover:border-emerald-300 transition-all group">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-4">
-                                <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg">New Unique Product</span>
-                                <span className="text-slate-300 text-xs">•</span>
-                                <span className="text-slate-400 text-xs font-bold">AI Confidence: {(p.confidence_score * 100).toFixed(0)}%</span>
+                                <span className="px-3 py-1 bg-indigo-100 text-indigo-900 border border-indigo-300 text-xs font-bold uppercase tracking-wider rounded-lg">New Unique Product</span>
+                                <span className="text-slate-400 text-xs" aria-hidden="true">•</span>
+                                <span className="text-slate-600 text-xs font-bold">AI Confidence: {(p.confidence_score * 100).toFixed(0)}%</span>
                               </div>
-                              <p className="text-2xl font-black text-slate-900 mb-2">{p.name_th}</p>
-                              <p className="text-sm text-slate-400 font-medium mb-6 italic">Cleaned: {p.metadata?.clean_name}</p>
+                              <p className="text-2xl font-black text-slate-900 mb-2 thai-text">{p.name_th}</p>
+                              <p className="text-xs text-slate-500 font-medium mb-6">Cleaned: {p.metadata?.clean_name}</p>
                               
                               <div className="flex flex-wrap items-center gap-4">
-                                <div className="flex items-center gap-3 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100">
-                                  <Tag className="w-4 h-4 text-emerald-500" />
-                                  <span className="text-sm font-black text-slate-700">AI แนะนำ: {p.metadata?.suggested_category}</span>
+                                <div className="flex items-center gap-3 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-200">
+                                  <Tag className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                                  <span className="text-sm font-bold text-slate-800 thai-text">AI แนะนำ: {p.metadata?.suggested_category}</span>
                                 </div>
-                                <ArrowRight className="w-4 h-4 text-slate-300" />
+                                <ArrowRight className="w-4 h-4 text-slate-400" aria-hidden="true" />
                                 <select
                                   data-testid="category-select"
                                   disabled={busyId === p.id}
-                                  className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none disabled:opacity-40"
+                                  aria-label={`เลือกหมวดหมู่สำหรับ ${p.name_th}`}
+                                  className={`px-6 py-3 bg-white border border-slate-300 rounded-2xl text-sm font-bold text-slate-800 outline-none disabled:opacity-40 cursor-pointer ${FOCUS_RING}`}
                                   defaultValue={p.category_id}
                                   onChange={(e) => handleCategoryConfirm(p.id, e.target.value)}
                                 >
@@ -294,12 +356,14 @@ export default function VerifyTab() {
                             </div>
                             <div className="ml-8">
                               <button
+                                type="button"
                                 onClick={() => handleCategoryConfirm(p.id, p.category_id || '')}
                                 disabled={busyId === p.id}
                                 data-testid="confirm-category-btn"
-                                className="px-8 py-4 bg-emerald-600 text-white rounded-[20px] font-black text-sm shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-40"
+                                aria-label={`ยืนยันหมวดหมู่นี้สำหรับ ${p.name_th}`}
+                                className={`px-8 py-4 bg-emerald-600 text-white rounded-[20px] font-bold text-sm shadow-md hover:bg-emerald-700 transition-all flex items-center gap-3 disabled:opacity-40 ${FOCUS_RING}`}
                               >
-                                <Save className="w-5 h-5" />
+                                <Save className="w-5 h-5" aria-hidden="true" />
                                 ยืนยันหมวดนี้
                               </button>
                             </div>

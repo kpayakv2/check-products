@@ -6,6 +6,7 @@ import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import WizardTab from '@/components/Import/WizardTab'
 import ImportHistory from '@/components/Import/ImportHistory'
+import { FOCUS_RING } from '@/components/ui/Modal'
 import { 
   UploadIcon,
   ClockIcon,
@@ -46,7 +47,7 @@ export default function ImportPage() {
             {/* Page Header Area */}
             <div className="mb-12">
               <h1 data-testid="import-title" className="text-4xl font-extrabold text-slate-900 tracking-tight thai-text">Import ข้อมูลสินค้า</h1>
-              <p className="text-slate-500 mt-2 text-lg font-medium thai-text">นำเข้า ตรวจสอบ และอนุมัติข้อมูลสินค้าขนาดใหญ่อย่างอัจฉริยะ</p>
+              <p className="text-slate-600 mt-2 text-lg font-medium thai-text">นำเข้า ตรวจสอบ และอนุมัติข้อมูลสินค้าขนาดใหญ่อย่างอัจฉริยะ</p>
             </div>
 
             {/* Main Action Grid */}
@@ -56,25 +57,30 @@ export default function ImportPage() {
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <div onClick={() => setActiveTab('wizard')} data-testid="new-import-card" className="block group">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('wizard')}
+                  data-testid="new-import-card"
+                  className={`block group text-left w-full rounded-[48px] ${FOCUS_RING}`}
+                >
                   <div className="bg-white/60 backdrop-blur-md rounded-[48px] p-10 border border-white shadow-xl shadow-indigo-100/20 group-hover:bg-white group-hover:border-indigo-100 transition-all cursor-pointer h-full flex flex-col items-start">
                     <div className="w-16 h-16 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/30 mb-8 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                      <UploadIcon className="w-8 h-8" />
+                      <UploadIcon className="w-8 h-8" aria-hidden="true" />
                     </div>
                     
                     <h3 data-testid="new-import-title" className="text-2xl font-black text-slate-900 mb-4 thai-text tracking-tight uppercase">
                       New Import Batch
                     </h3>
-                    <p className="text-slate-500 text-base font-medium thai-text leading-relaxed mb-10 flex-1">
+                    <p className="text-slate-600 text-base font-medium thai-text leading-relaxed mb-10 flex-1">
                       อัปโหลดผลิตภัณฑ์จากไฟล์ CSV ของคุณ ระบบจะวิเคราะห์โครงสร้างข้อมูลและแนะนำหมวดหมู่ตาม Taxonomy อัตโนมัติ
                     </p>
                     
                     <div className="flex items-center gap-2 text-indigo-600 font-black tracking-widest text-xs uppercase">
                       Start Migration Process
-                      <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                      <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-2 transition-transform" aria-hidden="true" />
                     </div>
                   </div>
-                </div>
+                </button>
               </motion.div>
 
             </div>
@@ -82,32 +88,32 @@ export default function ImportPage() {
             {/* Advanced Utility Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
               <div className="bg-white p-8 rounded-[40px] border border-slate-100 flex items-center gap-6 group hover:border-indigo-100 transition-colors">
-                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                  <FolderIcon className="w-6 h-6" />
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                  <FolderIcon className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-1">Local Storage</h4>
-                   <p className="text-xs font-medium text-slate-400 thai-text leading-tight">จัดการไฟล์ที่เคยอัปโหลดไว้แล้ว</p>
+                   <p className="text-xs font-medium text-slate-600 thai-text leading-tight">จัดการไฟล์ที่เคยอัปโหลดไว้แล้ว</p>
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-[40px] border border-slate-100 flex items-center gap-6 group hover:border-indigo-100 transition-colors">
-                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                  <FileSpreadsheetIcon className="w-6 h-6" />
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                  <FileSpreadsheetIcon className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-1">CSV Template</h4>
-                   <p className="text-xs font-medium text-slate-400 thai-text leading-relaxed">ดาวน์โหลดเทมเพลตมาตรฐาน</p>
+                   <p className="text-xs font-medium text-slate-600 thai-text leading-relaxed">ดาวน์โหลดเทมเพลตมาตรฐาน</p>
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-[40px] border border-slate-100 flex items-center gap-6 group hover:border-indigo-100 transition-colors">
-                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                  <ZapIcon className="w-6 h-6" />
+                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                  <ZapIcon className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-1">Fast Track</h4>
-                   <p className="text-xs font-medium text-slate-400 thai-text leading-relaxed">อัปโหลดแบบข้ามขั้นตอนรีวิว</p>
+                   <p className="text-xs font-medium text-slate-600 thai-text leading-relaxed">อัปโหลดแบบข้ามขั้นตอนรีวิว</p>
                 </div>
               </div>
             </div>
@@ -117,11 +123,11 @@ export default function ImportPage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
-                    <HistoryIcon className="w-5 h-5 text-indigo-600" />
+                    <HistoryIcon className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                   </div>
                   <div>
                     <h2 className="text-xl font-black text-slate-900 thai-text tracking-tight">ประวัติการนำเข้า</h2>
-                    <p className="text-xs text-slate-400 font-medium thai-text">ไฟล์ล่าสุด 20 รายการ · คลิกแถวเพื่อดูรายละเอียด</p>
+                    <p className="text-xs text-slate-600 font-medium thai-text">ไฟล์ล่าสุด 20 รายการ · คลิกแถวเพื่อดูรายละเอียด</p>
                   </div>
                 </div>
               </div>

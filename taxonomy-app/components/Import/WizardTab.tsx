@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import type { ParsedCSV } from '@/utils/csv-parser'
 import type { SaveResult, WizardItem } from '@/types/import'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 const wizardSteps: WizardStep[] = [
   {
@@ -242,9 +243,9 @@ export default function WizardTab() {
               onBack={handleBack}
             />
           ) : (
-            <div className="p-8 text-center bg-red-50 text-red-600 rounded-2xl">
+            <div className="p-8 text-center bg-rose-50 text-rose-800 border border-rose-200 rounded-2xl" role="alert">
               <p className="font-bold text-xl mb-4">❌ กรุณาอัปโหลดไฟล์ก่อน</p>
-              <button onClick={handleBack} className="px-6 py-2 bg-slate-200 text-slate-800 rounded-full">ย้อนกลับ</button>
+              <button onClick={handleBack} className={`px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-full font-bold ${FOCUS_RING}`}>ย้อนกลับ</button>
             </div>
           )
   
@@ -262,9 +263,9 @@ export default function WizardTab() {
               onBack={handleBack}
             />
           ) : (
-            <div className="p-8 text-center bg-red-50 text-red-600 rounded-2xl">
+            <div className="p-8 text-center bg-rose-50 text-rose-800 border border-rose-200 rounded-2xl" role="alert">
               <p className="font-bold text-xl mb-4">❌ ไม่มีข้อมูลที่ถูกทำความสะอาด</p>
-              <button onClick={handleBack} className="px-6 py-2 bg-slate-200 text-slate-800 rounded-full">ย้อนกลับ</button>
+              <button onClick={handleBack} className={`px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-full font-bold ${FOCUS_RING}`}>ย้อนกลับ</button>
             </div>
           )
   
@@ -284,9 +285,9 @@ export default function WizardTab() {
               onBack={handleBack}
             />
           ) : (
-            <div className="p-8 text-center bg-red-50 text-red-600 rounded-2xl">
+            <div className="p-8 text-center bg-rose-50 text-rose-800 border border-rose-200 rounded-2xl" role="alert">
               <p className="font-bold text-xl mb-4">❌ ไม่มีข้อมูลที่ผ่านการตรวจสอบของซ้ำ</p>
-              <button onClick={handleBack} className="px-6 py-2 bg-slate-200 text-slate-800 rounded-full">ย้อนกลับ</button>
+              <button onClick={handleBack} className={`px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-full font-bold ${FOCUS_RING}`}>ย้อนกลับ</button>
             </div>
           )
         }

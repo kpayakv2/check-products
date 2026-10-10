@@ -19,6 +19,7 @@ import {
   EyeIcon,
   ZapIcon
 } from 'lucide-react'
+import { FOCUS_RING } from '@/components/ui/Modal'
 import { parseCSV, validateCSV, getColumnStats, type ParsedCSV } from '@/utils/csv-parser'
 
 export interface ColumnMapping {
@@ -274,28 +275,29 @@ export default function ColumnMappingStep({
               {SYSTEM_FIELDS.map((field) => (
                 <div key={field.key} className="group">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="flex items-center gap-2 text-sm font-black text-slate-700">
-                      <field.icon className={`w-4 h-4 ${field.required ? 'text-indigo-600' : 'text-slate-400'}`} />
+                    <label htmlFor={`mapping-${field.key}`} className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                      <field.icon className={`w-4 h-4 ${field.required ? 'text-indigo-600' : 'text-slate-500'}`} aria-hidden="true" />
                       {field.label}
-                      {field.required && <span className="text-rose-500">*</span>}
+                      {field.required && <span className="text-rose-600">*</span>}
                     </label>
-                    <span className="text-[10px] text-slate-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-xs text-slate-500 font-medium">
                       {field.description}
                     </span>
                   </div>
 
                   <div className="relative">
                     <select
+                      id={`mapping-${field.key}`}
                       value={mapping[field.key] || ''}
                       onChange={(e) => handleFieldChange(field.key, e.target.value)}
                       className={`
                         w-full appearance-none bg-slate-50 border-2 rounded-2xl px-5 py-3.5 pr-12
-                        text-sm font-bold transition-all outline-none
+                        text-sm font-bold transition-all outline-none ${FOCUS_RING}
                         ${mapping[field.key] 
-                          ? 'border-indigo-100 text-slate-900 focus:border-indigo-500 bg-white' 
+                          ? 'border-indigo-200 text-slate-900 focus:border-indigo-500 bg-white' 
                           : field.required 
-                          ? 'border-slate-100 text-slate-300 focus:border-indigo-500' 
-                          : 'border-slate-50 text-slate-300'
+                          ? 'border-slate-200 text-slate-500 focus:border-indigo-500' 
+                          : 'border-slate-100 text-slate-500'
                         }
                       `}
                     >
@@ -309,8 +311,8 @@ export default function ColumnMappingStep({
                         )
                       })}
                     </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                      <ArrowRightIcon className="w-4 h-4 rotate-90" />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                      <ArrowRightIcon className="w-4 h-4 rotate-90" aria-hidden="true" />
                     </div>
                   </div>
                 </div>
@@ -323,13 +325,13 @@ export default function ColumnMappingStep({
         <div className="lg:col-span-5 space-y-6">
           {/* Validation Box */}
           <div className={`p-8 rounded-[2rem] border-2 transition-all ${
-            isProductNameMapped ? 'bg-emerald-50/50 border-emerald-100' : 'bg-rose-50/50 border-rose-100'
+            isProductNameMapped ? 'bg-emerald-50 border-emerald-300' : 'bg-rose-50 border-rose-300'
           }`}>
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                isProductNameMapped ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'
+                isProductNameMapped ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
               }`}>
-                {isProductNameMapped ? <CheckCircleIcon className="w-6 h-6" /> : <AlertCircleIcon className="w-6 h-6" />}
+                {isProductNameMapped ? <CheckCircleIcon className="w-6 h-6" aria-hidden="true" /> : <AlertCircleIcon className="w-6 h-6" aria-hidden="true" />}
               </div>
               <div>
                 <h4 className={`text-lg font-black uppercase tracking-tight mb-1 ${
@@ -337,7 +339,7 @@ export default function ColumnMappingStep({
                 }`}>
                   {isProductNameMapped ? 'พร้อมประมวลผล' : 'ต้องการข้อมูลเพิ่ม'}
                 </h4>
-                <p className={`text-xs font-medium ${isProductNameMapped ? 'text-emerald-600' : 'text-rose-600'}`}>
+                <p className={`text-xs font-medium ${isProductNameMapped ? 'text-emerald-800' : 'text-rose-800'}`}>
                   {isProductNameMapped 
                     ? 'ระบบตรวจสอบเบื้องต้นแล้ว ข้อมูลครบถ้วนสำหรับเริ่มงานครับ' 
                     : 'กรุณาเลือกคอลัมน์ "ชื่อสินค้า" เพื่อให้ระบบวิเคราะห์ทำงานได้'}
@@ -349,16 +351,17 @@ export default function ColumnMappingStep({
           {/* Data Sample Preview */}
           <div className="premium-card p-8 bg-white border border-slate-100 shadow-sm overflow-hidden">
              <div className="flex items-center gap-3 mb-6">
-              <EyeIcon className="w-5 h-5 text-slate-400" />
+              <EyeIcon className="w-5 h-5 text-slate-500" aria-hidden="true" />
               <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">ข้อมูลต้นฉบับ (5 แถวแรก)</h3>
             </div>
             
             <div className="overflow-x-auto -mx-8">
               <table className="w-full text-left border-collapse">
+                <caption className="sr-only">ตัวอย่างข้อมูลต้นฉบับ 5 แถวแรก</caption>
                 <thead>
                   <tr className="bg-slate-50">
                     {preview?.headers.map((h, i) => (
-                      <th key={i} className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-tighter border-b border-slate-100 whitespace-nowrap">
+                      <th scope="col" key={i} className="px-6 py-3 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200 whitespace-nowrap">
                         {i+1}. {h}
                       </th>
                     ))}
@@ -366,9 +369,9 @@ export default function ColumnMappingStep({
                 </thead>
                 <tbody>
                   {preview?.rows.slice(0, 5).map((row, ri) => (
-                    <tr key={ri} className="border-b border-slate-50 last:border-0">
+                    <tr key={ri} className="border-b border-slate-100 last:border-0">
                       {preview.headers.map((h, ci) => (
-                        <td key={ci} className="px-6 py-4 text-xs font-bold text-slate-600 whitespace-nowrap max-w-[150px] truncate">
+                        <td key={ci} className="px-6 py-4 text-xs font-medium text-slate-700 whitespace-nowrap max-w-[150px] truncate">
                           {row[h] || '-'}
                         </td>
                       ))}
@@ -377,7 +380,7 @@ export default function ColumnMappingStep({
                 </tbody>
               </table>
             </div>
-            <div className="mt-6 p-4 bg-slate-50 rounded-2xl text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
+            <div className="mt-6 p-4 bg-slate-50 rounded-2xl text-xs font-bold text-slate-600 text-center uppercase tracking-wider">
               แสดงเฉพาะ 5 แถวแรกเพื่อใช้ตรวจสอบความถูกต้อง
             </div>
           </div>
@@ -387,27 +390,29 @@ export default function ColumnMappingStep({
       {/* Footer Actions */}
       <div className="flex items-center justify-between pt-8 border-t border-slate-100">
         <button
+          type="button"
           onClick={onBack}
-          className="px-8 py-4 text-slate-400 hover:text-slate-900 font-bold text-sm transition-all flex items-center gap-2"
+          className={`px-8 py-4 text-slate-600 hover:text-slate-900 font-bold text-sm transition-all flex items-center gap-2 rounded-xl ${FOCUS_RING}`}
         >
           ← ย้อนกลับ
         </button>
 
         <button
+          type="button"
           onClick={handleComplete}
           disabled={!canProceed}
           className={`
-            px-16 py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 flex items-center gap-4
+            px-16 py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95 flex items-center gap-4 ${FOCUS_RING}
             ${canProceed 
               ? 'bg-slate-900 text-white hover:bg-black shadow-slate-900/30' 
-              : 'bg-slate-100 text-slate-300 cursor-not-allowed shadow-none'
+              : 'bg-slate-200 text-slate-500 cursor-not-allowed shadow-none'
             }
           `}
         >
           {canProceed ? (
             <>
               เริ่มประมวลผลวิเคราะห์
-              <ZapIcon className="w-4 h-4 fill-current text-yellow-400" />
+              <ZapIcon className="w-4 h-4 fill-current text-yellow-400" aria-hidden="true" />
             </>
           ) : (
             'รอเลือกชื่อสินค้า...'

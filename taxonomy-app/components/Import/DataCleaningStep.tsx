@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { SparklesIcon, CheckCircleIcon, ArrowRightIcon, BrainIcon } from 'lucide-react'
+import { SparklesIcon, CheckCircleIcon, ArrowRightIcon } from 'lucide-react'
 import { ParsedCSV } from '@/utils/csv-parser'
 import { ColumnMapping } from './ColumnMappingStep'
 import { parsePrice } from '@/utils/price'
 import type { WizardItem } from '@/types/import'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 interface DataCleaningStepProps {
   parsedData: ParsedCSV
@@ -84,14 +85,14 @@ export default function DataCleaningStep({
 
   if (isCleaning) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 space-y-6">
+      <div className="flex flex-col items-center justify-center py-32 space-y-6" role="status" aria-live="polite">
         <div className="relative">
-          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-          <SparklesIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+          <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full motion-safe:animate-spin"></div>
+          <SparklesIcon className="w-8 h-8 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 motion-safe:animate-pulse" aria-hidden="true" />
         </div>
         <div className="text-center">
           <h3 className="text-xl font-bold text-slate-800 thai-text">กำลังทำความสะอาดข้อมูล...</h3>
-          <p className="text-slate-500 thai-text">ลบคำฟุ่มเฟือย แปลงเลขไทย และจัดรูปแบบตัวอักษร</p>
+          <p className="text-slate-600 thai-text">ลบคำฟุ่มเฟือย แปลงเลขไทย และจัดรูปแบบตัวอักษร</p>
         </div>
       </div>
     )
@@ -103,19 +104,19 @@ export default function DataCleaningStep({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight font-noto-sans-thai mb-2 flex items-center gap-3">
-            <SparklesIcon className="w-8 h-8 text-indigo-600" />
+            <SparklesIcon className="w-8 h-8 text-indigo-600" aria-hidden="true" />
             ข้อมูลที่ทำความสะอาดแล้ว
           </h2>
-          <p className="text-slate-500 font-medium thai-text">ตรวจสอบผลลัพธ์การลบคำขยะและสระลอยก่อนนำไปหาของซ้ำ</p>
+          <p className="text-slate-600 font-medium thai-text">ตรวจสอบผลลัพธ์การลบคำขยะและสระลอยก่อนนำไปหาของซ้ำ</p>
         </div>
         <div className="flex gap-4">
-          <div className="bg-indigo-50 px-6 py-3 rounded-2xl text-center">
-            <div className="text-2xl font-black text-indigo-600">{stats.total}</div>
-            <div className="text-xs font-black text-indigo-900 uppercase tracking-widest thai-text">รายการทั้งหมด</div>
+          <div className="bg-indigo-50 border border-indigo-100 px-6 py-3 rounded-2xl text-center">
+            <div className="text-2xl font-black text-indigo-700">{stats.total}</div>
+            <div className="text-xs font-bold text-indigo-900 uppercase tracking-widest thai-text">รายการทั้งหมด</div>
           </div>
-          <div className="bg-emerald-50 px-6 py-3 rounded-2xl text-center">
-            <div className="text-2xl font-black text-emerald-600">{stats.changed}</div>
-            <div className="text-xs font-black text-emerald-900 uppercase tracking-widest thai-text">ถูกแก้ไข</div>
+          <div className="bg-emerald-50 border border-emerald-100 px-6 py-3 rounded-2xl text-center">
+            <div className="text-2xl font-black text-emerald-700">{stats.changed}</div>
+            <div className="text-xs font-bold text-emerald-900 uppercase tracking-widest thai-text">ถูกแก้ไข</div>
           </div>
         </div>
       </div>
@@ -124,12 +125,13 @@ export default function DataCleaningStep({
       <div className="premium-card p-0 overflow-hidden bg-white border border-slate-200 shadow-xl rounded-3xl">
         <div className="overflow-x-auto max-h-[500px]">
           <table className="w-full text-left border-collapse">
+            <caption className="sr-only">ตารางเปรียบเทียบชื่อดั้งเดิมและชื่อที่ทำความสะอาดแล้ว</caption>
             <thead className="sticky top-0 bg-slate-50/90 backdrop-blur-md shadow-sm z-10">
               <tr>
-                <th className="px-6 py-4 text-xs font-black text-slate-500 uppercase tracking-wider thai-text w-1/2">
+                <th scope="col" className="px-6 py-4 text-xs font-bold text-slate-700 uppercase tracking-wider thai-text w-1/2">
                   ชื่อดั้งเดิม (Original)
                 </th>
-                <th className="px-6 py-4 text-xs font-black text-indigo-600 uppercase tracking-wider thai-text w-1/2">
+                <th scope="col" className="px-6 py-4 text-xs font-bold text-indigo-900 uppercase tracking-wider thai-text w-1/2">
                   ชื่อที่ทำความสะอาดแล้ว (Cleaned)
                 </th>
               </tr>
@@ -138,18 +140,18 @@ export default function DataCleaningStep({
               {cleanedResults.map((row, i) => (
                 <tr key={i} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-slate-500 line-clamp-2">
+                    <span className="text-sm font-medium text-slate-700 line-clamp-2">
                       {row._original_name}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-start gap-2">
-                      <span className={`text-sm font-bold line-clamp-2 ${row._is_changed ? 'text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded' : 'text-slate-700'}`}>
+                      <span className={`text-sm font-bold line-clamp-2 ${row._is_changed ? 'text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded' : 'text-slate-800'}`}>
                         {row._cleaned_name}
                       </span>
                       {row._is_changed && (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase tracking-wider">
-                          <CheckCircleIcon className="w-3 h-3" /> แก้ไขแล้ว
+                        <span className="shrink-0 inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                          <CheckCircleIcon className="w-3.5 h-3.5" aria-hidden="true" /> แก้ไขแล้ว
                         </span>
                       )}
                     </div>
@@ -165,17 +167,17 @@ export default function DataCleaningStep({
       <div className="flex items-center justify-between pt-8">
         <button
           onClick={onBack}
-          className="px-8 py-4 text-slate-500 hover:text-slate-900 font-bold text-sm transition-all thai-text"
+          className={`px-8 py-4 text-slate-700 hover:text-slate-900 font-bold text-sm rounded-xl transition-all thai-text ${FOCUS_RING}`}
         >
           ← ย้อนกลับ
         </button>
 
         <button
           onClick={() => onComplete(cleanedResults)}
-          className="px-10 py-4 bg-slate-900 hover:bg-black text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 thai-text"
+          className={`px-10 py-4 bg-slate-900 hover:bg-black text-white rounded-[2rem] font-black text-sm tracking-wide shadow-xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 thai-text ${FOCUS_RING}`}
         >
           นำไปจัดการของซ้ำ
-          <ArrowRightIcon className="w-5 h-5" />
+          <ArrowRightIcon className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
     </div>

@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
+import Modal, { FOCUS_RING } from '@/components/ui/Modal'
 import { 
   DatabaseService, 
   PENDING_REVIEW_STATUSES,
@@ -127,34 +128,34 @@ export default function ProductsPage() {
     switch (status) {
       case 'pending_review_dedup':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100/50 shadow-sm thai-text">
-            <ClockIcon className="mr-2 h-3.5 w-3.5" />
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-sm thai-text">
+            <ClockIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
             รอตรวจของซ้ำ
           </span>
         )
       case 'pending_review_category':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-sky-50 text-sky-600 border border-sky-100/50 shadow-sm thai-text">
-            <ClockIcon className="mr-2 h-3.5 w-3.5" />
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-900 border border-sky-300 shadow-sm thai-text">
+            <ClockIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
             รอตรวจหมวดหมู่
           </span>
         )
       case 'approved':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100/50 shadow-sm">
-            <CheckCircleIcon className="mr-2 h-4 w-4" />
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm">
+            <CheckCircleIcon className="mr-1.5 h-4 w-4" aria-hidden="true" />
             Verified Success
           </span>
         )
       case 'rejected':
         return (
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100/50 shadow-sm">
-            <XCircleIcon className="mr-2 h-4 w-4" />
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-300 shadow-sm">
+            <XCircleIcon className="mr-1.5 h-4 w-4" aria-hidden="true" />
             Rejected Duplicate
           </span>
         )
       default:
-        return <span className="text-slate-400">Unknown</span>
+        return <span className="text-slate-600 text-xs font-medium">ไม่ทราบสถานะ</span>
     }
   }
 
@@ -201,48 +202,56 @@ export default function ProductsPage() {
                   </p>
                </div>
 
-               <div className="flex items-center gap-8 bg-white/40 backdrop-blur-md p-6 rounded-[40px] border border-white shadow-xl">
+               <div className="flex items-center gap-8 bg-white/60 backdrop-blur-md p-6 rounded-[32px] border border-slate-200 shadow-md">
                   <div className="flex flex-col items-center">
-                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending</span>
-                     <span data-testid="pending-count" className="text-xl font-black text-amber-500">{pendingCount.toLocaleString()}</span>
+                     <span className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">รอตรวจ</span>
+                     <span data-testid="pending-count" className="text-xl font-black text-amber-600">{pendingCount.toLocaleString()}</span>
                   </div>
-                  <div className="w-[1px] h-10 bg-slate-100" />
-                  <div className="flex flex-col items-center uppercase text-[10px] font-black text-slate-400 tracking-widest">
-                     <span className="mb-1">Verified</span>
-                     <span className="text-xl font-black text-emerald-500 tracking-tight">{(statusCounts.approved || 0).toLocaleString()}</span>
+                  <div className="w-[1px] h-10 bg-slate-200" />
+                  <div className="flex flex-col items-center uppercase text-xs font-bold text-slate-600 tracking-wider">
+                     <span className="mb-1">ตรวจแล้ว</span>
+                     <span className="text-xl font-black text-emerald-600 tracking-tight">{(statusCounts.approved || 0).toLocaleString()}</span>
                   </div>
                </div>
             </div>
 
             {/* Filter Portal */}
-            <div className="premium-card p-10 mb-12 bg-white/60 border-white shadow-xl relative overflow-hidden">
-               <div className="flex flex-col lg:flex-row gap-8 items-center">
+            <div className="p-8 mb-10 bg-white rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+               <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="relative group flex-1 w-full">
-                    <SearchIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-300 h-5 w-5 group-focus-within:text-indigo-600 transition-colors" />
+                    <label htmlFor="product-search-input" className="sr-only">
+                      ค้นหาสินค้า (ชื่อสินค้า, แบรนด์, หรือ SKU)
+                    </label>
+                    <SearchIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5 group-focus-within:text-indigo-600 transition-colors pointer-events-none" aria-hidden="true" />
                     <input
+                      id="product-search-input"
                       type="text"
-                      placeholder="Search SKU, Brands, or Identity Attributes..."
+                      placeholder="ค้นหา SKU, แบรนด์, หรือชื่อสินค้า..."
                       data-testid="product-search"
                       value={filters.search}
                       onChange={(e) => updateFilters({ search: e.target.value })}
-                      className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-slate-100 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 transition-all font-black text-slate-800 placeholder:text-slate-300 uppercase text-xs tracking-widest"
+                      className={`w-full pl-16 pr-8 py-4 bg-slate-50 border border-slate-200 rounded-2xl ${FOCUS_RING} font-medium text-slate-800 placeholder:text-slate-400 text-sm`}
                     />
                   </div>
 
                   <div className="flex gap-4 w-full lg:w-auto">
                     <div className="relative group flex-1 lg:w-64">
-                       <FilterIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-indigo-600" />
+                       <label htmlFor="product-status-select" className="sr-only">
+                         กรองตามสถานะสินค้า
+                       </label>
+                       <FilterIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-600 pointer-events-none" aria-hidden="true" />
                        <select
+                         id="product-status-select"
                          value={filters.status}
                          onChange={(e) => updateFilters({ status: e.target.value })}
-                         className="w-full pl-14 pr-10 py-5 bg-white border border-slate-100 rounded-[32px] appearance-none font-black text-[11px] text-slate-600 uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer"
-                       >
-                         <option value="">Status: All</option>
-                         <option value="pending_review_dedup">🟡 รอตรวจของซ้ำ</option>
-                         <option value="pending_review_category">🔵 รอตรวจหมวดหมู่</option>
-                         <option value="approved">🟢 Verified</option>
-                         <option value="rejected">🔴 Rejected</option>
-                       </select>
+                         className={`w-full pl-14 pr-10 py-4 bg-white border border-slate-200 rounded-2xl appearance-none font-bold text-xs text-slate-700 tracking-wide ${FOCUS_RING} cursor-pointer`}
+                        >
+                          <option value="">สถานะทั้งหมด (All Statuses)</option>
+                          <option value="pending_review_dedup">🟡 รอตรวจของซ้ำ</option>
+                          <option value="pending_review_category">🔵 รอตรวจหมวดหมู่</option>
+                          <option value="approved">🟢 ตรวจสอบแล้ว (Verified)</option>
+                          <option value="rejected">🔴 ปฏิเสธ / ซ้ำ (Rejected)</option>
+                        </select>
                     </div>
                   </div>
                </div>
@@ -263,16 +272,17 @@ export default function ProductsPage() {
               ) : (
                 <div className="overflow-x-auto custom-scrollbar">
                   <table className="w-full text-left border-collapse">
+                    <caption className="sr-only">รายการสินค้าในสตอกและสถานะการตรวจสอบ</caption>
                     <thead>
-                      <tr className="border-b border-slate-100">
-                        <th className="px-10 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] thai-text">Product Signature</th>
-                        <th className="px-10 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] thai-text">Taxonomy Class</th>
-                        <th className="px-8 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] thai-text">Valuation</th>
-                        <th className="px-8 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] thai-text">Audit Trace</th>
-                        <th className="px-10 py-8 text-right text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Control</th>
+                      <tr className="border-b border-slate-200 bg-slate-50/50">
+                        <th scope="col" className="px-8 py-5 text-xs font-bold text-slate-700 uppercase tracking-wider thai-text">ข้อมูลสินค้า</th>
+                        <th scope="col" className="px-8 py-5 text-xs font-bold text-slate-700 uppercase tracking-wider thai-text">หมวดหมู่</th>
+                        <th scope="col" className="px-8 py-5 text-xs font-bold text-slate-700 uppercase tracking-wider thai-text">ราคา</th>
+                        <th scope="col" className="px-8 py-5 text-xs font-bold text-slate-700 uppercase tracking-wider thai-text">สถานะ</th>
+                        <th scope="col" className="px-8 py-5 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">จัดการ</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50/50">
+                    <tbody className="divide-y divide-slate-100">
                       {products.map((product, idx) => (
                         <motion.tr
                           key={product.id}
@@ -280,41 +290,58 @@ export default function ProductsPage() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.02 }}
                           onClick={() => handleProductSelect(product)}
-                          className="group hover:bg-indigo-50/30 transition-all duration-300 cursor-pointer"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              handleProductSelect(product)
+                            }
+                          }}
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`ดูรายละเอียด ${product.name_th}`}
+                          className={`group hover:bg-indigo-50/40 transition-colors cursor-pointer ${FOCUS_RING}`}
                         >
-                          <td className="px-10 py-8">
-                             <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 bg-white rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                                   <ShoppingBagIcon className="w-7 h-7 text-indigo-400" />
+                          <td className="px-8 py-6">
+                             <div className="flex items-center gap-5">
+                                <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center transition-all">
+                                   <ShoppingBagIcon className="w-6 h-6 text-indigo-500" aria-hidden="true" />
                                 </div>
                                 <div className="flex flex-col">
-                                   <h4 className="text-lg font-black text-slate-900 thai-text tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">{product.name_th}</h4>
-                                   <div className="flex items-center gap-2 mt-2">
-                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{product.brand || 'No Brand'}</span>
-                                      <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                                      <span className="text-[10px] font-black text-indigo-400 tracking-tighter">{product.sku || 'No SKU'}</span>
+                                   <span className="text-base font-bold text-slate-900 thai-text tracking-tight group-hover:text-indigo-600 transition-colors">{product.name_th}</span>
+                                   <div className="flex items-center gap-2 mt-1.5">
+                                      <span className="text-xs font-medium text-slate-600 uppercase">{product.brand || 'No Brand'}</span>
+                                      <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                                      <span className="text-xs font-medium text-indigo-600">{product.sku || 'No SKU'}</span>
                                    </div>
                                 </div>
                              </div>
                           </td>
-                          <td className="px-10 py-8">
+                          <td className="px-8 py-6">
                              <div className="flex flex-col">
-                                <span className="text-sm font-black text-slate-700 thai-text tracking-tight">{product.category?.name_th || 'Unclassed'}</span>
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 italic">Node Trace</span>
+                                <span className="text-sm font-semibold text-slate-800 thai-text">{product.category?.name_th || 'ไม่ได้ระบุหมวดหมู่'}</span>
+                                <span className="text-xs text-slate-500 mt-0.5">หมวดหมู่ระบบ</span>
                              </div>
                           </td>
-                          <td className="px-8 py-8">
+                          <td className="px-8 py-6">
                              <div className="flex flex-col">
-                                <span className="text-xl font-black text-slate-900 tracking-tighter">฿{product.price?.toLocaleString() || '0.00'}</span>
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Registry Price</span>
+                                <span className="text-lg font-bold text-slate-900">฿{product.price?.toLocaleString() || '0.00'}</span>
+                                <span className="text-xs text-slate-500 mt-0.5">ราคาลงทะเบียน</span>
                              </div>
                           </td>
-                          <td className="px-8 py-8">
+                          <td className="px-8 py-6">
                              {getStatusBadge(product.status)}
                           </td>
-                          <td className="px-10 py-8 text-right">
-                             <button className="w-12 h-12 bg-white/50 border border-slate-100 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xl transition-all duration-500 overflow-hidden relative">
-                                <ChevronRightIcon className="w-5 h-5" />
+                          <td className="px-8 py-6 text-right">
+                             <button
+                               type="button"
+                               aria-label={`ดูรายละเอียด ${product.name_th}`}
+                               onClick={(e) => {
+                                 e.stopPropagation()
+                                 handleProductSelect(product)
+                               }}
+                               className={`w-10 h-10 bg-white border border-slate-200 text-slate-500 rounded-xl inline-flex items-center justify-center hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-300 hover:shadow-sm transition-all ${FOCUS_RING}`}
+                             >
+                                <ChevronRightIcon className="w-4 h-4" aria-hidden="true" />
                              </button>
                           </td>
                         </motion.tr>
@@ -327,7 +354,7 @@ export default function ProductsPage() {
 
             {/* แบ่งหน้า — สตอกมีหลายพันแถว หน้านี้จึงโหลดทีละหน้าจากฐานข้อมูล */}
             <div className="flex items-center justify-between gap-6 mt-10 px-4">
-               <p data-testid="result-range" className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+               <p data-testid="result-range" className="text-xs font-semibold text-slate-600 tracking-wide">
                  {total === 0
                    ? 'ไม่พบรายการ'
                    : `${(offset + 1).toLocaleString()}–${Math.min(offset + PAGE_SIZE, total).toLocaleString()} จาก ${total.toLocaleString()}`}
@@ -335,17 +362,19 @@ export default function ProductsPage() {
                <div className="flex gap-3">
                   <button
                     data-testid="prev-page"
+                    type="button"
                     onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
                     disabled={offset === 0}
-                    className="px-8 py-4 bg-white border border-slate-100 rounded-[32px] text-[11px] font-black text-slate-600 uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md transition-all"
+                    className={`px-8 py-3.5 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-700 uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 hover:shadow-sm transition-all ${FOCUS_RING}`}
                   >
                     ก่อนหน้า
                   </button>
                   <button
                     data-testid="next-page"
+                    type="button"
                     onClick={() => setOffset(offset + PAGE_SIZE)}
                     disabled={offset + PAGE_SIZE >= total}
-                    className="px-8 py-4 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-600 transition-all"
+                    className={`px-8 py-3.5 bg-slate-900 text-white rounded-full text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-600 transition-all ${FOCUS_RING}`}
                   >
                     ถัดไป
                   </button>
@@ -355,113 +384,111 @@ export default function ProductsPage() {
         </main>
       </div>
 
-      {/* Audit Detail Modal Overhaul */}
-      <AnimatePresence>
-        {showProductDetail && selectedProduct && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
-             <motion.div
-               initial={{ opacity: 0, scale: 0.9, y: 40 }}
-               animate={{ opacity: 1, scale: 1, y: 0 }}
-               exit={{ opacity: 0, scale: 0.9, y: 40 }}
-               data-testid="product-detail"
-               className="bg-white rounded-[64px] shadow-[0_48px_120px_-24px_rgba(0,0,0,0.3)] w-full max-w-5xl overflow-hidden border border-white relative shadow-indigo-100/50"
-             >
-                {/* Hero Gradient Header */}
-                <div className="h-48 bg-indigo-600 relative overflow-hidden p-12 flex justify-between items-start">
-                   <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
-                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-[60px] -ml-32 -mb-32" />
-                   
-                   <div className="relative z-10 flex items-center gap-10">
-                      <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-[32px] border border-white/30 flex items-center justify-center text-white shadow-2xl">
-                         <SparklesIcon className="w-10 h-10" />
-                      </div>
-                      <div>
-                         <div className="flex items-center gap-3 mb-2">
-                            <span className="px-4 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black text-white uppercase tracking-widest border border-white/20">Audit Inspect</span>
-                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
-                         </div>
-                         <h2 className="text-4xl font-black text-white thai-text tracking-tighter uppercase leading-none">{selectedProduct.name_th}</h2>
-                      </div>
-                   </div>
+      {/* Product Detail Modal */}
+      <Modal
+        isOpen={showProductDetail && !!selectedProduct}
+        onClose={() => setShowProductDetail(false)}
+        maxWidth="max-w-5xl"
+        dataTestId="product-detail"
+        showCloseButton={false}
+        ariaLabel={selectedProduct ? `รายละเอียดสินค้า ${selectedProduct.name_th}` : 'รายละเอียดสินค้า'}
+        className="rounded-[40px] p-0"
+      >
+        {selectedProduct && (
+          <div className="-m-6">
+            {/* Hero Gradient Header */}
+            <div className="h-48 bg-indigo-600 relative overflow-hidden p-8 sm:p-12 flex justify-between items-start">
+               <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
+               <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-[60px] -ml-32 -mb-32 pointer-events-none" />
+               
+               <div className="relative z-10 flex items-center gap-6 sm:gap-10">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 backdrop-blur-md rounded-[28px] border border-white/30 flex items-center justify-center text-white shadow-2xl shrink-0">
+                     <SparklesIcon className="w-8 h-8 sm:w-10 sm:h-10" aria-hidden="true" />
+                  </div>
+                  <div>
+                     <div className="flex items-center gap-3 mb-2">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold text-white uppercase tracking-wider border border-white/20">Audit Inspect</span>
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full motion-safe:animate-ping" aria-hidden="true" />
+                     </div>
+                     <h2 className="text-2xl sm:text-3xl font-black text-white thai-text tracking-tight uppercase leading-tight">{selectedProduct.name_th}</h2>
+                  </div>
+               </div>
 
-                   <button onClick={()=>setShowProductDetail(false)} className="relative z-10 w-16 h-16 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all backdrop-blur-md border border-white/20">
-                      <XIcon className="w-7 h-7" />
-                   </button>
-                </div>
+               <button
+                 type="button"
+                 onClick={() => setShowProductDetail(false)}
+                 aria-label="ปิดหน้าต่างรายละเอียดสินค้า"
+                 className={`relative z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all backdrop-blur-md border border-white/20 ${FOCUS_RING}`}
+               >
+                  <XIcon className="w-6 h-6" aria-hidden="true" />
+               </button>
+            </div>
 
-                {/* Content Matrix */}
-                <div className="p-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
-                   <div className="lg:col-span-2 space-y-12">
-                      <section>
-                         <h5 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
-                            <div className="w-1 h-4 bg-indigo-600 rounded-full" />
-                            Technical Specifications
-                         </h5>
-                         <div className="grid grid-cols-2 gap-6">
-                            {[
-                               { label: 'Merchant SKU', value: selectedProduct.sku || 'UNREADABLE' },
-                               { label: 'Global Brand', value: selectedProduct.brand || 'GENERIC' },
-                               { label: 'Model Tier', value: selectedProduct.model || 'STANDARD' },
-                               { label: 'Taxonomy Category', value: selectedProduct.category?.name_th || 'PENDING' }
-                            ].map((item, i) => (
-                               <div key={i} className="p-8 bg-slate-50 rounded-[40px] border border-slate-100 hover:bg-white hover:shadow-xl transition-all group">
-                                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-indigo-400">{item.label}</p>
-                                  <p className="text-lg font-black text-slate-800 thai-text tracking-tight italic">{item.value}</p>
-                               </div>
-                            ))}
-                         </div>
-                      </section>
+            {/* Content Matrix */}
+            <div className="p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+               <div className="lg:col-span-2 space-y-8">
+                  <section>
+                     <h3 className="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-4 flex items-center gap-3">
+                        <div className="w-1.5 h-4 bg-indigo-600 rounded-full" aria-hidden="true" />
+                        ข้อมูลทางเทคนิค (Technical Specifications)
+                     </h3>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {[
+                           { label: 'Merchant SKU', value: selectedProduct.sku || 'ไม่ระบุ' },
+                           { label: 'Global Brand', value: selectedProduct.brand || 'ไม่ระบุแบรนด์' },
+                           { label: 'Model Tier', value: selectedProduct.model || 'มาตรฐาน' },
+                           { label: 'Taxonomy Category', value: selectedProduct.category?.name_th || 'รอการจำแนก' }
+                        ].map((item, i) => (
+                           <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{item.label}</p>
+                              <p className="text-base font-bold text-slate-800 thai-text tracking-tight">{item.value}</p>
+                           </div>
+                        ))}
+                     </div>
+                  </section>
 
-                      <section>
-                         <h5 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.4em] mb-6">Semantic Narrative</h5>
-                         <div className="p-10 bg-slate-900 rounded-[48px] text-slate-300 text-lg font-medium leading-relaxed thai-text relative overflow-hidden">
-                            <ActivityIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 text-white/5 pointer-events-none" />
-                            "{selectedProduct.description || 'No descriptive metadata captured for this entity.'}"
-                         </div>
-                      </section>
-                   </div>
+                  <section>
+                     <h3 className="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-4">
+                        รายละเอียดเพิ่มเติม (Description)
+                     </h3>
+                     <div className="p-6 bg-slate-900 rounded-2xl text-slate-200 text-base font-medium leading-relaxed thai-text relative overflow-hidden">
+                        <ActivityIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 text-white/5 pointer-events-none" aria-hidden="true" />
+                        &ldquo;{selectedProduct.description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับรายการนี้'}&rdquo;
+                     </div>
+                  </section>
+               </div>
 
-                   <div className="space-y-12">
-                      <section className="bg-indigo-50/50 p-10 rounded-[56px] border border-indigo-100 flex flex-col justify-between min-h-[320px]">
-                         <div>
-                            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6">Registry Value</p>
-                            <div className="flex items-baseline gap-2">
-                               <span className="text-5xl font-black text-indigo-600 tracking-tighter">฿{selectedProduct.price?.toLocaleString()}</span>
-                               <span className="text-xs font-bold text-indigo-300 uppercase italic">THB</span>
-                            </div>
-                         </div>
-                         
-                         <div className="pt-8 border-t border-indigo-100/50 space-y-4">
-                            <div className="flex items-center justify-between">
-                               <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Pricing Quality</span>
-                               <div className="flex gap-1">
-                                  {[1,2,3,4,5].map(s=><div key={s} className="w-1.5 h-4 bg-indigo-600 rounded-full" />)}
-                               </div>
-                            </div>
-                         </div>
-                      </section>
+               <div className="space-y-8">
+                  <section className="bg-indigo-50/70 p-8 rounded-2xl border border-indigo-200 flex flex-col justify-between">
+                     <div>
+                        <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider mb-4">ราคาลงทะเบียน (Registry Value)</p>
+                        <div className="flex items-baseline gap-2">
+                           <span className="text-4xl font-black text-indigo-700 tracking-tight">฿{selectedProduct.price?.toLocaleString()}</span>
+                           <span className="text-xs font-bold text-indigo-500 uppercase">THB</span>
+                        </div>
+                     </div>
+                  </section>
 
-                      {PENDING_REVIEW_STATUSES.includes(selectedProduct.status) && (
-                        <section className="p-10 bg-amber-50/60 rounded-[48px] border border-amber-100 space-y-4">
-                           <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">รอการตรวจ</p>
-                           <p className="text-sm font-medium text-slate-600 thai-text leading-relaxed">
-                             สินค้าชิ้นนี้ยังรอคนตรวจอยู่ หน้านี้ดูอย่างเดียว — งานตรวจทั้งหมดอยู่ที่ศูนย์ตรวจสอบข้อมูล
-                           </p>
-                           <a
-                             href="/data-quality"
-                             className="inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-indigo-600 transition-all"
-                           >
-                             ไปที่ศูนย์ตรวจสอบข้อมูล
-                             <ArrowRightIcon className="w-4 h-4" />
-                           </a>
-                        </section>
-                      )}
-                   </div>
-                </div>
-             </motion.div>
+                  {PENDING_REVIEW_STATUSES.includes(selectedProduct.status) && (
+                    <section className="p-8 bg-amber-50 rounded-2xl border border-amber-200 space-y-4">
+                       <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">รอการตรวจ</p>
+                       <p className="text-sm font-medium text-slate-700 thai-text leading-relaxed">
+                         สินค้าชิ้นนี้ยังรอคนตรวจอยู่ หน้านี้ดูอย่างเดียว — งานตรวจทั้งหมดอยู่ที่ศูนย์ตรวจสอบข้อมูล
+                       </p>
+                       <a
+                         href="/data-quality"
+                         className={`inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-indigo-600 transition-all ${FOCUS_RING}`}
+                       >
+                         ไปที่ศูนย์ตรวจสอบข้อมูล
+                         <ArrowRightIcon className="w-4 h-4" aria-hidden="true" />
+                       </a>
+                    </section>
+                  )}
+               </div>
+            </div>
           </div>
         )}
-      </AnimatePresence>
+      </Modal>
     </div>
   )
 }

@@ -18,6 +18,44 @@
 
 ---
 
+## ✅ Session 20 ก.ย. 2569 — WCAG 2.2 Level AA Accessibility Remediation
+
+ปรับปรุงการเข้าถึงตามมาตรฐาน WCAG 2.2 ระดับ AA ครบทั้ง 7 หน้าที่อยู่ในขอบเขตการตรวจสอบ (`app/page.tsx`, `app/products/page.tsx`, `app/unlock/page.tsx`, `app/data-quality/page.tsx`, `app/taxonomy/page.tsx`, `app/settings/page.tsx`, `app/import/page.tsx`) โดยไม่แตะ `PosExportTab.tsx` และคง `data-testid` เดิมทุกจุด
+
+### 🛠️ สิ่งที่ทำในแต่ละขั้นตอน
+1. **Modal Component & Focus Ring (`components/ui/Modal.tsx`)**:
+   - สร้างคอมโพเนนต์ `<Modal>` กลางพร้อมระบบ Focus Trap (Tab/Shift+Tab), ปิดด้วยปุ่ม `Esc`, คืน Focus ไปยังปุ่มที่เปิดเมื่อปิด, และประกาศ `role="dialog" aria-modal="true"`
+   - ส่งออกค่า `FOCUS_RING` รวม (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2`) เพื่อให้ทุกปุ่มและ input มีสถานะ Focus ที่ชัดเจนและเป็นเอกภาพ
+2. **Dashboard & Layout (`Sidebar.tsx`, `Header.tsx`, `app/page.tsx`)**:
+   - แก้ไข Contrast ข้อความและไอคอนให้ผ่านเกณฑ์ 4.5:1 (เช่น `text-slate-600`/`text-slate-700` แทน `text-slate-400`, `text-indigo-900` บนพื้นหลังอ่อน)
+   - ปรับเมนูและสถานะระบบให้มี `role="status"` และ `aria-live="polite"`
+3. **Stock Browser (`app/products/page.tsx`)**:
+   - ผูก `<label htmlFor>` กับช่องค้นหาและตัวกรองทุกตัว, เพิ่ม `<caption>` และ `scope="col"` บนตารางสินค้า
+   - ปรับสีแท็กสถานะ `approved`/`rejected`/`pending_*` ให้มี Contrast ≥ 4.5:1 และขนาดตัวอักษร ≥ 12px
+4. **Unlock (`app/unlock/page.tsx`)**:
+   - เพิ่ม `<label htmlFor="unlock-secret">`, `autoComplete="current-password"`, `role="alert"` สำหรับข้อความแจ้งเตือนรหัสผ่านผิด
+5. **Data Quality Center (`app/data-quality/page.tsx`, `DeduplicationTab.tsx`, `VerifyTab.tsx`, `AutoLearnTab.tsx`)**:
+   - ปรับแท็บหลักให้เป็น ARIA tablist/tab รองรับการเลื่อนด้วยปุ่มลูกศร (ArrowLeft/ArrowRight, Home, End)
+   - ปรับการ์ดสรุปและตัวกรอง, ปรับสี Badge และตัวเลือกให้ได้ Contrast AA
+   - *คง `PosExportTab.tsx` ไว้ตามเดิม 100% ตามข้อตกลง*
+6. **Taxonomy Manager (`app/taxonomy/page.tsx`, `SynonymsPanel.tsx`)**:
+   - ปรับแท็บสลับ Tree / Synonyms ให้เป็น ARIA tabs
+   - แปลง Modal สร้าง/แก้ไขหมวดหมู่และ Synonym มาใช้ `<Modal>` พร้อมฟอร์มที่เชื่อมโยง `id`/`htmlFor`
+   - ทำให้ปุ่ม Action (Edit/Delete) ในแต่ละ Node มองเห็นได้เมื่อรับคีย์บอร์ดโฟกัส (`group-focus-within:opacity-100`)
+7. **Settings (`app/settings/page.tsx`)**:
+   - ปรับแท็บการตั้งค่าให้รองรับคีย์บอร์ด, ฟอร์มเชื่อมโยง `<label>`, กล่องทดสอบ Keyword/Regex เพิ่ม `aria-live="polite"`, ปรับปุ่มแก้ไข/ลบกฎให้มองเห็นเมื่อ Focus
+8. **Import Wizard (`app/import/page.tsx`, `components/Import/*`)**:
+   - ตัวระบุขั้นตอน Wizard ใช้ `aria-current="step"` และมี Focus Ring
+   - Progress bar มี `role="progressbar"` พร้อม `aria-valuenow`, `aria-valuemin`, `aria-valuemax`
+   - ตารางเปรียบเทียบและประวัติการนำเข้ามี `<caption>` ที่ซ่อนด้วย `sr-only` และ `scope="col"`
+   - แถวประวัติการนำเข้าและรายการ Storage เป็น Interactive element ที่กดปุ่ม Enter หรือ Space เพื่อขยายดูรายละเอียดได้
+
+### 🧪 ผลการทดสอบ
+- `npx tsc --noEmit`: มีเพียง 2 error เดิมใน `__tests__/integration/synonym.integration.test.ts` (0 new errors)
+- `npx jest --ci`: 35 passed, 4 suite-level live-DB throws ตามเอกสาร `AGENTS.md`, **278 passed / 278 tests (100% ผ่านทั้งหมด)**
+
+---
+
 ## ✅ Session 30 ส.ค. 2569 — กู้ชุด Playwright ที่ผุ (ขั้น 1-3)
 
 ชุด e2e เดิมไม่ใช่ด่านกันของเสีย มันเป็นด่านหลอก — วัดจริงแล้วเป็นแบบนี้

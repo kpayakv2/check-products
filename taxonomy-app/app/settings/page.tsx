@@ -25,6 +25,7 @@ import {
   XIcon
 } from 'lucide-react'
 import { DatabaseService } from '@/utils/supabase'
+import { FOCUS_RING } from '@/components/ui/Modal'
 
 interface RegexRule {
   id: string
@@ -125,6 +126,18 @@ export default function SettingsPage() {
     loadRules()
     loadSystemSettings()
   }, [])
+
+  // Close modals on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showJsonEditor) setShowJsonEditor(false)
+        if (showRuleEditor) setShowRuleEditor(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showJsonEditor, showRuleEditor])
 
   const loadRules = async () => {
     try {
@@ -367,6 +380,28 @@ export default function SettingsPage() {
     { id: 'import', name: 'Import/Export', icon: DownloadIcon }
   ]
 
+  const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      const nextIndex = (index + 1) % tabs.length
+      setActiveTab(tabs[nextIndex].id as any)
+      document.getElementById(`settings-tab-${tabs[nextIndex].id}`)?.focus()
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      const prevIndex = (index - 1 + tabs.length) % tabs.length
+      setActiveTab(tabs[prevIndex].id as any)
+      document.getElementById(`settings-tab-${tabs[prevIndex].id}`)?.focus()
+    } else if (e.key === 'Home') {
+      e.preventDefault()
+      setActiveTab(tabs[0].id as any)
+      document.getElementById(`settings-tab-${tabs[0].id}`)?.focus()
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      setActiveTab(tabs[tabs.length - 1].id as any)
+      document.getElementById(`settings-tab-${tabs[tabs.length - 1].id}`)?.focus()
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
       <Sidebar />
@@ -385,25 +420,36 @@ export default function SettingsPage() {
               <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight thai-text uppercase">
                 System Workflow Configuration
               </h1>
-              <p className="mt-2 text-slate-500 font-medium thai-text">
+              <p className="mt-2 text-slate-600 font-medium thai-text">
                 จัดการกฎเกณฑ์ของ AI, กติกาการจัดหมวดหมู่ และการตั้งค่าเชิงลึกของระบบจัดการสินค้า
               </p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="mb-10 p-1.5 bg-slate-100 rounded-3xl inline-flex gap-1 border border-slate-200/60 shadow-inner">
-              {tabs.map((tab) => {
+            <div 
+              role="tablist"
+              aria-label="การตั้งค่าระบบ"
+              className="mb-10 p-1.5 bg-slate-100 rounded-3xl inline-flex gap-1 border border-slate-200/60 shadow-inner"
+            >
+              {tabs.map((tab, index) => {
                 const Icon = tab.icon
                 const isActive = activeTab === tab.id
                 return (
                   <button
                     key={tab.id}
+                    id={`settings-tab-${tab.id}`}
+                    role="tab"
+                    type="button"
+                    aria-selected={isActive}
+                    aria-controls={`settings-panel-${tab.id}`}
+                    tabIndex={isActive ? 0 : -1}
                     onClick={() => setActiveTab(tab.id as any)}
+                    onKeyDown={(e) => handleTabKeyDown(e, index)}
                     className={`
-                      relative flex items-center px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300
+                      relative flex items-center px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${FOCUS_RING}
                       ${isActive
                         ? 'text-indigo-600'
-                        : 'text-slate-400 hover:text-slate-600'
+                        : 'text-slate-600 hover:text-slate-900'
                       }
                     `}
                   >
@@ -414,10 +460,11 @@ export default function SettingsPage() {
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
-                    <span className="relative z-10 flex items-center">
-                          <span className={`text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === tab.id ? 'text-indigo-600' : 'text-slate-400'}`}>
-                            {tab.name}
-                          </span>
+                    <span className="relative z-10 flex items-center gap-2">
+                      <Icon className="w-4 h-4" aria-hidden="true" />
+                      <span className={`text-xs font-bold uppercase tracking-wider transition-colors ${isActive ? 'text-indigo-700' : 'text-slate-600'}`}>
+                        {tab.name}
+                      </span>
                     </span>
                   </button>
                 )
@@ -431,11 +478,15 @@ export default function SettingsPage() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}
+                    role="tabpanel"
+                    id={`settings-panel-${activeTab}`}
+                    aria-labelledby={`settings-tab-${activeTab}`}
+                    tabIndex={0}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
-                    className="premium-card p-10 bg-white/60 backdrop-blur-xl border border-white"
+                    className="premium-card p-10 bg-white/60 backdrop-blur-xl border border-white focus:outline-none"
                   >
                     {/* Regex Rules Tab */}
                     {activeTab === 'regex' && (
@@ -443,25 +494,25 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Regular Expression Engine</h2>
-                            <p className="text-sm font-medium text-slate-400 thai-text">กำหนดกฎสำหรับการแยกคุณลักษณะสินค้าจากข้อความอัตโนมัติ</p>
+                            <p className="text-sm font-medium text-slate-600 thai-text">กำหนดกฎสำหรับการแยกคุณลักษณะสินค้าจากข้อความอัตโนมัติ</p>
                           </div>
                           <div className="hidden sm:flex space-x-3">
                             <button
                               onClick={() => openJsonEditor('regex')}
-                              className="btn-premium-secondary"
+                              className={`btn-premium-secondary ${FOCUS_RING}`}
                             >
-                              <CodeIcon className="w-4 h-4 mr-2" />
+                              <CodeIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                               JSON Setup
                             </button>
-                            <button className="btn-premium px-8">
-                              <PlusIcon className="w-4 h-4 mr-2" />
+                            <button className={`btn-premium px-8 ${FOCUS_RING}`}>
+                              <PlusIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                               Add Identifier
                             </button>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 gap-6">
-                          {regexRules.map((rule, idx) => (
+                          {regexRules.map((rule) => (
                             <div 
                               key={rule.id}
                               className="bg-white/80 rounded-[32px] p-8 border border-slate-100 group hover:border-indigo-100 transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-indigo-100/10"
@@ -470,31 +521,40 @@ export default function SettingsPage() {
                                 <div className="flex-1">
                                   <div className="flex items-center space-x-4 mb-3">
                                     <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 border border-indigo-100/50 group-hover:scale-110 transition-transform">
-                                      <SearchIcon className="w-5 h-5" />
+                                      <SearchIcon className="w-5 h-5" aria-hidden="true" />
                                     </div>
                                     <h3 className="text-xl font-extrabold text-slate-800 tracking-tight">{rule.name}</h3>
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                      rule.is_active ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-100'
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                                      rule.is_active ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-slate-100 text-slate-700 border-slate-300'
                                     }`}>
                                       {rule.is_active ? 'Production Ready' : 'DRAFT'}
                                     </span>
                                   </div>
-                                  <p className="text-sm font-medium text-slate-500 thai-text leading-relaxed mb-6">{rule.description}</p>
+                                  <p className="text-sm font-medium text-slate-600 thai-text leading-relaxed mb-6">{rule.description}</p>
                                   
                                   <div className="flex flex-wrap gap-4 items-center">
                                     <div className="px-4 py-2 bg-slate-900 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg">
-                                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest border-r border-white/10 pr-3">Pattern</span>
+                                      <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider border-r border-white/10 pr-3">Pattern</span>
                                       <code className="text-xs font-mono font-bold text-indigo-100">{rule.pattern}</code>
                                     </div>
                                   </div>
                                 </div>
                                 
-                                <div className="flex flex-col gap-2">
-                                  <button onClick={() => { setSelectedRule(rule); setShowRuleEditor(true); }} className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-white border border-slate-100 hover:border-indigo-100 transition-all">
-                                    <EditIcon className="w-4 h-4" />
+                                <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-all">
+                                  <button 
+                                    type="button"
+                                    aria-label={`แก้ไขกฎ Regex ${rule.name}`}
+                                    onClick={() => { setSelectedRule(rule); setShowRuleEditor(true); }} 
+                                    className={`p-3 bg-white rounded-xl text-slate-600 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200 transition-all ${FOCUS_RING}`}
+                                  >
+                                    <EditIcon className="w-4 h-4" aria-hidden="true" />
                                   </button>
-                                  <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-100 hover:border-rose-100 transition-all">
-                                    <Trash2Icon className="w-4 h-4" />
+                                  <button 
+                                    type="button"
+                                    aria-label={`ลบกฎ Regex ${rule.name}`}
+                                    className={`p-3 bg-white rounded-xl text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all ${FOCUS_RING}`}
+                                  >
+                                    <Trash2Icon className="w-4 h-4" aria-hidden="true" />
                                   </button>
                                 </div>
                               </div>
@@ -510,18 +570,18 @@ export default function SettingsPage() {
                          <div className="flex items-center justify-between">
                           <div>
                             <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Keyword Logic</h2>
-                            <p className="text-sm font-medium text-slate-400 thai-text">ตรรกะสำหรับการจับคูสินค้าด้วยคำสำคัญ (Keyword Mapping)</p>
+                            <p className="text-sm font-medium text-slate-600 thai-text">ตรรกะสำหรับการจับคูสินค้าด้วยคำสำคัญ (Keyword Mapping)</p>
                           </div>
                           <div className="hidden sm:flex space-x-3">
                             <button
                               onClick={() => openJsonEditor('keywords')}
-                              className="btn-premium-secondary"
+                              className={`btn-premium-secondary ${FOCUS_RING}`}
                             >
-                              <CodeIcon className="w-4 h-4 mr-2" />
+                              <CodeIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                               JSON Setup
                             </button>
-                            <button className="btn-premium px-8">
-                              <PlusIcon className="w-4 h-4 mr-2" />
+                            <button className={`btn-premium px-8 ${FOCUS_RING}`}>
+                              <PlusIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                               Add Keywords
                             </button>
                           </div>
@@ -537,30 +597,38 @@ export default function SettingsPage() {
                                 <div className="flex-1">
                                   <div className="flex items-center space-x-4 mb-3">
                                     <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100/50 group-hover:scale-110 transition-transform">
-                                      <CodeIcon className="w-5 h-5" />
+                                      <CodeIcon className="w-5 h-5" aria-hidden="true" />
                                     </div>
                                     <h3 className="text-xl font-extrabold text-slate-800 tracking-tight">{rule.name}</h3>
-                                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-600 border border-indigo-100">
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-900 border border-indigo-300">
                                       {rule.match_type} MATCH
                                     </span>
                                   </div>
-                                  <p className="text-sm font-medium text-slate-500 thai-text leading-relaxed mb-6">{rule.description}</p>
+                                  <p className="text-sm font-medium text-slate-600 thai-text leading-relaxed mb-6">{rule.description}</p>
                                   
                                   <div className="flex flex-wrap gap-2">
                                     {rule.keywords.slice(0, 10).map((k, i) => (
-                                      <span key={i} className="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg text-xs font-bold text-slate-600">{k}</span>
+                                      <span key={i} className="px-3 py-1 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-slate-700">{k}</span>
                                     ))}
                                     {rule.keywords.length > 10 && (
-                                      <span className="text-xs font-bold text-slate-400">+{rule.keywords.length - 10} more</span>
+                                      <span className="text-xs font-bold text-slate-500">+{rule.keywords.length - 10} more</span>
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                  <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-white border border-slate-100 hover:border-indigo-100 transition-all">
-                                    <EditIcon className="w-4 h-4" />
+                                <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-all">
+                                  <button 
+                                    type="button"
+                                    aria-label={`แก้ไขกฎ Keyword ${rule.name}`}
+                                    className={`p-3 bg-white rounded-xl text-slate-600 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200 transition-all ${FOCUS_RING}`}
+                                  >
+                                    <EditIcon className="w-4 h-4" aria-hidden="true" />
                                   </button>
-                                  <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-100 hover:border-rose-100 transition-all">
-                                    <Trash2Icon className="w-4 h-4" />
+                                  <button 
+                                    type="button"
+                                    aria-label={`ลบกฎ Keyword ${rule.name}`}
+                                    className={`p-3 bg-white rounded-xl text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all ${FOCUS_RING}`}
+                                  >
+                                    <Trash2Icon className="w-4 h-4" aria-hidden="true" />
                                   </button>
                                 </div>
                               </div>
@@ -576,10 +644,10 @@ export default function SettingsPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Global Policy</h2>
-                            <p className="text-sm font-medium text-slate-400 thai-text">คอนฟิกูเรชันหลักสำหรับ AI Engine และ System Behavior</p>
+                            <p className="text-sm font-medium text-slate-600 thai-text">คอนฟิกูเรชันหลักสำหรับ AI Engine และ System Behavior</p>
                           </div>
-                          <button onClick={saveSystemSettings} className="btn-premium px-10">
-                            <SaveIcon className="w-4 h-4 mr-2" />
+                          <button onClick={saveSystemSettings} className={`btn-premium px-10 ${FOCUS_RING}`}>
+                            <SaveIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                             Apply Changes
                           </button>
                         </div>
@@ -588,21 +656,24 @@ export default function SettingsPage() {
                           <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600 border border-indigo-100/50">
-                                  <SearchIcon className="w-5 h-5" />
+                                  <SearchIcon className="w-5 h-5" aria-hidden="true" />
                                </div>
                                <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">Search & Indexing</h3>
                             </div>
                             
                             <div className="space-y-4">
                               <div>
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Default Search Strategy</label>
+                                <label htmlFor="setting-default-search-strategy" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 px-1">
+                                  Default Search Strategy
+                                </label>
                                 <select
+                                  id="setting-default-search-strategy"
                                   value={systemSettings.search.defaultSearchType}
                                   onChange={(e) => setSystemSettings(prev => ({
                                     ...prev,
                                     search: { ...prev.search, defaultSearchType: e.target.value as any }
                                   }))}
-                                  className="select-premium w-full text-sm font-black"
+                                  className={`select-premium w-full text-sm font-bold ${FOCUS_RING}`}
                                 >
                                   <option value="vector">Semantic Vector Search</option>
                                   <option value="text">Fuzzy Text Matching</option>
@@ -612,27 +683,33 @@ export default function SettingsPage() {
                               
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Max Result Cap</label>
+                                  <label htmlFor="setting-max-results" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 px-1">
+                                    Max Result Cap
+                                  </label>
                                   <input
+                                    id="setting-max-results"
                                     type="number"
                                     value={systemSettings.search.maxResults}
                                     onChange={(e) => setSystemSettings(prev => ({
                                       ...prev,
-                                      search: { ...prev.search, maxResults: parseInt(e.target.value) }
+                                      search: { ...prev.search, maxResults: parseInt(e.target.value) || 0 }
                                     }))}
-                                    className="input-premium w-full text-sm font-black"
+                                    className={`input-premium w-full text-sm font-bold ${FOCUS_RING}`}
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Confidence Thres.</label>
+                                  <label htmlFor="setting-confidence-threshold" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 px-1">
+                                    Confidence Thres.
+                                  </label>
                                   <input
+                                    id="setting-confidence-threshold"
                                     type="number" step="0.05"
                                     value={systemSettings.search.confidenceThreshold}
                                     onChange={(e) => setSystemSettings(prev => ({
                                       ...prev,
-                                      search: { ...prev.search, confidenceThreshold: parseFloat(e.target.value) }
+                                      search: { ...prev.search, confidenceThreshold: parseFloat(e.target.value) || 0 }
                                     }))}
-                                    className="input-premium w-full text-sm font-black"
+                                    className={`input-premium w-full text-sm font-bold ${FOCUS_RING}`}
                                   />
                                 </div>
                               </div>
@@ -642,21 +719,24 @@ export default function SettingsPage() {
                           <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600 border border-emerald-100/50">
-                                  <ZapIcon className="w-5 h-5" />
+                                  <ZapIcon className="w-5 h-5" aria-hidden="true" />
                                </div>
                                <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">AI Engine Settings</h3>
                             </div>
 
                             <div className="space-y-4">
                               <div>
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Active Model</label>
+                                <label htmlFor="setting-active-model" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 px-1">
+                                  Active Model
+                                </label>
                                 <select
+                                  id="setting-active-model"
                                   value={systemSettings.ai.embeddingModel}
                                   onChange={(e) => setSystemSettings(prev => ({
                                     ...prev,
                                     ai: { ...prev.ai, embeddingModel: e.target.value }
                                   }))}
-                                  className="select-premium w-full text-sm font-black"
+                                  className={`select-premium w-full text-sm font-bold ${FOCUS_RING}`}
                                 >
                                   <option value="paraphrase-multilingual-MiniLM-L12-v2">OpenAI Ada-V2</option>
                                   <option value="multilingual-e5-large">Multilingual E5 Large</option>
@@ -664,19 +744,24 @@ export default function SettingsPage() {
                               </div>
                               
                               <div>
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Preference Provider</label>
-                                <div className="grid grid-cols-3 gap-2">
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 px-1">
+                                  Preference Provider
+                                </label>
+                                <div role="radiogroup" aria-label="Preference Provider" className="grid grid-cols-3 gap-2">
                                   {['openai', 'huggingface', 'local'].map((provider) => (
                                     <button
                                       key={provider}
+                                      type="button"
+                                      role="radio"
+                                      aria-checked={systemSettings.ai.apiProvider === provider}
                                       onClick={() => setSystemSettings(prev => ({
                                         ...prev,
                                         ai: { ...prev.ai, apiProvider: provider as any }
                                       }))}
-                                      className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+                                      className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${FOCUS_RING} ${
                                         systemSettings.ai.apiProvider === provider 
-                                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/20' 
-                                          : 'bg-white text-slate-400 border-slate-100 hover:border-indigo-100 hover:text-slate-600'
+                                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/20' 
+                                          : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-200 hover:text-slate-900'
                                       }`}
                                     >
                                       {provider}
@@ -695,29 +780,46 @@ export default function SettingsPage() {
                       <div className="space-y-12">
                         <div>
                           <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase mb-2">Workspace Portability</h2>
-                          <p className="text-sm font-medium text-slate-400 thai-text">แบ็คอัพหรืออพยพกฎเกณฑ์และความตั้งค่าของระบบ</p>
+                          <p className="text-sm font-medium text-slate-600 thai-text">แบ็คอัพหรืออพยพกฎเกณฑ์และความตั้งค่าของระบบ</p>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                           <div className="bg-white/80 rounded-[40px] p-8 border border-slate-100 shadow-sm flex flex-col items-center text-center">
                             <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform">
-                              <DownloadIcon className="w-8 h-8" />
+                              <DownloadIcon className="w-8 h-8" aria-hidden="true" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 tracking-tight uppercase mb-2">Export Library</h3>
-                            <p className="text-sm font-medium text-slate-400 thai-text mb-8 px-8">บันทึกกฎทั้งหมดลงไฟล์ JSON สำหรับใช้เป็นชุดข้อมูลสำรองหรือย้ายเครื่อง</p>
-                            <button onClick={exportRules} className="btn-premium w-full justify-center py-4">
+                            <p className="text-sm font-medium text-slate-600 thai-text mb-8 px-8">บันทึกกฎทั้งหมดลงไฟล์ JSON สำหรับใช้เป็นชุดข้อมูลสำรองหรือย้ายเครื่อง</p>
+                            <button onClick={exportRules} className={`btn-premium w-full justify-center py-4 ${FOCUS_RING}`}>
                               Generate Ruleset Snapshot
                             </button>
                           </div>
 
                           <div className="bg-white/80 rounded-[40px] p-8 border border-slate-100 shadow-sm flex flex-col items-center text-center">
                             <div className="w-16 h-16 bg-amber-50 rounded-3xl flex items-center justify-center text-amber-600 mb-6 group-hover:scale-110 transition-transform">
-                              <UploadIcon className="w-8 h-8" />
+                              <UploadIcon className="w-8 h-8" aria-hidden="true" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 tracking-tight uppercase mb-2">Sync Infrastructure</h3>
-                            <p className="text-sm font-medium text-slate-400 thai-text mb-8 px-8">นำเข้าชุดกฎเกณฑ์จากไฟล์เดิม ระวัง: ข้อมูลปัจจุบันจะถูกเขียนทับทันที</p>
-                            <input type="file" accept=".json" onChange={importRules} className="hidden" id="import-file" />
-                            <label htmlFor="import-file" className="btn-premium-secondary w-full justify-center py-4 cursor-pointer">
+                            <p className="text-sm font-medium text-slate-600 thai-text mb-8 px-8">นำเข้าชุดกฎเกณฑ์จากไฟล์เดิม ระวัง: ข้อมูลปัจจุบันจะถูกเขียนทับทันที</p>
+                            <input 
+                              type="file" 
+                              accept=".json" 
+                              onChange={importRules} 
+                              className="sr-only" 
+                              id="import-file" 
+                              aria-label="เลือกไฟล์ JSON สำหรับนำเข้ากฎเกณฑ์"
+                            />
+                            <label 
+                              htmlFor="import-file" 
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault()
+                                  document.getElementById('import-file')?.click()
+                                }
+                              }}
+                              className={`btn-premium-secondary w-full justify-center py-4 cursor-pointer ${FOCUS_RING}`}
+                            >
                               Upload Rule Archive
                             </label>
                           </div>
@@ -734,40 +836,44 @@ export default function SettingsPage() {
                   <div className="p-8 border-b border-white">
                     <div className="flex items-center gap-3 mb-6">
                        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
-                          <ActivityIcon className="w-5 h-5" />
+                          <ActivityIcon className="w-5 h-5" aria-hidden="true" />
                        </div>
                        <div>
                           <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase">Rule Sandbox</h3>
-                          <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Isolated Environment</p>
+                          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Isolated Environment</p>
                        </div>
                     </div>
                     
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Source Payload (Single Item)</label>
+                        <label htmlFor="sandbox-test-input" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 px-1">
+                          Source Payload (Single Item)
+                        </label>
                         <textarea
+                          id="sandbox-test-input"
                           value={testInput}
                           onChange={(e) => setTestInput(e.target.value)}
                           placeholder="วางข้อความชื่อสินค้าสำหรับทดสอบ..."
-                          className="input-premium w-full h-32 text-sm font-semibold thai-text leading-relaxed p-4 bg-white/50"
+                          className={`input-premium w-full h-32 text-sm font-semibold thai-text leading-relaxed p-4 bg-white/70 border-slate-200 ${FOCUS_RING}`}
                         />
                       </div>
 
                       <button
+                        type="button"
                         onClick={runTests}
-                        className="btn-premium w-full py-4 text-sm tracking-[0.1em] justify-center group shadow-indigo-600/25"
+                        className={`btn-premium w-full py-4 text-sm tracking-[0.1em] justify-center group shadow-indigo-600/25 ${FOCUS_RING}`}
                       >
-                        <ZapIcon className="w-4 h-4 mr-2 group-hover:animate-pulse" />
+                        <ZapIcon className="w-4 h-4 mr-2 group-hover:animate-pulse" aria-hidden="true" />
                         Execute Core Test
                       </button>
                     </div>
                   </div>
 
                   {/* Test Results Display */}
-                  <div className="p-8 bg-indigo-50/20 min-h-[300px]">
+                  <div className="p-8 bg-indigo-50/20 min-h-[300px]" aria-live="polite">
                     <div className="flex items-center justify-between mb-6">
-                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Logic Trace Results</h4>
-                       <span className="text-[10px] font-bold text-indigo-500 bg-white px-2 py-0.5 rounded-md border border-indigo-100/50">{testResults.length} Hits</span>
+                       <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-1">Logic Trace Results</h4>
+                       <span className="text-xs font-bold text-indigo-700 bg-white px-2 py-0.5 rounded-md border border-indigo-100">{testResults.length} Hits</span>
                     </div>
 
                     {testResults.length > 0 ? (
@@ -776,14 +882,14 @@ export default function SettingsPage() {
                           <div 
                             key={index}
                             className={`p-5 rounded-3xl border shadow-sm relative overflow-hidden group ${
-                              result.isMatch ? 'bg-white border-emerald-100 text-emerald-800' : 'bg-white/40 border-slate-100 text-slate-300 opacity-60'
+                              result.isMatch ? 'bg-white border-emerald-200 text-emerald-900' : 'bg-white/40 border-slate-200 text-slate-500 opacity-75'
                             }`}
                           >
                             <div className="flex items-center gap-3 relative z-10">
                               {result.isMatch ? (
-                                <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
+                                <CheckCircleIcon className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                               ) : (
-                                <XIcon className="w-4 h-4 text-slate-200" />
+                                <XIcon className="w-4 h-4 text-slate-400" aria-hidden="true" />
                               )}
                               <span className="font-extrabold text-xs uppercase tracking-tight">{result.rule.name}</span>
                             </div>
@@ -791,7 +897,7 @@ export default function SettingsPage() {
                             {result.isMatch && (
                                <div className="mt-4 flex flex-wrap gap-2 relative z-10">
                                   {(result.matches || result.matchedKeywords || []).map((match: string, mI: number) => (
-                                     <span key={mI} className="px-2 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-black font-mono shadow-sm">
+                                     <span key={mI} className="px-2 py-1 bg-emerald-700 text-white rounded-lg text-xs font-bold font-mono shadow-sm">
                                         {match}
                                      </span>
                                   ))}
@@ -803,9 +909,9 @@ export default function SettingsPage() {
                     ) : (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
                          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 mb-6">
-                            <ActivityIcon className="w-8 h-8 text-indigo-400" />
+                            <ActivityIcon className="w-8 h-8 text-indigo-500" aria-hidden="true" />
                          </div>
-                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-relaxed px-10">
+                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-relaxed px-10">
                             ไม่มีกฎที่จับคู่กันได้ (Miss)<br/>กรุณาเพิ่มความเข้มข้นของ Keywords หรือปรับปรุง Regex Pattern
                          </p>
                       </div>
@@ -821,44 +927,55 @@ export default function SettingsPage() {
       {/* JSON Editor Modal */}
       <AnimatePresence>
         {showJsonEditor && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 sm:p-10">
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="json-editor-title"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 sm:p-10"
+          >
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="bg-slate-900 rounded-[56px] w-full max-w-5xl shadow-2xl border border-white/10 flex flex-col overflow-hidden max-h-full"
             >
-              <div className="p-10 border-b border-white/5 flex items-center justify-between bg-slate-900">
+              <div className="p-10 border-b border-white/10 flex items-center justify-between bg-slate-900">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400 border border-indigo-500/30">
-                    <CodeIcon className="w-6 h-6" />
+                    <CodeIcon className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-white tracking-tight uppercase">Infrastructure Direct Override</h3>
-                    <p className="text-xs font-medium text-indigo-300/60 uppercase tracking-widest mt-1">Direct System Parameter Modification</p>
+                    <h3 id="json-editor-title" className="text-2xl font-black text-white tracking-tight uppercase">
+                      Infrastructure Direct Override
+                    </h3>
+                    <p className="text-xs font-medium text-indigo-300 uppercase tracking-widest mt-1">Direct System Parameter Modification</p>
                   </div>
                 </div>
                 
                 <button
+                  type="button"
+                  aria-label="ปิดหน้าต่างแก้ไข JSON"
                   onClick={() => setShowJsonEditor(false)}
-                  className="p-4 text-white/50 hover:text-white hover:bg-white/5 rounded-3xl transition-all"
+                  className={`p-4 text-white/70 hover:text-white hover:bg-white/10 rounded-3xl transition-all ${FOCUS_RING}`}
                 >
-                  <XIcon className="w-6 h-6" />
+                  <XIcon className="w-6 h-6" aria-hidden="true" />
                 </button>
               </div>
               
               <div className="flex-1 p-10 bg-slate-800/20">
+                <label htmlFor="json-editor-textarea" className="sr-only">โครงสร้าง JSON</label>
                 <textarea
+                  id="json-editor-textarea"
                   value={jsonEditorContent}
                   onChange={(e) => setJsonEditorContent(e.target.value)}
-                  className="w-full h-full min-h-[400px] bg-transparent font-mono text-sm border-none text-indigo-100 focus:ring-0 resize-none leading-relaxed"
+                  className={`w-full h-full min-h-[400px] bg-transparent font-mono text-sm border-none text-indigo-100 focus:ring-0 resize-none leading-relaxed ${FOCUS_RING}`}
                   placeholder="Insert valid JSON payload here..."
                 />
               </div>
               
-              <div className="p-10 bg-slate-900 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div className="flex items-start gap-4 p-5 bg-amber-500/10 border border-amber-500/20 rounded-3xl max-w-2xl">
-                   <AlertCircleIcon className="w-6 h-6 text-amber-500 shrink-0" />
+              <div className="p-10 bg-slate-900 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="flex items-start gap-4 p-5 bg-amber-500/10 border border-amber-500/30 rounded-3xl max-w-2xl">
+                   <AlertCircleIcon className="w-6 h-6 text-amber-400 shrink-0" aria-hidden="true" />
                    <p className="text-xs font-medium text-amber-200 thai-text leading-relaxed">
                       คำเตือน: การเปลี่ยนโครงสร้าง JSON โดยตรงอาจส่งผลกระทบต่อความเสถียรของระบบ (Parsing Integrity) และอาจทำให้ฟังก์ชันบางส่วนทำงานผิดพลาดได้ กรุณาตรวจสอบ Syntax และ Schema ให้ถูกต้องก่อนกด Commit
                    </p>
@@ -866,14 +983,16 @@ export default function SettingsPage() {
 
                 <div className="flex items-center gap-4 w-full lg:w-auto">
                   <button
+                    type="button"
                     onClick={() => setShowJsonEditor(false)}
-                    className="flex-1 lg:flex-none px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
+                    className={`flex-1 lg:flex-none px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition-all ${FOCUS_RING}`}
                   >
                     Discard Changes
                   </button>
                   <button
+                    type="button"
                     onClick={saveJsonEditor}
-                    className="flex-1 lg:flex-none btn-premium px-12 py-4"
+                    className={`flex-1 lg:flex-none btn-premium px-12 py-4 ${FOCUS_RING}`}
                   >
                     Commit Parameters
                   </button>
