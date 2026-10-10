@@ -13,6 +13,7 @@ from src.api.models import (
 )
 from src.api.dependencies import get_taxonomy_service, get_ml_learning_system, get_supabase_client, initialize_embedding_model
 from src.services.human_feedback_system import ProductComparison, FeedbackType
+from src.core.product_identity import PairVerdict, classify_pair
 import csv
 import io
 
@@ -41,6 +42,21 @@ def is_match_label(pred_label) -> bool:
     ใช้ตัดสินว่าสินค้าใหม่ที่กำลังตรวจ "มีในสตอกแล้ว" หรือ "ยังไม่เคยมี"
     """
     return str(pred_label) in MATCH_LABELS
+
+
+def is_pair_resolved(pair_key, reviewed_pairs, name_a: str, name_b: str) -> bool:
+    """คู่นี้ไม่ต้องให้คนดูแล้วหรือยัง
+
+    สองเหตุผลที่คัดออกได้: คนตรวจไปแล้ว หรือกฎอ่านตัวเลขตัดสินว่าเป็นคนละสินค้า
+    กฎคัดออกได้เฉพาะฝั่งนั้น — ฝั่งที่กฎว่า "ซ้ำ" ยังต้องให้คนยืนยันก่อนรวมสินค้า
+    และเมื่อกฎเงียบ คู่นั้นต้องถึงมือคน ห้ามคัดออกเงียบๆ
+
+    เดิมคัดออกเฉพาะคู่ที่ reviewed=true ทำให้คู่ที่ embedding จับผิดถูกยื่นให้คนดูซ้ำทุกครั้ง
+    ที่สแกน (`หม้อหู - จระเข้ #22` กับ `#28` ได้คะแนน 0.996)
+    """
+    if pair_key in reviewed_pairs:
+        return True
+    return classify_pair(name_a, name_b) is PairVerdict.DIFFERENT
 
 
 PRODUCTS_FETCH_PAGE_SIZE = 1000
@@ -252,10 +268,9 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
                     i, j = int(i_indices[idx]), int(j_indices[idx])
                     sim = float(similarity_matrix[i, j])
                     
-                    # Check if this pair has already been reviewed
                     pair_key = tuple(sorted([ids[i], ids[j]]))
-                    if pair_key in reviewed_pairs:
-                        continue # Skip already resolved pairs
+                    if is_pair_resolved(pair_key, reviewed_pairs, names[i], names[j]):
+                        continue
                         
                     comp = ProductComparison(
                         id="inference",
@@ -316,7 +331,7 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
                     sim = float(similarity_matrix[i, j])
                     
                     pair_key = tuple(sorted([ids[i], ids[j]]))
-                    if pair_key in reviewed_pairs:
+                    if is_pair_resolved(pair_key, reviewed_pairs, names[i], names[j]):
                         continue
                         
                     cat_a = category_mapping.get(cat_ids[i], "Unmapped")
@@ -349,7 +364,7 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
                 sim = float(similarity_matrix[i, j])
                 
                 pair_key = tuple(sorted([ids[i], ids[j]]))
-                if pair_key in reviewed_pairs:
+                if is_pair_resolved(pair_key, reviewed_pairs, names[i], names[j]):
                     continue
                     
                 cat_a = category_mapping.get(cat_ids[i], "Unmapped")

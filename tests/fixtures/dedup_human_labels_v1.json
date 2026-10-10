@@ -1,0 +1,706 @@
+[
+  {
+    "match_id": "052f6b5b-04c7-4ea7-8e92-2867b07d4aee",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-1030 (ด้ามเลสหนา)",
+    "name_b": "ตะแกรงตักทอด - เลส SJ-1030 (ด้ามเลสหนา)",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:55.967Z"
+  },
+  {
+    "match_id": "0d0e811a-20bd-4b88-bb83-b6af1f918a2b",
+    "name_a": "ขาตั้งถังน้ำขาวขุ่น #8145-5 หูจับกลาง (1*5)",
+    "name_b": "ขาตั้งถังน้ำขาวขุ่น #8145-5 หูจับกลาง (1*5)",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:35:50.521Z"
+  },
+  {
+    "match_id": "0d1062f5-33d1-4e10-b86b-7166cee99306",
+    "name_a": "เอ็นเขียว#60ตัวเลข-เขียว",
+    "name_b": "เอ็นเขียว#60ตัวเลข-เขียว",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:29.577Z"
+  },
+  {
+    "match_id": "24ca7a63-e5a3-4740-8695-a577eb082ed6",
+    "name_a": "ขันน้ำ 20A CS",
+    "name_b": "ขันน้ำ 20A CS",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:35:17.302Z"
+  },
+  {
+    "match_id": "40f65cad-f780-4cb6-abc8-80b0026f21c8",
+    "name_a": "ชั้นวางของเรียบ 2 ชั้น 504 DMT",
+    "name_b": "ชั้นวางของเรียบ 2 ชั้น 504 DMT",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:49.916Z"
+  },
+  {
+    "match_id": "46d23050-1926-400d-aeaf-db2c6d3396f6",
+    "name_a": "ยาสีฟันคอลเกต100g.",
+    "name_b": "ยาสีฟันคอลเกต100g.",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:46.843Z"
+  },
+  {
+    "match_id": "b8f09102-1781-449d-b46b-52c4fdf1c21e",
+    "name_a": "หวีแปรงสุนัข 15702 IMM",
+    "name_b": "หวีแปรงสุนัข 15702 IMM",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:21.809Z"
+  },
+  {
+    "match_id": "f6d8db56-1f68-4483-ac93-0fc8a05cb60e",
+    "name_a": "สบู่วิภาดาเหลี่ยม65g สูตรนมแพะ",
+    "name_b": "สบู่วิภาดาเหลี่ยม65g สูตรนมแพะ",
+    "embedding_score": 1.0,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:53.553Z"
+  },
+  {
+    "match_id": "8ee5b765-69e6-4250-9d3e-e79488f9723c",
+    "name_a": "\"ผ้าปูโต๊ะ (พลาสติก-หนา) (36*54\"\") CW\"",
+    "name_b": "\"ผ้าปูโต๊ะ (พลาสติก - หนา) (36*54\"\") CW\"",
+    "embedding_score": 0.999,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:22.760Z"
+  },
+  {
+    "match_id": "52e08780-da3f-4fb9-a48f-73b4a5975053",
+    "name_a": "เหยือกตวง #9859 พลาสติก PP ขีดแดง",
+    "name_b": "เหยือกตวง #9858 พลาสติก PP ขีดแดง",
+    "embedding_score": 0.998,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:45.210Z"
+  },
+  {
+    "match_id": "b87f41ae-ca7c-4085-9edd-00961b747838",
+    "name_a": "ชั้นวางของ-คว่ำจาน 2 ชั้น 504-2 DMT",
+    "name_b": "ชั้นวางของ - คว่ำจาน 2 ชั้น 504-2 DMT",
+    "embedding_score": 0.998,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:34:54.631Z"
+  },
+  {
+    "match_id": "ea7486dd-e951-467f-94cb-4b2058d4292b",
+    "name_a": "\"ตะหลิวโฟกัส - ยาว 4\"\" #400 (ดำ) แบล็คไลท์\"",
+    "name_b": "\"ตะหลิวโฟกัส-ยาว 4\"\" #400 (ดำ) แบล็คไลท์\"",
+    "embedding_score": 0.997,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:27.635Z"
+  },
+  {
+    "match_id": "2ac5c9ee-80c8-40bf-a949-269d6ab039b3",
+    "name_a": "หม้อหู - จระเข้ #22 TNH",
+    "name_b": "หม้อหู - จระเข้ #28 TNH",
+    "embedding_score": 0.996,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:36:37.204Z"
+  },
+  {
+    "match_id": "3d79707c-49df-45d9-868e-47811d14ce3b",
+    "name_a": "ขวดซอส 7015 BG",
+    "name_b": "ขวดซอส 7016 BG",
+    "embedding_score": 0.996,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:33.061Z"
+  },
+  {
+    "match_id": "47810577-8d38-4c87-a0ed-018185578929",
+    "name_a": "\"วางเค้กใหญ่ #1 (L) VS, BOMM\"",
+    "name_b": "\"วางเค้กใหญ่ #1 (L) VS,BOMM\"",
+    "embedding_score": 0.996,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:54.777Z"
+  },
+  {
+    "match_id": "d625d6bd-14d4-442d-b0fb-daafc7bd6b12",
+    "name_a": "กล่องล็อค 4 ด้านใส 8023 SET LOCK SW",
+    "name_b": "กล่องล็อค 4 ด้าน ใส 8023 SET LOCK SW",
+    "embedding_score": 0.996,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:40.853Z"
+  },
+  {
+    "match_id": "e66b6e8b-18c6-4ada-aff0-53e2787815be",
+    "name_a": "ขวดซอสแฟนซี-เล็ก 1105 GW (10บ)",
+    "name_b": "ขวดซอสแฟนซี - เล็ก 1105 GW (10บ)",
+    "embedding_score": 0.996,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:39:00.235Z"
+  },
+  {
+    "match_id": "169b2d4c-90cf-4b19-874a-8469de209c6a",
+    "name_a": "ถาดกลมเลส 32 cm LH-4413 TLH",
+    "name_b": "ถาดกลมเลส 34 cm LH-4414 TLH",
+    "embedding_score": 0.995,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:35.200Z"
+  },
+  {
+    "match_id": "21503829-ba08-457b-9385-fd211e3d446d",
+    "name_a": "กระปุกฝาเกลียว215/5 11ลิตร",
+    "name_b": "กระปุกฝาเกลียว214/5 11ลิตร",
+    "embedding_score": 0.995,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:24.246Z"
+  },
+  {
+    "match_id": "31bdf547-8cfe-4749-a3fb-a587358da68d",
+    "name_a": "แปรงซักผ้า ฝาครอบ 123 SMT",
+    "name_b": "แปรงซักผ้า - ฝาครอบ 123 SMT",
+    "embedding_score": 0.995,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:30.821Z"
+  },
+  {
+    "match_id": "8c85675c-83e9-4fcb-88c9-ba47598d2d3c",
+    "name_a": "ขวดซอส 7015 BG",
+    "name_b": "ขวดซอส 7012 BG",
+    "embedding_score": 0.995,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:39:02.834Z"
+  },
+  {
+    "match_id": "d666df05-62c8-40b5-9000-0101ec57863c",
+    "name_a": "หม้อหู - จระเข้ #26 TNH",
+    "name_b": "หม้อหู - จระเข้ #28 TNH",
+    "embedding_score": 0.995,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:31.407Z"
+  },
+  {
+    "match_id": "2259aa59-a38c-4ce6-867d-b9388235de9e",
+    "name_a": "เก้าอี้ซักผ้า 910 สี",
+    "name_b": "เก้าอี้ซักผ้า910สี",
+    "embedding_score": 0.994,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:03.831Z"
+  },
+  {
+    "match_id": "79dc7a0f-0546-450c-92ad-2198c01b6d4a",
+    "name_a": "มีดด้ามพลาสติก 830P KW",
+    "name_b": "มีดด้ามพลาสติก 840P KW",
+    "embedding_score": 0.994,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:35:20.141Z"
+  },
+  {
+    "match_id": "a636f886-cbcc-4ebf-b423-31b5f99b8585",
+    "name_a": "ชั้นวางของคว่ำจาน 2 ชั้น 504-2 DMT",
+    "name_b": "ชั้นวางของ-คว่ำจาน 2 ชั้น 504-2 DMT",
+    "embedding_score": 0.994,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:22.424Z"
+  },
+  {
+    "match_id": "e49bf8aa-ebb1-43b7-b001-4f60900e9af5",
+    "name_a": "กล่องเหลื่ยม216/3",
+    "name_b": "กล่องเหลื่ยม218/3",
+    "embedding_score": 0.994,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:05.017Z"
+  },
+  {
+    "match_id": "34c2c642-ee22-484d-b851-b7898ad897ae",
+    "name_a": "หม้อหู - จระเข้ #26 TNH",
+    "name_b": "หม้อหู - จระเข้ #22 TNH",
+    "embedding_score": 0.993,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:13.662Z"
+  },
+  {
+    "match_id": "bdfbc058-107e-4dec-be55-267c868983d3",
+    "name_a": "หม้อหู - จระเข้ #24 TNH",
+    "name_b": "หม้อหู - จระเข้ #26 TNH",
+    "embedding_score": 0.993,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:38.965Z"
+  },
+  {
+    "match_id": "cca47496-4214-48cf-a817-d64ddbd7c0fc",
+    "name_a": "ขวดซอส 7016 BG",
+    "name_b": "ขวดซอส 7012 BG",
+    "embedding_score": 0.993,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:32.661Z"
+  },
+  {
+    "match_id": "f814d30c-cfe1-49f3-af1a-77f89756a752",
+    "name_a": "หม้อหู - จระเข้ #34",
+    "name_b": "หม้อหู - จระเข้ #32",
+    "embedding_score": 0.993,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:41.792Z"
+  },
+  {
+    "match_id": "22eaa6cc-338a-4de4-adaf-eeaf22137cd3",
+    "name_a": "หวี/หวีแปรง/หวีไดร์/หวีสับ 21 บ.",
+    "name_b": "หวี/หวีแปรง/หวีไดร์/หวีสับ 22 บ.",
+    "embedding_score": 0.992,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:45.581Z"
+  },
+  {
+    "match_id": "312d6cce-2802-403f-846a-4857d3f5cf0a",
+    "name_a": "กล่องล็อค - หูคู่ 4405 CSC",
+    "name_b": "กล่องล็อค - หูคู่ 4404 CSC",
+    "embedding_score": 0.992,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:39:05.424Z"
+  },
+  {
+    "match_id": "ce6cfec7-965b-457e-92d1-ee493871f7de",
+    "name_a": "เก้าอี้เตี้ย 610 ดำ",
+    "name_b": "เก้าอี้เตี้ย610ดำ",
+    "embedding_score": 0.992,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:39:01.569Z"
+  },
+  {
+    "match_id": "c0744d94-6ffe-4024-af7b-f80d550ecdfe",
+    "name_a": "ปีนฉีดนํ้าสนาม(หัวฝักบัว7ทาง)",
+    "name_b": "ปีนฉีดนํ้าสนาม(หัวฝักบัว8ทาง)",
+    "embedding_score": 0.991,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:36:00.886Z"
+  },
+  {
+    "match_id": "d474dbcf-e975-4bb7-92fd-ff0fbeea754c",
+    "name_a": "\"มีดเหล็กกล้านกแก้ว 3\"\" NK\"",
+    "name_b": "\"มีดเหล็กกล้า - นกแก้ว 3\"\" NK\"",
+    "embedding_score": 0.991,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:35.357Z"
+  },
+  {
+    "match_id": "1cbf2546-5617-4c17-86a0-e5b65a687d9e",
+    "name_a": "ถ่านCR1632พานาโซนิค",
+    "name_b": "ถ่านCR1616พานาโซนิค",
+    "embedding_score": 0.99,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:35:44.054Z"
+  },
+  {
+    "match_id": "5c90ecd7-0a70-499f-8872-4ae8df9952c6",
+    "name_a": "พวงกุญแจ 10522 (1X10) IMM",
+    "name_b": "พวงกุญแจ 10530 (1X10) IMM",
+    "embedding_score": 0.99,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:08.651Z"
+  },
+  {
+    "match_id": "8fb10bf9-6b5a-47f7-8fe2-43f0641ef405",
+    "name_a": "กล่องล็อค8030หูคู่สีหวาน",
+    "name_b": "กล่องล็อค8030หูคู่(สีหวาน)",
+    "embedding_score": 0.99,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:27.321Z"
+  },
+  {
+    "match_id": "97bf2354-4776-4d7d-aea0-fb9a535a5096",
+    "name_a": "ขวดโหล - ฝาคลิบล็อคสี F7404-2 KEY",
+    "name_b": "ขวดโหล - ฝาคลิบล็อคสี F7404-1 KEY",
+    "embedding_score": 0.99,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:35:09.669Z"
+  },
+  {
+    "match_id": "a65e5380-70df-4af1-9ab0-4635d6cad641",
+    "name_a": "ชั้นวางของคว่ำจาน 2 ชั้น 504-2 DMT",
+    "name_b": "ชั้นวางของ - คว่ำจาน 2 ชั้น 504-2 DMT",
+    "embedding_score": 0.99,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:33.103Z"
+  },
+  {
+    "match_id": "f44fcb01-5e70-4855-b8fc-895040e9f414",
+    "name_a": "\"ตีไข่เส้นลวดสี - ด้ามใส 10\"\" #2794 SBR\"",
+    "name_b": "\"ตีไข่เส้นลวดสี - ด้ามไม้ 10\"\" #2792 SBR\"",
+    "embedding_score": 0.99,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:38:56.665Z"
+  },
+  {
+    "match_id": "fdb72a2c-4b11-4898-b580-97c56665a544",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-3216 (ด้ามไม้แบน)",
+    "name_b": "ตะแกรงตักทอด - เลส SJ-3220 (ด้ามไม้แบน)",
+    "embedding_score": 0.99,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:35:41.052Z"
+  },
+  {
+    "match_id": "0c225021-e68b-49e3-81a0-b1068b968929",
+    "name_a": "เหล็กงัดยาง11*+แผ่นแปะ(แผงกระดาษ)",
+    "name_b": "เหล็กงัดยาง11+แผ่นแปะ(แผงกระดาษ)",
+    "embedding_score": 0.989,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:47.254Z"
+  },
+  {
+    "match_id": "451cf531-c9cb-4c0a-b7d1-57c59eee90dc",
+    "name_a": "\"มีดเหล็กกล้านกแก้ว 2\"\" NK\"",
+    "name_b": "\"มีดเหล็กกล้า - นกแก้ว 2\"\" NK\"",
+    "embedding_score": 0.989,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:13.336Z"
+  },
+  {
+    "match_id": "4fb0ad18-a44b-45e4-9b8e-05345fa829ab",
+    "name_a": "มีด 476 KW",
+    "name_b": "มีด 474 KW",
+    "embedding_score": 0.989,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:13.870Z"
+  },
+  {
+    "match_id": "5acdec82-4045-4fd3-bc1e-4b74af8bf9b3",
+    "name_a": "หม้อหู - จระเข้ #24 TNH",
+    "name_b": "หม้อหู - จระเข้ #22 TNH",
+    "embedding_score": 0.989,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:36:56.740Z"
+  },
+  {
+    "match_id": "b4c26bf7-d075-4827-b6dd-0b13242dd1dd",
+    "name_a": "แหนบหุ้มผึ้ง (1*6) NO.601 BEE",
+    "name_b": "แหนบหุ้มผึ้ง (1*6) NO.602 BEE",
+    "embedding_score": 0.989,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:38.166Z"
+  },
+  {
+    "match_id": "cd6e556d-830d-4752-b1de-66b64994f00b",
+    "name_a": "ห่วงตากผ้ากลม (ใหญ่) 001-01 (193) PCO",
+    "name_b": "ห่วงตากผ้า - กลม (ใหญ่) 001-01 (193) PCO",
+    "embedding_score": 0.989,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:35:30.021Z"
+  },
+  {
+    "match_id": "e2e07a40-a9ad-428f-b7b1-1a946dcaead0",
+    "name_a": "\"ตะหลิวใหญ่ 5\"\" #590 (แบล็คไลท์) ข้างคาว\"",
+    "name_b": "\"ตะหลิว - ใหญ่ 5\"\" #590 (แบล็คไลท์) ข้างคาว\"",
+    "embedding_score": 0.988,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:25.715Z"
+  },
+  {
+    "match_id": "eefe0994-0a8e-4288-92ca-415413fa9b34",
+    "name_a": "หม้อข้าวตราจระเข้34ซม",
+    "name_b": "หม้อข้าวตราจระเข้36ซม",
+    "embedding_score": 0.988,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T14:37:19.453Z"
+  },
+  {
+    "match_id": "1cfe908c-9552-4465-9530-9b6e9c9031f9",
+    "name_a": "กระจกเมจิ - ใหญ่ 19 บ FSM1-31 FT",
+    "name_b": "กระจกเมจิ - ใหญ่ 19บ FSM1-31 FT",
+    "embedding_score": 0.987,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:35:13.933Z"
+  },
+  {
+    "match_id": "32d7cfdc-077c-4ae1-9225-d2d6cd8c9510",
+    "name_a": "\"คีบสลัดเล็ก 10\"\" (หนา) FW-088 แพ็คครึ่ง\"",
+    "name_b": "\"คีบสลัด - เล็ก 10\"\" (หนา) FW-088 แพ็คครึ่ง\"",
+    "embedding_score": 0.985,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:08.100Z"
+  },
+  {
+    "match_id": "5da5c399-b51a-4e3b-9da4-90b2114cc146",
+    "name_a": "กิ๊บหนีบผ้า-เลส12ตัวแผงกระดาษ",
+    "name_b": "กิ๊บหนีบผ้า-เลส12ตัว แผงกระดาษ",
+    "embedding_score": 0.985,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:08.567Z"
+  },
+  {
+    "match_id": "0b984e52-c905-4e24-95ed-3f164cdbbef3",
+    "name_a": "ของเล่นรวม (1*12)",
+    "name_b": "ของเล่นรวม1*12",
+    "embedding_score": 0.983,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:25.969Z"
+  },
+  {
+    "match_id": "69fb824e-cc04-459a-b5f5-24093a4b08cd",
+    "name_a": "ตะกร้าเหลี่ยม - สีหวาย 922 SMT",
+    "name_b": "ตะกร้าเหลี่ยม สีหวาย 922 SMT",
+    "embedding_score": 0.983,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:20.809Z"
+  },
+  {
+    "match_id": "59673020-94a3-47b0-a645-1fcb9eb23216",
+    "name_a": "กระจาดเลสเจาะ TL-152 (30 ซม) ขอบพลาสติก",
+    "name_b": "กระจาดเลสเจาะ TL152 (30 ซม) ขอบพลาสติก",
+    "embedding_score": 0.982,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:12.167Z"
+  },
+  {
+    "match_id": "d10ede55-0959-428a-bab6-cc4af8381b3c",
+    "name_a": "ถัง ปูน 15 ดำ SP",
+    "name_b": "ถังปูน 15 ดำ SP",
+    "embedding_score": 0.98,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:24.448Z"
+  },
+  {
+    "match_id": "d6f2d8ee-f973-4057-a8f6-e866f5f0e9dc",
+    "name_a": "ถัง ปูน 15 สี AC",
+    "name_b": "ถังปูน 15 สี AC",
+    "embedding_score": 0.98,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:12.204Z"
+  },
+  {
+    "match_id": "3c8b6d13-ab37-45d9-9640-abd985aea35d",
+    "name_a": "ตะแกรงลายหวาย-จิ๋ว556(เดี่ยว)",
+    "name_b": "ตะแกรงลายหวาย-จิ๋ว556เดี่ยว",
+    "embedding_score": 0.977,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:18.566Z"
+  },
+  {
+    "match_id": "42748ecb-ede5-48a3-bfb0-a10c7e47b4c3",
+    "name_a": "กระจกด้ามจับ 25*17 cm #5114 IMM",
+    "name_b": "กระจกด้ามจับ 25*17CM #5114 IMM",
+    "embedding_score": 0.977,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:37.733Z"
+  },
+  {
+    "match_id": "4c05dbdd-bf76-468c-9c27-5754782e5931",
+    "name_a": "ถัง ปูน 15 สี SP",
+    "name_b": "ถังปูน 15 สี SP",
+    "embedding_score": 0.976,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:03.731Z"
+  },
+  {
+    "match_id": "4e7a9d11-871b-4d7e-815d-6e466bf6e617",
+    "name_a": "กระจาดเลสเจาะ TL-151/LH7009 (28 ซม)",
+    "name_b": "กระจาดเลสเจาะ TL151/LH7009 (28 ซม)",
+    "embedding_score": 0.976,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:35:54.414Z"
+  },
+  {
+    "match_id": "e12e904f-1409-4bbb-bd51-6cf0aaa6a480",
+    "name_a": "ถาดกลมเลส 34 cm LH-4414 TLH",
+    "name_b": "ถาดกลมเลส 34 cm LH4414 TLH",
+    "embedding_score": 0.975,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:59.528Z"
+  },
+  {
+    "match_id": "c50f3c0b-0e9c-4822-bcab-cf554aa62cf4",
+    "name_a": "กล่องล็อค - หูคู่ 4405 CSC",
+    "name_b": "กล่องล็อค-หูคู่4405 csc",
+    "embedding_score": 0.974,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:29.606Z"
+  },
+  {
+    "match_id": "e03eaa69-442a-4fda-947b-4c4444214cb2",
+    "name_a": "แปรงเรนโบว์ซักผ้า พลาสติกรูป8 BB",
+    "name_b": "แปรงเรนโบว์ (ซักผ้าพลาสติกรูป 8) BB",
+    "embedding_score": 0.972,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:51.480Z"
+  },
+  {
+    "match_id": "7b8e149d-15c6-4448-bca8-fd533beeabe0",
+    "name_a": "ตักน้ำแข็งมิเนียม (จัมโบ้) CCD-1 CCD",
+    "name_b": "ตักน้ำแข็ง - มิเนียม (จัมโบ้) CCD-1 CCD",
+    "embedding_score": 0.962,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:36:17.882Z"
+  },
+  {
+    "match_id": "0385bc10-be97-4efe-9ac4-6ab3a87da439",
+    "name_a": "ถังฝา 4.5 SRT",
+    "name_b": "ถัง + ฝา 4.5 SRT",
+    "embedding_score": 0.955,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:17.841Z"
+  },
+  {
+    "match_id": "0eb66c0e-1911-40da-9a39-aa6d923918b2",
+    "name_a": "โหลแก้วกลม - ฝาแก้วจุก 3500mL #3652 (LY)",
+    "name_b": "โหลแก้วกลม - ฝาแก้วจุก 3500 ml. #3652 (LY)",
+    "embedding_score": 0.952,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:36.207Z"
+  },
+  {
+    "match_id": "5959d6cd-56cd-4ec4-8bcd-0eedd5df079d",
+    "name_a": "เก้าอี้เตี้ย 610 AB",
+    "name_b": "เก้าอี้เตี้ย610AB",
+    "embedding_score": 0.951,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:02.340Z"
+  },
+  {
+    "match_id": "58af7f3b-8ed7-4d22-8724-87c3ceb15cf1",
+    "name_a": "น้ำยาล้างจานยูนิปอปแกลลอน",
+    "name_b": "น้ำยาล้างจานยูนิป็อป20",
+    "embedding_score": 0.947,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:16.842Z"
+  },
+  {
+    "match_id": "142f416c-76b0-4127-9fa4-28d1813dd6c3",
+    "name_a": "น้ำยาล้างจานยูนิป็อป20",
+    "name_b": "น้ำยาล้างจานทีโพ เกลอน",
+    "embedding_score": 0.943,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:10.097Z"
+  },
+  {
+    "match_id": "15503145-3a64-458d-bfa3-cbba05acb09a",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-1030 (ด้ามเลสหนา)",
+    "name_b": "ตะแกรงตักทอด เลส SJ1030 (ด้ามเลสหนา)",
+    "embedding_score": 0.942,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:03.075Z"
+  },
+  {
+    "match_id": "533d5f2d-6bdd-457a-bfcf-88f60934acce",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-1030 (ด้ามเลสหนา)",
+    "name_b": "ตะแกรงตักทอด เลส SJ1030 (ด้ามเลสหนา)",
+    "embedding_score": 0.942,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:00.419Z"
+  },
+  {
+    "match_id": "5b55e7d2-fed9-45e3-adb6-07b9b1a7fcee",
+    "name_a": "แชมพูเฮดแอนด์โชลเดอร์Men.135ml",
+    "name_b": "แชมพูเฮดแอนด์โชลเดอร์Men135ml",
+    "embedding_score": 0.939,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:37:40.271Z"
+  },
+  {
+    "match_id": "4764aa7c-0e73-40ad-91e9-9dc282f23131",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-1024 (ด้ามเลสหนา)",
+    "name_b": "ตะแกรงตักทอด เลส SJ1024 (ด้ามเลสหนา)",
+    "embedding_score": 0.936,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T14:38:58.670Z"
+  },
+  {
+    "match_id": "24893d44-7fcf-4614-be71-9a9ee6930a9f",
+    "name_a": "สบู่โพรเทคก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรน้ำนมข้าว 130g",
+    "embedding_score": 0.934,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:35.605Z"
+  },
+  {
+    "match_id": "de70bb78-2968-4eca-94a8-6d50506ec6bf",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรน้ำนมข้าว 130g",
+    "embedding_score": 0.932,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:11.908Z"
+  },
+  {
+    "match_id": "6ebfdf25-f8f1-4b14-b005-c320a524aac0",
+    "name_a": "สายฟักบัว",
+    "name_b": "ฝักบัว1ระบบ",
+    "embedding_score": 0.93,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:39.002Z"
+  },
+  {
+    "match_id": "861444f3-858e-43bf-8a0c-8e296bcb39cc",
+    "name_a": "สายฟักบัว",
+    "name_b": "ฝักบัว1ระบบ",
+    "embedding_score": 0.93,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:41.056Z"
+  },
+  {
+    "match_id": "05c38218-8cf5-4c90-a564-bb6669af2d60",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรนมแพะ",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมแพะ160g",
+    "embedding_score": 0.929,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:07.211Z"
+  },
+  {
+    "match_id": "d582fcf4-4e7b-4388-9b8b-8fe4843d348f",
+    "name_a": "กระจกพับ - เด็กเกาหลี/สัตว์น่ารัก #7772C",
+    "name_b": "กระจกพับ  เด็กเกาหลี/สัตว์น่ารัก",
+    "embedding_score": 0.929,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T16:06:26.871Z"
+  },
+  {
+    "match_id": "f33be83e-4a54-4dd7-9ea7-5b4b87733ed3",
+    "name_a": "ขวดซอสใหญ่ (สีหวาน) 7026 BG",
+    "name_b": "ขวดซอสใหญ่(สีหวาน)",
+    "embedding_score": 0.929,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T16:05:27.831Z"
+  },
+  {
+    "match_id": "a8dd7753-6449-4b91-88de-860197534d04",
+    "name_a": "กล่องฝาปิด - สีใส 555 SMT",
+    "name_b": "กล่องตะเกียบฝาใส",
+    "embedding_score": 0.745,
+    "human_verdict": "สินค้าซ้ำ",
+    "labelled_at": "2026-10-10T16:06:00.696Z"
+  },
+  {
+    "match_id": "3b15f6ff-2951-4cae-8ed9-a34607a41dac",
+    "name_a": "กล่องล็อค 553 SMT",
+    "name_b": "กล่องล็อคใส",
+    "embedding_score": 0.724,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:06:20.601Z"
+  },
+  {
+    "match_id": "7838a86c-e7d5-4d14-9aa7-62c97805a127",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "ยาสีฟันเด็ก มินเนียน  40g",
+    "embedding_score": 0.707,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:31.353Z"
+  },
+  {
+    "match_id": "274272d2-1828-4825-bb9d-bad0595086c2",
+    "name_a": "ครีมอาบน้ำมิสทีนฟักข้าว500ml",
+    "name_b": "สายฟักบัว",
+    "embedding_score": 0.696,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:19.479Z"
+  },
+  {
+    "match_id": "d7fb3724-c3d5-457a-b2ab-e2e252a80ac4",
+    "name_a": "น้ำยาถูพื้นมาจิคลีนม่วง",
+    "name_b": "สีสเปรย์สีเคลืบเงาno.190 231",
+    "embedding_score": 0.679,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:43.856Z"
+  },
+  {
+    "match_id": "aca0fa13-2ca3-45f5-a65c-a812060bb144",
+    "name_a": "เลื่อย (ไวกิ้ง) 18 #444 BJH",
+    "name_b": "ขันด้ามโดเรม่อน",
+    "embedding_score": 0.675,
+    "human_verdict": "คนละสินค้า",
+    "labelled_at": "2026-10-10T16:05:22.650Z"
+  }
+]

@@ -1,8 +1,10 @@
 # Thai Product Taxonomy Manager & Similarity Checker
 
-AI-powered Thai product taxonomy management and similarity/dedup matching. This glossary currently covers how the project's own documentation is organized — the vocabulary below lets any session, or any of the agent tools used on this repo, decide which file wins when two documents disagree.
+AI-powered Thai product taxonomy management and similarity/dedup matching. This glossary covers two areas: how the project's own documentation is organized (so any session, or any of the agent tools used on this repo, can decide which file wins when two documents disagree), and the vocabulary of product matching.
 
 ## Language
+
+### เอกสาร
 
 **Rule**:
 A behavioral constraint — something an agent must or must not do. Lives in `AGENTS.md`, or in a file `AGENTS.md` explicitly names as where the detail for one rule lives. Never duplicated — every other mention of a rule links back instead of restating it.
@@ -27,3 +29,21 @@ _Avoid_: shared memory, team notes
 **Team Memory**:
 Hand-written lessons in `.agents/memory/`, checked into the repo. Visible to anyone who opens the repo, in any agent tool — not auto-injected, has to be read on purpose.
 _Avoid_: personal notes, session log
+
+### การจับคู่สินค้า
+
+**สินค้าซ้ำ**:
+สินค้าสองรายการที่เป็น SKU เดียวกัน ต่างกันแค่วิธีเขียนชื่อ หากขนาด ปริมาณ รุ่น หรือสีต่างกัน ถือเป็นคนละสินค้า ไม่ใช่สินค้าซ้ำ
+_Avoid_: สินค้าคล้าย, similar, สินค้าเดียวกัน (กำกวม — อยู่ในสายผลิตภัณฑ์เดียวกันไม่ได้แปลว่าซ้ำ)
+
+**คนละสินค้า**:
+สินค้าสองรายการที่ต้องสั่งซื้อแยกกัน แม้ชื่อจะคล้ายกันเกือบทุกตัวอักษร นี่คือผลลัพธ์ที่ถูกต้องสำหรับคู่ที่ต่างกันแค่ขนาดหรือรุ่น
+_Avoid_: ไม่ซ้ำ, not duplicate
+
+**Reviewed**:
+สถานะที่ยืนยันว่า **คน** ตัดสินคู่สินค้านั้นแล้ว เครื่องประทับสถานะนี้ให้ตัวเองไม่ได้ ไม่ว่าจะมั่นใจแค่ไหน — ผลที่เครื่องตัดสินต้องอยู่ในช่องของตัวเองเสมอ
+_Avoid_: checked, verified, ตรวจแล้ว (กำกวมว่าใครตรวจ)
+
+**รายการคละราคา**:
+แถวสินค้าที่ชื่อระบุหมวดสินค้าพร้อมช่วงราคา (`หวี/หวีแปรง/หวีไดร์/หวีสับ 20 บ.`) แทนการระบุสินค้าชิ้นใดชิ้นหนึ่ง ราคาในชื่อทำหน้าที่เป็นตัวระบุรายการ จึงนับเป็นคนละรายการกับช่วงราคาอื่น ต่างจากหมายเหตุราคาในรูปแบบ `(ราคา 25 บาท)` ซึ่งแปะบนสินค้าตัวเดียวและไม่ใช่ตัวระบุ
+_Avoid_: สินค้าคละ, ของเบ็ดเตล็ด
