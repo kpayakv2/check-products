@@ -372,7 +372,7 @@ export default function TaxonomyManager() {
                     <FolderTreeIcon className="h-10 w-10 text-slate-200" />
                   </div>
                   <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight thai-text">Tree Empty</h3>
-                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-10">Initializing Root Node Required</p>
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-10">Initializing Root Node Required</p>
                   <button
                     onClick={() => setShowForm(true)}
                     className="btn-premium-secondary px-12 py-5 cursor-pointer font-black uppercase tracking-widest"

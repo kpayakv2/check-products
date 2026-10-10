@@ -368,7 +368,7 @@ export default function SynonymsPanel() {
                             <div className="flex items-center gap-2">
                               {synonym.category ? (
                                 <>
-                                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" aria-hidden="true" />
+                                  <div className="w-2 h-2 bg-indigo-500 rounded-full motion-safe:animate-pulse" aria-hidden="true" />
                                   <span data-testid="synonym-category" className="text-xs font-black text-slate-700 thai-text">{synonym.category.name_th}</span>
                                 </>
                               ) : (

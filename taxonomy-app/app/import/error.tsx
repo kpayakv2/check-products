@@ -61,7 +61,7 @@ export default function Error({
         </div>
 
         <div className="mt-10 pt-10 border-t border-slate-100/50">
-           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.3em]">
+           <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">
              Error ID: {error.digest || 'IMPORT_ERR_UNKNOWN'}
            </p>
         </div>

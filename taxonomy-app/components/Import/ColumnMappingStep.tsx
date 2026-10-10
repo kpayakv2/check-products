@@ -226,7 +226,7 @@ export default function ColumnMappingStep({
           <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
           <BrainIcon className="w-6 h-6 text-indigo-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
-        <p className="text-slate-500 font-bold animate-pulse font-noto-sans-thai text-sm uppercase tracking-widest">พยัคฆ์อัจฉริยะกำลังตรวจสอบโครงสร้างไฟล์...</p>
+        <p className="text-slate-500 font-bold motion-safe:animate-pulse font-noto-sans-thai text-sm uppercase tracking-widest">พยัคฆ์อัจฉริยะกำลังตรวจสอบโครงสร้างไฟล์...</p>
       </div>
     )
   }

@@ -863,7 +863,7 @@ export default function SettingsPage() {
                         onClick={runTests}
                         className={`btn-premium w-full py-4 text-sm tracking-[0.1em] justify-center group shadow-indigo-600/25 ${FOCUS_RING}`}
                       >
-                        <ZapIcon className="w-4 h-4 mr-2 group-hover:animate-pulse" aria-hidden="true" />
+                        <ZapIcon className="w-4 h-4 mr-2 group-hover:motion-safe:animate-pulse" aria-hidden="true" />
                         Execute Core Test
                       </button>
                     </div>

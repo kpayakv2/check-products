@@ -163,15 +163,15 @@ export default function ProductsPage() {
     return (
       <div className="flex h-screen bg-white font-sans">
         <Sidebar />
-        <div className="flex-1 flex flex-col items-center justify-center relative">
+        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-50/50 rounded-full blur-[100px]" />
            <div className="relative flex flex-col items-center">
               <div className="w-20 h-20 relative flex items-center justify-center">
                  <div className="absolute inset-0 border-4 border-indigo-100 rounded-full" />
                  <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin" />
-                 <ShoppingBagIcon className="w-8 h-8 text-indigo-600 animate-pulse" />
+                 <ShoppingBagIcon className="w-8 h-8 text-indigo-600 motion-safe:animate-pulse" />
               </div>
-              <p className="mt-8 text-xs font-bold text-slate-400 uppercase tracking-widest thai-text animate-pulse">Syncing Inventory...</p>
+              <p className="mt-8 text-xs font-bold text-slate-400 uppercase tracking-widest thai-text motion-safe:animate-pulse">Syncing Inventory...</p>
            </div>
         </div>
       </div>
@@ -267,7 +267,7 @@ export default function ProductsPage() {
                       <SearchIcon className="w-16 h-16 text-slate-200" />
                    </div>
                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight thai-text">No Results Found</h3>
-                   <p className="text-slate-400 uppercase text-[10px] font-black tracking-widest mt-2">Adjust your audit filters</p>
+                   <p className="text-slate-400 uppercase text-xs font-black tracking-widest mt-2">Adjust your audit filters</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto custom-scrollbar">

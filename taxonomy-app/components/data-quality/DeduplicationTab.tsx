@@ -358,7 +358,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          <h4 className={`text-xs font-black uppercase tracking-[0.15em] mb-1 transition-colors ${currentStep >= step.id ? 'text-slate-900' : 'text-slate-300'}`}>
                             {step.name}
                          </h4>
-                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                         <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">
                             {step.description}
                          </p>
                       </div>
@@ -578,7 +578,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          <DatabaseIcon className="w-6 h-6" />
                       </div>
                       <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">ตรวจสอบคลังสินค้า</p>
+                         <p className="text-xs font-black text-slate-500 uppercase tracking-wider">ตรวจสอบคลังสินค้า</p>
                          <p className="text-2xl font-black text-slate-800 mt-1">{totalScanned.toLocaleString()} รายการ</p>
                       </div>
                    </div>
@@ -587,16 +587,16 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          <ScaleIcon className="w-6 h-6" />
                       </div>
                       <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">เกณฑ์ความเหมือนเวกเตอร์</p>
+                         <p className="text-xs font-black text-slate-500 uppercase tracking-wider">เกณฑ์ความเหมือนเวกเตอร์</p>
                          <p className="text-2xl font-black text-slate-800 mt-1">&gt;= {(scanThreshold * 100).toFixed(0)}%</p>
                       </div>
                    </div>
                    <div className="premium-card p-6 bg-white border-slate-100 flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                         <AlertCircle className="w-6 h-6 animate-pulse" />
+                         <AlertCircle className="w-6 h-6 motion-safe:animate-pulse" />
                       </div>
                       <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">ตรวจพบคู่ซ้ำแฝงในระบบ</p>
+                         <p className="text-xs font-black text-slate-500 uppercase tracking-wider">ตรวจพบคู่ซ้ำแฝงในระบบ</p>
                          <p className="text-2xl font-black text-rose-600 mt-1">{internalPairs.length} คู่</p>
                       </div>
                    </div>
@@ -770,7 +770,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          onClick={() => resolveInternalPair('merge', 'a')}
                          className={`w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
-                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
+                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-xs font-mono border border-white/20 select-none">
                             <span>A</span>
                             <span>/</span>
                             <span>←</span>
@@ -785,7 +785,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          onClick={() => resolveInternalPair('keep_both')}
                          className={`w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
-                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
+                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-xs font-mono border border-white/20 select-none">
                             <span>S</span>
                             <span>/</span>
                             <span>↓</span>
@@ -800,7 +800,7 @@ export default function DeduplicationTab({ onComplete }: { onComplete?: () => vo
                          onClick={() => resolveInternalPair('merge', 'b')}
                          className={`w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/10 px-8 py-4 rounded-[20px] font-black text-xs transition-all hover:scale-105 flex items-center justify-center gap-3 ${FOCUS_RING}`}
                       >
-                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-[9px] font-mono border border-white/20 select-none">
+                         <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded text-xs font-mono border border-white/20 select-none">
                             <span>D</span>
                             <span>/</span>
                             <span>→</span>
