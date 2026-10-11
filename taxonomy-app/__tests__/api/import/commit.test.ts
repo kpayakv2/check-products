@@ -173,3 +173,79 @@ describe('/api/import/commit — กันบันทึกซ้ำด้ว�
     expect(importInserts()).toHaveLength(0)
   })
 })
+
+describe('/api/import/commit — คู่ที่บันทึกลง similarity_matches', () => {
+  const STOCK_ID = '55555555-5555-4555-8555-555555555555'
+
+  beforeEach(() => {
+    calls.length = 0
+    results = {}
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ embeddings: [[0.1, 0.2]] })
+    }) as unknown as typeof fetch
+    results['imports.select'] = { data: null, error: null }
+    results['imports.insert'] = { data: { id: 'batch-ใหม่' }, error: null }
+    results['products.select'] = { data: [{ id: STOCK_ID, name_th: 'ถังปูน 15 สี SP' }], error: null }
+    results['products.insert'] = {
+      data: [{ id: 'new-1', name_th: 'ถังปูน 15 สี sp', status: 'rejected' }],
+      error: null
+    }
+  })
+
+  const commitDuplicate = (extra: Record<string, unknown> = {}) =>
+    POST(new NextRequest('http://127.0.0.1:3000/api/import/commit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'dedup',
+        wizard_run_id: RUN_ID,
+        items: [
+          {
+            name_th: 'ถังปูน 15 สี sp',
+            bucket: 'duplicate',
+            similarity: 0.985,
+            matched_product_id: STOCK_ID,
+            ...extra
+          }
+        ]
+      })
+    }))
+
+  const savedPair = () =>
+    calls.find((c) => c.table === 'similarity_matches' && c.op === 'insert')?.payload as
+      Array<Record<string, unknown>> | undefined
+
+  it('ไม่ประทับ reviewed ให้การทิ้งที่เครื่องตัดสินเอง', async () => {
+    await commitDuplicate()
+
+    const [pair] = savedPair() ?? []
+    expect(pair).toBeDefined()
+    // reviewed หมายถึงคนตัดสินแล้วเท่านั้น (CONTEXT.md) ส่วนคำตอบของเครื่องเก็บใน is_duplicate
+    expect(pair.reviewed).toBe(false)
+    expect(pair.reviewed_at).toBeNull()
+    expect(pair.is_duplicate).toBe(true)
+    expect(pair.match_type).toBe('import_duplicate')
+  })
+
+  it('ประทับ reviewed เมื่อคนเป็นผู้ตัดสินในขั้นรีวิวของ wizard', async () => {
+    await commitDuplicate({ reviewed_by_user: true })
+
+    const [pair] = savedPair() ?? []
+    expect(pair.reviewed).toBe(true)
+    expect(typeof pair.reviewed_at).toBe('string')
+  })
+
+  it('บอกที่มาของการตัดสินไว้ใน metadata ให้แยกคนกับเครื่องย้อนหลังได้', async () => {
+    await commitDuplicate()
+    const machine = (savedPair() ?? [])[0].metadata as { labelled_by?: string }
+
+    calls.length = 0
+    results['imports.select'] = { data: null, error: null }
+    await commitDuplicate({ reviewed_by_user: true })
+    const human = (savedPair() ?? [])[0].metadata as { labelled_by?: string }
+
+    expect(machine.labelled_by).toBe('machine_import')
+    expect(human.labelled_by).toBe('wizard_review')
+  })
+})

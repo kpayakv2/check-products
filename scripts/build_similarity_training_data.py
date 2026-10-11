@@ -15,6 +15,13 @@
 "ค่าความคล้ายสูง = ซ้ำ" เป็นพื้นฐานก่อน คุณค่าจริงจะมาเมื่อคนรีวิวคู่ในช่วงกลาง
 ซึ่งเป็นช่วงที่ความคล้ายอย่างเดียวตัดสินไม่ได้ แล้วเทรนซ้ำ
 
+**ไม่ประทับ reviewed=true ให้เฉลยอัตโนมัติอีกแล้ว** — คำนั้นหมายถึงคนตัดสินเท่านั้น (CONTEXT.md)
+สคริปต์นี้เคยประทับ true ให้ทั้งสองปลาย ทำให้ ML เอาเฉลยของเกณฑ์ความคล้ายไปสอนตัวเอง และคู่ที่
+embedding จับผิด (`หม้อหู #22` ↔ `#28` ได้ 0.996) ถูกซ่อนจากคนถาวร ข้อมูล 1,344 แถวที่เคยสร้างไว้
+ถูกปลดป้ายแล้วด้วย scripts/unmark_machine_reviewed_matches.py ผลคือสคริปต์นี้ปั๊มข้อมูลฝึกให้ ML
+ไม่ได้อีก — ข้อมูลฝึกต้องมาจากคนตรวจคู่ในช่วงกลางเท่านั้น (tests/unit/test_reviewed_means_human.py
+บังคับกฎนี้) ที่เหลือคือใช้สร้างคิวให้คนตัดสิน
+
 รันซ้ำได้ — ลบคู่ที่สคริปต์นี้สร้างไว้ก่อนเสมอ
 
     .venv/Scripts/python.exe scripts/build_similarity_training_data.py --dry-run
@@ -141,14 +148,14 @@ def main() -> int:
                 "metadata": {
                     "product_a_name": names[a],
                     "product_b_name": names[b],
-                    "labelled_by": "threshold" if reviewed else "pending_human",
+                    "labelled_by": "pending_human" if is_duplicate is None else "threshold",
                 },
             })
         return built
 
     rows = (
-        build(duplicates, is_duplicate=True, reviewed=True, match_type="auto_duplicate")
-        + build(negatives, is_duplicate=False, reviewed=True, match_type="auto_different")
+        build(duplicates, is_duplicate=True, reviewed=False, match_type="auto_duplicate")
+        + build(negatives, is_duplicate=False, reviewed=False, match_type="auto_different")
         + build(review_band, is_duplicate=None, reviewed=False, match_type="needs_review")
     )
 

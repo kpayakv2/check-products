@@ -35,6 +35,8 @@ const ItemSchema = z.object({
   similarity: z.coerce.number().min(0).max(1).default(0),
   // สินค้าในสตอกที่จับคู่ได้ — ใช้สร้างคู่ใน similarity_matches
   matched_product_id: z.string().uuid().optional(),
+  // คนกดตัดสินเองในขั้นรีวิวของ wizard — ไม่ส่งมาแปลว่าเครื่องตัดสิน (ดู pairs ด้านล่าง)
+  reviewed_by_user: z.boolean().optional(),
   sku: z.string().optional(),
   price: z.coerce.number().optional(),
 })
@@ -221,17 +223,23 @@ async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
   const byName = new Map(inserted.map((row) => [row.name_th, row.id]))
   const pairs = items
     .filter((item) => item.bucket === 'duplicate' && item.matched_product_id && byName.has(item.name_th))
-    .map((item) => ({
-      product_a_id: byName.get(item.name_th)!,
-      product_b_id: item.matched_product_id!,
-      similarity_score: item.similarity,
-      match_type: 'import_duplicate',
-      algorithm: 'import_wizard_dedup',
-      is_duplicate: true,
-      reviewed: true,
-      reviewed_at: new Date().toISOString(),
-      metadata: { product_a_name: item.name_th, labelled_by: 'threshold_import' },
-    }))
+    .map((item) => {
+      // reviewed หมายถึงคนตัดสินแล้วเท่านั้น (CONTEXT.md) — เคยประทับ true ให้ทุกคู่ ทั้งที่
+      // เครื่องตัดสินเองด้วย threshold ผลคือ ML เอาคู่เหล่านั้นไปสอนตัวเอง (ดึงเฉพาะ reviewed=true)
+      // คำตอบของเครื่องยังเก็บไว้ที่ is_duplicate ต่างกันแค่ว่ามีคนยืนยันหรือยัง
+      const byPerson = item.reviewed_by_user === true
+      return {
+        product_a_id: byName.get(item.name_th)!,
+        product_b_id: item.matched_product_id!,
+        similarity_score: item.similarity,
+        match_type: 'import_duplicate',
+        algorithm: 'import_wizard_dedup',
+        is_duplicate: true,
+        reviewed: byPerson,
+        reviewed_at: byPerson ? new Date().toISOString() : null,
+        metadata: { product_a_name: item.name_th, labelled_by: byPerson ? 'wizard_review' : 'machine_import' },
+      }
+    })
 
   if (pairs.length > 0) {
     const { error } = await supabaseAdmin.from('similarity_matches').insert(pairs)

@@ -181,6 +181,9 @@ class ProductMatchResult(BaseModel):
     mlPrediction: str  # 'similar' or 'different'
     status: str = "pending"
     reason: str
+    # คำตัดสินของกฎอ่านตัวเลข (src/core/product_identity): 'different' | 'duplicate' | 'needs_judgment'
+    # frontend ใช้ตัดสินว่าสินค้านำเข้าจะถูกทิ้ง ส่งให้คนดู หรือนับเป็นของใหม่ — ไม่ต้องมีกฎซ้ำอีกภาษา
+    identityVerdict: Optional[str] = None
 
 
 class FileDeduplicationStats(BaseModel):

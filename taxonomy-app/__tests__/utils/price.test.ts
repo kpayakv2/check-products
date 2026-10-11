@@ -57,29 +57,61 @@ describe('isPriceMismatch', () => {
 })
 
 describe('classifyDedupBucket', () => {
-  it('auto-merges ≥95% similarity when price is consistent', () => {
-    expect(classifyDedupBucket(0.97, 'similar', 100, 110)).toBe('duplicate')
+  // นโยบายปัจจุบัน: ทิ้งสินค้านำเข้าโดยไม่มีคนเห็นได้ก็ต่อเมื่อคะแนน ≥95% **และ**
+  // กฎอ่านตัวเลขยืนยันว่าซ้ำ (ชื่อเหมือนเป๊ะหลังตัดเครื่องหมาย) — วัดแล้วคะแนนอย่างเดียว
+  // ทิ้งผิด 3 จาก 37 รายการ เช่น "กะละมัง 004 58" ถูกจับคู่กับ "004/53"
+  describe('auto-discard needs the identity rule to confirm', () => {
+    it('discards ≥95% similarity when the rule confirms a duplicate and price is consistent', () => {
+      expect(classifyDedupBucket(0.97, 'similar', 100, 110, 'duplicate')).toBe('duplicate')
+    })
+
+    it('sends ≥95% to review when the rule stays silent', () => {
+      expect(classifyDedupBucket(0.97, 'similar', 100, 110, 'needs_judgment')).toBe('review')
+    })
+
+    it('sends ≥95% to review when the backend gave no verdict at all', () => {
+      expect(classifyDedupBucket(0.97, 'similar', 100, 110)).toBe('review')
+      expect(classifyDedupBucket(0.97, 'similar', 100, 110, undefined)).toBe('review')
+    })
+
+    it('demotes a confirmed duplicate to review when price differs by more than 2x', () => {
+      expect(classifyDedupBucket(0.97, 'similar', 300, 100, 'duplicate')).toBe('review')
+    })
+
+    it('still discards a confirmed duplicate when price data is missing on either side', () => {
+      expect(classifyDedupBucket(0.97, 'similar', undefined, 100, 'duplicate')).toBe('duplicate')
+      expect(classifyDedupBucket(0.97, 'similar', 100, undefined, 'duplicate')).toBe('duplicate')
+    })
   })
 
-  it('demotes ≥95% similarity to review when price differs by more than 2x', () => {
-    expect(classifyDedupBucket(0.97, 'similar', 300, 100)).toBe('review')
+  // "ของใหม่" ยังมีคนยืนยันหมวดหมู่ต่ออีกด่าน ต่างจากการทิ้งที่ไม่มีใครเห็น
+  // กฎที่ผิดจึงเสียหายน้อยกว่าฝั่งนั้นมาก
+  describe('rule veto sends different products to new', () => {
+    it('routes a ≥95% pair the rule calls different to new', () => {
+      expect(classifyDedupBucket(0.97, 'similar', 100, 110, 'different')).toBe('new')
+    })
+
+    it('routes an 80-94% pair the rule calls different to new', () => {
+      expect(classifyDedupBucket(0.85, 'similar', 100, 110, 'different')).toBe('new')
+    })
+
+    it('routes a below-80% pair the rule calls different to new', () => {
+      expect(classifyDedupBucket(0.5, 'different', 100, 100, 'different')).toBe('new')
+    })
   })
 
-  it('still auto-merges ≥95% similarity when price data is missing on either side', () => {
-    expect(classifyDedupBucket(0.97, 'similar', undefined, 100)).toBe('duplicate')
-    expect(classifyDedupBucket(0.97, 'similar', 100, undefined)).toBe('duplicate')
-  })
+  describe('below the discard line, nothing else changes', () => {
+    it('keeps the 80-94% band as review regardless of price when the rule is silent', () => {
+      expect(classifyDedupBucket(0.85, 'different', 100, 110, 'needs_judgment')).toBe('review')
+      expect(classifyDedupBucket(0.85, 'different', 300, 100, 'needs_judgment')).toBe('review')
+    })
 
-  it('keeps the 80-94% band as review regardless of price', () => {
-    expect(classifyDedupBucket(0.85, 'different', 100, 110)).toBe('review')
-    expect(classifyDedupBucket(0.85, 'different', 300, 100)).toBe('review')
-  })
+    it('keeps below-80% as new regardless of price', () => {
+      expect(classifyDedupBucket(0.5, 'different', 100, 100)).toBe('new')
+    })
 
-  it('keeps below-80% as new regardless of price', () => {
-    expect(classifyDedupBucket(0.5, 'different', 100, 100)).toBe('new')
-  })
-
-  it('review zone via mlPrediction=similar below 80% is unaffected by price', () => {
-    expect(classifyDedupBucket(0.78, 'similar', 300, 100)).toBe('review')
+    it('review zone via mlPrediction=similar below 80% is unaffected by price', () => {
+      expect(classifyDedupBucket(0.78, 'similar', 300, 100, 'needs_judgment')).toBe('review')
+    })
   })
 })

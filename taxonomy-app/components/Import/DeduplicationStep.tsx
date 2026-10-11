@@ -107,7 +107,13 @@ export default function DeduplicationStep({
           }
 
           // _bucket ต้องติดไปกับข้อมูลด้วย ขั้นถัดไปใช้ตัดสินว่าจะบันทึกด้วยสถานะอะไร
-          const bucket = classifyDedupBucket(score, match.mlPrediction, item.price, match.oldPrice)
+          const bucket = classifyDedupBucket(
+            score,
+            match.mlPrediction,
+            item.price,
+            match.oldPrice,
+            match.identityVerdict
+          )
           if (bucket === 'duplicate') {
             autoMerged.push({ ...enriched, _bucket: 'duplicate' })
           } else if (bucket === 'review') {

@@ -129,6 +129,8 @@ export default function WizardTab() {
             bucket: item._bucket ?? 'new',
             similarity: item._similarity_score ?? 0,
             matched_product_id: item._matched_id,
+            // ต้องส่งไปด้วย ไม่งั้นการตัดสินของคนในขั้นรีวิวจะถูกบันทึกเป็นของเครื่อง
+            reviewed_by_user: item._reviewed_by_user === true,
             price: item.price,
           })),
         }),

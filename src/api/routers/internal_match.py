@@ -59,6 +59,18 @@ def is_pair_resolved(pair_key, reviewed_pairs, name_a: str, name_b: str) -> bool
     return classify_pair(name_a, name_b) is PairVerdict.DIFFERENT
 
 
+def annotate_identity(matches: List[ProductMatchResult]) -> List[ProductMatchResult]:
+    """ติดคำตัดสินของกฎอ่านตัวเลขให้ทุกคู่ที่จับคู่ได้ตอนนำเข้า
+
+    wizard เคยตัดสินว่าสินค้านำเข้า "มีในสตอกแล้ว" (ทิ้งโดยไม่มีคนเห็น) จากคะแนนความคล้ายอย่างเดียว
+    วัดกับไฟล์ทดสอบ 405 รายการแล้วทิ้งผิด 3 จาก 37 เช่น `กะละมัง 004 58` ถูกจับคู่กับ `004/53`
+    ส่งคำตัดสินไปให้ frontend ใช้ ไม่ให้มีกฎซ้ำสองภาษา
+    """
+    for match in matches:
+        match.identityVerdict = classify_pair(match.newProduct, match.oldProduct).name.lower()
+    return matches
+
+
 PRODUCTS_FETCH_PAGE_SIZE = 1000
 
 
@@ -831,9 +843,9 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
                     status="pending",
                     reason=f"ความคล้าย {sim*100:.1f}% - {'อาจซ้ำกัน' if ml_pred == 'similar' else 'อาจแตกต่าง'}"
                 ))
-                
-        return matches
-        
+
+        return annotate_identity(matches)
+
     except Exception as e:
         logger.exception("Import deduplication failed")
         raise HTTPException(status_code=500, detail=f"Import deduplication failed: {str(e)}")
