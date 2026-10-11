@@ -21,6 +21,8 @@ HUMAN_DECISION_WRITERS = {
     "taxonomy-app/app/api/similarity/resolve/route.ts",
     # บันทึกผลที่ผู้ใช้ตัดสินเองจากชุดวัดผลแช่แข็ง
     "scripts/apply_human_dedup_labels.py",
+    # รอบสอง: บันทึกคำตอบของผู้ใช้จากชุดวัดผลแช่แข็ง v2 (สินค้านำเข้า + คู่ในสตอก)
+    "scripts/apply_human_dedup_labels_r2.py",
     # ไม่ได้ตัดสินใหม่ — โหมด --revert คืนค่าให้ตรงเดิมพร้อมเวลาเดิมที่เก็บไว้ ไว้ใช้ถอยหลังเท่านั้น
     "scripts/unmark_machine_import_matches.py",
 }

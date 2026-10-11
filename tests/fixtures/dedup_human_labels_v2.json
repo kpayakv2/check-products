@@ -1,0 +1,4331 @@
+[
+  {
+    "kind": "import",
+    "id": "abaf0ff8-3061-493f-a3fa-3f24ed2ae445",
+    "name_a": "กล่องล้อ k 1000",
+    "name_b": "กล่องล้อ K-1000",
+    "embedding_score": 0.9458,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:15.614Z"
+  },
+  {
+    "kind": "import",
+    "id": "799088f2-267f-489e-a940-c4b900b8f023",
+    "name_a": "แปรงซักเสื้อขนใส อีสแมน s 09 bb",
+    "name_b": "แปรงซักเสื้อขนใส-อีสแมน S-09 BB",
+    "embedding_score": 0.9458,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:19.771Z"
+  },
+  {
+    "kind": "import",
+    "id": "b4d645b1-002c-4367-b065-37ce69b5dc65",
+    "name_a": "ด้ามกระทะใหญ่ ปลายมล vk",
+    "name_b": "ด้ามกระทะ (ใหญ่) ปลายมน VK",
+    "embedding_score": 0.9454,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:29.419Z"
+  },
+  {
+    "kind": "import",
+    "id": "64335d87-c931-44fc-9fc5-5f3a757bf9fd",
+    "name_a": "กะละมังเหลี่ยม 666 os",
+    "name_b": "กะละมังเหลี่ยม 666 OS",
+    "embedding_score": 0.9444,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:31.489Z"
+  },
+  {
+    "kind": "import",
+    "id": "53eb51e3-9158-4177-95d0-df74d43b6dc1",
+    "name_a": "ตะกร้าเหลี่ยมเตี้ย 4000 สีเข้ม os",
+    "name_b": "ตะกร้าเหลี่ยมเตี้ย 4000 สีเข้ม OS",
+    "embedding_score": 0.9439,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:34.719Z"
+  },
+  {
+    "kind": "import",
+    "id": "7b5db2c1-8cde-496e-92bb-8a76b6436061",
+    "name_a": "แปรงซักเสื้อ แป้นไม้ ไดโน ncl",
+    "name_b": "แปรงซักเสื้อ - แป้นไม้ (ไดโน) NCL",
+    "embedding_score": 0.9404,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:39.348Z"
+  },
+  {
+    "kind": "import",
+    "id": "b1ed96ee-4e0b-431c-98db-b418812ae4ed",
+    "name_a": "ทัพพีแขกด้ามพลาสติกสี ตราสมอ ppl",
+    "name_b": "ทัพพีแขก - ด้ามพลาสติกสี ตราสมอ PPL",
+    "embedding_score": 0.9399,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:50:43.797Z"
+  },
+  {
+    "kind": "import",
+    "id": "f7485bba-b419-4b56-804d-aa25a696dc9c",
+    "name_a": "แปรงซักผ้า ไดโน แป้นไม้ ขนสีนม ncl",
+    "name_b": "แปรงซักผ้า (ไดโน) แป้นไม้ - ขนสีนม NCL",
+    "embedding_score": 0.9398,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:08.207Z"
+  },
+  {
+    "kind": "import",
+    "id": "3d3215e0-ff2f-4993-b793-6f82d26688a6",
+    "name_a": "ตะแกรงเหลี่ยม 903 สีเข้ม rth",
+    "name_b": "ตะแกรงเหลี่ยม 903 สีเข้ม RTH",
+    "embedding_score": 0.9377,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:10.571Z"
+  },
+  {
+    "kind": "import",
+    "id": "c1910c5d-fb95-4bf6-ae74-b603999d70be",
+    "name_a": "ขูดมะพร้าว2หัวม้า กระต่าย อย่างดี nk",
+    "name_b": "ขูดมะพร้าว 2 หัวม้า/กระต่าย (อย่างดี) NK",
+    "embedding_score": 0.9366,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:15.837Z"
+  },
+  {
+    "kind": "import",
+    "id": "3dd06908-cb47-4f25-979e-058ca665ae1d",
+    "name_a": "ตะกร้ากลม 9899 3 สีใส smt",
+    "name_b": "ตะกร้ากลม 9899/3 สีใส SMT",
+    "embedding_score": 0.9364,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:19.218Z"
+  },
+  {
+    "kind": "import",
+    "id": "7a6d1db0-7ddd-40e9-aae8-568602971ff7",
+    "name_a": "หัวแร้งแท่งยาว ds 15193 แผงเขียว ds",
+    "name_b": "หัวแร้งแท่งยาว DS-15193 แผงเขียว DS",
+    "embedding_score": 0.9363,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:23.162Z"
+  },
+  {
+    "kind": "import",
+    "id": "79f05aa0-bdbc-4bce-9cc0-80b83b3ac5cc",
+    "name_a": "กล่องแช่เหลี่ยม4425 srt",
+    "name_b": "กล่องแช่เหลี่ยม 4425 SRT",
+    "embedding_score": 0.9352,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:25.062Z"
+  },
+  {
+    "kind": "import",
+    "id": "ac6582c4-a3e9-4640-8872-734fd48b5b3d",
+    "name_a": "กระทะม้วนขอบ 33 ร่ม ไม่รับเปลี่ยน um",
+    "name_b": "กระทะม้วนขอบ #33 ร่ม (ไม่รับเปลี่ยน) UM",
+    "embedding_score": 0.9348,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:28.453Z"
+  },
+  {
+    "kind": "import",
+    "id": "30b3f5c2-c5a6-46f6-a030-9c3ca1955a5f",
+    "name_a": "แปรงขัดรองเท้า666 แปรงไทย",
+    "name_b": "แปรงขัดรองเท้าดำ 666 แปรงไทย",
+    "embedding_score": 0.934,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:38.152Z"
+  },
+  {
+    "kind": "import",
+    "id": "139be3b9-4213-41f6-b561-02817f6bef4b",
+    "name_a": "ช้อนส้อมเกาหลี ps 444 19 หัวเล็กด้ามยาว",
+    "name_b": "ช้อนส้อมเกาหลี PS-444-19 (หัวเล็กด้ามยาว)",
+    "embedding_score": 0.9337,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:55:55.564Z"
+  },
+  {
+    "kind": "import",
+    "id": "3f20e4e2-f042-4773-aacc-4cd34035377f",
+    "name_a": "คั้นส้มขาตั้งกลมใหญ่ มีเนียม kpt",
+    "name_b": "คั้นส้มขาตั้ง - กลมเล็ก (มิเนียม) KPT",
+    "embedding_score": 0.9316,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T01:56:05.312Z"
+  },
+  {
+    "kind": "import",
+    "id": "12a2c9e4-8d76-43f9-8e49-6f44d37af87a",
+    "name_a": "ลวดอเนกประสงค์เส้นใหญ่ วงใหญ่ kawa",
+    "name_b": "ลวดอเนกประสงค์ - เส้นใหญ่ (วงใหญ่) KAWA",
+    "embedding_score": 0.9316,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:56:14.150Z"
+  },
+  {
+    "kind": "import",
+    "id": "beae6915-6820-4fbb-a161-e6d9f85e2fa0",
+    "name_a": "ตะแกรงเหลี่ยม 900 สีเข้ม rth",
+    "name_b": "ตะแกรงเหลี่ยม 900 สีเข้ม RTH",
+    "embedding_score": 0.9311,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:56:34.716Z"
+  },
+  {
+    "kind": "import",
+    "id": "be2f1a90-e28e-429b-a878-109f43b7eea1",
+    "name_a": "ทัพพีม้าลาย ด้ามดำจีน เล็ก ไม่รับคืน",
+    "name_b": "ทัพพีม้าลาย - ด้ามดำจีน (เล็ก) **ไม่รับคืน/เปลี่ยน",
+    "embedding_score": 0.9309,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:56:39.378Z"
+  },
+  {
+    "kind": "import",
+    "id": "5bfdd703-151b-43ac-a5bc-adf3334c603f",
+    "name_a": "ตะแกรงใหญ่ 519 dmt",
+    "name_b": "ตะแกรงใหญ่ 519 DMT",
+    "embedding_score": 0.9245,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:56:41.840Z"
+  },
+  {
+    "kind": "import",
+    "id": "5dd081c6-dc1d-49ee-bac6-f1b0a7aef8dc",
+    "name_a": "กาวช้างแท้ อัลโก้ qs",
+    "name_b": "กาว ช้าง แท้ - อัล ที โก้ QS",
+    "embedding_score": 0.9198,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:05.026Z"
+  },
+  {
+    "kind": "import",
+    "id": "af7e47ff-ca71-4e33-8df4-88a6ca25cff8",
+    "name_a": "กล่องแซ่4402 srt",
+    "name_b": "กล่องแช่4402",
+    "embedding_score": 0.9161,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:07.008Z"
+  },
+  {
+    "kind": "import",
+    "id": "2a0765ce-5742-4e9d-a98e-f3a30b4c614a",
+    "name_a": "ถัง ฝา 12 สี bp",
+    "name_b": "ถัง + ฝา 12 สี BP",
+    "embedding_score": 0.9159,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:09.041Z"
+  },
+  {
+    "kind": "import",
+    "id": "c96be0b7-c26d-4e1d-86d2-4772bf0f09a5",
+    "name_a": "ตะหลิวม้าลาย กลาง บาร์42102 ไม่รับคืน",
+    "name_b": "ตะหลิวม้าลาย - กลาง (บาร์-42102) **ไม่รับคืน/เปลี่ยน",
+    "embedding_score": 0.9158,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:12.285Z"
+  },
+  {
+    "kind": "import",
+    "id": "c3e491d1-c28b-4e3a-9ddb-b09fda5d34cc",
+    "name_a": "แปรง 2 สีใหญ่ ctb 09 ตราสมอ bb",
+    "name_b": "แปรง 2 สีใหญ่ CTB-09 ตราสมอ BB",
+    "embedding_score": 0.9147,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:14.730Z"
+  },
+  {
+    "kind": "import",
+    "id": "c6d22445-46f4-4b8b-9421-423517a4f95d",
+    "name_a": "ตะกร้าฝาปิดหูหิ้ว 321 3n สีnew ใหญ่ vj",
+    "name_b": "ตะกร้าฝาปิดหูหิ้ว 321-3N สี NEW (ใหญ่) VJ",
+    "embedding_score": 0.912,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:17.590Z"
+  },
+  {
+    "kind": "import",
+    "id": "ecd7b0bc-c695-44c3-9216-008b9f292a73",
+    "name_a": "ลวกเส้น เลสตาข่าย12ซมด้ามยาวเลสแบน",
+    "name_b": "ลวกเส้น - เลสตาข่าย 12 ซม. ด้ามยาวเลสแบน",
+    "embedding_score": 0.9115,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:20.987Z"
+  },
+  {
+    "kind": "import",
+    "id": "020d1314-9e06-443d-b07e-c703099af3a2",
+    "name_a": "ตะแกรง 9831 smt",
+    "name_b": "ตะแกรง 9831 SMT",
+    "embedding_score": 0.9096,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:22.398Z"
+  },
+  {
+    "kind": "import",
+    "id": "9ff268af-dd4e-4dde-9297-c02cdf46195b",
+    "name_a": "ทัพพีแขกด้ามพลาสติกสี ตราสมอ ppl p15",
+    "name_b": "ทัพพีแขก - ด้ามพลาสติกสี ตราสมอ PPL",
+    "embedding_score": 0.9094,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:57:36.334Z"
+  },
+  {
+    "kind": "import",
+    "id": "fa127726-8cde-404e-9fdd-4c28f31784ca",
+    "name_a": "คีบหัวใบไม้สั้น9\" fw 083 mifl",
+    "name_b": "\"คีบหัวใบไม้ สั้น 9\"\" FW-083 MIFL\"",
+    "embedding_score": 0.909,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:59:53.369Z"
+  },
+  {
+    "kind": "import",
+    "id": "9d5ec83c-92e9-4cfe-9349-c093901003c7",
+    "name_a": "ตักถ่าน หนา 1\"10อัน cy",
+    "name_b": "ตักถ่านดำหนา (1*10 อัน) CY",
+    "embedding_score": 0.9085,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T01:59:59.926Z"
+  },
+  {
+    "kind": "import",
+    "id": "7c25c5ee-805d-446f-b711-924365182114",
+    "name_a": "ถาดกลมเลส32cm lh 4413 tlh",
+    "name_b": "ถาดกลมเลส 32 cm LH-4413 TLH",
+    "embedding_score": 0.9079,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:03.803Z"
+  },
+  {
+    "kind": "import",
+    "id": "454cf08f-61ed-47d6-a604-dd48a422f4f5",
+    "name_a": "กล่องล้อ k 1200",
+    "name_b": "กล่องล้อ K-1200",
+    "embedding_score": 0.9024,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:06.635Z"
+  },
+  {
+    "kind": "import",
+    "id": "54c9c0e0-e5ec-4954-ba27-7dfa08ef2e9e",
+    "name_a": "ตักน้ำแข็งมิเนียม ccd 2 ccd",
+    "name_b": "ตักน้ำแข็งมิเนียม CCD-2 CCD",
+    "embedding_score": 0.9019,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:10.730Z"
+  },
+  {
+    "kind": "import",
+    "id": "b999154a-8ff3-4223-a2f6-8b2e3484457b",
+    "name_a": "ถัง ฝา 12 ตำ ac",
+    "name_b": "ถัง + ฝา 12 ดำ AC",
+    "embedding_score": 0.9003,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:14.673Z"
+  },
+  {
+    "kind": "import",
+    "id": "19cc661a-e022-4352-a37e-f43e73b402d7",
+    "name_a": "ถุงห่วงกาแฟ จัมโบ้6\" s p no 01 bir",
+    "name_b": "\"ถุงห่วงกาแฟ - จัมโบ้ 6\"\" (S.P.) NO.01 BIR\"",
+    "embedding_score": 0.9002,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:23.880Z"
+  },
+  {
+    "kind": "import",
+    "id": "70433f4f-e70e-49a7-9b0f-0514804f270b",
+    "name_a": "ทัพพีจีนใหญ่ด้ามพลาสติกสี ตราสมอ p25",
+    "name_b": "ทัพพีจีนใหญ่ - ด้ามพลาสติกสี ตราสมอ PPL",
+    "embedding_score": 0.8962,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:00:40.844Z"
+  },
+  {
+    "kind": "import",
+    "id": "450da030-89f3-4ecd-a7f7-cf72a32bafa6",
+    "name_a": "คีบต่อ คอใหญ่ fw 075 mifl",
+    "name_b": "คีบต่อ - คอใหญ่ FW-075 MIFL",
+    "embedding_score": 0.8957,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:44.282Z"
+  },
+  {
+    "kind": "import",
+    "id": "ae8a3a9c-37d0-4fdc-9428-82349ec4af10",
+    "name_a": "ขันปั้มลายไทย no 14 tm",
+    "name_b": "ขันปั๊มลายไทย NO.14 TM",
+    "embedding_score": 0.8866,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:46.970Z"
+  },
+  {
+    "kind": "import",
+    "id": "23c79b90-62c3-43d7-9d8e-bcdf3c096124",
+    "name_a": "ตะหลิวม้าลาย เล็ก 104008 ไม่รับคืน",
+    "name_b": "\"ตะหลิวม้าลาย - เล็ก #104008 \"\"ไม่รับคืน/เปลี่ยน\"\"\"",
+    "embedding_score": 0.8824,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:00:54.554Z"
+  },
+  {
+    "kind": "import",
+    "id": "c9006129-407b-4f4a-b0bf-d3cacebc96fe",
+    "name_a": "กระบวยตักน้ำไก่ 2 1 5 vtw",
+    "name_b": "กระบวยตักน้ำไก่ #2 (1*5) VTW",
+    "embedding_score": 0.8822,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:01:00.629Z"
+  },
+  {
+    "kind": "import",
+    "id": "ec8556e7-71cd-48e3-9027-66e4c1972587",
+    "name_a": "ใบขัดด้ามเตารีดเดี่ยว ด้ามแปรงขัดพื้น",
+    "name_b": "ใยขัดด้ามเตารีดเดี่ยว (ด้ามแปรงขัดพื้น)",
+    "embedding_score": 0.8817,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:01:06.500Z"
+  },
+  {
+    "kind": "import",
+    "id": "89c9be4b-57f6-417c-9671-a12c2ef895fb",
+    "name_a": "คั้นมะนาว แสตนเลส fw 147 แผง",
+    "name_b": "คั้นมะนาว - แสตนเลส FW 147 (แผงกระดาษ",
+    "embedding_score": 0.8784,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:01:10.642Z"
+  },
+  {
+    "kind": "import",
+    "id": "9275e539-07fe-4aa6-bdc3-728f9677e5da",
+    "name_a": "คีบสลัด เล็ก 10\" หนา fw 088 แพคครึ่ง",
+    "name_b": "\"คีบสลัดเล็ก 10\"\" (หนา) FW-088 แพ็คครึ่ง\"",
+    "embedding_score": 0.8717,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:01:15.186Z"
+  },
+  {
+    "kind": "import",
+    "id": "5ba16aa4-1e56-4e08-bf78-9045be2987ec",
+    "name_a": "หิ้งพระ 20 ขาคู่ 1 2ตัว dt",
+    "name_b": "หิ้งพระ #20 (ขาคู่) ตื้น (1*2 ตัว) DT",
+    "embedding_score": 0.8712,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:00.681Z"
+  },
+  {
+    "kind": "import",
+    "id": "a33dd001-9808-4fa5-80a9-274bcd076533",
+    "name_a": "คีบหัวใบไม้ใหญ่13\" fw 082 mifl",
+    "name_b": "\"คีบหัวใบไม้ใหญ่ 13\"\" FW-082 MIFL\"",
+    "embedding_score": 0.8707,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:03.424Z"
+  },
+  {
+    "kind": "import",
+    "id": "bf476d34-d547-47ba-a15c-7d248084613c",
+    "name_a": "ขูดมะพร้าว2หัวมันเล็ก1\"10 nk",
+    "name_b": "ขูดมะพร้าว 2 หัวม้า-เล็ก 1*10 NK",
+    "embedding_score": 0.8705,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:08.975Z"
+  },
+  {
+    "kind": "import",
+    "id": "24897f77-d004-4fff-a5b7-0fd6378d661e",
+    "name_a": "ตะแกรงเหลี่ยม จัมโบ้ 1989 srt",
+    "name_b": "ตะแกรงเหลี่ยม - จัมโบ้ 1989 SRT",
+    "embedding_score": 0.8702,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:10.873Z"
+  },
+  {
+    "kind": "import",
+    "id": "e2a958d5-5116-4d26-9d1f-8c723931055d",
+    "name_a": "ตะหลิวด้ามดำใหญ่ 40ซม 205 pl",
+    "name_b": "กระบวยด้ามดำ - ใหญ่ 40 ซม #205A PL",
+    "embedding_score": 0.867,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:02:18.683Z"
+  },
+  {
+    "kind": "import",
+    "id": "6c3ed644-1d04-4268-8681-ed8310e76172",
+    "name_a": "กระบวยตักน้ำไก่ 1 1 5 vtw",
+    "name_b": "กระบวยตักน้ำไก่ #1 (1*5) VTW",
+    "embedding_score": 0.8645,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:22.327Z"
+  },
+  {
+    "kind": "import",
+    "id": "43e4f36c-0bd4-49b3-a247-53bd59822f37",
+    "name_a": "เขียงพลาสติก ใหญ่ no 167 vr",
+    "name_b": "เขียงพลาสติก - ใหญ่ NO.167 VR",
+    "embedding_score": 0.8645,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:25.121Z"
+  },
+  {
+    "kind": "import",
+    "id": "566ac226-5149-4927-9bcf-abf6719fbb81",
+    "name_a": "ตะหลิวโฟกัส ยาว 4\" 400 คำ แบล็คไลท์",
+    "name_b": "\"ตะหลิวโฟกัส - ยาว 4\"\" #400 (ดำ) แบล็คไลท์\"",
+    "embedding_score": 0.8637,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:33.395Z"
+  },
+  {
+    "kind": "import",
+    "id": "c95531c9-eea7-4e59-ab43-2979c32315e7",
+    "name_a": "เข็มตลับตัดด้วยสายวัด บาร์36316",
+    "name_b": "เข็มตลับ + ตัดขี้ด้าย + สายวัด (บาร์ 36316) หัว",
+    "embedding_score": 0.8575,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:42.914Z"
+  },
+  {
+    "kind": "import",
+    "id": "5f3c19f1-d57f-40c8-8d8a-aa75cea32f9c",
+    "name_a": "ตะแกรง 1990 สีใส สีสด srt",
+    "name_b": "ตะแกรง 1990 สีใส-สีสด SRT",
+    "embedding_score": 0.8573,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:51.039Z"
+  },
+  {
+    "kind": "import",
+    "id": "27870b7a-f886-4471-a741-33737027574c",
+    "name_a": "มีด199 kw",
+    "name_b": "มีด 199 KW",
+    "embedding_score": 0.8494,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:52.594Z"
+  },
+  {
+    "kind": "import",
+    "id": "81a5130a-fda8-45dd-af19-a03ab68e0382",
+    "name_a": "แม็กซ์ใหญ่10239 dl0306 จับราคา imm",
+    "name_b": "แม็กซ์ใหญ่ 10239 / DL0306 (จับราคา) IMM",
+    "embedding_score": 0.8493,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:55.251Z"
+  },
+  {
+    "kind": "import",
+    "id": "38ed47f7-64ec-4ffa-b794-49be5929884e",
+    "name_a": "ตะหลิวยาว4\"ไม้ hfw 039 ม้าน้ำ mifl",
+    "name_b": "\"ตะหลิวยาว 4\"\" ไม้ #FW-039 ม้าน้ำ MIFL\"",
+    "embedding_score": 0.8476,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:02:58.078Z"
+  },
+  {
+    "kind": "import",
+    "id": "41b7902a-5b2b-44bd-bd82-6caf467524d4",
+    "name_a": "คีบสลัดใหญ่15\" หนา fw 086 แพคครึ่ง",
+    "name_b": "\"คีบสลัด - ใหญ่ 15\"\" (หนา) FW-086 แพ็คครึ่ง\"",
+    "embedding_score": 0.8449,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:00.928Z"
+  },
+  {
+    "kind": "import",
+    "id": "41d7310c-866b-400c-bc37-6b97b41df87d",
+    "name_a": "วันปั้มลายไทย no 26 tm",
+    "name_b": "ขันปั๊มลายไทย NO.26 TM",
+    "embedding_score": 0.8415,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:03.123Z"
+  },
+  {
+    "kind": "import",
+    "id": "eafdfcb5-dfa1-4b29-af21-20e4f336d4dc",
+    "name_a": "ลวกเส้น เลสตาข่าย12ซม s 102",
+    "name_b": "ลวกเส้น-เลสตาข่าย 12 ซม SJ-102 (ด้ามเลส)",
+    "embedding_score": 0.8403,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:11.984Z"
+  },
+  {
+    "kind": "import",
+    "id": "cb888094-6c18-491b-9c25-f644654d4b79",
+    "name_a": "วันปั้มลายไทย 12cm บาร์01125 tm",
+    "name_b": "ขันปั๊มลายไทย 12CM. (บาร์ 01125) TM",
+    "embedding_score": 0.8402,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:14.918Z"
+  },
+  {
+    "kind": "import",
+    "id": "9626bec0-12b6-4523-8adb-4e01ee7c2ba8",
+    "name_a": "ถังปูน 15 ต่ำ ac",
+    "name_b": "ถังปูน 15 ดำ AC",
+    "embedding_score": 0.8307,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:16.392Z"
+  },
+  {
+    "kind": "import",
+    "id": "6591e13d-3b6b-4ddc-b6cc-93d8b443d07d",
+    "name_a": "ทัพพีเล็กด้ามดำ tp 076 ต้นสน tk",
+    "name_b": "ทัพพีเล็ก - ด้ามดำ TP-076 (ต้นสน) TK",
+    "embedding_score": 0.8186,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:18.961Z"
+  },
+  {
+    "kind": "import",
+    "id": "887e9a0b-5c09-4445-8046-57ddc639ebbf",
+    "name_a": "ทัพพีใหญ่ด้ามดำ tp 079 ต้นสน tk",
+    "name_b": "ทัพพ์ใหญ่ - ด้ามดำ TP-079 (ต้นสน) TK",
+    "embedding_score": 0.8171,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:21.475Z"
+  },
+  {
+    "kind": "import",
+    "id": "f9a6af62-ea3c-4c67-9352-aab95af256be",
+    "name_a": "ตะหลิวยาว4\" ด้ามดำ fw 038 ม้าน้ำ",
+    "name_b": "\"ตะหลิวยาว 4\"\" ด้ามดำ #FW-038 ม้าน้ำ MIFL\"",
+    "embedding_score": 0.8107,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:03:26.793Z"
+  },
+  {
+    "kind": "import",
+    "id": "3508c304-825e-488f-afc3-345d7aab741b",
+    "name_a": "วางเค้กใหญ่ 1 l vs bomm",
+    "name_b": "\"วางเค้กใหญ่ #1 (L) VS, BOMM\"",
+    "embedding_score": 0.7936,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:19.135Z"
+  },
+  {
+    "kind": "import",
+    "id": "c1f13ab2-9f65-4ece-9c90-2731e0939f6a",
+    "name_a": "กะละมังเลส เกาหลี ก้นตัด เคลือบสีลาย",
+    "name_b": "กะละมังเลส เกาหลี (กันตัด)",
+    "embedding_score": 0.7902,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:04:32.114Z"
+  },
+  {
+    "kind": "import",
+    "id": "e17a79c4-e7bf-4f15-8ecc-f1bf36d1be5c",
+    "name_a": "ถังปูน 10 ค่า sp",
+    "name_b": "ถัง ปูน 10 ดำ SP",
+    "embedding_score": 0.7843,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:46.100Z"
+  },
+  {
+    "kind": "import",
+    "id": "0a601941-0c12-4dbf-ba34-db0960374e89",
+    "name_a": "ลิปบอกเงินแท่งดำ 3.2g jackelin 1 6 fm",
+    "name_b": "ลิปปอกเงินแท่งเล็ก 3.2G. Jackelin (1*6) FM",
+    "embedding_score": 0.769,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:53.250Z"
+  },
+  {
+    "kind": "pair",
+    "id": "79be1878-14ab-4f1e-8ddd-b04f0841fd55",
+    "name_a": "ไบกอนหัวฉีดคู่",
+    "name_b": "ไบกอนหัวฉีดคู่",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:55.529Z"
+  },
+  {
+    "kind": "pair",
+    "id": "78be98bc-57c4-4a1a-bc62-f96e6c412c4f",
+    "name_a": "แป้งแคร์สีฟ้า",
+    "name_b": "แป้งแคร์สีฟ้า",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:56.830Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9f447714-0efa-461a-a39c-8627174a69fe",
+    "name_a": "แป้งเภสัชชมพู",
+    "name_b": "แป้งเภสัชชมพู",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:57.952Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f8f47887-f13a-471f-a4be-641df161f51c",
+    "name_a": "ยาทาเล็บเจลซาซ่า",
+    "name_b": "ยาทาเล็บเจลซาซ่า",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:04:59.368Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0dcf8836-2ca6-43e5-a857-f97fe05ad7f8",
+    "name_a": "ยาทาเล็บเจลซาซ่า",
+    "name_b": "ยาทาเล็บเจลซาซ่า",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:01.736Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6ce944e3-87b9-4ef0-9cd0-87d18c897d5f",
+    "name_a": "ยาทาเล็บเจลซาซ่า",
+    "name_b": "ยาทาเล็บเจลซาซ่า",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:15.390Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f32742e5-1293-4fe1-a997-a63163e500b9",
+    "name_a": "สายฟักบัว",
+    "name_b": "สายฟักบัว",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:23.276Z"
+  },
+  {
+    "kind": "pair",
+    "id": "560a2078-184d-473a-8a56-6edddcc7a8dd",
+    "name_a": "แป้งแคร์สีเขียว",
+    "name_b": "แป้งแคร์สีเขียว",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:24.797Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7ca2a3ad-52c8-4f7a-8145-13a8f09eef02",
+    "name_a": "แป้งเภสัชชมพู",
+    "name_b": "แป้งเภสัชชมพู",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:30.681Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0f730059-1fb0-4883-aee1-506259e4cd09",
+    "name_a": "แป้งเภสัชชมพู",
+    "name_b": "แป้งเภสัชชมพู",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:34.516Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ffb8107a-954f-417b-af2f-24ac7abb053a",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็กคอลเกต",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:36.842Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e9950ec5-f5c6-4d2a-9b64-0b11b6a52d0f",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ",
+    "name_b": "หวี/หวีแปรง/หวีโตร์/หวีสับ",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:38.273Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9275a76e-0c01-45d6-8520-2db33e73139c",
+    "name_a": "แป้งแคร์สีม่วง",
+    "name_b": "แป้งแคร์สีม่วง",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:39.438Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9a88b889-f747-466c-a665-b0b42c513db4",
+    "name_a": "แป้งโฟรเทคส์เฟรช",
+    "name_b": "แป้งโฟรเทคส์เฟรช",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:40.710Z"
+  },
+  {
+    "kind": "pair",
+    "id": "971ffcbb-cab0-4cb8-8680-6ec54fe450ce",
+    "name_a": "แป้งเภสัชเขียว",
+    "name_b": "แป้งเภสัชเขียว",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:41.933Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7a1eee16-b39b-40b4-8846-0091d8ea58db",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กswan",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:43.410Z"
+  },
+  {
+    "kind": "pair",
+    "id": "23bcc26e-d938-401c-9d1b-63efaf632da8",
+    "name_a": "แปรงสีฟันเด็กเฟรชชี่่",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:44.406Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7f451b48-5941-4b76-a2dd-e801f5f26336",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานปินโตซอง",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:46.154Z"
+  },
+  {
+    "kind": "pair",
+    "id": "73b27ffb-b1a7-4384-9115-ba5485e72b2d",
+    "name_a": "หัวพ่นไฟคุณภาพตราแรด",
+    "name_b": "หัวพ่นไฟคุณภาพตราแรด",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:47.968Z"
+  },
+  {
+    "kind": "pair",
+    "id": "140bf31a-1891-4020-a2da-3462fd412533",
+    "name_a": "หัวพ่นไฟคุณภาพตราแรด",
+    "name_b": "หัวพ่นไฟคุณภาพตราแรด",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:50.054Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3ede86b9-c463-4183-9098-cb7462fe01fa",
+    "name_a": "แป้งแคร์สีขาว",
+    "name_b": "แป้งแคร์สีขาว",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:51.368Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c5d05701-08f9-4e1d-827d-d9c03090508b",
+    "name_a": "มินิบอลวาวล์",
+    "name_b": "มินิบอลวาวล์",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:54.499Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4b1f30d5-6ae9-45e6-a087-004554163525",
+    "name_a": "แปลงสีฟันJAGA",
+    "name_b": "แปลงสีฟันJAGA",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:55.934Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e79a01bc-f2dd-4c2c-b2df-6e66456617da",
+    "name_a": "สำลีก้านเชอรี่เป็ด",
+    "name_b": "สำลีก้านเชอรี่เป็ด",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:57.500Z"
+  },
+  {
+    "kind": "pair",
+    "id": "cd627e5b-ad60-44dc-9347-93a5ca53ee55",
+    "name_a": "หัวพ่นไฟคุณภาพตราแรด",
+    "name_b": "หัวพ่นไฟคุณภาพตราแรด",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:05:58.753Z"
+  },
+  {
+    "kind": "pair",
+    "id": "85999440-2328-4a93-b3e1-ffaa67419d60",
+    "name_a": "ชิลด์ท้อกช์กำจัดยุง",
+    "name_b": "ชิลด์ท้อกช์กำจัดยุง",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:06:00.259Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ff89eebf-93db-42cb-affe-c0eda4110653",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันคอลเกต",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:06:01.161Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2408c881-f98f-4ebd-9944-f2deea7135d4",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันคอลเกต",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:06:03.279Z"
+  },
+  {
+    "kind": "pair",
+    "id": "08842252-0304-44ea-846b-c211d7be00db",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันคอลเกต",
+    "embedding_score": 1.0,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:06:04.702Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a72fc41f-3b8e-4f0c-9ae8-e5fa61af8eac",
+    "name_a": "เคเบิ้ลไทร์3*100 (ราคา 25 บาท)",
+    "name_b": "เคเบิ้ลไทร์3*100 (ราคา 20 บาท)",
+    "embedding_score": 0.998,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:06:52.250Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c3e4f251-2db0-4496-aff2-46dddb492f77",
+    "name_a": "เก๊ะลิ้นชัก 4 ชั้น (หูหิ้ว) CK-124 KEY",
+    "name_b": "เก๊ะลิ้นชัก 4 ชั้น (หูห้อย) CK-124 KEY",
+    "embedding_score": 0.9975,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:00.232Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a273a6cc-23a9-4c0c-9363-6e53f446b81e",
+    "name_a": "แปรงซักผ้าแป้นไม้-สีนม (ตราสมอ)",
+    "name_b": "แปรงซักผ้าแป้นไม้ - สีนม (ตราสมอ)",
+    "embedding_score": 0.9972,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:07.898Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4eeffbfa-5c2d-446f-bb7b-aecb033c4180",
+    "name_a": "ใบมีดโกน - ดอลโก้ DORCO (20 ชิ้น)",
+    "name_b": "ใบมีดโกน - ตอลโก้ DORCO (20 ชิ้น)",
+    "embedding_score": 0.9949,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:10.191Z"
+  },
+  {
+    "kind": "pair",
+    "id": "dd7cabb7-23a9-4e3b-a018-56b59b721601",
+    "name_a": "ยาสระผมเคลียร์สีน้ำเงิน25บาท",
+    "name_b": "ยาสระผมเคลียร์สีฟ้า25บาท",
+    "embedding_score": 0.9923,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:07:15.854Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a76cdb0a-4938-40c2-8952-77830c7985fb",
+    "name_a": "กล่องปิกนิคฝาสีหวาน",
+    "name_b": "กล่องปิคนิคฝาสีหวาน",
+    "embedding_score": 0.9919,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:19.110Z"
+  },
+  {
+    "kind": "pair",
+    "id": "93d44a4a-eb98-40a8-b81b-831a8c270b8c",
+    "name_a": "ทัพพ์ใหญ่ - ด้ามดำ TP-079 (ต้นสน) TK",
+    "name_b": "ทัพพีใหญ่ - ด้ามดำ TP-079 (ต้นสน) TK",
+    "embedding_score": 0.991,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:21.488Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b32eab23-882b-499b-a99f-5d8435af856e",
+    "name_a": "แป้งโฟรเทคส์ไอซ์ซี่คูล",
+    "name_b": "แป้งโฟรเทคไอซซี่คูล",
+    "embedding_score": 0.9907,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:24.442Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6b83283c-8111-4304-948c-bfe7a9354072",
+    "name_a": "แปรงซักเสื้อ-แป้นไม้ (ไดโน) NCL",
+    "name_b": "แปรงซักเสื้อ - แป้นไม้ (ไดโน) NCL",
+    "embedding_score": 0.9903,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:28.243Z"
+  },
+  {
+    "kind": "pair",
+    "id": "db02c038-2ebe-4afe-8811-f0baf76df8c6",
+    "name_a": "ข้าวหอมชมพู่ฟ้า 5 กก.",
+    "name_b": "ข้าวหอมชมพู่หยก 5 กก. (หอมสกล)",
+    "embedding_score": 0.9897,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:07:32.133Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7e4bf08a-bcf2-41a8-a67c-e8b85ca0caa2",
+    "name_a": "คีมปากจิ้งจก (ราคา 80 บาท)",
+    "name_b": "คีมปากจิ้งจก (ราคา 79 บาท)",
+    "embedding_score": 0.9894,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:07:39.163Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8968137f-c35d-421d-90ce-15a727575cd7",
+    "name_a": "โหลเพชรจิ๋ว+ฝาดอกกุหลาบ 984-1 SW",
+    "name_b": "โหลเพชรจิ๋ว + ฝาตอกุหลาบ 984-1 SW",
+    "embedding_score": 0.9894,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:45.504Z"
+  },
+  {
+    "kind": "pair",
+    "id": "54d10162-bea3-4c14-a0c1-913df36d6df2",
+    "name_a": "ปากกาเคมี - ตราม้า - สีน้ำเงิน",
+    "name_b": "ปากกาเคมี ตราม้า - สีน้ำเงิน",
+    "embedding_score": 0.9893,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:49.967Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d9ade6de-ea96-40b9-9c3c-101d70eb42dd",
+    "name_a": "ข้าวหอมชมพู่ฟ้า 15 กก.",
+    "name_b": "ข้าวหอมชมพู่หยก 15 กก. (หอมสกล)",
+    "embedding_score": 0.9886,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:07:52.683Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5d08e130-a3de-438d-88bd-454e7b2f875b",
+    "name_a": "คีมปากเฉียง (ราคา 120 บาท)",
+    "name_b": "คีมปากเฉียง (ราคา 80 บาท)",
+    "embedding_score": 0.9884,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:07:55.524Z"
+  },
+  {
+    "kind": "pair",
+    "id": "40419811-7d5f-4700-8ca9-7518b620fd31",
+    "name_a": "ไม้แขวนเสื้อลวดหุ้ม 189 (1*12 ห่อ) SM (โครเมี่ยม)",
+    "name_b": "ไม้แขวนเสื้อลวดหุ้ม 189 (1*12 ห่อ) SM",
+    "embedding_score": 0.9883,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:07:59.247Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6b3b1cce-6f24-40c8-a6b1-9c5e2aa149f0",
+    "name_a": "แปรงลวดด้าม ทด 1*2 #10669 IMM",
+    "name_b": "แปรงลวดด้าม พต1*2 #10669 IMM",
+    "embedding_score": 0.9877,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:08:01.933Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f1a6bd16-9292-463d-b44b-37b6f5769362",
+    "name_a": "ตะแกรงลายหวาย-จิ๋ว556(เดี่ยว)",
+    "name_b": "ตะแกรงลายหวาย-จิ๋ว556",
+    "embedding_score": 0.9871,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:08:03.950Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8d9d920a-fa2b-4ae4-87e9-3c8735bdd4cb",
+    "name_a": "แปรงซักเสื้อขนใส-อีสแมน S-09 BB",
+    "name_b": "แปรงซักเสื้อขนโส - อีสแมน S-09 BB",
+    "embedding_score": 0.987,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:08:06.152Z"
+  },
+  {
+    "kind": "pair",
+    "id": "65af6096-2f94-4f9e-83f1-9169ce21216c",
+    "name_a": "สบู่โพรแทคแพค 1*4  สูตรสมูทแคร์",
+    "name_b": "สบู่โพรแทคแพค 1*4  สูตรเฟรช",
+    "embedding_score": 0.9869,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:08:09.792Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2c61bf2-3163-47ff-bf62-149687fabf6f",
+    "name_a": "ครีมอาบน้ำ Dettol 500ml เขียว",
+    "name_b": "ครีมอาบน้ำ Dettol 500ml เขียวคู่",
+    "embedding_score": 0.9865,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:08:51.802Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8305e788-301b-49f3-930b-6e7862175c3b",
+    "name_a": "ถุงขยะคุณภาพดีแบบบางs",
+    "name_b": "ถุงขยะคุณภาพดีแบบบางxl",
+    "embedding_score": 0.985,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:08:56.667Z"
+  },
+  {
+    "kind": "pair",
+    "id": "70ea424e-4f3e-41b3-a4ce-596860b0538e",
+    "name_a": "แป้งโฟรเทคส์ฟอร์เมนเย็นสุดขั่ว",
+    "name_b": "แป้งโฟรเทคส์เย็นสุดขั่ว",
+    "embedding_score": 0.9845,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:09:15.042Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8d399dc8-ceea-4dda-aec7-19d8c3a66725",
+    "name_a": "ด้ายเย็บผ้า นกยูง 1*12 ชิ้น (หลอดใหญ่ - ขาว)",
+    "name_b": "ด้ายเย็บผ้า นกยูง 1*12 ชิ้น (หลอดใหญ่ - ดำ)",
+    "embedding_score": 0.9844,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:09:21.670Z"
+  },
+  {
+    "kind": "pair",
+    "id": "31234d2e-7643-4638-8df8-e0f4adeca9d2",
+    "name_a": "แม่กุญแจสปริงSekure38mm",
+    "name_b": "แม่กุญแจสปริงSekure38mmL",
+    "embedding_score": 0.9843,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:09:30.793Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5216629f-aa02-411d-83b4-b519fd16ef94",
+    "name_a": "จุกนมแผงกระดาษ1*3โกกิS",
+    "name_b": "จุกนมแผงกระดาษ1*3โกกิM",
+    "embedding_score": 0.984,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:09:33.435Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1d381ed5-8e62-42f3-ae01-21b07c52e9e2",
+    "name_a": "ปืนยิงกาวแผงใส - ใหญ่ 40W 39 #0250 IMM",
+    "name_b": "ปืนยิงกาวแผงใส - ใหญ่ 40W 39 #0250 IMP",
+    "embedding_score": 0.984,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:09:41.289Z"
+  },
+  {
+    "kind": "pair",
+    "id": "41c0b061-631c-4446-939a-9a84c8e12103",
+    "name_a": "แปรงซักผ้า (ไม้ใหญ่) ขนสี (บาร์ 00449)",
+    "name_b": "แปรงซักผ้า (ไม้ใหญ่) ขนสี (บาร์ 00449) NC",
+    "embedding_score": 0.9839,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:09:44.646Z"
+  },
+  {
+    "kind": "pair",
+    "id": "04c5df71-43d5-44c3-9cfb-d430456dd82a",
+    "name_a": "ลูกเหม็น 800 จัมโบ้ ATM",
+    "name_b": "ลูกเหม็น800 กรัม ATM",
+    "embedding_score": 0.9836,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:10:08.457Z"
+  },
+  {
+    "kind": "pair",
+    "id": "baa3b75a-ddf4-48ce-bc40-03aca9df05a0",
+    "name_a": "คีมปากจิ้งจก (ราคา 80 บาท)",
+    "name_b": "คีมปากเฉียง (ราคา 80 บาท)",
+    "embedding_score": 0.9836,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:10:11.277Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d44b7968-9655-4881-9995-5f7f43399f0f",
+    "name_a": "กระจกพับเหลี่ยม - หวี A01272/1272 IM",
+    "name_b": "กระจกพับเหลี่ยม - ทวี A01272/1272 IM",
+    "embedding_score": 0.9833,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:10:15.823Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2ab2c9d-62cd-4154-ad65-a8f8c722ebb5",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรฆ่าเชื้อ แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรฆ่าเชื้อ",
+    "embedding_score": 0.9826,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:10:48.531Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1a0667ff-7706-4a51-a991-fe077c95be90",
+    "name_a": "ลับมีด-โค้ง",
+    "name_b": "ลับมีด โค้ง",
+    "embedding_score": 0.9825,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:13:46.521Z"
+  },
+  {
+    "kind": "pair",
+    "id": "55d04a1f-75aa-45ab-8863-c786aac84505",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9821,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:14:25.303Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6b292e96-1fb1-463a-9589-d96175c5d88f",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9821,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:14:28.082Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c9ea2cd6-38bb-4908-94bb-406ed5972adc",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9821,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:14:31.703Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b909fbb9-835a-4655-9810-eba40f03914c",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9821,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:14:38.430Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c036b77c-ac2b-451b-bb1f-3cfed574e14d",
+    "name_a": "สบู่วิภาดาเหลี่ยม65g สูตรลำไย",
+    "name_b": "สบู่วิภาดาเหลี่ยม65g สูตรลำไย แพคโหล",
+    "embedding_score": 0.9819,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:14:42.073Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0f8f30d0-48e4-4703-a2bc-96c9010bd438",
+    "name_a": "แม่กุญแจสปริงSekure32mm",
+    "name_b": "แม่กุญแจสปริงSekure32mmL",
+    "embedding_score": 0.981,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:15:02.435Z"
+  },
+  {
+    "kind": "pair",
+    "id": "06f69c2b-2372-4f2d-ac3c-8e0a4fbc12e2",
+    "name_a": "พวงกุญแจ 10530 (1×10) IMM",
+    "name_b": "พวงกุญแจ 10530 (1X10) IMM",
+    "embedding_score": 0.9809,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:15:06.608Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3b300cb4-0279-4b47-ae1b-7294b9eb9191",
+    "name_a": "ครีมอาบน้ำ Dettol 500ml น้ำเงิน",
+    "name_b": "ครีมอาบน้ำ Dettol 500ml น้ำเงินคู่",
+    "embedding_score": 0.9808,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:15:10.621Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fe0d0ddc-41da-45f2-a887-0480d2001f27",
+    "name_a": "สบู่โพรแทคแพค 1*4 สูตรพรอพโพลิท",
+    "name_b": "สบู่โพรแทคแพค 1*4  สูตรสมูทแคร์",
+    "embedding_score": 0.9804,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:15:15.794Z"
+  },
+  {
+    "kind": "pair",
+    "id": "65ec71ed-702c-4d6e-89ef-c202dc267c27",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่โพรเทคก้อนกลม สูตรน้ำนมข้าว",
+    "embedding_score": 0.9803,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:15:20.416Z"
+  },
+  {
+    "kind": "pair",
+    "id": "24781e39-0e3d-41fd-879a-402f00bccbf0",
+    "name_a": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละกอแพ",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละ",
+    "embedding_score": 0.9803,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:15:29.637Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e5293323-6a3c-4c6b-96c5-fdac62404b6c",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรส้มมะละกอ แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรส้มมะละกอ",
+    "embedding_score": 0.9801,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:18:16.329Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bbacc569-3ef7-4638-b569-39c65a1ed26b",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9797,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:18:23.964Z"
+  },
+  {
+    "kind": "pair",
+    "id": "46e5c99c-e1f1-43ae-b65f-4d1f9a6f9dea",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9797,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:20:28.432Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e7e33529-b47a-4403-8b4f-474da5baf19a",
+    "name_a": "แม่กุญแจสปริงSekure50mm",
+    "name_b": "แม่กุญแจสปริงSekure50mmL",
+    "embedding_score": 0.9796,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:20:30.131Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7ccb626e-267c-472c-bf2b-7035d63b2af6",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันคอลเกตสลิมซอฟ",
+    "embedding_score": 0.9785,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:20:39.525Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e0f3b865-50bb-4e14-86dc-05d315750def",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันคอลเกตสลิมซอฟ",
+    "embedding_score": 0.9785,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:20:40.895Z"
+  },
+  {
+    "kind": "pair",
+    "id": "34f996d3-7694-42ae-a668-8b8415fcf536",
+    "name_a": "แปรงสีฟันคอลเกตสลิมซอฟ",
+    "name_b": "แปรงสีฟันคอลเกต",
+    "embedding_score": 0.9785,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:20:42.869Z"
+  },
+  {
+    "kind": "pair",
+    "id": "514472b1-1bc4-49d2-95ec-76d662695e82",
+    "name_a": "สบู่Kเหลี่ยม80g สูตรมะละกอ",
+    "name_b": "สบู่Kเหลี่ยม80g สูตรมะละกอ แพคโหล",
+    "embedding_score": 0.9779,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:20:44.675Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0dd21add-b046-49e7-8226-3e1ac0286689",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว",
+    "embedding_score": 0.9772,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:20:47.065Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3d6e9f3f-e229-4c3e-b3f4-67b71bcd5439",
+    "name_a": "กระจกเมจิ - ใหญ่ 19 นิ้ว FSM1-31 FT",
+    "name_b": "กระจกเมจิ - ใหญ่ 19บ FSM1-31 FT",
+    "embedding_score": 0.9771,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:20:55.673Z"
+  },
+  {
+    "kind": "pair",
+    "id": "51112637-dc47-422a-a817-d275906c1c2b",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรนมแพะ แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรนมแพะ",
+    "embedding_score": 0.9768,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:20:57.527Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f7c0e218-cea8-4e42-ad13-ce7493f8b851",
+    "name_a": "คีมปากจิ้งจก (ราคา 79 บาท)",
+    "name_b": "คีมปากเฉียง (ราคา 120 บาท)",
+    "embedding_score": 0.9766,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:20:59.858Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4530cfeb-d670-43b2-a1d3-b33fd0c6d94d",
+    "name_a": "ฟองนํ้าแบบตาข่าย",
+    "name_b": "ฟองนํ้าแบบตาข่ายโฟลี่",
+    "embedding_score": 0.9765,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:04.067Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b92702bc-b690-4142-8e8a-4a2873300845",
+    "name_a": "ยาสีฟันคอลเกต 100 g เกลือชาโคล",
+    "name_b": "ยาสีฟันคอลเกต 100 g เกลือสุนไพร",
+    "embedding_score": 0.9765,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:21:07.856Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b9bc0c3c-27b9-481e-a5fb-a58f2f285dfd",
+    "name_a": "สบู่นกแก้วแพ็ค1*4 ชมพู75g",
+    "name_b": "สบู่นกแก้วแพ็ค1*4 สีชมพู  75g",
+    "embedding_score": 0.9754,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:21:11.490Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bd1b4238-0087-4877-b9f5-c5ca472c22fe",
+    "name_a": "สบู่โพรแทคแพค 1*4 สูตรพรอพโพลิท",
+    "name_b": "สบู่โพรแทคแพค 1*4  สูตรเฟรช",
+    "embedding_score": 0.9751,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:21:15.689Z"
+  },
+  {
+    "kind": "pair",
+    "id": "60129b0c-2e0d-48dc-a866-97d23e3059bd",
+    "name_a": "คีมปากจิ้งจก (ราคา 79 บาท)",
+    "name_b": "คีมปากเฉียง (ราคา 80 บาท)",
+    "embedding_score": 0.975,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:21:18.321Z"
+  },
+  {
+    "kind": "pair",
+    "id": "01e90640-599e-433b-8a1e-3ce6d9d5444a",
+    "name_a": "น้ำหอมเฟมัส 35 ML รุ่น ฟินม่วง",
+    "name_b": "น้ำหอมเฟมัส 35 ML รุ่น เบบี้ม่วง",
+    "embedding_score": 0.9748,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:21:22.195Z"
+  },
+  {
+    "kind": "pair",
+    "id": "115a4617-c204-4436-ba24-3298cdfa4f9e",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานปินโตแบบซองกีวี",
+    "embedding_score": 0.9747,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:26.695Z"
+  },
+  {
+    "kind": "pair",
+    "id": "21348f47-476f-498f-bf55-ce6297b97ad5",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานปินโตแบบซองกีวี",
+    "embedding_score": 0.9747,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:28.742Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bbde5705-e606-42e0-893e-df7dd482fc1e",
+    "name_a": "พอน์สไปรท์มิราเคิล6.5g.",
+    "name_b": "พอนด์สไปรท์มิราเคิล6.5g.",
+    "embedding_score": 0.9745,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:21:33.173Z"
+  },
+  {
+    "kind": "pair",
+    "id": "daf3f96d-ade7-4e84-9f53-4c809df6fe1b",
+    "name_a": "แชมพูปิดผมขาว ดำ",
+    "name_b": "แชมพูปิดผมขาวokสีดำ",
+    "embedding_score": 0.9744,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:39.375Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2eee9992-8dc0-44dd-a3ab-d03e1fedbd02",
+    "name_a": "ยาสีฟันคอลเกตอิอพไวท์100g.",
+    "name_b": "ยาสีฟันคอลเกต100g.",
+    "embedding_score": 0.9743,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:43.116Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a0f658e1-de6a-42a3-b4ef-0cbe60f3cb85",
+    "name_a": "ยาสีฟันคอลเกตอิอพไวท์100g.",
+    "name_b": "ยาสีฟันคอลเกต100g.",
+    "embedding_score": 0.9743,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:44.940Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fa11aa06-2f8a-4509-9992-7f8070e8a5fd",
+    "name_a": "คัทตัลบัต100ก้านจิ๋วB-Duck(ซอง)",
+    "name_b": "คัทตัลบัท100ก้านจิ๋วB-Duckกระปุก",
+    "embedding_score": 0.9742,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:21:54.417Z"
+  },
+  {
+    "kind": "pair",
+    "id": "72678f07-7078-4123-815c-c4161e05573f",
+    "name_a": "รีจอยส์ทรีอินวัน70มล",
+    "name_b": "รีจอยส์ริช70มล",
+    "embedding_score": 0.9734,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:21:59.274Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f56b2520-005e-411b-9da4-a7a56d5c1814",
+    "name_a": "กระจกโค้ง - ใหญ่ 19 บ FSM1-02B/FSM-02E",
+    "name_b": "กระจกโค้ง - ใหญ่ 19 นิ้ว FSM1-02B/FSM-02E",
+    "embedding_score": 0.9731,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:22:27.795Z"
+  },
+  {
+    "kind": "pair",
+    "id": "079f297c-1c14-49d6-b7f9-8128790a755c",
+    "name_a": "แปรงซักผ้า (ไม้เล็ก) แป้นไม้-ขนสีนม NCL",
+    "name_b": "แปรงซักผ้า (ไดโน) แป้นไม้ - ขนสีนม NCL",
+    "embedding_score": 0.972,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:22:37.736Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b3745b01-08e1-4d2b-bdab-6c9668170eb5",
+    "name_a": "เก๊ะลิ้นชัก 3 ชั้น + ฝาปิดมุน CA-303 KEY",
+    "name_b": "เก๊ะลิ้นชัก 3 ชั้น + ฝาปิดบน CA-303 KEY",
+    "embedding_score": 0.9719,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:22:41.761Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5c46a05a-ea17-49b8-af94-9cde6b8db67d",
+    "name_a": "ถ่านAAธานาโซนิค",
+    "name_b": "ถ่านAAAพานาโซนิค",
+    "embedding_score": 0.9713,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:22:43.799Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1ec545d6-ab14-4008-ad25-b13198c5a511",
+    "name_a": "ตะหลิวด้ามดำ - กลาง 30 ซม #204 PL",
+    "name_b": "กระบวยด้ามดำ - กลาง 30 ซม. #204A PL",
+    "embedding_score": 0.9712,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:22:47.636Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6068ed33-de35-4be4-9ac2-9cb040538d78",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันออรัลบี",
+    "embedding_score": 0.9709,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:22:51.505Z"
+  },
+  {
+    "kind": "pair",
+    "id": "145e9b16-7d8c-4141-9415-0f301d9acc2a",
+    "name_a": "แปรงสีฟันคอลเกต",
+    "name_b": "แปรงสีฟันออรัลบี",
+    "embedding_score": 0.9709,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:22:53.411Z"
+  },
+  {
+    "kind": "pair",
+    "id": "598d6ec6-3f1d-4ee7-93ba-b603db067f1a",
+    "name_a": "แปรงสีฟันออรัลบี",
+    "name_b": "แปรงสีฟันคอลเกต",
+    "embedding_score": 0.9709,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:22:54.825Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c836c4ef-909f-4da0-9838-e8a77e1d8bdd",
+    "name_a": "ถ่านcพานาโซนิค",
+    "name_b": "ถ่านAAAพานาโซนิค",
+    "embedding_score": 0.9704,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:22:57.328Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f02f6250-7d9f-4863-80bf-b959aad21835",
+    "name_a": "กรรไกรตัดสีสังกะสี",
+    "name_b": "กรรไกรตัดสังกะสี",
+    "embedding_score": 0.9697,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:23:05.032Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0c79fe2d-64d8-479d-9075-5b370a444ec5",
+    "name_a": "คีมปากจิ้งจก (ราคา 80 บาท)",
+    "name_b": "คีมปากเฉียง (ราคา 120 บาท)",
+    "embedding_score": 0.9696,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:06.578Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fde597d7-d366-4ff9-b6f2-11781afe6d55",
+    "name_a": "รีจอยส์ริช70มล",
+    "name_b": "รีจอยส์แฮรฟัล70มล",
+    "embedding_score": 0.9696,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:10.117Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a6f1f69b-672a-41f0-92ef-e7773e4f6164",
+    "name_a": "ตะแกรงลายหวาย-จิ๋ว556เดี่ยว",
+    "name_b": "ตะแกรงลายหวาย-จิ๋ว556",
+    "embedding_score": 0.9691,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:23:13.170Z"
+  },
+  {
+    "kind": "pair",
+    "id": "63154d18-11c2-4490-820c-bd4b70022be2",
+    "name_a": "ถุงมือหนัง (วัว/ขุย + ผสม PU) ยาว KTH",
+    "name_b": "ถุงมือหนัง (วัว/ขุย + ผสม PU) สั้น KTH",
+    "embedding_score": 0.969,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:17.488Z"
+  },
+  {
+    "kind": "pair",
+    "id": "51c2f290-5e15-4f4f-932c-767bd60f7ac2",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรบัวหิมะ แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรบัวหิมะ",
+    "embedding_score": 0.9689,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:23:19.964Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7bb466ed-326d-4642-9eae-75817c0da565",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กคอลเกต",
+    "embedding_score": 0.9687,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:22.352Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bca6d595-2368-43e8-967f-f557277b42e7",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กคอลเกต",
+    "embedding_score": 0.9687,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:23.956Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bff63d13-07b6-4b7b-be6d-cd9b79b07c48",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กคอลเกต",
+    "embedding_score": 0.9687,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:25.205Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e3026b6e-50ab-451e-b881-83c116976358",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กคอลเกต",
+    "embedding_score": 0.9687,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:27.229Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1607493f-38a2-4897-9617-a26a89c50e90",
+    "name_a": "ลูกเหม็น800 กรัม ATM",
+    "name_b": "ลูกเหม็น 800 เม็ดเล็ก ATM",
+    "embedding_score": 0.9687,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:23:43.009Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4fd257c4-0d77-49a1-9593-99d797789960",
+    "name_a": "แป้งแคร์สีชมพู",
+    "name_b": "แป้งแคร์ชมพู",
+    "embedding_score": 0.9687,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:23:45.605Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4f821337-2e0a-416d-a1b7-f978c495a804",
+    "name_a": "ยาสีฟันคอลเกต 100 g เกลือสุนไพร",
+    "name_b": "ยาสีฟันคอลเกต 100g เกลือเฟรช",
+    "embedding_score": 0.9684,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:47.602Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ec46c189-2a5d-4edc-9499-5a509900c274",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาแดง",
+    "name_b": "โคโลญน้ำหอมมิสทีน 80 ml ไวท์มัส",
+    "embedding_score": 0.9678,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:51.607Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f7a6443a-70fa-4e27-8c5e-55e4d368c0cb",
+    "name_a": "แปรงสีฟันเด็กเฟรชชี่่",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9677,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:54.102Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8c7e29da-78bf-455f-8f5c-caceaa3fcd3c",
+    "name_a": "แปรงสีฟันเด็กเฟรชชี่่",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9677,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:56.008Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7646f5c0-cc62-4626-b27b-fcdcb627dfb1",
+    "name_a": "ถ่านDพานาโซนิค",
+    "name_b": "ถ่านcพานาโซนิค",
+    "embedding_score": 0.9672,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:23:57.973Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0157fcc2-f040-44f3-a977-b641535e3c49",
+    "name_a": "ผ้ายางกันเปื้อนเด็ก - ใหญ่ NUT",
+    "name_b": "ผ้ายางกันเปื้อนเด็ก - เล็ก NUT",
+    "embedding_score": 0.9671,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:01.111Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f75ca61b-1768-4cee-a869-8e57504fc91c",
+    "name_a": "แปรงเตารีด-ทองเหลือง SB-106 พระอาทิตย์",
+    "name_b": "แปรงเตารีด - ทองเหลือง SBI-106 พระอาทิตย์",
+    "embedding_score": 0.9671,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:24:03.721Z"
+  },
+  {
+    "kind": "pair",
+    "id": "73c4ec54-7cba-4335-9933-1a557dad2102",
+    "name_a": "น้ำยาซักผ้าบรสชมพู 700มล.",
+    "name_b": "น้ำยาซักผ้าวิวช์ชมพู700มล.",
+    "embedding_score": 0.9668,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:09.767Z"
+  },
+  {
+    "kind": "pair",
+    "id": "16e759bd-363b-4778-84a6-a2b5077112cb",
+    "name_a": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "name_b": "น้ำยาล้างจานปินโตแบบซองกีวี",
+    "embedding_score": 0.9665,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:13.679Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ab6acfb7-98f6-4389-ab71-6668068d3396",
+    "name_a": "แปรงสีฟันออรัลบี",
+    "name_b": "แปรงสีฟันคอลเกตสลิมซอฟ",
+    "embedding_score": 0.9662,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:15.857Z"
+  },
+  {
+    "kind": "pair",
+    "id": "cfb97b35-ce70-4486-b005-156202ad51b1",
+    "name_a": "ลูกเหม็น 800 จัมโบ้ ATM",
+    "name_b": "ลูกเหม็น 800 เม็ดเล็ก ATM",
+    "embedding_score": 0.9661,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:17.842Z"
+  },
+  {
+    "kind": "pair",
+    "id": "11f07709-ea52-44d3-a0b8-4517cf88f7e7",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ 38 บ.",
+    "name_b": "หวี/หวีแปรง/หวีไดร์/หวีสับ 38 บ.",
+    "embedding_score": 0.9657,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:24:20.919Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4df34140-8e6f-4f8f-a029-a7007ea46786",
+    "name_a": "แปรงซักผ้า ขนสี-แป้นบรอนซ์ 333 CC",
+    "name_b": "แปรงซักผ้าขนสั้นม - แป้นสีบรอนซ์ 333 CC",
+    "embedding_score": 0.9656,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:29.499Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6df64fae-9b63-43c4-9c70-290543fdef96",
+    "name_a": "ช้อนส้อมด้ามมน no.2 #PS-444-9 PL",
+    "name_b": "ช้อนส้อมด้ามมน กก.2 #PS-444-9 PL",
+    "embedding_score": 0.9654,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:24:33.589Z"
+  },
+  {
+    "kind": "pair",
+    "id": "51dd5ff4-ed29-4281-a05b-c4ce8883ca1f",
+    "name_a": "ยาสีฟันดอกบัวคู่100g ออริจิ",
+    "name_b": "ยาสีฟันดอกบัวคู่100g เฟรช",
+    "embedding_score": 0.9651,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:35.824Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0f4f77ec-e0ed-412f-a1bb-946c4b4d017c",
+    "name_a": "ยาสีฟันคอลเกต150g เกลือเฟรช",
+    "name_b": "ยาสีฟันคอลเกต150g เกลือชาโคล",
+    "embedding_score": 0.9647,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:37.729Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1545f9ea-aef5-44f0-9014-366a63c29d32",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ 45 บ.",
+    "name_b": "หวี/หวีแปรง/หวีไดร์/หวีสับ 45 บ.",
+    "embedding_score": 0.9644,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:24:39.062Z"
+  },
+  {
+    "kind": "pair",
+    "id": "892d24f8-f596-419e-b263-0da4dbbe06d8",
+    "name_a": "ตระกร้าวงรี-สีหวาน",
+    "name_b": "ตระกร้า-สีหวาน",
+    "embedding_score": 0.9643,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:24:45.345Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e35ff981-af3f-4309-8596-dfba5767c351",
+    "name_a": "ดาวนี่ผงซักฟอกฟ้า220g",
+    "name_b": "ดาวนี่ผงซักฟอกเขียว220g",
+    "embedding_score": 0.9642,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:49.888Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7752c319-2553-4bae-8363-aa93f9be3238",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9642,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:51.262Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b4df222c-5c61-4b19-b3ca-d4bc58078357",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็ก",
+    "embedding_score": 0.9642,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:24:52.754Z"
+  },
+  {
+    "kind": "pair",
+    "id": "104e09fc-87aa-4eb0-9cce-141afc520673",
+    "name_a": "ครีมอาบน้ำโพรเทค400ml ไอซีคูล",
+    "name_b": "ครีมอาบน้ำโพรเทค400ml พรอพโดพริท",
+    "embedding_score": 0.964,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:26:41.458Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2e7bce7f-57f5-401d-b619-c684338be4be",
+    "name_a": "ยาสีฟันดอกบัวคู่150g ออริจิ",
+    "name_b": "ยาสีฟันดอกบัวคู่150g เลเวอเฟรช",
+    "embedding_score": 0.9636,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:26:43.823Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2082e780-a43e-413c-95a3-b60e9b52cdaf",
+    "name_a": "โลชั่นวิตามินอี 200g แอรอน",
+    "name_b": "โลชั่นวิตามินอี กลูตา 200g เออาร์",
+    "embedding_score": 0.9634,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:26:50.545Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c9e3fd04-8977-4cd5-ae86-f2b3ecd2c8c3",
+    "name_a": "น้ำยาบ้วนปากคอลเกตเปเปอร์มิ้น500ml",
+    "name_b": "น้ำยาบ้วนปากคอลเกตดีทอก500ml",
+    "embedding_score": 0.9634,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:26:53.697Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8ad3537d-8a21-4171-816f-4cbb6ef2e302",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml แคทลียา",
+    "name_b": "โคโลญน้ำหอมมิสทีน 80 ml ไวท์มัส",
+    "embedding_score": 0.9633,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:26:55.658Z"
+  },
+  {
+    "kind": "pair",
+    "id": "388dfd06-90cf-4a59-968b-4d31e8841a65",
+    "name_a": "แปรงสีฟันคอลเกต แถมยาสีฟัน",
+    "name_b": "แปลงสีฟันคอลเกตแถมยาสีฟัน",
+    "embedding_score": 0.9627,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:27:01.632Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b5ae7d48-7fd2-4913-b65e-c616a06b1e35",
+    "name_a": "แปรงสลัด - ชนสี (อีสแมน) #100303 แปรง",
+    "name_b": "แปรงสลัด - ขนสี (อีสแมน) #100303 แปรงไทย",
+    "embedding_score": 0.9626,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:27:03.540Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0aa4b351-3be9-4cbb-b3c8-d9b43dd5ba86",
+    "name_a": "Whiz เช็ดกระจก พิงค์ 360 ml",
+    "name_b": "Whiz เช็ดกระจก ฟ้า 360 ml",
+    "embedding_score": 0.9618,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:47:37.268Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4ed422a3-801d-4203-a51e-1a9d0bcbf6f6",
+    "name_a": "ถ่านAAธานาโซนิค",
+    "name_b": "ถ่านcพานาโซนิค",
+    "embedding_score": 0.9617,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:47:39.159Z"
+  },
+  {
+    "kind": "pair",
+    "id": "30bce401-d1a8-4e25-8904-be3b62c6007a",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาแดง",
+    "name_b": "โคโลญน้ำหอมมิสทีน 80 ml แคทลียา",
+    "embedding_score": 0.9616,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:47:54.104Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5ab00ae0-dc27-4823-837d-912dda000297",
+    "name_a": "แป้งเย็นโฟรเทคส์คูลบูล",
+    "name_b": "แป้งเย็นโฟรเทคส์ฟลอรัลพิงค์",
+    "embedding_score": 0.9616,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:47:56.742Z"
+  },
+  {
+    "kind": "pair",
+    "id": "171f3910-d4bb-4de2-b467-942d28e311b9",
+    "name_a": "ขวดนม8ออนซ์โด้ง",
+    "name_b": "ขวดนม8ออนซ์ มือจับ",
+    "embedding_score": 0.9615,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:48:05.932Z"
+  },
+  {
+    "kind": "pair",
+    "id": "05cef348-a378-483f-816a-1b8f4a5e1046",
+    "name_a": "ปืนยิงกาว-เล็ก(แผงเหลืองนํ้าเงิน)",
+    "name_b": "ปืนยิงกาว-เล็กแผงเหลืองนํ้าเงิน",
+    "embedding_score": 0.9611,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:48:09.741Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b5eaed10-29dc-4b70-8c4b-00a504c01e1a",
+    "name_a": "ข้าวสารหอมชมพู่ชมพู 5 กก.",
+    "name_b": "ข้าวสารหอมชมพู่เพชร 5 กก.",
+    "embedding_score": 0.9607,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:48:15.838Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4e42a1a5-f5f2-4d5b-a836-5cd604ef47c7",
+    "name_a": "สบู่ศิริอรเหลี่ยม80g สูตรส้มมะรุม",
+    "name_b": "สบู่เหลี่ยมK 80g สูตรส้มมะรุม แพคโห",
+    "embedding_score": 0.9607,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:49:21.582Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8598ea2a-4ef6-4ed7-bbae-8f0231b8b174",
+    "name_a": "แป้งเย็นโฟรเทคไอซซี่คูล",
+    "name_b": "แป้งเย็นโฟรเทคส์คูลบูล",
+    "embedding_score": 0.9599,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:49:27.631Z"
+  },
+  {
+    "kind": "pair",
+    "id": "205b0b9d-4b46-4ddb-b264-ba66853e5a3a",
+    "name_a": "\"กระบวยด้ามดำ 4\"\" TP-031 (ต้นสน) TK\"",
+    "name_b": "\"กระบวยด้ามตัว 4\"\" TP-031 (ต้นสน) TK\"",
+    "embedding_score": 0.9599,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:49:32.651Z"
+  },
+  {
+    "kind": "pair",
+    "id": "99c52773-5b1b-4979-88fe-615fa4d6304b",
+    "name_a": "Garnier Light 7ml เหลือง",
+    "name_b": "Garnier light  7 g สีเหลือง",
+    "embedding_score": 0.9597,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:49:38.364Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3df9c50c-152c-4a29-98b3-bad2c7fdf91c",
+    "name_a": "รีจอยส์เพอฟูม70มล",
+    "name_b": "รีจอยส์ริช70มล",
+    "embedding_score": 0.9597,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:50:53.440Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0fc35164-0a60-446e-9530-684d76a5d5d2",
+    "name_a": "หกเหลื่ยม9ตัว(หัวบอลสั้น)",
+    "name_b": "หกเหลื่ยม9ตัว(หัวบอล)สั้นตราแรด",
+    "embedding_score": 0.9594,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:51:01.470Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8e1bc8ce-4bec-47ad-82e1-2197e59e1c28",
+    "name_a": "ปรับผ้านุ่มไฮยีน 490ซัมเมอมาการอง",
+    "name_b": "ปรับผ้านุ่มไฮยีน 490 mlสปริงคัพเคก",
+    "embedding_score": 0.9583,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:07.483Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4c2bb45b-3369-4144-9093-438032615d10",
+    "name_a": "กระถางต้นไม้กลมฟักทอง - ดำ 040B LK",
+    "name_b": "กระถางต้นไม้กลมพักทอง-ดำ040B",
+    "embedding_score": 0.9578,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:52:12.007Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a98f00ac-67b4-4281-9696-e08aa04ba2fc",
+    "name_a": "รีจอยส์เพอฟูม70มล",
+    "name_b": "รีจอยส์ทรีอินวัน70มล",
+    "embedding_score": 0.9575,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:14.018Z"
+  },
+  {
+    "kind": "pair",
+    "id": "98c165ed-bb2a-47fc-b85d-57a43313eb78",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "embedding_score": 0.9575,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:18.402Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ef0338de-5b82-4b23-ae66-b164c4505a05",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "embedding_score": 0.9575,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:20.402Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2db5d45-0ce2-4341-8862-d6aeb02fe6dd",
+    "name_a": "สมุดฉีก - เส้น (เล็ก) (1*20) TC",
+    "name_b": "สมุดฉีก - เส้น (ใหญ่) (1*20) TC",
+    "embedding_score": 0.957,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:22.712Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9c060435-f09a-4290-9f17-9b96b9158062",
+    "name_a": "Whiz เช็ดกระจก พิงค์ 520 ml",
+    "name_b": "Whiz เช็ดกระจก ฟ้า 520 ml",
+    "embedding_score": 0.9568,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:25.300Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bf6992f1-7c2b-4acc-828a-746533e0834b",
+    "name_a": "ยันฮีไวท์เทนนิ่งไปร์ทครีมซอง7g.",
+    "name_b": "ยันฮีเมล่าครีมซอง7g.",
+    "embedding_score": 0.9568,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:31.877Z"
+  },
+  {
+    "kind": "pair",
+    "id": "adfa3c3b-8247-4c36-bcf0-cdbd0cc8684f",
+    "name_a": "ครีมอาบน้ำมีสทีนโกทมิลค์500ml",
+    "name_b": "ครีมอาบน้ำมิสทีนฟักข้าว500ml",
+    "embedding_score": 0.9566,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:35.320Z"
+  },
+  {
+    "kind": "pair",
+    "id": "838c0dac-6dcd-4bab-ad42-a0d6dc11501d",
+    "name_a": "ปรับผ้านุ่มไฮยีน 490ซัมเมอมาการอง",
+    "name_b": "ปรับผ้านุ่มไฮยีนเลิฟบี้บูม490มล.",
+    "embedding_score": 0.9563,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:39.215Z"
+  },
+  {
+    "kind": "pair",
+    "id": "62b31ba1-8497-4ef0-81c2-d08ef009f1f5",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว แพค",
+    "name_b": "สบู่โพรเทคก้อนกลม สูตรน้ำนมข้าว",
+    "embedding_score": 0.956,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:43.194Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f0ad66f7-7c26-4abf-8432-beb07c8b2d30",
+    "name_a": "กระจกเมจิ - ใหญ่ 19 บ FSM1-31 FT",
+    "name_b": "กระจกเมจิ - ใหญ่ 19 นิ้ว FSM1-31 FT",
+    "embedding_score": 0.956,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:52:47.919Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f40dea7c-7b3c-4d05-94a5-2a85e0faaea4",
+    "name_a": "ข้าวสารหอมชมพู่ชมพู 15 กก.",
+    "name_b": "ข้าวสารหอมชมพู่เพชร 15 กก.",
+    "embedding_score": 0.9558,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:50.767Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b5bd114a-8d99-4159-824d-541fd63c6c11",
+    "name_a": "สายฟักบัว",
+    "name_b": "หัวฟักบัว",
+    "embedding_score": 0.9557,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:57.208Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b1e88b8e-1648-44d4-bf2b-6fd8d07151fd",
+    "name_a": "สายฟักบัว",
+    "name_b": "หัวฟักบัว",
+    "embedding_score": 0.9557,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:52:58.875Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d4b5904f-8865-45c5-a25b-cd5f46e52fef",
+    "name_a": "ปรับผ้านุ่มไฮยีน 490 mlสปริงคัพเคก",
+    "name_b": "ปรับผ้านุ่มไฮยีนเลิฟบี้บูม490มล.",
+    "embedding_score": 0.9551,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:01.550Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3b9bb069-9948-4d69-a163-d3cd4fcf8316",
+    "name_a": "แม่กุญแจสปริงSekure50mmL",
+    "name_b": "แม่กุญแจสปริงKinzo50mmL",
+    "embedding_score": 0.9547,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:06.078Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b0aa434b-89f6-4d4e-b280-aeade8098318",
+    "name_a": "น้ำยาล้างจานยูนิปอปแกลลอน",
+    "name_b": "น้ำยาล้างจานทีโพ เกลอน",
+    "embedding_score": 0.9546,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:10.207Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a8ceef53-e6a5-41fb-be4c-7937124e0022",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9546,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:16.149Z"
+  },
+  {
+    "kind": "pair",
+    "id": "22e41e5b-ebea-4d85-86eb-a667826506d5",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9546,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:20.430Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b82e41d5-d32b-4f27-89a2-8a047e4868a5",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9546,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:22.887Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0adcab4b-b597-4458-b45c-04d43f7e31df",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.9546,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:28.270Z"
+  },
+  {
+    "kind": "pair",
+    "id": "47b8816f-117c-4f8b-b034-b55b3f917184",
+    "name_a": "แปรงสีฟันคอลเกต แถมยาสีฟัน",
+    "name_b": "ยาสีฟันสมุนไฟรแถมแปรงสีฟัน",
+    "embedding_score": 0.9541,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:32.866Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a6fb1da1-81d2-4dff-9507-aab11937479d",
+    "name_a": "สบู่เบนเนต130g ว่านหางจรเข้",
+    "name_b": "สบู่เบนเนต130g ขมิ้น",
+    "embedding_score": 0.954,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:35.562Z"
+  },
+  {
+    "kind": "pair",
+    "id": "aeda6f67-dd3a-4036-8825-87e5fb914b81",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละกอแพ",
+    "embedding_score": 0.9539,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:44.260Z"
+  },
+  {
+    "kind": "pair",
+    "id": "233cd474-a800-483b-a272-61ac3fb85362",
+    "name_a": "แชมพูเฮดแอนด์โชลเดอร์25บาทเมนทอล",
+    "name_b": "แชมพูเฮดแอนด์โชลเดอร์25บาทสมูท",
+    "embedding_score": 0.9535,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:53:47.035Z"
+  },
+  {
+    "kind": "pair",
+    "id": "56ca1249-e59b-4084-9dc0-acabfb56b873",
+    "name_a": "คัทตัลบัท 100 ก้านจิ๋ว B-Duck (กระปุก) RR",
+    "name_b": "คัทตัลบัท100ก้านจิ๋วB-Duckกระปุก",
+    "embedding_score": 0.9534,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:53:50.963Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5d71e9f1-3a32-45b9-901d-13466590956a",
+    "name_a": "ก๊อกต่อฟักบัวด้ามขวาน",
+    "name_b": "ก๊อกต่อฟักบัวด้ามจับ",
+    "embedding_score": 0.9533,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:54:07.563Z"
+  },
+  {
+    "kind": "pair",
+    "id": "91cf83a4-95a3-429b-afd7-26facac39d63",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละ",
+    "embedding_score": 0.9532,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:54:10.458Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5754caa3-3a96-4c8d-b973-013e911e2019",
+    "name_a": "ปรับผ้านุ่มไฮยีน 300g ชมพู",
+    "name_b": "ปรับผ้านุ่ม Famony 300g ชมพู",
+    "embedding_score": 0.9529,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:54:14.336Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4b7dcc12-ebef-4e60-a9f1-90b6ae12d1a5",
+    "name_a": "ยาสีฟันคอลเกต100g ยอดนิยม",
+    "name_b": "ยาสีฟันคอลเกต100g.",
+    "embedding_score": 0.9515,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:54:21.173Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ff6d6b31-9fad-4e86-9070-95c2aa63f97e",
+    "name_a": "ยาสีฟันคอลเกต100g ยอดนิยม",
+    "name_b": "ยาสีฟันคอลเกต100g.",
+    "embedding_score": 0.9515,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T02:54:26.020Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6954e919-a6a7-40c7-8509-cc62785c644f",
+    "name_a": "สบู่อัมพิกาก้อนกลม สูตรนมแพะ160g",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าว160g",
+    "embedding_score": 0.9508,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:54:36.460Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a8057dbd-bc42-46e9-a48b-250652c3ce47",
+    "name_a": "สบู่อัมพิกาก้อนกลม สูตรแตงโม 1*6",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรแตงโม",
+    "embedding_score": 0.9508,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:55:07.385Z"
+  },
+  {
+    "kind": "pair",
+    "id": "118dad28-efbf-41d0-89f5-50cbc384eae9",
+    "name_a": "ล้อรถเข็นพร้อมสกูร",
+    "name_b": "ลูกล้อรถเข็น",
+    "embedding_score": 0.9499,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:55:15.481Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2484d865-4992-4a82-a509-1930306b36c1",
+    "name_a": "ครีมอาบน้ำมะขาม500ml",
+    "name_b": "ครีมอาบน้ำมิสทีนฟักข้าว500ml",
+    "embedding_score": 0.9497,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:55:43.118Z"
+  },
+  {
+    "kind": "pair",
+    "id": "76a88931-9913-4a61-91d4-ab98882f5dc3",
+    "name_a": "เก้าอี้ไต้หวัน 230 (A) หน้าเหลี่ยม SH",
+    "name_b": "เก้าอี้ไต้หวัน 230 สีเข้ม B - หน้าเหลี่ยม SH",
+    "embedding_score": 0.9496,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:02.651Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9504dda5-fa98-4101-ba81-52306403ef40",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาแดง",
+    "name_b": "โคโลญน้ำหอมมิสทีน 80 ml ฝาชมพู",
+    "embedding_score": 0.9492,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:05.370Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4903fe8a-45b3-43a8-90c2-f7091e4663d9",
+    "name_a": "โฟมล้างหน้ากานีเยาวิตซี50g.",
+    "name_b": "โฟมล้างหน้าพรชาโคล50g.",
+    "embedding_score": 0.949,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:09.465Z"
+  },
+  {
+    "kind": "pair",
+    "id": "64c18d49-c58e-4503-b0fa-99db89fd79d2",
+    "name_a": "แป้งหอมมิสทีน เดบูตอง 100g",
+    "name_b": "แป้งหอมมิสทีนทานาคา 100g",
+    "embedding_score": 0.949,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:11.304Z"
+  },
+  {
+    "kind": "pair",
+    "id": "81616f0f-f333-4324-b261-be699585cbfa",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว แพค",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละกอแพ",
+    "embedding_score": 0.9477,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:15.781Z"
+  },
+  {
+    "kind": "pair",
+    "id": "faff30ee-8843-4612-ab59-9eb7c2cc70bf",
+    "name_a": "สบู่อิงอรก้อนกลม มะขามทองพันชั่ง แพค",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรมะขามทองพันชั่ง",
+    "embedding_score": 0.9476,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T02:56:20.940Z"
+  },
+  {
+    "kind": "pair",
+    "id": "924514e7-e5cd-4265-8472-ac2aadc5c8e5",
+    "name_a": "น้ำหอมเฟมัส 35 ML รุ่น ฟินแดง",
+    "name_b": "น้ำหอมเฟมัส 35 ML รุ่น ฟินม่วง",
+    "embedding_score": 0.9472,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:23.397Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6e02eb99-8087-4fbb-91d8-c8cd6aa02279",
+    "name_a": "ชิลด์ท้อกช์กำจัดยุง",
+    "name_b": "เชนไดรท์กำจัดยุง",
+    "embedding_score": 0.9466,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:26.270Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d4f16310-1934-4387-b046-b6a1980b3df6",
+    "name_a": "ชิลด์ท้อกช์กำจัดยุง",
+    "name_b": "เชนไดรท์กำจัดยุง",
+    "embedding_score": 0.9466,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:28.418Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c8bb375d-c033-4d1b-bc10-d16f1ad119fe",
+    "name_a": "สบู่ ซิตตร้า 110g ทานาคา",
+    "name_b": "สบู่ ซิตตร้า 110g วิตตามินซี",
+    "embedding_score": 0.9462,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:56:30.805Z"
+  },
+  {
+    "kind": "pair",
+    "id": "24e1f557-36e8-4542-b780-986d5faa392e",
+    "name_a": "ถุงยูนิค8×16",
+    "name_b": "ถุงไฮโซ8×16",
+    "embedding_score": 0.946,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:37.715Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5f738424-fba1-4cab-b5e3-16333051e28b",
+    "name_a": "ครีมอาบน้ำมิสทีนฟักข้าว500ml",
+    "name_b": "ครีมอาบน้ำมิสทีนหัวม้า500ml",
+    "embedding_score": 0.946,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:43.694Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b8b2e5de-4988-45f2-be5d-55784a8d4b6f",
+    "name_a": "รีจอยส์เพอฟูม70มล",
+    "name_b": "รีจอยส์แฮรฟัล70มล",
+    "embedding_score": 0.9459,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:45.142Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4e275e9c-e41d-4bb4-9d64-e13b32f05919",
+    "name_a": "นีเวีย ไปรท์เทนนิ่ง50มล.",
+    "name_b": "นีเวีย ดีโอ แมนแบล็ก50มล.",
+    "embedding_score": 0.9459,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:48.574Z"
+  },
+  {
+    "kind": "pair",
+    "id": "95a53555-2438-426d-a104-deea24a0fde6",
+    "name_a": "สบู่นกแก้วแพ็ก1*4มะลิ",
+    "name_b": "สบู่นกแก้วแพ็ก1*4ลิลลี่พืช",
+    "embedding_score": 0.9458,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:52.328Z"
+  },
+  {
+    "kind": "pair",
+    "id": "890ca236-11d2-4971-9b0b-9cf1d113b417",
+    "name_a": "เทปผ้าสีนํ้าเงิน48mm×5y",
+    "name_b": "เทปผ้าสีบรอนซ์48mm×5y",
+    "embedding_score": 0.9458,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:57:57.754Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2a524c14-ec69-4ac9-9e1c-f5020cd10694",
+    "name_a": "น้ำยาบ้วนปากคอลเกตมิกเบอรี่500ml",
+    "name_b": "น้ำยาบ้วนปากคอลเกตดีทอก500ml",
+    "embedding_score": 0.9455,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:01.569Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5810f91c-3bb7-42c8-938e-b61a87485c6d",
+    "name_a": "ครีมนวดซัลชิลเหลือง60มล.",
+    "name_b": "ครีมนวดซัลชิลส้ม60มล.",
+    "embedding_score": 0.9454,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:03.851Z"
+  },
+  {
+    "kind": "pair",
+    "id": "743002e7-2da3-4633-a824-65be3a4f132d",
+    "name_a": "คัทตัลบัท100ก้านB-Duck(ซองคู่)",
+    "name_b": "คัทตัลบัต100ก้านจิ๋วB-Duck(ซอง)",
+    "embedding_score": 0.9453,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:20.653Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8311005f-2452-4049-bbae-3f7942b15605",
+    "name_a": "ครีมนวดซีลชิลเขียว60มล.",
+    "name_b": "ครีมนวดซัลชิลเหลือง60มล.",
+    "embedding_score": 0.945,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:22.976Z"
+  },
+  {
+    "kind": "pair",
+    "id": "af3ea46d-6e1c-408e-90a0-c61beb58572c",
+    "name_a": "สบู่อัมพิกาก้อนกลม สูตรมะละกอ 130g",
+    "name_b": "สบู่อัมพิกาก้อนกลมสูตรมะขาม130g",
+    "embedding_score": 0.945,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:27.500Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6c46cc5b-d18f-46b9-81d3-3a97a932bd0d",
+    "name_a": "ตะแกรงตักทอด เลส (ด้ามเลสหนา)",
+    "name_b": "ตะแกรงตักทอด เลส (ด้ามไม้แบบ)",
+    "embedding_score": 0.9449,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:31.826Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f3093599-c789-4dfe-8dee-c050ae5b1d64",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานทีโพ เกลอน",
+    "embedding_score": 0.9449,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:58:34.430Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3d5f49ed-8c35-4202-b3a2-706fd8a2595e",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "น้ำยาล้างจานทีโพ เกลอน",
+    "embedding_score": 0.9449,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:59:26.810Z"
+  },
+  {
+    "kind": "pair",
+    "id": "22fbc050-629b-4851-b90f-c2627a859606",
+    "name_a": "รีจอยส์ทรีอินวัน70มล",
+    "name_b": "รีจอยส์มะละกอ70มล",
+    "embedding_score": 0.9448,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:59:52.751Z"
+  },
+  {
+    "kind": "pair",
+    "id": "07a41cb6-2473-4c67-aecf-14f7350d41d7",
+    "name_a": "หมุดปักบอดร์",
+    "name_b": "ล้อลาก",
+    "embedding_score": 0.9447,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T02:59:57.340Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5e1bbb8c-523a-4bd7-890b-955e656c2b59",
+    "name_a": "สบู่นกแก้วแพ็ก1*4มะลิ",
+    "name_b": "สบู่นกแก้ว1*4ไม้หอม",
+    "embedding_score": 0.9445,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:00:15.124Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fcaeb5d9-2387-4ee6-b3e1-db316b894d86",
+    "name_a": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "name_b": "น้ำยาล้างจานปินโตแบบถังเลม่อน",
+    "embedding_score": 0.9444,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:00:20.723Z"
+  },
+  {
+    "kind": "pair",
+    "id": "be16a36d-67c0-4861-9a50-795383ba626c",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรส้มมะละกอ",
+    "name_b": "สบู่โพรเทคก้อนกลม สูตรส้ม",
+    "embedding_score": 0.9441,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:13.074Z"
+  },
+  {
+    "kind": "pair",
+    "id": "78ee8290-3e47-4ef2-8e04-0e47f4bd5c19",
+    "name_a": "สบู่ก้อนกลมมิสทีน ใบบัวบก",
+    "name_b": "สบู่อิงอรก้อนกลมสมุนไฟร",
+    "embedding_score": 0.9441,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:17.248Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ac58679b-e5b0-4067-a769-702afc02b316",
+    "name_a": "ปรับผ้านุ่มไฮยีนฟ้า480มล.",
+    "name_b": "ปรับผ้านุ่มไฮยีนน้ำเงิน480มล.",
+    "embedding_score": 0.944,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:19.440Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4c73ed07-3167-4bd3-9905-c3590811682d",
+    "name_a": "ขวดโหลกลม ฝาเกลียวจุกสี",
+    "name_b": "ขวดโหลเหลี่ยมเรียบ ฝาพ.โสสี",
+    "embedding_score": 0.9434,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:22.315Z"
+  },
+  {
+    "kind": "pair",
+    "id": "80bf666d-b98a-40fe-85a0-23addfc0ed5a",
+    "name_a": "คัทตัลบัท100ก้านB-Duck(ซองคู่)",
+    "name_b": "คัทตัลบัท100ก้านจิ๋วB-Duckกระปุก",
+    "embedding_score": 0.9434,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:24.607Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8ec0f0a6-276d-4584-9ac6-55b2788bf8ea",
+    "name_a": "บอลพลาสติกเล็ก",
+    "name_b": "บอลพลาสติก กลาง",
+    "embedding_score": 0.943,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:26.851Z"
+  },
+  {
+    "kind": "pair",
+    "id": "339293ba-7c84-4799-ba23-dd12773c3bb3",
+    "name_a": "เครื่องมือ tools",
+    "name_b": "เครื่องมือtools",
+    "embedding_score": 0.9428,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:01:29.004Z"
+  },
+  {
+    "kind": "pair",
+    "id": "5218116a-6ffe-48c5-b4cf-1a176d44f202",
+    "name_a": "ครีมอาบน้ำมีสทีน มะขาม 200ml",
+    "name_b": "ครีมอาบน้ำมีสทีน ฟักข้าว 200ml",
+    "embedding_score": 0.9422,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:31.023Z"
+  },
+  {
+    "kind": "pair",
+    "id": "eaad7a74-9998-4941-9003-bdbb207c7bbb",
+    "name_a": "ยันฮีผงขัดผิวกระปุก",
+    "name_b": "ยันฮีผงขัดผิวซอง",
+    "embedding_score": 0.942,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:34.742Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ec78bf23-0913-42c1-b526-afc86829c7d6",
+    "name_a": "ครีมอาบน้ำมะขาม500ml",
+    "name_b": "ครีมอาบน้ำมีสทีนโกทมิลค์500ml",
+    "embedding_score": 0.9413,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:01:57.187Z"
+  },
+  {
+    "kind": "pair",
+    "id": "31de7edb-3498-4522-988d-c8efb576b8a7",
+    "name_a": "ขวดซอสใหญ่",
+    "name_b": "ขวดซอสใหญ่(สีหวาน)",
+    "embedding_score": 0.9407,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T03:02:01.816Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8b128710-3662-44be-aa19-d25800959a92",
+    "name_a": "ครีมอาบน้ำโพรเทค400ml พรีไบโอติน",
+    "name_b": "ครีมอาบน้ำโพรเทค400ml พรีไบโอชมพู",
+    "embedding_score": 0.9407,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:11.995Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f0fc4f1e-0dd4-456f-a585-bb4e7e7ade23",
+    "name_a": "ถุงยูนิค9×18",
+    "name_b": "ถุงไฮโซ9×18",
+    "embedding_score": 0.9403,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:13.378Z"
+  },
+  {
+    "kind": "pair",
+    "id": "23948dd5-bec3-4430-abd0-d339eff62831",
+    "name_a": "น้ำยาบ้วนปากคอลเกตมิกเบอรี่500ml",
+    "name_b": "น้ำยาบ้วนปากคอลเกตเปเปอร์มิ้น500ml",
+    "embedding_score": 0.94,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:17.526Z"
+  },
+  {
+    "kind": "pair",
+    "id": "aeb23acc-d905-4e85-82b6-9e46560ef1b1",
+    "name_a": "ยาสีฟันคอลเกต 100 g เกลือชาโคล",
+    "name_b": "ยาสีฟันคอลเกต 100g เกลือเฟรช",
+    "embedding_score": 0.9399,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:21.123Z"
+  },
+  {
+    "kind": "pair",
+    "id": "31881096-f98e-4ec4-b645-63c05c5e4e69",
+    "name_a": "ยาสีฟันkodomo 40g สตอเบอรี่",
+    "name_b": "ยาสีฟันkodomo 40g รสองุ่น",
+    "embedding_score": 0.9397,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:23.302Z"
+  },
+  {
+    "kind": "pair",
+    "id": "babd2b74-2e24-4821-a26d-5acfd5a3a6f4",
+    "name_a": "สบู่อิงอร 85g มะขามแท้",
+    "name_b": "สบู่อิงอร85g.มะขามผสมทานาคา",
+    "embedding_score": 0.9397,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:27.117Z"
+  },
+  {
+    "kind": "pair",
+    "id": "16e695a0-32ff-4054-b88e-a5aeb1b8450d",
+    "name_a": "แก้วหู - สิงห์ LG312312 (16) SA",
+    "name_b": "แก้วหู - ไฮเนเก้น LG312312 (16) SA",
+    "embedding_score": 0.9397,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:02:57.841Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c2990736-c5ec-4994-b0f6-56d574a944b7",
+    "name_a": "ถ่านDพานาโซนิค",
+    "name_b": "ถ่านAAAพานาโซนิค",
+    "embedding_score": 0.9395,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:00.299Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c302e8c5-c296-47e3-b8cf-c87c6d0f6596",
+    "name_a": "รีจอยส์ทรีอินวัน70มล",
+    "name_b": "รีจอยส์แฮรฟัล70มล",
+    "embedding_score": 0.9392,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:04.236Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6ad6b794-ed42-4051-b6f9-3a729d8aef5c",
+    "name_a": "ถุงไฮโซ6×11",
+    "name_b": "ถุงยูนิค6×11",
+    "embedding_score": 0.9391,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:05.374Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bbcd4611-dbb4-4b55-b3fc-dfbd867cc8d9",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรฆ่าเชื้อ แพค",
+    "name_b": "สบู่อิงอรก้อนกลมสมุนไฟร",
+    "embedding_score": 0.9389,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:09.027Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d30aac05-d2c5-46e3-b6d9-f8a43fc33362",
+    "name_a": "น้ำหอมเฟมัส 35 ML รุ่น โพเอ็ม",
+    "name_b": "น้ำหอมเฟมัส 35 ML รุ่น ฟินแดง",
+    "embedding_score": 0.9385,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:10.452Z"
+  },
+  {
+    "kind": "pair",
+    "id": "aecb8590-5ac6-4e03-8ec9-75e9fc3b4d68",
+    "name_a": "ยาสีฟันคอลเกต150g เกลือชาโคล",
+    "name_b": "ยาสีฟันคอลเกต150g เกลือสมุนไพร",
+    "embedding_score": 0.9382,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:11.983Z"
+  },
+  {
+    "kind": "pair",
+    "id": "2e5b0540-9314-4804-8e4e-7da3c3174286",
+    "name_a": "แม่กุญแจสปริงSekure50mm",
+    "name_b": "แม่กุญแจสปริงKinzo50mmL",
+    "embedding_score": 0.937,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:13.690Z"
+  },
+  {
+    "kind": "pair",
+    "id": "aab5a28a-232c-42c1-b45a-2dd02eef60a6",
+    "name_a": "ถุงยูนิค12×20",
+    "name_b": "ถุงไฮโซ12×20",
+    "embedding_score": 0.9366,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:14.785Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1a3566c6-c00d-4b8b-a41f-2171d2198898",
+    "name_a": "ชั้นพลาสติก 4 ชั้น (ผืนผ้า - สีดำ) RTH",
+    "name_b": "ชั้นพลาสติก 4 ชั้น (จตุรัส - สีหวาน) RTH",
+    "embedding_score": 0.9364,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:17.962Z"
+  },
+  {
+    "kind": "pair",
+    "id": "52dbba78-ce58-481c-9385-de3e135c3f07",
+    "name_a": "ฟองนํ้าหุ้มตาข่ายอย่างหนา",
+    "name_b": "ฟองนํ้าแบบตาข่าย",
+    "embedding_score": 0.9362,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T03:03:20.996Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6587996f-6190-423f-9719-feb2fe7e62e8",
+    "name_a": "ผงซักฟอกอีซี่10ขาว",
+    "name_b": "ผงซักฟอกอีซี่10ฟ้า",
+    "embedding_score": 0.9361,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:23.028Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3ba2255e-794c-4ae5-a1b9-67aa7b7bccb1",
+    "name_a": "ปรับผ้านุ่มไฮยีน 540 ml ชมพูเด็ก",
+    "name_b": "ปรับผ้านุ่มไฮยีน540ml ชมพู",
+    "embedding_score": 0.9358,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T03:03:27.654Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6ed79f63-2119-405e-be06-19ff921a6658",
+    "name_a": "ถุงยูนิค7×15",
+    "name_b": "ถุงไฮโซ7×15",
+    "embedding_score": 0.9347,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:29.696Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4894ef92-2a5b-42c9-ad6c-9ba568e23de8",
+    "name_a": "เข็มขัดหัวเจาะ100",
+    "name_b": "เข็มขัดหัวล็อค100",
+    "embedding_score": 0.9346,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:33.088Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ad6e5367-1b20-4eb8-9324-59a4023af012",
+    "name_a": "กระเป๋าย่ามพื้นเมือง - รูปช้าง (ใหญ่) (1*3) SN",
+    "name_b": "กระเป๋าย่ามพื้นเมือง - รูปช้าง (เล็ก) (1*3) SNI",
+    "embedding_score": 0.9345,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:35.415Z"
+  },
+  {
+    "kind": "pair",
+    "id": "cb6cedfc-007e-417a-951c-44a295993149",
+    "name_a": "นีเวียโฟมแอกซ์เน่50g.",
+    "name_b": "นีเวียโฟมสูตรออย50g.",
+    "embedding_score": 0.9342,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:37.292Z"
+  },
+  {
+    "kind": "pair",
+    "id": "3dbced2e-48da-4b99-9f77-0cd4bf38800c",
+    "name_a": "รีจอยส์ริช140มล",
+    "name_b": "รีจอยส์มะละกอ140มล",
+    "embedding_score": 0.9341,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:39.096Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4cfa7ca2-357f-45d8-b41a-8898ce11391e",
+    "name_a": "น้ำยาล้างจานทีโพ เกลอน",
+    "name_b": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "embedding_score": 0.9341,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:41.976Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6168d916-3465-4e56-a1f8-c044e1458d5e",
+    "name_a": "แป้งหอมโรตตัวมิสทิน",
+    "name_b": "แป้งหอมโรยตัวแคทลียาเพอร์ฟูม",
+    "embedding_score": 0.9339,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:45.813Z"
+  },
+  {
+    "kind": "pair",
+    "id": "df8f1f33-072b-4add-98c4-2e297d343eb3",
+    "name_a": "สบู่ขัดผิว วิภาดา สูตรมะขาม",
+    "name_b": "สบู่อิงอรก้อนกลมสมุนไฟร",
+    "embedding_score": 0.9339,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:03:47.327Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b1b7dc9b-ef28-4ce3-a4e1-334345347af9",
+    "name_a": "ใสตะเกียบลายหวาย557เดี่ยว",
+    "name_b": "ใส่ตะเกียบลายหวาย557เดี่ยว",
+    "embedding_score": 0.9338,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:03:52.611Z"
+  },
+  {
+    "kind": "pair",
+    "id": "789287e0-f382-49a9-8245-f0a79351c610",
+    "name_a": "แป้งโฟรเทคส์เฟรช",
+    "name_b": "แป้งโฟรเทคไอซซี่คูล",
+    "embedding_score": 0.9332,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:03:54.875Z"
+  },
+  {
+    "kind": "pair",
+    "id": "10723a3e-6771-4da1-b5f2-204bd6baad43",
+    "name_a": "แป้งโฟรเทคส์เฟรช",
+    "name_b": "แป้งโฟรเทคไอซซี่คูล",
+    "embedding_score": 0.9332,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:03:58.050Z"
+  },
+  {
+    "kind": "pair",
+    "id": "19b868eb-b55c-43a6-a92f-02a8bf4faf00",
+    "name_a": "กาวแท่งสีขาว",
+    "name_b": "กาวแท่งสีขาวใหญ่",
+    "embedding_score": 0.9329,
+    "human_verdict": "unsure",
+    "labelled_at": "2026-10-11T03:04:00.709Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bce078c4-52f5-4c03-8a47-b0636be02ced",
+    "name_a": "สบู่ก้อน เซฟการ์ดแพค 1*4 เพียวไวท์",
+    "name_b": "สบู่ก้อน เซฟการ์ดแพค 1*4 เหลือง",
+    "embedding_score": 0.9328,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:03.358Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c6827412-528a-472b-9789-d9fa440905c5",
+    "name_a": "หกเหลื่ยม9ตัว(หัวบอล)กลางตราแรด",
+    "name_b": "หกเหลื่ยม9ตัว(หัวบอล)สั้นตราแรด",
+    "embedding_score": 0.9325,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:06.765Z"
+  },
+  {
+    "kind": "pair",
+    "id": "045217d9-8977-4dd0-80a8-3575c3d0a5f9",
+    "name_a": "กล่องล็อค 8030 หูคู่ (สีหวาน) SW",
+    "name_b": "กล่องล็อค8030หูคู่(สีหวาน)",
+    "embedding_score": 0.9317,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:04:10.203Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4d0f780a-b37a-4a4c-88f0-87e8a0593cdb",
+    "name_a": "แปลงสีฟันJAGA",
+    "name_b": "แปรงสีฟันออรัลบี",
+    "embedding_score": 0.9315,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:12.629Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7ad8002f-f264-4b10-b563-187a5e736ad6",
+    "name_a": "แปลงสีฟันJAGA",
+    "name_b": "แปรงสีฟันออรัลบี",
+    "embedding_score": 0.9315,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:14.950Z"
+  },
+  {
+    "kind": "pair",
+    "id": "54566eb3-d4ab-4ab3-aa99-bd91a3635750",
+    "name_a": "ครีมอาบนํ้ามิสทีน500g.พิเศษครีมอาบนํ้า",
+    "name_b": "ครีมอาบนํ้า ซากุระ500g.",
+    "embedding_score": 0.931,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:17.132Z"
+  },
+  {
+    "kind": "pair",
+    "id": "50f9beda-bd35-424b-b573-41cde323f2ae",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรน้ำนมข้าว แพค",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละ",
+    "embedding_score": 0.9307,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:19.056Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e8acde84-f623-4697-8b99-50d5f624ac9d",
+    "name_a": "ยันฮีแอคเน่ครีมซอง",
+    "name_b": "ยันฮีเมล่าครีมกล่อง",
+    "embedding_score": 0.9306,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:22.847Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b7ea6243-e813-4a05-bed5-4e6c8eec98ba",
+    "name_a": "ลูกเหม็นลูกเล็ก800g.",
+    "name_b": "ลูกเหม็นลูกใหญ่800g.",
+    "embedding_score": 0.9304,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:34.025Z"
+  },
+  {
+    "kind": "pair",
+    "id": "41fd7e47-8ee8-44ea-9c49-138c7e01d736",
+    "name_a": "ผงซักฟอกอีซี่10ม่วง",
+    "name_b": "ผงซักฟอกอีซี่10ฟ้า",
+    "embedding_score": 0.9302,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:50.000Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f88d05e3-8f7d-4f80-b105-9d68db54346f",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาชมพู",
+    "name_b": "โคโลญน้ำหอมมิสทีน 80 ml แคทลียา",
+    "embedding_score": 0.9302,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:52.764Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9123abc3-bab5-429d-8a7e-26c7f2532b35",
+    "name_a": "ถ่านAAธานาโซนิค",
+    "name_b": "ถ่านDพานาโซนิค",
+    "embedding_score": 0.93,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:54.488Z"
+  },
+  {
+    "kind": "pair",
+    "id": "38ab218f-b56c-4f5c-a540-6b30c657fe64",
+    "name_a": "สบู่โพรเทคก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละกอแพ",
+    "embedding_score": 0.93,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:56.800Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d2b9ac0c-459f-4da4-aa5e-0c52a96f0c92",
+    "name_a": "ปรับผ้านุ่มDowny 300g ชมพูน้ำหอม",
+    "name_b": "ปรับผ้านุ่ม Famony 300g ชมพู",
+    "embedding_score": 0.93,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:04:59.038Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e2195ac5-b52f-44a5-9f18-9fc3718a59a8",
+    "name_a": "คัทตัลบัท 100 ก้านจิ๋ว B-Duck (กระปุก) RR",
+    "name_b": "คัทตัลบัต100ก้านจิ๋วB-Duck(ซอง)",
+    "embedding_score": 0.9299,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:00.848Z"
+  },
+  {
+    "kind": "pair",
+    "id": "24deee22-d274-4eec-ac56-88b427eb6bec",
+    "name_a": "ครีมอาบน้ำLux 80ml ม่วง",
+    "name_b": "ครีมอาบน้ำLux 80ml ชมพู",
+    "embedding_score": 0.9296,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:02.535Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9237e55c-530a-4973-9203-c5a45670f4ba",
+    "name_a": "ยาสีฟันคอลเกต100g ยอดนิยม",
+    "name_b": "ยาสีฟันคอลเกตอิอพไวท์100g.",
+    "embedding_score": 0.9294,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:10.941Z"
+  },
+  {
+    "kind": "pair",
+    "id": "735d5f8a-deaa-475f-8a1f-67bb16d6c465",
+    "name_a": "นีเวีย แมนโรลออน50มล.",
+    "name_b": "นีเวีย ดีโอ แมนแบล็ก50มล.",
+    "embedding_score": 0.929,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:21.519Z"
+  },
+  {
+    "kind": "pair",
+    "id": "778530ba-3552-452f-abf9-18024c14bd47",
+    "name_a": "สบู่ก้อนเภสัช ชมพู",
+    "name_b": "สบู่ก้อนกลมมิสทีน ซองชมพู",
+    "embedding_score": 0.9289,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:24.741Z"
+  },
+  {
+    "kind": "pair",
+    "id": "326f544f-3087-4901-8b99-667533893fae",
+    "name_a": "กระดาษห่อของขวัญ เรนโบว์/เลเซอร์ลาย #OC",
+    "name_b": "กระดาษห่อของขวัญ เรนโบว์/เลเซอร์ลาย",
+    "embedding_score": 0.9286,
+    "human_verdict": "same",
+    "labelled_at": "2026-10-11T03:05:27.743Z"
+  },
+  {
+    "kind": "pair",
+    "id": "11b0ec6c-954c-421f-a7e5-b2a67f76ba66",
+    "name_a": "หกเหลื่ยม9ตัว(หัวบอลสั้น)",
+    "name_b": "หกเหลื่ยม9ตัว(หัวตัดกลาง)",
+    "embedding_score": 0.9282,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:31.733Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e116622a-7a1d-42ef-a54a-729216eb5d53",
+    "name_a": "น้ำยาถูพื้น Spaclean 700 ml ดำแดง",
+    "name_b": "น้ำยาถูพื้น Spaclean 700 ml ชมพูดำ",
+    "embedding_score": 0.9282,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:05:52.532Z"
+  },
+  {
+    "kind": "pair",
+    "id": "27d7cd78-0cf2-4e81-8334-9a1f7684264d",
+    "name_a": "ยาสีฟันคอลเกต150g เกลือเฟรช",
+    "name_b": "ยาสีฟันคอลเกต150g เกลือสมุนไพร",
+    "embedding_score": 0.9279,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:08.304Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d0e16ec8-2e71-43ac-8761-9f54efb465b0",
+    "name_a": "สบู่นกแก้วแพ็ก1*4ลิลลี่พืช",
+    "name_b": "สบู่นกแก้ว1*4ไม้หอม",
+    "embedding_score": 0.9277,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:10.358Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d123992b-71b0-4ba4-8f21-64b38c4eefe5",
+    "name_a": "หกเหลื่ยม9ตัว(หัวบอลสั้น)",
+    "name_b": "หกเหลื่ยม9ตัว(หัวบอล)กลางตราแรด",
+    "embedding_score": 0.9276,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:12.550Z"
+  },
+  {
+    "kind": "pair",
+    "id": "90ce1cae-0025-4d13-a899-3a188572ad50",
+    "name_a": "แปรงซักผ้า (ไดโน) แป้นไม้ - ขนสีนม NCL",
+    "name_b": "แปรงซักเสื้อ - แป้นไม้ (ไดโน) NCL",
+    "embedding_score": 0.9274,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:32.414Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d78f232a-9e6d-498b-92c0-52be6491c344",
+    "name_a": "ฟิวเจอร์บอร์ดเล็ก - ผืนผ้า คละสี 49*65 ซม",
+    "name_b": "ฟิวเจอร์บอร์ดเล็ก - ผืนผ้า สีขาวล้วน 49*65 ซม",
+    "embedding_score": 0.9274,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:35.374Z"
+  },
+  {
+    "kind": "pair",
+    "id": "82cb36c1-77a6-4028-90a6-5ea4ddd2ad40",
+    "name_a": "ปรับผ้านุ่มไฮยีนน้ำเงิน480มล.",
+    "name_b": "ปรับผ้านุ่มไฮยีนแดง480มล.",
+    "embedding_score": 0.9273,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:06:53.839Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b60ff62f-85d3-44d3-8e4e-029b413a4eb7",
+    "name_a": "น้ำยาซักผ้า BabyMild 550ml Pink",
+    "name_b": "น้ำยาซักผ้าเด็กดีนี่ 550ml ชมพู",
+    "embedding_score": 0.9273,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:05.054Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c0cbed70-c77f-4bbb-b88f-96eb74aad4d0",
+    "name_a": "ทิชชู่แมคโม่อเนกประสงค์",
+    "name_b": "ถาดลึก-สีเรนโบว์",
+    "embedding_score": 0.738,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:07.187Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7ab4c233-c3c8-4cc2-bb8e-651e52d8ffd3",
+    "name_a": "สบู่โพรเทคก้อนกลม สูตรน้ำนมข้าว",
+    "name_b": "สบู่โพรเทคก้อนกลม สูตรส้ม",
+    "embedding_score": 0.7214,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:09.567Z"
+  },
+  {
+    "kind": "pair",
+    "id": "718a7abb-f00b-4876-9a25-fa10f06f5fe1",
+    "name_a": "สำลีก้านตราทวิน",
+    "name_b": "กระจาดเลสเจาะ",
+    "embedding_score": 0.6846,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:12.260Z"
+  },
+  {
+    "kind": "pair",
+    "id": "66e8e913-89be-4fd6-860f-26839a0dce50",
+    "name_a": "แป้งแคร์สีม่วง",
+    "name_b": "แป้งฝุ่นหอมโรยตัว",
+    "embedding_score": 0.681,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:14.478Z"
+  },
+  {
+    "kind": "pair",
+    "id": "07c4bdc6-f707-4053-94ce-ac6ebbf51d75",
+    "name_a": "กาวดับหนูชนิดถาดเอ็นแร็ท",
+    "name_b": "ก๊อกต่อฟักบัวด้ามจับ",
+    "embedding_score": 0.6758,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:16.855Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ceade0dc-febb-4ae2-8388-c7389d0dc874",
+    "name_a": "สบู่อัมพิกาก้อนกลม สูตรนมข้าวมะละ",
+    "name_b": "ผงซักฟอกอีซี่ชมพู 160g.",
+    "embedding_score": 0.6742,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:19.674Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e06e0478-29a9-44ef-8e65-9795237abd8b",
+    "name_a": "ทัพพีจีนใหญ่ - ด้ามพลาสติกสี ตราสมอ PPL",
+    "name_b": "พลาสติกถนอมสาย + เก็บสายแฟชั่นหัวการ์ตูน",
+    "embedding_score": 0.6656,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:24.293Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0936c11a-4f8d-41b0-8f81-866e7cfba31c",
+    "name_a": "ทิชชู่มายแพค5",
+    "name_b": "กระจาดเลสเจาะ",
+    "embedding_score": 0.6553,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:25.492Z"
+  },
+  {
+    "kind": "pair",
+    "id": "07292118-8636-4d3e-b9bd-ca2c0e51af67",
+    "name_a": "Detol สบู่เหลวล้างมือ แพคคู่",
+    "name_b": "แปรงลวด ทองเหลืองด้ามพลาสติก",
+    "embedding_score": 0.6525,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:26.734Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bd6e3236-9177-40b8-9935-a7d877572c3c",
+    "name_a": "น้ำยาล้างจานปินโตซอง",
+    "name_b": "สบู่อิงอรก้อนกลม สูตรฆ่าเชื้อ แพค",
+    "embedding_score": 0.651,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:31.174Z"
+  },
+  {
+    "kind": "pair",
+    "id": "83ea3dc4-431e-4053-8d0b-7ea6d117f84c",
+    "name_a": "โต๊ะกาแฟเหลี่ยม-ลายไม้สัก 20*30 ขาเหล็ก",
+    "name_b": "กระปุกกลมฝาสี-ช้อน ขีดระดับ",
+    "embedding_score": 0.6471,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:38.282Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b9ee1de5-e1a4-44cd-9e37-57f193c82660",
+    "name_a": "Detol สบู่เหลวล้างมือ แพคคู่",
+    "name_b": "ผงซักฟอกอีซี่10ขาว",
+    "embedding_score": 0.6471,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:07:40.102Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9b176bd4-0f2f-4ff9-995b-eb1b00193fb8",
+    "name_a": "ถัง ปูน 15 สี SP",
+    "name_b": "ขวดซอส-กลาง",
+    "embedding_score": 0.6464,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:09.466Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e8d67cbd-71ee-4d6e-a12e-1d1272cb207e",
+    "name_a": "ช้อนคาว - ม้าลาย (1*12 กล่อง)",
+    "name_b": "ขวดซอส-กลาง",
+    "embedding_score": 0.6462,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:10.542Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bf30ccd7-36e4-446d-8015-632bf1e4b567",
+    "name_a": "กระดาษเช็คชู่หน้าสก็อตต์แบบกล่อง",
+    "name_b": "ใบคัทเตอร์-ใหญ่(กล่องแดง)",
+    "embedding_score": 0.645,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:11.779Z"
+  },
+  {
+    "kind": "pair",
+    "id": "dafc0cb8-a4a7-4d7e-90b1-3d0ae40ab236",
+    "name_a": "ตะกร้ากลม 82 ลายถักเล็ก - สีหวาน (ตราลิง)",
+    "name_b": "แป้งตรางู",
+    "embedding_score": 0.6445,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:12.699Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fb8294a5-a274-49ac-9c04-15f4fcbb5297",
+    "name_a": "ยันฮีเมล่าครีมซอง7g.",
+    "name_b": "แป้งโฟรเทคไอซซี่คูล",
+    "embedding_score": 0.6414,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:13.745Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b2351da2-bcfc-4222-a4e8-dc3ed2878a80",
+    "name_a": "คีมปากจิ้งจก (ราคา 80 บาท)",
+    "name_b": "ไบกอนหัวฉีดคู่",
+    "embedding_score": 0.6406,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:14.708Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1037aed5-3693-46dc-9252-dcc31cdb8c99",
+    "name_a": "แปรงเรนโบว์ (ซักผ้าพลาสติกรูป 8) BB",
+    "name_b": "ผลิตภัณฑ์กำจัดหมัดตรารถถัง",
+    "embedding_score": 0.64,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:15.726Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e313afff-632d-4344-bc44-a19c3970cbf8",
+    "name_a": "ขันด้ามลายผลไม้ 019 #019-2 สีใส GW",
+    "name_b": "กล่องฝาปิด-สีใส",
+    "embedding_score": 0.6356,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:18.647Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e5de2b85-89d0-42e0-a50e-1165dd9a1cfd",
+    "name_a": "หม้อหู - จระเข้ #26 TNH",
+    "name_b": "ด้ามกระทะ (ใหญ่) ปลายมน",
+    "embedding_score": 0.6347,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:19.855Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e30da467-7da9-4d53-a31b-af5d5176518d",
+    "name_a": "ช้อนคาว - ม้าลาย",
+    "name_b": "ตระกร้า-สีหวาน",
+    "embedding_score": 0.6338,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:20.858Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8e88cb19-dee8-48c6-9b6f-4417bd38186b",
+    "name_a": "แป้งบีบี นาทรีพ 25 g ม่วง",
+    "name_b": "แพนทีนครีมบำรุงผมเซรั่มสูตรเข้มข้นม่วง",
+    "embedding_score": 0.6289,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:22.040Z"
+  },
+  {
+    "kind": "pair",
+    "id": "39f5de94-a99b-4734-8d62-2e55dbe74ede",
+    "name_a": "น้ำยาบ้วนปากคอลเกตเปเปอร์มิ้น100ml",
+    "name_b": "โฟมล้างหน้านีเวียโคลน 100g แดง",
+    "embedding_score": 0.6276,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:34.929Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1a990946-62b3-4bea-bcdb-3d8c09fc3f0e",
+    "name_a": "ใยขัดด้ามเตารีดเดี่ยว (ด้ามแปรงขัดพื้น)",
+    "name_b": "กระปุกฝาเกลียวสูงชีลยาง",
+    "embedding_score": 0.627,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:38.423Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bc90a427-f044-4f08-92fe-429663ca61e5",
+    "name_a": "ยันฮีผงขัดผิวกระปุก",
+    "name_b": "ปรับผ้านุ่ม Downy 500g แดงน้ำหอม",
+    "embedding_score": 0.6246,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:39.518Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a57dc38f-d6df-4f3c-98f2-da3454a33099",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาแดง",
+    "name_b": "ยันฮีผงขัดผิวซอง",
+    "embedding_score": 0.6235,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:40.462Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0fee68a5-202a-4c39-a84b-190baddf1631",
+    "name_a": "ไม้จิ้มฟัน - หลอดกลาง (แพนด้า) 333 ขวดใส",
+    "name_b": "ขวดซอส-กลาง",
+    "embedding_score": 0.6217,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:41.380Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b778c556-981f-4223-9590-284aa44f925e",
+    "name_a": "ที่คั้นน้ำมะนาว  มือจับ",
+    "name_b": "ตะแกรงตักทอด เลส (ด้ามไม้แบบ)",
+    "embedding_score": 0.6205,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:42.268Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e79ff30b-de45-424f-9a4a-5b03fae8463b",
+    "name_a": "ถุงข้าวเหนียว 3 ชิ้น 20บ 61874 TAS",
+    "name_b": "ขอสับเรียบชุปโคร",
+    "embedding_score": 0.6167,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:43.186Z"
+  },
+  {
+    "kind": "pair",
+    "id": "769d72ea-c1b0-43c5-933f-75f9e6395fc0",
+    "name_a": "สบู่นกแก้ว1*4ไม้หอม",
+    "name_b": "ไม้หนีบผ้า-พลาสติก1*4ปลายมนสีหวาน",
+    "embedding_score": 0.6164,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:44.025Z"
+  },
+  {
+    "kind": "pair",
+    "id": "c5db18d0-40b2-4a4b-96e4-b9a5af99e3ae",
+    "name_a": "แปรงล้างห้องน้ำ - หัวแบน (จงอย) #7133 ต้า",
+    "name_b": "แปรงล้างขวดคู่ AJ",
+    "embedding_score": 0.6152,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:46.418Z"
+  },
+  {
+    "kind": "pair",
+    "id": "817c8a5a-326c-4ee9-86ca-07a32c418965",
+    "name_a": "รีจอยส์เพอฟูม70มล",
+    "name_b": "ซัลซิลสีส้ม70มล",
+    "embedding_score": 0.6149,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:47.454Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9b903b8d-3d9f-40fc-9f1e-dfb8052a10b6",
+    "name_a": "กระปุกฝาเกลียว 251-1 อ้วนซีลยาง W",
+    "name_b": "กระบุงใหญ่+ฝา(ตราเพชร)",
+    "embedding_score": 0.613,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:49.509Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e77a1196-fedf-4a9b-8e4f-e1da8c552ea5",
+    "name_a": "ยาทาเล็บชาช่าใหญ่",
+    "name_b": "ยันฮีเซรั่มวิตซี",
+    "embedding_score": 0.6117,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:50.681Z"
+  },
+  {
+    "kind": "pair",
+    "id": "51789c47-65c7-4c5d-ad80-aa466c31bd2b",
+    "name_a": "กระเป๋ากุ๊นเล็ก - ซิป # 98815 KSN",
+    "name_b": "กล่องปิกนิคฝาสีหวาน",
+    "embedding_score": 0.6116,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:51.655Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4c77fa4c-4cf5-4bb5-95e0-0b635eb275db",
+    "name_a": "ตะแกรงตักทอด - เลส SJ-3220 (ด้ามไม้แบน)",
+    "name_b": "กระจาดเลสเจาะ",
+    "embedding_score": 0.6088,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:52.897Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ee8a436c-8b2e-4570-8d9e-f5f65de11563",
+    "name_a": "ยาสีฟันคอลเกต150g เกลือชาโคล",
+    "name_b": "เซรั่มบำรุงหน้าสูตรเข้มข้น",
+    "embedding_score": 0.6079,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:53.834Z"
+  },
+  {
+    "kind": "pair",
+    "id": "52f4b623-2b81-4578-b3f1-ddf8b40b63dc",
+    "name_a": "ถัง + ฝา 30 สี SP",
+    "name_b": "น้ำยาล้างจานปินโตแบบถังกีวี",
+    "embedding_score": 0.6047,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:54.906Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ca2facab-fdfc-4c54-bd89-bea33bbcc700",
+    "name_a": "ตะแกรงเหลี่ยม 242 ดำ BI",
+    "name_b": "ตะกร้า สีดำ",
+    "embedding_score": 0.603,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:56.075Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4675249f-7335-47c7-8c92-5b383bdd2d9f",
+    "name_a": "สกํอตไปร์",
+    "name_b": "กาวTOA4ออนช์",
+    "embedding_score": 0.6021,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:57.835Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e55c2b04-8519-495c-8cf1-4c60eeaa3f03",
+    "name_a": "ห่วงตากผ้าเลส-เหลี่ยม (กล่องชมพู) CTA",
+    "name_b": "\"ผ้าปูโต๊ะ (พลาสติก - หนา) (36*54\"\") CW\"",
+    "embedding_score": 0.6011,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:58.854Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2806a48-a3c8-46b0-b13f-d5da333b269d",
+    "name_a": "หม้อลาวตรารถยนต์ no.20",
+    "name_b": "ปลั๊กเสียบในรถ",
+    "embedding_score": 0.5995,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:08:59.951Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1356b339-d51c-420b-b955-ffcbc8dff7fb",
+    "name_a": "ตะกร้าหิ้ว 270 สีหวาน BI",
+    "name_b": "ตะกร้าหิ้ว(ใหญ่)สีใส",
+    "embedding_score": 0.5986,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:03.423Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ed14c0d6-e20c-429b-8801-e791e2d86a83",
+    "name_a": "หม้อโจ๊กตราร่มขนาด 18 CM",
+    "name_b": "กล่องฝาล็อค-เหลื่ยมสูง",
+    "embedding_score": 0.5973,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:04.833Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4d8fd62a-4546-4087-a986-7ce508bbecfe",
+    "name_a": "คาร์เวียร์ สไตล์วิ่งเจล ฝาเทา 250G. (1*6) CAI",
+    "name_b": "ชุดฟิวรถยนต์",
+    "embedding_score": 0.597,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:05.919Z"
+  },
+  {
+    "kind": "pair",
+    "id": "807a5f79-d57c-4f28-a965-5315f8e3867a",
+    "name_a": "กิ๊ปจับหนีบแพ็ค6",
+    "name_b": "ขวดโหล 6 เหลี่ยม ฝาหูหิ้ว",
+    "embedding_score": 0.5964,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:06.968Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d8578750-6e0a-491c-a3a8-0877480cdf1a",
+    "name_a": "สบู่อิงอรก้อนกลม สูตรมะขามทองพันชั่ง",
+    "name_b": "Detol สบู่เหลวล้างมือ เขียว",
+    "embedding_score": 0.5962,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:08.828Z"
+  },
+  {
+    "kind": "pair",
+    "id": "9cd24799-65be-46bc-857f-55febc34b6f7",
+    "name_a": "ด้ามกระทะ (ใหญ่) ปลายมน VK",
+    "name_b": "คัทตัลบัท100ก้านจิ๋ว",
+    "embedding_score": 0.5952,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:09.861Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6f90644c-9b30-48b1-89e2-ae0b97672c79",
+    "name_a": "ด้ามกระทะ (ใหญ่) ปลายมน VK",
+    "name_b": "กรรไกรกล่องฟ้า 253 (ตรานก) LI",
+    "embedding_score": 0.5948,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:12.442Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bc2dd895-5124-4801-960c-5b19ec05f8f0",
+    "name_a": "น้ำยาล้างจานซันไลน์ซอง500mlขาว",
+    "name_b": "สบู่ขัดผิว วิภาดา น้ำนมข้าว คอลลาเจน",
+    "embedding_score": 0.5917,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:14.363Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0196b687-90a7-4840-8755-63e9a665081d",
+    "name_a": "คัทตัลบัท 200ก้านกระปุก แจ็กซ์เพี่ยว JAXX",
+    "name_b": "ขันปั๊มลายไทย",
+    "embedding_score": 0.5904,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:15.337Z"
+  },
+  {
+    "kind": "pair",
+    "id": "01502d1b-7e35-4cc7-a490-ae2dc6319ebb",
+    "name_a": "ชั้นลวด 3 ชั้น - จัมโบ้ ND",
+    "name_b": "สายพ่วงแบต-ใหญ่",
+    "embedding_score": 0.5901,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:16.354Z"
+  },
+  {
+    "kind": "pair",
+    "id": "db5d189d-4e6d-4add-96c9-767a56530cc0",
+    "name_a": "กล่องเคลียป็อค3.5ลิตร",
+    "name_b": "กล่องหูล็อค ญ.",
+    "embedding_score": 0.5895,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:17.459Z"
+  },
+  {
+    "kind": "pair",
+    "id": "35247706-1024-44ac-8d2d-f8db2a06acf6",
+    "name_a": "ที่นอนปิกนิค3ฟุต",
+    "name_b": "หกเหลี่ยม (หัวตัด) ใหญ่",
+    "embedding_score": 0.5891,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:18.710Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7162913d-2b4a-45b3-b577-d0fdb631df06",
+    "name_a": "กรรไกรตัดเอนกประสงค์ #91C ปากโค้ง (Kit",
+    "name_b": "กาวแท่งสีขาว",
+    "embedding_score": 0.5881,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:19.890Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e364537d-c9b5-403b-ab91-dbb84270c520",
+    "name_a": "แป้งโฟรเทคส์เฟรช",
+    "name_b": "หม้อข้าวตราจระเข้24ซม",
+    "embedding_score": 0.587,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:21.064Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4e16ac9f-9d88-47d8-95a1-18f9ca2ff187",
+    "name_a": "ตะแกรงตักทอด เลส (ด้ามไม้แบบ)",
+    "name_b": "นํ้ายาทำความสะอาดจุดซ้อนเร่น1แถม1",
+    "embedding_score": 0.5844,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:22.720Z"
+  },
+  {
+    "kind": "pair",
+    "id": "cde1b14a-186c-4737-8b22-39526a1240e5",
+    "name_a": "โคโลญน้ำหอมมิสทีน 80 ml ฝาแดง",
+    "name_b": "น้ำยารีดเรียบไฮยีนขวด ชมพู",
+    "embedding_score": 0.5833,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:23.876Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1841e239-b566-4a27-b092-cf75fa6b56c2",
+    "name_a": "แปรงสีฟันเด็กswan",
+    "name_b": "แปรงแชล็ก4ชม.",
+    "embedding_score": 0.583,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:26.857Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4879c449-0483-43d7-b37d-8f59439dab14",
+    "name_a": "ตะกร้าสาน + ฝา 75 สีหวาน SW",
+    "name_b": "แป้งเบบี้ ดี เพาเดอร์",
+    "embedding_score": 0.5829,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:28.030Z"
+  },
+  {
+    "kind": "pair",
+    "id": "86ed8b64-4f02-4309-a5f9-aaea307d8bcd",
+    "name_a": "ใส่ขวดแชมพูจุกยาง CP-007 JOT",
+    "name_b": "หัวแปรงสายยาง",
+    "embedding_score": 0.5821,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:29.087Z"
+  },
+  {
+    "kind": "pair",
+    "id": "67b41640-cdc8-42d7-a218-a3ae166e4759",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ 18 บ.",
+    "name_b": "ขันน้ำลายไทย 18 CM สีเงิน",
+    "embedding_score": 0.5814,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:30.043Z"
+  },
+  {
+    "kind": "pair",
+    "id": "87acab89-60e0-41a0-8a55-5d4e56375d52",
+    "name_a": "แปรงซักผ้า - ฝาครอบ 123 SMT",
+    "name_b": "หวี/หวีแปรง/หวีโตร์/หวีสับ",
+    "embedding_score": 0.5792,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:31.159Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8342999d-9e2a-43e8-91e7-0cadbf133523",
+    "name_a": "ไบกอนหัวฉีดคู่",
+    "name_b": "กรวยเลสเล็ก (ไม่รับเปลี่ยน)",
+    "embedding_score": 0.5786,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:09:32.457Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ab79c411-8109-40c7-b7b7-86ae110cf30c",
+    "name_a": "BY127 กีวีบลู ก้อนดับกลิ่นชักโครก",
+    "name_b": "คีม คินโซ่",
+    "embedding_score": 0.5784,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:00.795Z"
+  },
+  {
+    "kind": "pair",
+    "id": "67947838-8bf1-4fd1-ab35-da30c661fb41",
+    "name_a": "ขวดน้ำยักS0003ทรงกลม",
+    "name_b": "กล่องผืนผ้าจุกปล่อยอากาศsw",
+    "embedding_score": 0.5782,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:04.150Z"
+  },
+  {
+    "kind": "pair",
+    "id": "0d72f19d-6bbc-4d8a-a132-6fc3645c7314",
+    "name_a": "กระชอนพลาสติก #10 PYP",
+    "name_b": "ผงซักฟอกอีซี่10ขาว",
+    "embedding_score": 0.5758,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:06.362Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fc211735-8f27-4d3f-b14f-5b02831bcba7",
+    "name_a": "ก๊อกต่อฟักบัวด้ามขวาน",
+    "name_b": "ใบคัทเตอร์-ใหญ่(กล่องแดง)",
+    "embedding_score": 0.5757,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:07.452Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4cf6620c-6f9d-4291-b246-d89f32323e6d",
+    "name_a": "ยาสีฟันเด็ก โคโดโมะ 40g ส้ม",
+    "name_b": "สบู่ขัดผิว วิภาดา สูตรมะขาม",
+    "embedding_score": 0.5752,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:20.278Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6b80067e-b476-49b0-83ad-8511796b4921",
+    "name_a": "ครีมอาบน้ำ Dettol 500ml ชมพู",
+    "name_b": "ชุดฝักบัวอาบนํ้า",
+    "embedding_score": 0.5752,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:21.682Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2e549cf-de20-4e5f-9924-b35beffbd7bc",
+    "name_a": "ยาสีฟันคอลเกต150g เกลือสมุนไพร",
+    "name_b": "แปรงสีฟันออรัลบี",
+    "embedding_score": 0.5745,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:22.947Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bd747144-e166-4298-8078-41f594cf119d",
+    "name_a": "เสียมมิดเหลี่ยม-สีหวาน 8003 SW",
+    "name_b": "กระปุกกลม-ใส(ทรงสูง)",
+    "embedding_score": 0.5731,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:10:38.002Z"
+  },
+  {
+    "kind": "pair",
+    "id": "6fd8e477-69cd-4551-b4a0-4cfc97609897",
+    "name_a": "เหยือกตวง #9859 พลาสติก PP ขีดแดง",
+    "name_b": "ถังขยะ 9859 เหลี่ยมดำ SMT",
+    "embedding_score": 0.572,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:27.992Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1fa7b67d-2334-4116-aba1-7b08726ea23d",
+    "name_a": "กล่องตะเกียบ - เลส JRR",
+    "name_b": "ตะแกรงเหลี่ยม 172 เบอเกอรี่ - ฉลุลาย (น้ำตาล)",
+    "embedding_score": 0.5714,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:30.536Z"
+  },
+  {
+    "kind": "pair",
+    "id": "162cd410-02bb-4351-a04e-0f2c420e1d7c",
+    "name_a": "ถังปูน 15 สี SP",
+    "name_b": "ทัพพีจีนใหญ่ - ด้ามพลาสติกสี ตราสมอ PPL",
+    "embedding_score": 0.5709,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:31.597Z"
+  },
+  {
+    "kind": "pair",
+    "id": "61a7dc26-cd2c-4f45-b91a-72fdc0096da2",
+    "name_a": "หวีเสนียดด้าม - แกนกลางแบน - สีหวาน #8364",
+    "name_b": "กระปุกกลม-ช้อน",
+    "embedding_score": 0.5705,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:32.694Z"
+  },
+  {
+    "kind": "pair",
+    "id": "8f0162fe-1182-4f27-81be-aebc98b3ad8a",
+    "name_a": "ครีมอาบน้ำ Deenee  เขียว 200ml",
+    "name_b": "ยันฮีผงขัดผิวกระปุก",
+    "embedding_score": 0.5698,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:34.656Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e76ea4f8-a60e-49a8-923f-91e31c619cda",
+    "name_a": "รีจอยส์ริช140มล",
+    "name_b": "ขันด้ามโดเรม่อน",
+    "embedding_score": 0.5696,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:35.671Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ff3726e1-c6d4-4c9a-83dd-ee38b8ba1fb1",
+    "name_a": "หมอนหนุนขาวเจเอฟ",
+    "name_b": "ที่นอนปิกนิกถุงใส3ฟุต",
+    "embedding_score": 0.5693,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:36.763Z"
+  },
+  {
+    "kind": "pair",
+    "id": "bed6d52c-b7a6-4295-b6f5-10960ec4f981",
+    "name_a": "ช้อนกลางด้ามยาว - แบน 16.5 ซม. (เงิน) #SK2",
+    "name_b": "ถาดกลมเลส",
+    "embedding_score": 0.5687,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:38.244Z"
+  },
+  {
+    "kind": "pair",
+    "id": "e0e70338-765a-43c8-bb57-3e3a0fe15aa9",
+    "name_a": "ถังฝา ! VJ",
+    "name_b": "ยันฮีแอคเน่ครีมซอง",
+    "embedding_score": 0.5664,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:41.840Z"
+  },
+  {
+    "kind": "pair",
+    "id": "ce21a79a-2b10-44b3-b50b-131edb8d5ebb",
+    "name_a": "สบู่โพรเทคก้อนกลม สูตรซากูระ ทานาคา",
+    "name_b": "ถาดลึก-สีเรนโบว์",
+    "embedding_score": 0.5659,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:42.922Z"
+  },
+  {
+    "kind": "pair",
+    "id": "326cb85a-e366-4af4-93d4-c57cd512e0d8",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ 42 บ.",
+    "name_b": "แปรงสีฟันเด็กเฟรชชี่่",
+    "embedding_score": 0.5648,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:44.128Z"
+  },
+  {
+    "kind": "pair",
+    "id": "deb81a6f-082d-4054-b459-26a44f65ead4",
+    "name_a": "แป้งบีบี นาทรีพ 25 g ม่วง",
+    "name_b": "แป้งเย็นโฟรเทคไอซซี่คูล",
+    "embedding_score": 0.5647,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:11:52.334Z"
+  },
+  {
+    "kind": "pair",
+    "id": "952c7871-df8f-4090-b271-aef3132f9936",
+    "name_a": "สบู่ก้อน เซฟการ์ดแพค 1*4 เหลือง",
+    "name_b": "มีสทีนครีมอาบน้ำฟ้าทะลายโจร",
+    "embedding_score": 0.5642,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:00.012Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4dcf6a18-e7e0-400a-887f-bba310e8c3b5",
+    "name_a": "ยาสีฟันดาลี่ 35 g ดับเบิลแอคชั่น",
+    "name_b": "โคโลญลูกกลิ้งมิสทีน 35 ml ฟ้า",
+    "embedding_score": 0.5626,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:11.807Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7bbd6826-965d-430f-9abc-08f869f9a5ea",
+    "name_a": "ใบคัทเตอร์ 15/14 เฉียง 30 องศา - ใหญ่",
+    "name_b": "กาวแท่งตราวีพี",
+    "embedding_score": 0.5621,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:12.907Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1124cc52-1738-4d57-946d-f3dc9cf068b0",
+    "name_a": "หวีเสนียด - แกนกลางแบน - สีหวาน (ลายเสือ)",
+    "name_b": "นีเวียเมนเอ็กช์ตร้า",
+    "embedding_score": 0.5616,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:28.821Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f6bda04b-4f39-48e9-afaa-f5bb089b6dd8",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ 45 บ.",
+    "name_b": "ตะแกรงตักทอด เลส (ด้ามไม้แบบ)",
+    "embedding_score": 0.5616,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:32.919Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a52c283c-bcfe-4683-bb0e-fa2849554ec7",
+    "name_a": "ถัง + ฝา 30 สี SP",
+    "name_b": "หัวฉีดสายชำระ",
+    "embedding_score": 0.5603,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:34.719Z"
+  },
+  {
+    "kind": "pair",
+    "id": "7f690e33-02f4-4756-9b13-63ce2d30a7dd",
+    "name_a": "กระป๋องกาแฟ ปากต่อ #16 JRR",
+    "name_b": "น้ำยาอัดกลีบไฮยีนขวด",
+    "embedding_score": 0.5595,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:39.228Z"
+  },
+  {
+    "kind": "pair",
+    "id": "09d68951-7859-4a4a-abda-556dd42fe386",
+    "name_a": "ยาทาเล็บชาช่าใหญ่",
+    "name_b": "นีเวียเพิร์ลไบรท์",
+    "embedding_score": 0.5595,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:50.008Z"
+  },
+  {
+    "kind": "pair",
+    "id": "31c0c6e4-7130-4061-8d04-8c925abb0dcb",
+    "name_a": "กระจาดกลม 233 สีใส MM",
+    "name_b": "ใบคัทเตอร์-ใหญ่(กล่องแดง)",
+    "embedding_score": 0.5583,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:55.108Z"
+  },
+  {
+    "kind": "pair",
+    "id": "28b663ea-6298-40ea-b781-0d2943572674",
+    "name_a": "โถข้าวลายไทย ตรากระเช้า 20 CM",
+    "name_b": "คืมล็อค คินโซ่",
+    "embedding_score": 0.5581,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:56.172Z"
+  },
+  {
+    "kind": "pair",
+    "id": "993e66f6-ef49-4a00-b945-3f8dc0bb0ad8",
+    "name_a": "ผ้าไมโครไฟเบอร์สองสี40*50",
+    "name_b": "กรวยพลาสติกใส สีหวาน",
+    "embedding_score": 0.5555,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:57.106Z"
+  },
+  {
+    "kind": "pair",
+    "id": "d28cfc9e-db06-4a1f-99f6-380f53eac942",
+    "name_a": "ถังฝา #250 สีหวาน AY",
+    "name_b": "ยาทาเล็บชาช่าเล็ก",
+    "embedding_score": 0.5554,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:12:58.846Z"
+  },
+  {
+    "kind": "pair",
+    "id": "cb614bd7-fb8a-444d-ae38-03471f080dcb",
+    "name_a": "ไขควง4ชิ้น",
+    "name_b": "ด้ามกระทะ (ใหญ่) ปลายมน",
+    "embedding_score": 0.555,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:00.186Z"
+  },
+  {
+    "kind": "pair",
+    "id": "1d9f1b64-c85f-4666-aae7-d848a9e38ec3",
+    "name_a": "หม้อข้าวตราม้า24ซม.",
+    "name_b": "ก๊อกต่อฟักบัวด้ามขวาน",
+    "embedding_score": 0.5549,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:01.220Z"
+  },
+  {
+    "kind": "pair",
+    "id": "fd366ee5-4347-48ca-86fc-9af0f2b54dd0",
+    "name_a": "โฟมล้างหน้าพอนด์ 15g แดง",
+    "name_b": "ขวดโหลเหลี่ยมเรียบ ฝาพ.โสสี",
+    "embedding_score": 0.5545,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:02.527Z"
+  },
+  {
+    "kind": "pair",
+    "id": "b9371bfa-bf0a-4d4a-9c04-fce740332261",
+    "name_a": "หวี/หวีแปรง/หวีโตร์/หวีสับ",
+    "name_b": "ไขควงด้ามใส(แผงเกาหลี)",
+    "embedding_score": 0.5544,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:03.673Z"
+  },
+  {
+    "kind": "pair",
+    "id": "31241940-035f-4989-988d-acab6175636a",
+    "name_a": "ทัพพีจีนใหญ่ - ด้ามพลาสติกสี ตราสมอ PPL",
+    "name_b": "Olay  ซองฉีกสีชมพู 7.5g",
+    "embedding_score": 0.5543,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:04.801Z"
+  },
+  {
+    "kind": "pair",
+    "id": "84d2bab5-58ce-4ed2-9451-81d8100a5839",
+    "name_a": "แปรงสีฟันเด็กคอลเกต",
+    "name_b": "สบู่ก้อนกลม ตราคนใส่แว่น",
+    "embedding_score": 0.5543,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:05.919Z"
+  },
+  {
+    "kind": "pair",
+    "id": "93674f1a-37fe-48fa-8d92-d25fcb138813",
+    "name_a": "แป้งเบบี้ ดี เพาเดอร์",
+    "name_b": "โหลแก้วกลม ฝาแก้วจุก",
+    "embedding_score": 0.5538,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:07.060Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f93845f9-bb89-4d12-a965-868b1ca4ba9a",
+    "name_a": "ครีมBL",
+    "name_b": "ถาดลึก-สีเรนโบว์",
+    "embedding_score": 0.5538,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:08.143Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a917531e-943f-4cfc-b606-5d58ec5d7fbf",
+    "name_a": "ที่คั้นน้ำมะนาว  มือจับ",
+    "name_b": "คีมปากแหลม",
+    "embedding_score": 0.5537,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:09.408Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a0f704e6-fd0c-414b-892d-3fe946c00058",
+    "name_a": "เลื่อย (ไวกิ้ง) 18 #444 BJH",
+    "name_b": "แคร์ แป้งเด็กฟ้า",
+    "embedding_score": 0.5537,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:10.622Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a74e5bd2-1f0c-4cee-843f-b06069e0888f",
+    "name_a": "ตะกร้ากลม 82 ลายถักเล็ก - สีหวาน (ตราลิง)",
+    "name_b": "ขวดโหลเหลี่ยมเรียบ ฝาพ.โสสี",
+    "embedding_score": 0.5536,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:14.525Z"
+  },
+  {
+    "kind": "pair",
+    "id": "a6510b93-9561-4f9d-93b3-2919ee8289fe",
+    "name_a": "จุฬาเฮิร์น แครท เดลี่ เซรั่ม 8g.",
+    "name_b": "ดอกคูณคู่ป้องกันจุดด่างดำ",
+    "embedding_score": 0.5532,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:15.497Z"
+  },
+  {
+    "kind": "pair",
+    "id": "dde8ae80-b14a-4b13-84a6-9ff7e50c1eec",
+    "name_a": "ยันฮีแอคเน่ครีมซอง",
+    "name_b": "โหลแก้วกลม ฝาแก้วจุก",
+    "embedding_score": 0.5532,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:16.597Z"
+  },
+  {
+    "kind": "pair",
+    "id": "f2cc44c4-694b-4b92-b1db-705dcb1d5e59",
+    "name_a": "น้ำยาบ้วนปากคอลเกต มิกเบอรี่10",
+    "name_b": "สบู่โพรเทคก้อนกลม สูตรซากูระ ทานาคา",
+    "embedding_score": 0.5532,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:17.710Z"
+  },
+  {
+    "kind": "pair",
+    "id": "140c144c-f0a7-4754-ae4a-a6f951034cfc",
+    "name_a": "กล่องตะเกียบ - เลส JRR",
+    "name_b": "คีมช่างทอง5*ปากนกแก้ว(ด้ามดำ/ด้ามสี)",
+    "embedding_score": 0.5526,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:18.678Z"
+  },
+  {
+    "kind": "pair",
+    "id": "91da162d-3118-4bad-8254-174aeeb0a8c9",
+    "name_a": "ทัพพีจีนใหญ่ - ด้ามพลาสติกสี ตราสมอ PPL",
+    "name_b": "ตะกร้ากลม - จัมโบ้ 43-2-สีหวานใส SRT",
+    "embedding_score": 0.5526,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:19.585Z"
+  },
+  {
+    "kind": "pair",
+    "id": "4f6c55ef-f245-44d6-ac5a-c7a0be4012dc",
+    "name_a": "หม้อหู - จระเข้ #24 TNH",
+    "name_b": "หัวแปรงสายยาง",
+    "embedding_score": 0.5516,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:20.699Z"
+  },
+  {
+    "kind": "pair",
+    "id": "28273e21-eea6-4b19-a3ce-093b92f31acc",
+    "name_a": "เซรั่มว้ตซีกล่อง",
+    "name_b": "ขวดโหล 6 เหลี่ยม ฝาหูหิ้ว",
+    "embedding_score": 0.5502,
+    "human_verdict": "diff",
+    "labelled_at": "2026-10-11T03:13:22.054Z"
+  }
+]
