@@ -45,6 +45,17 @@ processor = ThaiTextProcessor()
 | `normalize_units(text)` | มาตรฐานหน่วย | `"100 g"` | `"100ก."` |
 | `convert_thai_digits(text)` | แปลงเลขไทย | `"๑๒๓"` | `"123"` |
 
+### เรียกผ่าน FastAPI HTTP Endpoint (REST API)
+```python
+import httpx
+# ส่งสตริงเดี่ยวใน JSON body
+res = httpx.post("http://127.0.0.1:8000/api/v1/clean", json="สบู่  โพรเทคส์ ๑๐๐ก.")
+cleaned_name = res.json()  # "สบู่ โพรเทคส์ 100ก."
+```
+
+### TypeScript / Next.js Data Types (ADR 0004)
+ในฝั่ง frontend เมื่อประมวลผลข้อมูลสินค้าหลังทำความสะอาด ให้นำเข้า Type จาก `@/types` เท่านั้น (เช่น `Product`, `TaxonomyNodeLite`, `ImportRecord`) เพื่อรักษา Single Source of Truth
+
 ---
 
 ## Normalization Rules (มาตรฐาน)

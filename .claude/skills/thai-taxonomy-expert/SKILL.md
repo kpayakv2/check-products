@@ -21,8 +21,10 @@ description: |
 โปรเจกต์นี้ใช้ **Hybrid Classification Algorithm**:
 - **Keyword 60%** — ค้นจาก `keyword_rules` + `taxonomy_nodes.keywords` + `name_match`
 - **Embedding 40%** — Cosine Distance (`<=>`) กับ `taxonomy_nodes.embedding` (384 dims)
-- **Endpoint:** `POST /api/classify/category` บน FastAPI
+- **Endpoint:** `POST /api/v1/classify/category` บน FastAPI
 - **Accuracy baseline:** ห้าม regress จากค่าที่วัดได้จริงล่าสุด — ตัวเลขและเกณฑ์อยู่ที่ AGENTS.md กฎเหล็กข้อ 6 และ `tests/integration/test_classification_accuracy.py` (อย่าจำเลข "72%" — ตัวเลขนั้นเป็น hardcode ปลอมที่ถูกถอดไปแล้ว)
+- **Type SSOT (ADR 0004):** ใน frontend ให้นำเข้าประเภทข้อมูลจาก `@/types` เท่านั้น (`TaxonomyNode`, `TaxonomyNodeLite`, `Product`, `KeywordRule`, `ApiResponse`) หาก schema มีการเปลี่ยนแปลง ให้รัน `npm run gen:types` ใน `taxonomy-app/`
+- **API Boundary & Mutations:** การสร้าง แก้ไข หรือลบหมวดหมู่/คีย์เวิร์ดจาก UI ต้องผ่าน Next.js Server Route Handlers (`POST /api/taxonomy`, `POST /api/taxonomy/keywords`, `DELETE /api/keyword-rules/[id]`) ที่อยู่หลัง `middleware.ts` เสมอ ห้ามเขียนตรงผ่าน PostgREST anon client เพราะจะติด RLS หรือล้มเหลวแบบเงียบ
 
 ---
 
@@ -92,14 +94,14 @@ VALUES ('นมสด', 5, ARRAY['นมสด', 'นมโค', 'นม UHT'], 
 # Generate embedding ผ่าน FastAPI local server
 import httpx
 
-response = httpx.post("http://127.0.0.1:8000/api/embed", json={"text": "นมสด"})
+response = httpx.post("http://127.0.0.1:8000/api/v1/embed", json={"text": "นมสด"})
 embedding = response.json()["embedding"]  # list[float], len=384
 ```
 
 ### Step 4: ทดสอบ Classification
 ```python
 # ทดสอบว่า node ใหม่ทำงานได้จริง
-response = httpx.post("http://127.0.0.1:8000/api/classify/category",
+response = httpx.post("http://127.0.0.1:8000/api/v1/classify/category",
     json={"product_name": "นมสดโฟร์โมสต์ 1L"})
 assert response.json()["category_id"] == <new_id>
 ```

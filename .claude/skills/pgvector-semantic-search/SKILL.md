@@ -35,7 +35,7 @@ metadata:
 | Index ops | `halfvec_cosine_ops` | **`vector_cosine_ops`** |
 | Distance | `<=>` | `<=>` (เหมือนกัน) |
 | Model | OpenAI text-embedding | **`paraphrase-multilingual-MiniLM-L12-v2`** |
-| Embedding Provider | External API | **FastAPI local `http://127.0.0.1:8000/api/embed`** |
+| Embedding Provider | External API | **FastAPI local `http://127.0.0.1:8000/api/v1/embed`** |
 
 ### ตัวอย่างที่ถูกต้องสำหรับโปรเจกต์นี้
 ```sql
@@ -51,7 +51,7 @@ LIMIT 10;
 ```python
 # ✅ Generate embedding ผ่าน FastAPI local
 import httpx
-response = httpx.post("http://127.0.0.1:8000/api/embed", json={"text": "นมสด"})
+response = httpx.post("http://127.0.0.1:8000/api/v1/embed", json={"text": "นมสด"})
 embedding = response.json()["embedding"]  # len=384
 ```
 
