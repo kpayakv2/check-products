@@ -302,27 +302,7 @@ enabled = false
 # domain = "example.clerk.accounts.dev"
 
 [edge_runtime]
-enabled = true
-# Supported request policies: `oneshot`, `per_worker`.
-# `per_worker` (default) — enables hot reload during local development.
-# `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
-policy = "per_worker"
-# Port to attach the Chrome inspector for debugging edge functions.
-inspector_port = 8083
-# The Deno major version to use.
-deno_version = 2
-
-[edge_runtime.secrets]
-SUPABASE_URL = "env(SUPABASE_URL)"
-SUPABASE_ANON_KEY = "env(SUPABASE_ANON_KEY)"
-
-[functions]
-# A mapping of function slug to function path.
-#[functions.category-suggestions]
-#verify_jwt = false
-
-#[functions.generate-embeddings]
-#verify_jwt = false
+enabled = false
 
 [analytics]
 enabled = false

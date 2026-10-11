@@ -32,7 +32,7 @@ def embed_single(request: EmbeddingRequest):
     
     except Exception as e:
         logger.exception("Embedding failed")
-        raise HTTPException(status_code=500, detail=f"Embedding failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Embedding generation failed")
 
 @router.post("/batch", response_model=BatchEmbeddingResponse)
 def embed_batch(request: BatchEmbeddingRequest):
@@ -56,4 +56,4 @@ def embed_batch(request: BatchEmbeddingRequest):
     
     except Exception as e:
         logger.exception("Batch embedding failed")
-        raise HTTPException(status_code=500, detail=f"Batch embedding failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Batch embedding generation failed")

@@ -1,11 +1,7 @@
 // Simple API logic tests without external dependencies
 
-// Mock API response structure
-interface ApiResponse {
-  data?: any
-  error?: string
-  success: boolean
-}
+import type { ApiResponse } from '@/types'
+
 
 // Mock API handler logic
 class MockApiHandler {

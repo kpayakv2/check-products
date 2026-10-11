@@ -23,98 +23,47 @@ def test_health_check():
     print(f"   Uptime: {data['uptime']:.1f}s")
 
 
-def test_single_match():
-    """Test single product matching."""
-    print("\n🔍 Testing Single Product Match...")
-    
-    payload = {
-        "query_product": "ไอโฟน 14 โปร แมกซ์",
-        "reference_products": [
-            "iPhone 14 Pro Max 128GB สีทอง",
-            "Samsung Galaxy S23 Ultra",
-            "iPad Pro 12.9นิ้ว M2",
-            "MacBook Air M2"
-        ],
-        "threshold": 0.5,
-        "top_k": 5,
-        "include_metadata": True,
-        "include_confidence": True
-    }
-    
-    start_time = time.time()
+def test_root_endpoint():
+    """Test API root endpoint."""
+    print("\n🔍 Testing Root Endpoint...")
+    response = requests.get("http://127.0.0.1:8000/")
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    data = response.json()
+    assert data["status"] == "operational"
+    assert "web_interface" not in data.get("endpoints", {})
+    assert "/api/v1/health" in data.get("endpoints", {}).values()
+    print("✅ Root Endpoint Success (No /web dead link)!")
+
+
+def test_clean_texts():
+    """Test text cleaning endpoint."""
+    print("\n🔍 Testing Text Cleaning...")
+    payload = {"texts": ["ปากกาลูกลื่น 0.5มม. (แพ็ค 3 ด้าม)"]}
     response = requests.post(
-        "http://127.0.0.1:8000/api/v1/match/single",
+        "http://127.0.0.1:8000/api/v1/clean",
         json=payload,
         headers={"Content-Type": "application/json"}
     )
-    response_time = time.time() - start_time
-    
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-    results = response.json()
-    print(f"✅ Single Match Success!")
-    print(f"   Response Time: {response_time:.3f}s")
-    print(f"   Matches Found: {len(results)}")
-    
-    for i, match in enumerate(results[:2], 1):
-        print(f"   {i}. {match['matched_product'][:40]}...")
-        print(f"      Score: {match['similarity_score']:.4f}")
-        if 'confidence_level' in match:
-            print(f"      Confidence: {match['confidence_level']}")
+    data = response.json()
+    assert len(data["results"]) == 1
+    assert "cleaned" in data["results"][0]
+    print(f"✅ Clean Success: {data['results'][0]['cleaned']}")
 
 
-def test_batch_match():
-    """Test batch processing."""
-    print("\n🔍 Testing Batch Processing...")
-    
-    payload = {
-        "query_products": [
-            "ไอโฟน 14 โปร แมกซ์",
-            "แกแลกซี่ เอส 23",
-            "ไอแพด โปร"
-        ],
-        "reference_products": [
-            "iPhone 14 Pro Max 128GB สีทอง",
-            "Samsung Galaxy S23 Ultra",
-            "iPad Pro 12.9นิ้ว M2 WiFi 128GB"
-        ],
-        "threshold": 0.5,
-        "include_confidence": True
-    }
-    
-    # Start batch job
+def test_scan_internal():
+    """Test internal duplicates scan initiation."""
+    print("\n🔍 Testing Internal Duplicates Scan...")
+    payload = {"threshold": 0.95, "limit": 5}
     response = requests.post(
-        "http://127.0.0.1:8000/api/v1/match/batch",
+        "http://127.0.0.1:8000/api/v1/match/scan-internal",
         json=payload,
         headers={"Content-Type": "application/json"}
     )
-    
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-    batch_response = response.json()
-    job_id = batch_response["job_id"]
-    print(f"✅ Batch Job Started!")
-    print(f"   Job ID: {job_id}")
-    print(f"   Total Queries: {batch_response['total_queries']}")
-    
-    # Check job status
-    print("   Checking job status...")
-    job_completed = False
-    for attempt in range(10):  # Wait up to 10 seconds
-        status_response = requests.get(f"http://127.0.0.1:8000/api/v1/jobs/{job_id}")
-        assert status_response.status_code == 200, f"Status check failed: {status_response.text}"
-        status_data = status_response.json()
-        print(f"   Progress: {status_data['progress']:.1%} - {status_data['message']}")
-        
-        if status_data['status'] == 'completed':
-            print(f"✅ Batch Job Completed!")
-            job_completed = True
-            break
-        elif status_data['status'] == 'failed':
-            assert False, f"Batch Job Failed: {status_data['message']}"
-        
-        time.sleep(1)
-    
-    if not job_completed:
-        print("⏰ Batch job taking longer than expected...")
+    data = response.json()
+    assert "task_id" in data
+    print(f"✅ Scan Task Started! Task ID: {data['task_id']}")
 
 
 def test_api_documentation():
@@ -128,13 +77,14 @@ def test_api_documentation():
 
 def main():
     """Run all API tests."""
-    print("🚀 Phase 5 API Testing Suite")
+    print("🚀 API Client Testing Suite")
     print("=" * 50)
     
     tests = [
         ("Health Check", test_health_check),
-        ("Single Match", test_single_match),
-        ("Batch Processing", test_batch_match),
+        ("Root Endpoint", test_root_endpoint),
+        ("Text Cleaning", test_clean_texts),
+        ("Internal Scan", test_scan_internal),
         ("API Documentation", test_api_documentation)
     ]
     
@@ -166,9 +116,8 @@ def main():
     print(f"\n📊 Overall: {passed}/{total} tests passed")
     
     if passed == total:
-        print(f"🎉 All tests passed! Phase 5 API is working perfectly!")
+        print(f"🎉 All tests passed! API is working perfectly!")
         print(f"\n🌐 Access Points:")
-        print(f"   - Web Interface: http://127.0.0.1:8000/web")
         print(f"   - API Documentation: http://127.0.0.1:8000/docs")
         print(f"   - Health Check: http://127.0.0.1:8000/api/v1/health")
     else:

@@ -16,22 +16,8 @@ import {
   ChevronUpIcon
 } from 'lucide-react'
 import { FOCUS_RING } from '@/components/ui/Modal'
+import type { ImportRecord } from '@/types'
 
-interface ImportRecord {
-  id: string
-  name: string
-  file_name: string | null
-  file_size: number | null
-  file_type: string | null
-  total_records: number
-  processed_records: number
-  success_records: number
-  error_records: number
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  metadata: { storage_path?: string } | null
-  created_at: string
-  completed_at: string | null
-}
 
 const STATUS_CONFIG = {
   completed: { label: 'สำเร็จ', icon: CheckCircleIcon, color: 'text-emerald-900', bg: 'bg-emerald-50', border: 'border-emerald-200' },
@@ -142,11 +128,11 @@ export default function ImportHistory() {
     <div className="space-y-3">
       <AnimatePresence>
         {records.map((rec, idx) => {
-          const cfg = STATUS_CONFIG[rec.status] ?? STATUS_CONFIG.pending
+          const cfg = (rec.status && (STATUS_CONFIG as any)[rec.status]) ?? STATUS_CONFIG.pending
           const StatusIcon = cfg.icon
           const isExpanded = expanded === rec.id
           const displayName = rec.file_name || rec.name || 'ไฟล์ไม่ระบุชื่อ'
-          const hasStorage = !!rec.metadata?.storage_path
+          const hasStorage = !!(rec.metadata as { storage_path?: string } | null)?.storage_path
 
           return (
             <motion.div
@@ -183,7 +169,7 @@ export default function ImportHistory() {
                     {displayName}
                   </p>
                   <p className="text-xs text-slate-600 font-medium mt-0.5">
-                    {formatDate(rec.created_at)} · {formatBytes(rec.file_size)}
+                    {formatDate(rec.created_at ?? '')} · {formatBytes(rec.file_size ?? null)}
                   </p>
                 </div>
 

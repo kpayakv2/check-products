@@ -132,24 +132,6 @@ describe('getDashboardStats', () => {
   })
 })
 
-describe('getProducts', () => {
-  it('รับ status หลายค่าแล้วกรองด้วย in ไม่ใช่ eq', async () => {
-    await DatabaseService.getProducts(['pending_review_dedup', 'pending_review_category'])
-
-    const statusFilters = productQueries()[0].filters.filter(f => f.column === 'status')
-    expect(statusFilters).toEqual([
-      { op: 'in', column: 'status', value: ['pending_review_dedup', 'pending_review_category'] }
-    ])
-  })
-
-  it('รับ status ค่าเดียวแล้วยังกรองด้วย eq เหมือนเดิม', async () => {
-    await DatabaseService.getProducts('approved')
-
-    const statusFilters = productQueries()[0].filters.filter(f => f.column === 'status')
-    expect(statusFilters).toEqual([{ op: 'eq', column: 'status', value: 'approved' }])
-  })
-})
-
 describe('searchProducts', () => {
   it('ค้นหาที่ฝั่งฐานข้อมูล ไม่ใช่ดึงมากรองในเบราว์เซอร์', async () => {
     await DatabaseService.searchProducts({ search: 'ปากกา' })

@@ -1,0 +1,1479 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Product Similarity API",
+    "description": "Advanced product matching API with AI-powered similarity detection",
+    "version": "5.0.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "API root endpoint.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "description": "System health check.",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/config": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Config",
+        "description": "Get API configuration.",
+        "operationId": "get_config_api_v1_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Update Config",
+        "description": "Update API configuration.",
+        "operationId": "update_config_api_v1_config_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/upload/csv": {
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Upload Csv File",
+        "description": "Upload a CSV file for batch processing.",
+        "operationId": "upload_csv_file_api_v1_upload_csv_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/clean": {
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Clean Texts",
+        "description": "Clean and normalize Thai product names.\nUsed for Step 2 of the import wizard.",
+        "operationId": "clean_texts_api_v1_clean_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/single": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Match Single Product",
+        "description": "Match a single product against reference products.",
+        "operationId": "match_single_product_api_v1_match_single_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/batch": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Match Batch Products",
+        "description": "Start a batch product matching job.",
+        "operationId": "match_batch_products_api_v1_match_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/embed": {
+      "post": {
+        "tags": [
+          "Embeddings"
+        ],
+        "summary": "Embed Single",
+        "description": "Generate embedding for a single text.\nPrimary use: Called by Supabase Edge Functions.",
+        "operationId": "embed_single_api_embed_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/embed/batch": {
+      "post": {
+        "tags": [
+          "Embeddings"
+        ],
+        "summary": "Embed Batch",
+        "description": "Generate embeddings for multiple texts.",
+        "operationId": "embed_batch_api_embed_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Get Job Status",
+        "description": "Get the status of a background job.",
+        "operationId": "get_job_status_api_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": "@{type=string; title=Job Id}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/jobs": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "List Jobs",
+        "description": "List all background jobs.",
+        "operationId": "list_jobs_api_v1_jobs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/results/{job_id}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Get Job Results",
+        "description": "Get the results of a completed job.",
+        "operationId": "get_job_results_api_v1_results__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": "@{type=string; title=Job Id}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/learn/verify": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Learn From Verification",
+        "description": "Endpoint for auto-learning. Call this when a product category is verified in the UI.",
+        "operationId": "learn_from_verification_api_v1_learn_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/learn/retrain": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Trigger Ml Retraining",
+        "description": "Endpoint to trigger ML retraining from human feedback (similarity_matches).",
+        "operationId": "trigger_ml_retraining_api_v1_learn_retrain_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/learn/status": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Get Ml Status",
+        "description": "Get the current ML model's health, accuracy, and feature importance.",
+        "operationId": "get_ml_status_api_v1_learn_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/learn/history": {
+      "get": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Get Ml Training History",
+        "description": "Get training history from Supabase ml_training_history table.\nReturns the last N training sessions (most recent first).",
+        "operationId": "get_ml_training_history_api_v1_learn_history_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": "@{type=integer; default=10; title=Limit}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/scan-internal": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Scan Internal Duplicates",
+        "description": "Start an asynchronous background task to scan approved products for duplicates using pairwise cosine similarity.",
+        "operationId": "scan_internal_duplicates_api_v1_match_scan_internal_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/scan-internal/status/{task_id}": {
+      "get": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Get Internal Scan Status",
+        "description": "Get the status, progress, or results of a background scan task.",
+        "operationId": "get_internal_scan_status_api_v1_match_scan_internal_status__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": "@{type=string; title=Task Id}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/file-dedup": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Deduplicate Files",
+        "description": "Deduplicate uploaded CSV product files using hybrid vectorized cosine similarity\ncoupled with ML classification batch inference.",
+        "operationId": "deduplicate_files_api_v1_match_file_dedup_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/v1/match/import-dedup": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Deduplicate Imports",
+        "description": "Deduplicate a list of imported product names against the existing approved database products\nusing hybrid vectorized cosine similarity coupled with ML classification batch inference.",
+        "operationId": "deduplicate_imports_api_v1_match_import_dedup_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/classify/category": {
+      "post": {
+        "tags": [
+          "Classification"
+        ],
+        "summary": "Classify Category",
+        "description": "Classify a product into a taxonomy category.\n\nMethods:\n- keyword : Keyword matching only (fast, rule-based)\n- embedding: Vector similarity only (semantic)\n- hybrid  : Keyword 60% + Embedding 40% (default, most accurate)",
+        "operationId": "classify_category_api_classify_category_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    },
+    "/api/classify/batch": {
+      "post": {
+        "tags": [
+          "Classification"
+        ],
+        "summary": "Classify Batch",
+        "description": "Classify multiple products in batch.",
+        "operationId": "classify_batch_api_classify_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": "@{schema=}"
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": "@{application/json=}"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": "@{application/json=}"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "APIConfig": {
+        "properties": {
+          "default_threshold": {
+            "type": "number",
+            "title": "Default Threshold",
+            "default": 0.6
+          },
+          "default_top_k": {
+            "type": "integer",
+            "title": "Default Top K",
+            "default": 10
+          },
+          "max_batch_size": {
+            "type": "integer",
+            "title": "Max Batch Size",
+            "default": 1000
+          },
+          "max_file_size": {
+            "type": "integer",
+            "title": "Max File Size",
+            "default": 52428800
+          },
+          "allowed_file_types": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Allowed File Types",
+            "default": "csv xlsx json"
+          }
+        },
+        "type": "object",
+        "title": "APIConfig",
+        "description": "API configuration."
+      },
+      "BatchCategoryRequest": {
+        "properties": {
+          "products": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Products",
+            "description": "List of product names"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method",
+            "description": "Classification method",
+            "default": "hybrid"
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K",
+            "description": "Number of suggestions per product",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "products"
+        ],
+        "title": "BatchCategoryRequest",
+        "description": "Batch category classification request."
+      },
+      "BatchCategoryResponse": {
+        "properties": {
+          "total_products": {
+            "type": "integer",
+            "title": "Total Products"
+          },
+          "results": {
+            "items": "@{$ref=#/components/schemas/CategoryResponse}",
+            "type": "array",
+            "title": "Results"
+          },
+          "processing_time": {
+            "type": "number",
+            "title": "Processing Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_products",
+          "results",
+          "processing_time"
+        ],
+        "title": "BatchCategoryResponse",
+        "description": "Batch category classification response."
+      },
+      "BatchEmbeddingRequest": {
+        "properties": {
+          "texts": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Texts",
+            "description": "Texts to embed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "texts"
+        ],
+        "title": "BatchEmbeddingRequest",
+        "description": "Batch embedding request."
+      },
+      "BatchEmbeddingResponse": {
+        "properties": {
+          "embeddings": {
+            "items": "@{items=; type=array}",
+            "type": "array",
+            "title": "Embeddings"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "dimension": {
+            "type": "integer",
+            "title": "Dimension"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "processing_time": {
+            "type": "number",
+            "title": "Processing Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embeddings",
+          "count",
+          "dimension",
+          "model",
+          "processing_time"
+        ],
+        "title": "BatchEmbeddingResponse",
+        "description": "Batch embedding response."
+      },
+      "BatchMatchRequest": {
+        "properties": {
+          "query_products": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Query Products",
+            "description": "List of query products"
+          },
+          "reference_products": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Reference Products",
+            "description": "List of reference products"
+          },
+          "threshold": {
+            "anyOf": " ",
+            "title": "Threshold",
+            "description": "Similarity threshold",
+            "default": 0.6
+          },
+          "top_k": {
+            "anyOf": " ",
+            "title": "Top K",
+            "description": "Maximum number of results per query",
+            "default": 10
+          },
+          "include_metadata": {
+            "anyOf": " ",
+            "title": "Include Metadata",
+            "description": "Include processing metadata",
+            "default": true
+          },
+          "include_confidence": {
+            "anyOf": " ",
+            "title": "Include Confidence",
+            "description": "Include confidence scores",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "query_products",
+          "reference_products"
+        ],
+        "title": "BatchMatchRequest",
+        "description": "Batch product matching request."
+      },
+      "BatchMatchResponse": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "total_queries": {
+            "type": "integer",
+            "title": "Total Queries"
+          },
+          "processed": {
+            "type": "integer",
+            "title": "Processed"
+          },
+          "matches_found": {
+            "type": "integer",
+            "title": "Matches Found"
+          },
+          "processing_time": {
+            "anyOf": " ",
+            "title": "Processing Time"
+          },
+          "results": {
+            "anyOf": " ",
+            "title": "Results"
+          },
+          "performance_report": {
+            "anyOf": " ",
+            "title": "Performance Report"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "status",
+          "total_queries",
+          "processed",
+          "matches_found"
+        ],
+        "title": "BatchMatchResponse",
+        "description": "Batch matching response."
+      },
+      "Body_upload_csv_file_api_v1_upload_csv_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_csv_file_api_v1_upload_csv_post"
+      },
+      "CategoryRequest": {
+        "properties": {
+          "product_name": {
+            "type": "string",
+            "title": "Product Name",
+            "description": "Product name to classify"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method",
+            "description": "Classification method: keyword, embedding, or hybrid",
+            "default": "hybrid"
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K",
+            "description": "Number of suggestions to return",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_name"
+        ],
+        "title": "CategoryRequest",
+        "description": "Category classification request."
+      },
+      "CategoryResponse": {
+        "properties": {
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "category_id": {
+            "anyOf": " ",
+            "title": "Category Id"
+          },
+          "category_name": {
+            "anyOf": " ",
+            "title": "Category Name"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence",
+            "default": 0.0
+          },
+          "suggestions": {
+            "items": "@{$ref=#/components/schemas/CategorySuggestion}",
+            "type": "array",
+            "title": "Suggestions",
+            "default": ""
+          },
+          "processing_time": {
+            "type": "number",
+            "title": "Processing Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_name",
+          "processing_time"
+        ],
+        "title": "CategoryResponse",
+        "description": "Category classification response."
+      },
+      "CategorySuggestion": {
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "title": "Category Id"
+          },
+          "category_name": {
+            "type": "string",
+            "title": "Category Name"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "matched_keyword": {
+            "anyOf": " ",
+            "title": "Matched Keyword"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category_id",
+          "category_name",
+          "confidence",
+          "method"
+        ],
+        "title": "CategorySuggestion",
+        "description": "Single category suggestion."
+      },
+      "CleanTextRequest": {
+        "properties": {
+          "texts": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Texts",
+            "description": "List of raw texts to clean"
+          }
+        },
+        "type": "object",
+        "required": [
+          "texts"
+        ],
+        "title": "CleanTextRequest",
+        "description": "Batch text cleaning request."
+      },
+      "CleanTextResponse": {
+        "properties": {
+          "results": {
+            "items": "@{$ref=#/components/schemas/CleanTextResult}",
+            "type": "array",
+            "title": "Results"
+          },
+          "processing_time": {
+            "type": "number",
+            "title": "Processing Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results",
+          "processing_time"
+        ],
+        "title": "CleanTextResponse",
+        "description": "Batch cleaning response."
+      },
+      "CleanTextResult": {
+        "properties": {
+          "original": {
+            "type": "string",
+            "title": "Original"
+          },
+          "cleaned": {
+            "type": "string",
+            "title": "Cleaned"
+          }
+        },
+        "type": "object",
+        "required": [
+          "original",
+          "cleaned"
+        ],
+        "title": "CleanTextResult",
+        "description": "Single cleaned text result."
+      },
+      "EmbeddingRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "Text to embed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "EmbeddingRequest",
+        "description": "Single embedding request."
+      },
+      "EmbeddingResponse": {
+        "properties": {
+          "embedding": {
+            "items": "@{type=number}",
+            "type": "array",
+            "title": "Embedding"
+          },
+          "dimension": {
+            "type": "integer",
+            "title": "Dimension"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "processing_time": {
+            "type": "number",
+            "title": "Processing Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embedding",
+          "dimension",
+          "model",
+          "processing_time"
+        ],
+        "title": "EmbeddingResponse",
+        "description": "Embedding response."
+      },
+      "FileDeduplicationRequest": {
+        "properties": {
+          "old_products_path": {
+            "type": "string",
+            "title": "Old Products Path",
+            "description": "Path of existing products CSV in Supabase storage"
+          },
+          "new_products_path": {
+            "type": "string",
+            "title": "New Products Path",
+            "description": "Path of new products CSV in Supabase storage"
+          },
+          "threshold": {
+            "anyOf": " ",
+            "title": "Threshold",
+            "description": "Similarity threshold for matching",
+            "default": 0.75
+          }
+        },
+        "type": "object",
+        "required": [
+          "old_products_path",
+          "new_products_path"
+        ],
+        "title": "FileDeduplicationRequest",
+        "description": "Request schema for uploading files deduplication."
+      },
+      "FileDeduplicationResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "results": {
+            "items": "@{$ref=#/components/schemas/ProductMatchResult}",
+            "type": "array",
+            "title": "Results"
+          },
+          "uniqueProducts": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Uniqueproducts"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/FileDeduplicationStats"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "results",
+          "uniqueProducts",
+          "stats",
+          "summary"
+        ],
+        "title": "FileDeduplicationResponse",
+        "description": "Response containing matches, unique products, and job statistics."
+      },
+      "FileDeduplicationStats": {
+        "properties": {
+          "totalNewProducts": {
+            "type": "integer",
+            "title": "Totalnewproducts"
+          },
+          "totalOldProducts": {
+            "type": "integer",
+            "title": "Totaloldproducts"
+          },
+          "needsReview": {
+            "type": "integer",
+            "title": "Needsreview"
+          },
+          "autoApproved": {
+            "type": "integer",
+            "title": "Autoapproved"
+          },
+          "excludedDuplicates": {
+            "type": "integer",
+            "title": "Excludedduplicates"
+          },
+          "processingTime": {
+            "type": "number",
+            "title": "Processingtime"
+          }
+        },
+        "type": "object",
+        "required": [
+          "totalNewProducts",
+          "totalOldProducts",
+          "needsReview",
+          "autoApproved",
+          "excludedDuplicates",
+          "processingTime"
+        ],
+        "title": "FileDeduplicationStats",
+        "description": "Statistics for file deduplication job."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": "@{$ref=#/components/schemas/ValidationError}",
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ImportDeduplicationRequest": {
+        "properties": {
+          "products": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Products",
+            "description": "List of product names to deduplicate"
+          },
+          "threshold": {
+            "anyOf": " ",
+            "title": "Threshold",
+            "description": "Similarity threshold",
+            "default": 0.75
+          }
+        },
+        "type": "object",
+        "required": [
+          "products"
+        ],
+        "title": "ImportDeduplicationRequest",
+        "description": "Request schema for batch product deduplication against database."
+      },
+      "JobStatus": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress",
+            "default": 0.0
+          },
+          "message": {
+            "anyOf": " ",
+            "title": "Message"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": " ",
+            "title": "Completed At"
+          },
+          "results_url": {
+            "anyOf": " ",
+            "title": "Results Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "JobStatus",
+        "description": "Background job status."
+      },
+      "LearnVerifyRequest": {
+        "properties": {
+          "product_name": {
+            "type": "string",
+            "title": "Product Name",
+            "description": "The verified product name"
+          },
+          "category_id": {
+            "type": "string",
+            "title": "Category Id",
+            "description": "The confirmed category ID"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_name",
+          "category_id"
+        ],
+        "title": "LearnVerifyRequest",
+        "description": "Request for auto-learning from verified product."
+      },
+      "MatchResult": {
+        "properties": {
+          "query_product": {
+            "type": "string",
+            "title": "Query Product"
+          },
+          "matched_product": {
+            "type": "string",
+            "title": "Matched Product"
+          },
+          "similarity_score": {
+            "type": "number",
+            "title": "Similarity Score"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "confidence_score": {
+            "anyOf": " ",
+            "title": "Confidence Score"
+          },
+          "confidence_level": {
+            "anyOf": " ",
+            "title": "Confidence Level"
+          },
+          "metadata": {
+            "anyOf": " ",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query_product",
+          "matched_product",
+          "similarity_score",
+          "rank"
+        ],
+        "title": "MatchResult",
+        "description": "Single match result."
+      },
+      "ProductMatchRequest": {
+        "properties": {
+          "query_product": {
+            "type": "string",
+            "title": "Query Product",
+            "description": "Product name to match"
+          },
+          "reference_products": {
+            "items": "@{type=string}",
+            "type": "array",
+            "title": "Reference Products",
+            "description": "List of reference products"
+          },
+          "threshold": {
+            "anyOf": " ",
+            "title": "Threshold",
+            "description": "Similarity threshold",
+            "default": 0.6
+          },
+          "top_k": {
+            "anyOf": " ",
+            "title": "Top K",
+            "description": "Maximum number of results",
+            "default": 10
+          },
+          "include_metadata": {
+            "anyOf": " ",
+            "title": "Include Metadata",
+            "description": "Include processing metadata",
+            "default": true
+          },
+          "include_confidence": {
+            "anyOf": " ",
+            "title": "Include Confidence",
+            "description": "Include confidence scores",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "query_product",
+          "reference_products"
+        ],
+        "title": "ProductMatchRequest",
+        "description": "Single product matching request."
+      },
+      "ProductMatchResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "newProduct": {
+            "type": "string",
+            "title": "Newproduct"
+          },
+          "oldProduct": {
+            "type": "string",
+            "title": "Oldproduct"
+          },
+          "oldProductId": {
+            "anyOf": " ",
+            "title": "Oldproductid"
+          },
+          "oldPrice": {
+            "anyOf": " ",
+            "title": "Oldprice"
+          },
+          "similarity": {
+            "type": "number",
+            "title": "Similarity"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "mlPrediction": {
+            "type": "string",
+            "title": "Mlprediction"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "pending"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "identityVerdict": {
+            "anyOf": " ",
+            "title": "Identityverdict"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "newProduct",
+          "oldProduct",
+          "similarity",
+          "confidence",
+          "mlPrediction",
+          "reason"
+        ],
+        "title": "ProductMatchResult",
+        "description": "Unified file-based product match result."
+      },
+      "ScanInternalRequest": {
+        "properties": {
+          "threshold": {
+            "anyOf": " ",
+            "title": "Threshold",
+            "description": "Similarity threshold for matching",
+            "default": 0.95
+          },
+          "limit": {
+            "anyOf": " ",
+            "title": "Limit",
+            "description": "Maximum number of duplicate pairs to return",
+            "default": 100
+          }
+        },
+        "type": "object",
+        "title": "ScanInternalRequest",
+        "description": "Request to scan for internal duplicates."
+      },
+      "ScanStartResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "status",
+          "message"
+        ],
+        "title": "ScanStartResponse"
+      },
+      "ScanTaskStatusResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "progress": {
+            "type": "integer",
+            "title": "Progress"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "result": {
+            "anyOf": " ",
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": " ",
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "status",
+          "progress",
+          "message"
+        ],
+        "title": "ScanTaskStatusResponse"
+      },
+      "SystemHealth": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "uptime": {
+            "type": "number",
+            "title": "Uptime"
+          },
+          "components": {
+            "additionalProperties": "@{type=string}",
+            "type": "object",
+            "title": "Components"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "timestamp",
+          "version",
+          "uptime",
+          "components"
+        ],
+        "title": "SystemHealth",
+        "description": "System health check response."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": "@{anyOf=System.Object[]}",
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

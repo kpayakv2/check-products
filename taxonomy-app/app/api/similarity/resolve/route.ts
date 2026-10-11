@@ -5,12 +5,14 @@ import { rateLimit } from '@/utils/rate-limit'
 import { withErrorHandling } from '@/utils/error-handler'
 import { validateRequest } from '@/utils/validation'
 
+const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+
 // Validation Schema
 const ResolveDuplicateSchema = z.object({
   action: z.enum(['merge', 'keep_both']),
-  id_a: z.string().uuid('id_a ต้องเป็น UUID ที่ถูกต้อง'),
-  id_b: z.string().uuid('id_b ต้องเป็น UUID ที่ถูกต้อง'),
-  keep_id: z.string().uuid('keep_id ต้องเป็น UUID ที่ถูกต้อง').optional(),
+  id_a: z.string().regex(UUID_REGEX, 'id_a ต้องเป็น UUID ที่ถูกต้อง'),
+  id_b: z.string().regex(UUID_REGEX, 'id_b ต้องเป็น UUID ที่ถูกต้อง'),
+  keep_id: z.string().regex(UUID_REGEX, 'keep_id ต้องเป็น UUID ที่ถูกต้อง').optional(),
   similarity: z.coerce.number().min(0).max(1).default(1.0)
 })
 
@@ -59,16 +61,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const remove_id = keep_id === id_a ? id_b : id_a
 
       // Soft delete: Update the duplicate product status to 'duplicate'
-      const { error: updateError } = await supabaseAdmin
+      const { data: updatedRows, error: updateError } = await supabaseAdmin
         .from('products')
         .update({ status: 'duplicate' })
         .eq('id', remove_id)
+        .select('id')
 
       if (updateError) {
         console.error('Failed to update duplicate product status', updateError)
         return NextResponse.json(
           { success: false, error: 'Failed to update product status: ' + updateError.message },
           { status: 500 }
+        )
+      }
+
+      if (!updatedRows || updatedRows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: `ไม่พบสินค้าที่ต้องการลบ (ID: ${remove_id})` },
+          { status: 404 }
         )
       }
 

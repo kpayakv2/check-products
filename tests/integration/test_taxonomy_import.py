@@ -163,22 +163,20 @@ def analyze_embeddings(embedding_data):
 
 
 def run_product_matching():
-    """ทดสอบ Product Matching API (ถ้ามี)"""
-    print("\n🔍 Testing Product Matching...")
+    """ทดสอบ Import Deduplication Matching API"""
+    print("\n🔍 Testing Import Deduplication Matching...")
     try:
         df = pd.read_csv(CSV_FILE, encoding='utf-8-sig')
         query = df['product_name'].iloc[0]
         references = df['product_name'].iloc[1:6].tolist()
         
         payload = {
-            "query_product": query,
-            "reference_products": references,
-            "threshold": 0.6,
-            "top_k": 5
+            "products": [query] + references,
+            "threshold": 0.6
         }
         
         response = requests.post(
-            f"{API_BASE_URL}/api/v1/match/single",
+            f"{API_BASE_URL}/api/v1/match/import-dedup",
             json=payload,
             timeout=30
         )
@@ -186,18 +184,20 @@ def run_product_matching():
         if response.status_code == 200:
             matches = response.json()
             print(f"✅ Product matching successful!")
-            print(f"   Query: {query}")
+            print(f"   Query products: {len(payload['products'])}")
             print(f"   Matches found: {len(matches)}")
             
-            for match in matches:
-                print(f"   - {match['matched_product'][:40]:40} (score: {match['similarity_score']:.4f})")
+            for match in matches[:5]:
+                new_p = match.get('newProduct') or match.get('new_product') or ''
+                old_p = match.get('oldProduct') or match.get('old_product') or ''
+                print(f"   - {new_p[:30]} <-> {old_p[:30]} (score: {match['similarity']:.4f})")
             
             return True
         else:
-            print(f"⚠️ Product matching endpoint not available or failed")
+            print(f"⚠️ Product matching endpoint returned {response.status_code}: {response.text}")
             return False
     except Exception as e:
-        print(f"⚠️ Product matching test skipped: {e}")
+        print(f"⚠️ Product matching test failed: {e}")
         return False
 
 

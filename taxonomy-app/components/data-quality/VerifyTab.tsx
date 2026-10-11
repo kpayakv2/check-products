@@ -19,17 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { supabase } from '@/utils/supabase'
 import { FOCUS_RING } from '@/components/ui/Modal'
-
-
-interface Product {
-  id: string
-  name_th: string
-  status: string
-  confidence_score: number
-  category_id?: string
-  metadata: any
-  created_at: string
-}
+import type { Product } from '@/types'
 
 export default function VerifyTab() {
   const [activeTab, setActiveTab] = useState<'dedup' | 'category' | 'approved'>('dedup')
@@ -328,7 +318,7 @@ export default function VerifyTab() {
                               <div className="flex items-center gap-2 mb-4">
                                 <span className="px-3 py-1 bg-indigo-100 text-indigo-900 border border-indigo-300 text-xs font-bold uppercase tracking-wider rounded-lg">New Unique Product</span>
                                 <span className="text-slate-400 text-xs" aria-hidden="true">•</span>
-                                <span className="text-slate-600 text-xs font-bold">AI Confidence: {(p.confidence_score * 100).toFixed(0)}%</span>
+                                <span className="text-slate-600 text-xs font-bold">AI Confidence: {p.confidence_score !== null && p.confidence_score !== undefined ? (p.confidence_score * 100).toFixed(0) : '-'}%</span>
                               </div>
                               <p className="text-2xl font-black text-slate-900 mb-2 thai-text">{p.name_th}</p>
                               <p className="text-xs text-slate-500 font-medium mb-6">Cleaned: {p.metadata?.clean_name}</p>
@@ -344,7 +334,7 @@ export default function VerifyTab() {
                                   disabled={busyId === p.id}
                                   aria-label={`เลือกหมวดหมู่สำหรับ ${p.name_th}`}
                                   className={`px-6 py-3 bg-white border border-slate-300 rounded-2xl text-sm font-bold text-slate-800 outline-none disabled:opacity-40 cursor-pointer ${FOCUS_RING}`}
-                                  defaultValue={p.category_id}
+                                  defaultValue={p.category_id || ''}
                                   onChange={(e) => handleCategoryConfirm(p.id, e.target.value)}
                                 >
                                   <option value="">เลือกหมวดหมู่ที่ถูกต้อง...</option>

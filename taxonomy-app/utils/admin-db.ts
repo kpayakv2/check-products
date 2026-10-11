@@ -12,6 +12,8 @@
  */
 import { supabaseAdmin } from './supabase-admin'
 
+const fromTable = (table: string) => (supabaseAdmin as any).from(table)
+
 type Row = Record<string, unknown>
 
 /** ตัดคีย์ที่เป็น undefined หรือสตริงว่างออก — คอลัมน์ uuid รับ '' ไม่ได้ (22P02) */
@@ -21,8 +23,7 @@ export const omitEmpty = (input: Row): Row =>
   )
 
 export async function createRow<T = Row>(table: string, input: Row): Promise<T> {
-  const { data, error } = await supabaseAdmin
-    .from(table)
+  const { data, error } = await fromTable(table)
     .insert(omitEmpty(input))
     .select()
     .single()
@@ -33,8 +34,7 @@ export async function createRow<T = Row>(table: string, input: Row): Promise<T> 
 
 /** คืน null เมื่อไม่มีแถวนั้น (หรือถูก RLS กรอง) แทนที่จะเงียบแล้วดูเหมือนสำเร็จ */
 export async function updateRow<T = Row>(table: string, id: string, patch: Row): Promise<T | null> {
-  const { data, error } = await supabaseAdmin
-    .from(table)
+  const { data, error } = await fromTable(table)
     .update(omitEmpty(patch))
     .eq('id', id)
     .select()
@@ -46,8 +46,7 @@ export async function updateRow<T = Row>(table: string, id: string, patch: Row):
 
 /** คืน false เมื่อไม่มีแถวไหนถูกลบจริง */
 export async function deleteRow(table: string, id: string): Promise<boolean> {
-  const { data, error } = await supabaseAdmin
-    .from(table)
+  const { data, error } = await fromTable(table)
     .delete()
     .eq('id', id)
     .select('id')
@@ -57,8 +56,7 @@ export async function deleteRow(table: string, id: string): Promise<boolean> {
 }
 
 export async function insertRows<T = Row>(table: string, rows: Row[]): Promise<T[]> {
-  const { data, error } = await supabaseAdmin
-    .from(table)
+  const { data, error } = await fromTable(table)
     .insert(rows.map(omitEmpty))
     .select()
 
@@ -109,8 +107,7 @@ export async function writeSettingsRow<T = Row>(input: Row): Promise<T> {
 
 /** อ่านแถวเดียวด้วย id ผ่าน service role (ใช้ในเส้นทางเขียน เพื่อไม่ปนกับ client ของ anon) */
 export async function readRowById<T = Row>(table: string, id: string): Promise<T | null> {
-  const { data, error } = await supabaseAdmin
-    .from(table)
+  const { data, error } = await fromTable(table)
     .select('*')
     .eq('id', id)
     .maybeSingle()

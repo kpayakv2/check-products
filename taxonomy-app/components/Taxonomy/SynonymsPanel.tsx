@@ -135,10 +135,10 @@ export default function SynonymsPanel() {
       category_id: synonym.category_id || '',
       terms: synonym.terms?.map(term => ({
         term: term.term,
-        is_primary: term.is_primary,
-        confidence_score: term.confidence_score,
-        source: term.source,
-        language: term.language
+        is_primary: Boolean(term.is_primary),
+        confidence_score: Number(term.confidence_score ?? 1.0),
+        source: (term.source as 'manual' | 'auto' | 'imported' | 'ml') || 'manual',
+        language: term.language || 'th'
       })) || []
     })
     setShowForm(true)

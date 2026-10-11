@@ -209,48 +209,24 @@ const [taxonomyData, synonymData, productData] = await Promise.all([
 
 ## 🔌 API Routes (`/api`)
 
-### **Import APIs (`/api/import`)**
+ทุก Route (ยกเว้น `/api/unlock`) ได้รับการปกป้องโดย `middleware.ts` ตรวจสอบ Token Session จากคุกกี้ และใช้ Service Role (`supabaseAdmin`) สำหรับงานเขียนฐานข้อมูล
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/import/process` | POST | ประมวลผลไฟล์ CSV (SSE) |
-| `/api/import/process-local` | POST | ประมวลผลแบบ local |
-| `/api/import/process-storage` | POST | ประมวลผลจาก Storage |
-| `/api/import/pending` | GET | โหลดรายการรอการอนุมัติ |
-| `/api/import/pending` | POST | อนุมัติ/ปฏิเสธ |
-| `/api/import/approve` | POST | อนุมัติรายการ |
-
-### **Product APIs (`/api/products`)**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/products` | GET | ดึงรายการสินค้า |
-| `/api/products` | POST | สร้างสินค้าใหม่ |
-| `/api/products/[id]/review` | POST | รีวิวสินค้า (approve/reject) |
-
-### **Taxonomy APIs (`/api/taxonomy`)**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/taxonomy` | GET | ดึง Taxonomy Tree |
-| `/api/taxonomy` | POST | สร้างหมวดหมู่ใหม่ |
-| `/api/taxonomy/[id]` | PUT | แก้ไขหมวดหมู่ |
-| `/api/taxonomy/[id]` | DELETE | ลบหมวดหมู่ |
-
-### **Synonym APIs (`/api/synonyms`)**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/synonyms` | GET | ดึงรายการ Synonym |
-| `/api/synonyms` | POST | สร้าง Synonym ใหม่ |
-| `/api/synonyms/[id]` | PUT | แก้ไข Synonym |
-| `/api/synonyms/[id]` | DELETE | ลบ Synonym |
-
-### **Similarity APIs (`/api/similarity`)**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/similarity/[id]` | GET | ตรวจสอบความคล้ายคลึง |
+| Endpoint | Methods | Description |
+|---|---|---|
+| `/api/unlock` | POST | ตรวจสอบรหัสผ่านสำนักงานและออกคุกกี้ Session |
+| `/api/lock` | POST | ลบคุกกี้ Session เพื่อล็อกหน้าระบบ |
+| `/api/import/history` | GET | ดึงประวัติการนำเข้าไฟล์จากตาราง `imports` ผ่าน Service Role |
+| `/api/import/commit` | POST | บันทึกชุดสินค้านำเข้าลงใน `products`, `imports`, `similarity_matches` |
+| `/api/taxonomy` | POST | สร้างโหนดหมวดหมู่ใหม่ใน `taxonomy_nodes` |
+| `/api/taxonomy/[id]` | PUT, DELETE | แก้ไขหรือลบโหนดหมวดหมู่ |
+| `/api/synonyms` | POST | สร้างชุดคำพ้องใหม่ (`synonym_lemmas`, `synonym_terms`) |
+| `/api/synonyms/[id]` | PUT, DELETE | แก้ไขหรือลบคำพ้อง |
+| `/api/keyword-rules/[id]` | DELETE | ลบกฎ Keyword Rule จาก `keyword_rules` อย่างปลอดภัย |
+| `/api/similarity/resolve` | POST | จัดการคู่สินค้าซ้ำภายในคลัง (Action: merge / keep_both) |
+| `/api/recheck` | GET, POST | ดึงคู่สินค้าสำหรับตรวจซ้ำ (Recheck) และบันทึกผลการยืนยัน |
+| `/api/verify` | POST | ยืนยันหมวดหมู่สินค้าและส่ง auto-learning feedback ให้ AI |
+| `/api/pos-export` | POST | Export สินค้าที่อนุมัติแล้วในรูปแบบ POS พร้อมบันทึกประวัติ |
+| `/api/settings` | GET, POST | อ่านและบันทึกการตั้งค่าระบบ (`system_settings`) |
 
 ---
 

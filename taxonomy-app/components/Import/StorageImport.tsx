@@ -16,23 +16,8 @@ import {
   SearchIcon
 } from 'lucide-react'
 import { FOCUS_RING } from '@/components/ui/Modal'
+import type { ImportRecord } from '@/types'
 
-/* ──────────────────────────────────────────────────
-   Types
-────────────────────────────────────────────────── */
-interface ImportRecord {
-  id: string
-  name: string                // ชื่อไทยต้นฉบับ
-  file_name: string | null
-  file_size: number | null
-  file_type: string | null
-  total_records: number
-  processed_records: number
-  success_records: number
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  metadata: { storage_path?: string } | null
-  created_at: string
-}
 
 interface StorageImportProps {
   onFileSelect?: (file: File, fileName: string) => void
@@ -82,19 +67,16 @@ export default function StorageImport({ onFileSelect }: StorageImportProps) {
     )
   }, [search, records])
 
-  /* ── ดึงจาก imports table (มีชื่อไทย + storage_path) ── */
+  /* ── ดึงจาก imports table ผ่าน API service role (แก้ RLS บล็อก anon key คืน []) ── */
   const loadRecords = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('imports')
-        .select('id, name, file_name, file_size, file_type, total_records, processed_records, success_records, status, metadata, created_at')
-        .order('created_at', { ascending: false })
-        .limit(30)
-
-      if (error) throw error
+      const res = await fetch('/api/import/history?limit=30')
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error || 'Failed to fetch history')
+      const data: ImportRecord[] = json.data || []
       // กรองเฉพาะ record ที่มี storage_path (คือมีไฟล์จริงใน Storage)
-      const withFile = (data || []).filter(r => r.metadata?.storage_path)
+      const withFile = data.filter(r => (r.metadata as { storage_path?: string } | null)?.storage_path)
       setRecords(withFile)
       setFiltered(withFile)
     } catch (err: any) {
@@ -108,7 +90,7 @@ export default function StorageImport({ onFileSelect }: StorageImportProps) {
   /* ── ดาวน์โหลด + ส่งกลับ File object ── */
   const selectRecord = async (rec: ImportRecord) => {
     if (!onFileSelect) return
-    const storagePath = rec.metadata?.storage_path
+    const storagePath = (rec.metadata as { storage_path?: string } | null)?.storage_path
     if (!storagePath) { toast.error('ไม่พบไฟล์ใน Storage'); return }
 
     setDownloading(true)
@@ -196,7 +178,7 @@ export default function StorageImport({ onFileSelect }: StorageImportProps) {
         <AnimatePresence>
           <div className="space-y-2">
             {filtered.map((rec, idx) => {
-              const sConfig = STATUS[rec.status] ?? STATUS.pending
+              const sConfig = (rec.status && (STATUS as any)[rec.status]) ? (STATUS as any)[rec.status] : STATUS.pending
               const name    = displayName(rec)
               const isSelected = selected === rec.id
 
@@ -239,15 +221,15 @@ export default function StorageImport({ onFileSelect }: StorageImportProps) {
                       <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-600">
                         <span className="flex items-center gap-1">
                           <CalendarIcon className="w-3 h-3 text-slate-500" aria-hidden="true" />
-                          {formatDate(rec.created_at)}
+                          {formatDate(rec.created_at ?? '')}
                         </span>
                         <span className="flex items-center gap-1">
                           <HardDriveIcon className="w-3 h-3 text-slate-500" aria-hidden="true" />
-                          {formatBytes(rec.file_size)}
+                          {formatBytes(rec.file_size ?? null)}
                         </span>
                         <span className="flex items-center gap-1">
                           <PackageIcon className="w-3 h-3 text-slate-500" aria-hidden="true" />
-                          {rec.total_records.toLocaleString()} แถว
+                          {(rec.total_records ?? 0).toLocaleString()} แถว
                         </span>
                       </div>
                     </div>

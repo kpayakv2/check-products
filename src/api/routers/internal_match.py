@@ -431,8 +431,6 @@ def run_scan_task_background(task_id: str, threshold: float, limit: int):
             "error": str(e)
         }
 
-logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/v1/match", tags=["Matching"])
 
 @router.post("/scan-internal", response_model=ScanStartResponse)
 async def scan_internal_duplicates(request: ScanInternalRequest, background_tasks: BackgroundTasks):
@@ -494,13 +492,15 @@ async def deduplicate_files(request: FileDeduplicationRequest):
         try:
             old_bytes = supabase.storage.from_("uploads").download(request.old_products_path)
         except Exception as e:
-            raise HTTPException(status_code=404, detail=f"Failed to download old products file: {str(e)}")
+            logger.exception("Failed to download old products file")
+            raise HTTPException(status_code=404, detail="Failed to download old products file from storage")
             
         logger.info(f"Downloading new products file: {request.new_products_path}")
         try:
             new_bytes = supabase.storage.from_("uploads").download(request.new_products_path)
         except Exception as e:
-            raise HTTPException(status_code=404, detail=f"Failed to download new products file: {str(e)}")
+            logger.exception("Failed to download new products file")
+            raise HTTPException(status_code=404, detail="Failed to download new products file from storage")
             
         # 3. Parse products
         old_products = parse_csv(old_bytes)
@@ -677,7 +677,7 @@ async def deduplicate_files(request: FileDeduplicationRequest):
         )
     except Exception as e:
         logger.exception("File deduplication failed")
-        raise HTTPException(status_code=500, detail=f"File deduplication failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="File deduplication failed")
 
 
 @router.post("/import-dedup", response_model=List[ProductMatchResult])
@@ -848,6 +848,6 @@ async def deduplicate_imports(request: ImportDeduplicationRequest):
 
     except Exception as e:
         logger.exception("Import deduplication failed")
-        raise HTTPException(status_code=500, detail=f"Import deduplication failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Import deduplication failed")
 
 

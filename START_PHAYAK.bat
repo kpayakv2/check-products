@@ -21,11 +21,15 @@ start "Phayak Backend" cmd /c "cd /d %~dp0 && .\.venv\Scripts\python -m src.api.
 echo [2/3] Starting UI Dashboard (Next.js on Port 3000 - LAN enabled)...
 start "Phayak Frontend" cmd /c "cd /d %~dp0\taxonomy-app && npx next dev --hostname 0.0.0.0"
 
-:: 3. Wait a few seconds for services to warm up
-echo [3/3] Waiting for services to stabilize...
+:: 3. Start Cloudflare Tunnel (External Internet Access)
+echo [3/4] Starting Cloudflare Tunnel (ckeck.smilesboo.com)...
+start "Phayak Cloudflare Tunnel" cmd /c "cd /d %~dp0 && START_TUNNEL.bat"
+
+:: 4. Wait a few seconds for services to warm up
+echo [4/4] Waiting for services to stabilize...
 timeout /t 6 /nobreak > nul
 
-:: 4. Open Browser (local)
+:: 5. Open Browser (local)
 echo.
 echo ====================================================
 echo   All services are running!
@@ -39,8 +43,13 @@ echo   [LAN Access - other devices]
 echo   UI Dashboard : http://%LAN_IP%:3000
 echo   AI Backend   : http://%LAN_IP%:8000/docs
 echo.
+echo   [Internet Access - Cloudflare Tunnel]
+echo   UI Dashboard : https://ckeck.smilesboo.com
+echo                : https://check.smilesboo.com
+echo.
 echo   Keep the other windows open to maintain the service.
 echo ====================================================
 echo.
 start http://localhost:3000
 pause
+

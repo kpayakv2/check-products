@@ -169,40 +169,84 @@ class FileDeduplicationRequest(BaseModel):
 class ProductMatchResult(BaseModel):
     """Unified file-based product match result."""
     id: str
-    newProduct: str
-    oldProduct: str
+    new_product: str = Field(..., alias="newProduct")
+    old_product: str = Field(..., alias="oldProduct")
     # id จริงของสินค้าในคลังที่จับคู่ได้ — จำเป็นเวลาต้องบันทึกคู่ลง similarity_matches
     # ซึ่งมี FK บังคับทั้งสองฝั่ง (ฟิลด์ `id` ด้านบนเป็นเลขลำดับรีวิว ไม่ใช่ id ของสินค้า)
-    oldProductId: Optional[str] = None
+    old_product_id: Optional[str] = Field(None, alias="oldProductId")
     # ราคาสินค้าฝั่งสต๊อกที่จับคู่ได้ — ให้ frontend เทียบกับราคาของใหม่เพื่อช่วยตัดสินใจ
-    oldPrice: Optional[float] = None
+    old_price: Optional[float] = Field(None, alias="oldPrice")
     similarity: float
     confidence: float
-    mlPrediction: str  # 'similar' or 'different'
+    ml_prediction: str = Field("similar", alias="mlPrediction")  # 'similar' or 'different'
     status: str = "pending"
     reason: str
     # คำตัดสินของกฎอ่านตัวเลข (src/core/product_identity): 'different' | 'duplicate' | 'needs_judgment'
     # frontend ใช้ตัดสินว่าสินค้านำเข้าจะถูกทิ้ง ส่งให้คนดู หรือนับเป็นของใหม่ — ไม่ต้องมีกฎซ้ำอีกภาษา
-    identityVerdict: Optional[str] = None
+    identity_verdict: Optional[str] = Field(None, alias="identityVerdict")
+
+    model_config = {
+        "populate_by_name": True,
+    }
+
+    @property
+    def newProduct(self) -> str:
+        return self.new_product
+
+    @property
+    def oldProduct(self) -> str:
+        return self.old_product
+
+    @property
+    def oldProductId(self) -> Optional[str]:
+        return self.old_product_id
+
+    @property
+    def oldPrice(self) -> Optional[float]:
+        return self.old_price
+
+    @property
+    def mlPrediction(self) -> str:
+        return self.ml_prediction
+
+    @property
+    def identityVerdict(self) -> Optional[str]:
+        return self.identity_verdict
+
+    @identityVerdict.setter
+    def identityVerdict(self, value: Optional[str]):
+        self.identity_verdict = value
 
 
 class FileDeduplicationStats(BaseModel):
     """Statistics for file deduplication job."""
-    totalNewProducts: int
-    totalOldProducts: int
-    needsReview: int
-    autoApproved: int
-    excludedDuplicates: int
-    processingTime: float
+    total_new_products: int = Field(..., alias="totalNewProducts")
+    total_old_products: int = Field(..., alias="totalOldProducts")
+    needs_review: int = Field(..., alias="needsReview")
+    auto_approved: int = Field(..., alias="autoApproved")
+    excluded_duplicates: int = Field(..., alias="excludedDuplicates")
+    processing_time: float = Field(..., alias="processingTime")
+
+    model_config = {
+        "populate_by_name": True,
+    }
 
 
 class FileDeduplicationResponse(BaseModel):
     """Response containing matches, unique products, and job statistics."""
     success: bool
     results: List[ProductMatchResult]
-    uniqueProducts: List[str]
+    unique_products: List[str] = Field(..., alias="uniqueProducts")
     stats: FileDeduplicationStats
     summary: str
+
+    model_config = {
+        "populate_by_name": True,
+    }
+
+    @property
+    def uniqueProducts(self) -> List[str]:
+        return self.unique_products
 
 
 class ImportDeduplicationRequest(BaseModel):

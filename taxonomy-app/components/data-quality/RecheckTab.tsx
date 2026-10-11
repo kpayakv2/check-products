@@ -5,6 +5,8 @@ import { AlertCircle, ArrowRight, Check, RefreshCcw, User, Bot } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase'
 import { FOCUS_RING } from '@/components/ui/Modal'
+import type { TaxonomyNodeLite } from '@/types'
+
 
 interface RecheckItem {
   id: string
@@ -20,10 +22,6 @@ interface RecheckItem {
   }
 }
 
-interface TaxonomyNode {
-  id: string
-  name_th: string
-}
 
 const PAGE_SIZE = 25
 
@@ -35,7 +33,7 @@ const PAGE_SIZE = 25
  */
 export default function RecheckTab() {
   const [items, setItems] = useState<RecheckItem[]>([])
-  const [taxonomy, setTaxonomy] = useState<TaxonomyNode[]>([])
+  const [taxonomy, setTaxonomy] = useState<TaxonomyNodeLite[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -65,7 +63,7 @@ export default function RecheckTab() {
   useEffect(() => {
     supabase
       .from('taxonomy_nodes')
-      .select('id, name_th')
+      .select('id, name_th, parent_id')
       .eq('level', 1)
       .order('name_th')
       .then(({ data }) => setTaxonomy(data ?? []))

@@ -116,7 +116,8 @@ async function existingBatchResponse(batchId: string) {
 
   const rows = products ?? []
   const counts = rows.reduce<Record<string, number>>((acc, row) => {
-    acc[row.status] = (acc[row.status] ?? 0) + 1
+    const status = row.status ?? 'unknown'
+    acc[status] = (acc[status] ?? 0) + 1
     return acc
   }, {})
 
@@ -207,11 +208,11 @@ async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
     },
   }))
 
-  const inserted: { id: string; name_th: string; status: string }[] = []
+  const inserted: { id: string; name_th: string; status: string | null }[] = []
   for (let start = 0; start < rows.length; start += INSERT_BATCH) {
     const { data, error } = await supabaseAdmin
       .from('products')
-      .insert(rows.slice(start, start + INSERT_BATCH))
+      .insert(rows.slice(start, start + INSERT_BATCH) as any)
       .select('id, name_th, status')
     if (error) throw error
     inserted.push(...(data ?? []))
@@ -247,7 +248,8 @@ async function commitDedup(body: z.infer<typeof DedupCommitSchema>) {
   }
 
   const counts = inserted.reduce<Record<string, number>>((acc, row) => {
-    acc[row.status] = (acc[row.status] ?? 0) + 1
+    const status = row.status ?? 'unknown'
+    acc[status] = (acc[status] ?? 0) + 1
     return acc
   }, {})
 

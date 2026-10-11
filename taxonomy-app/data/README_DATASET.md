@@ -138,36 +138,25 @@ SELECT COUNT(*) as regex_rules FROM regex_rules WHERE is_active = true;
 
 ## 🔧 การใช้งาน API
 
-### 1. Category Suggestions:
+### 1. จัดหมวดหมู่สินค้าผ่าน FastAPI (Hybrid Classification):
 ```typescript
-const suggestions = await EdgeFunctionAPI.getCategorySuggestions({
-  text: "คราดมือเสือ 023 NCL",
-  options: {
-    maxSuggestions: 5,
-    minConfidence: 0.3,
-    includeExplanation: true
-  }
+const response = await fetch('http://127.0.0.1:8000/api/v1/classify/category', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    product_name: "คราดมือเสือ 023 NCL",
+    top_k: 5
+  })
 })
+const { matches } = await response.json()
 ```
 
-### 2. Hybrid Search:
+### 2. ค้นหาคำพ้องผ่าน Supabase:
 ```typescript
-const results = await EdgeFunctionAPI.hybridSearch({
-  query: "ขวดซอสแฟนซี",
-  type: 'hybrid',
-  filters: {
-    categories: ['cat_003_001']
-  }
-})
-```
-
-### 3. Synonym Matching:
-```typescript
-// ค้นหา synonyms ของคำ
-const synonyms = await DatabaseService.getSynonymsByTerm("คราด")
-
-// ค้นหา lemma ที่เกี่ยวข้อง
-const lemmas = await DatabaseService.getLemmasByCategory("cat_001_001")
+const { data: synonyms } = await supabase
+  .from('synonym_terms')
+  .select('term, confidence_score, lemma:synonym_lemmas(name_th)')
+  .ilike('term', '%คราด%')
 ```
 
 ## 📊 สถิติการใช้งาน

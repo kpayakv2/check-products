@@ -103,6 +103,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
+    if (!suggestion.product_id) {
+      return NextResponse.json(
+        { success: false, error: 'รายการข้อเสนอนี้ไม่มี product_id ผูกอยู่' },
+        { status: 400 }
+      )
+    }
+
     const previousCategoryId = (suggestion.metadata as Record<string, unknown>)
       ?.current_category_id as string | undefined
 
@@ -173,6 +180,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       success: true,
+      data: {
+        action,
+        category_id: finalCategoryId,
+        learned,
+      },
       action,
       category_id: finalCategoryId,
       learned,

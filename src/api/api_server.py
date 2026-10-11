@@ -31,13 +31,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env_path = BASE_DIR / "taxonomy-app" / ".env.local"
 load_dotenv(dotenv_path=str(env_path))
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from src.api.dependencies import initialize_pipeline, initialize_embedding_model
-from src.api.custom_websockets import manager
-from src.api.routers import match, embed, system, jobs, learn, internal_match, classify
+from src.api.routers import embed, system, learn, internal_match, classify
 
 
 # =============================================================================
@@ -60,11 +58,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Mount static files for web interface
-web_dir = Path(__file__).parent / "web"
-if web_dir.exists():
-    app.mount("/web", StaticFiles(directory=web_dir, html=True), name="web")
 
 
 # =============================================================================
@@ -92,30 +85,27 @@ async def root():
         "status": "operational",
         "endpoints": {
             "health": "/api/v1/health",
+            "clean": "/api/v1/clean",
+            "classify": "/api/classify/category",
+            "classify_batch": "/api/classify/batch",
             "embeddings": "/api/embed",
-            "batch embeddings": "/api/embed/batch",
-            "docs": "/docs",
-            "web_interface": "/web"
+            "batch_embeddings": "/api/embed/batch",
+            "scan_internal": "/api/v1/match/scan-internal",
+            "scan_status": "/api/v1/match/scan-internal/status/{task_id}",
+            "file_dedup": "/api/v1/match/file-dedup",
+            "import_dedup": "/api/v1/match/import-dedup",
+            "learn_verify": "/api/v1/learn/verify",
+            "learn_status": "/api/v1/learn/status",
+            "learn_retrain": "/api/v1/learn/retrain",
+            "learn_history": "/api/v1/learn/history",
+            "docs": "/docs"
         }
     }
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time updates."""
-    await manager.connect(websocket)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
 # Include Routers
 app.include_router(system.router)
-app.include_router(match.router)
 app.include_router(embed.router)
-app.include_router(jobs.router)
 app.include_router(learn.router)
 app.include_router(internal_match.router)
 app.include_router(classify.router)

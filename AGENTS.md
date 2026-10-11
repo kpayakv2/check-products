@@ -24,7 +24,7 @@ AI-powered Thai product taxonomy management + similarity/dedup matching.
 4. **No Tailwind outside `taxonomy-app/`**
 5. **Test before changing code or DB** — run pytest/jest first, never skip
 6. **Never regress the measured accuracy baseline** — run `tests/integration/test_classification_accuracy.py` before and after any algorithm change. The old "≥72% F1" rule cited `tests/benchmark_similarity.py`, which printed a hardcoded "72%" without classifying anything; it was deleted 2026-08-26 and replaced by that real test. Raise the baselines in the test when an improvement is proven
-7. **`127.0.0.1`, never `localhost`, in Python/FastAPI on Win32** — see Windows rules below
+7. **Connect via `127.0.0.1`, never `localhost`, in Python/FastAPI on Win32** — server binding accepts `127.0.0.1` or `0.0.0.0` (for LAN access); client/internal connections must always use `127.0.0.1` (never `localhost`). See Windows rules below
 
 ## Known Unresolved Issues (re-verified 2026-08-26)
 Original audit: `docs/reports/REPO_AUDIT_2026-08-19.md`. Current status:
@@ -60,7 +60,7 @@ Before editing any function, class, or shared module: check callers first. Use t
 ## Windows / PowerShell
 - Supabase API Gateway: port `54331` (`54321` is often Windows-reserved)
 - Supabase DB port: `54325`
-- FastAPI/Python: bind and connect via `127.0.0.1`, not `localhost` (socket binding is unreliable on Win32)
+- FastAPI/Python: server binding accepts `127.0.0.1` or `0.0.0.0` (for LAN access); client connections must use `127.0.0.1`, not `localhost` (socket binding/resolution is unreliable on Win32)
 - Frontend `.env.local`: use `http://localhost:3000` for the browser-facing URL (avoids CORS)
 - PowerShell command chaining: use `;`, not `&&`
 

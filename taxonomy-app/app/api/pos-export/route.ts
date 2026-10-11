@@ -139,11 +139,20 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async () => {
     const { rows } = await loadExportRows()
 
+    const total = rows.length
+    const issues = countPosExportIssues(rows)
+    const preview = rows.slice(0, PREVIEW_LIMIT)
+
     return NextResponse.json({
       success: true,
-      total: rows.length,
-      issues: countPosExportIssues(rows),
-      preview: rows.slice(0, PREVIEW_LIMIT),
+      data: {
+        total,
+        issues,
+        preview,
+      },
+      total,
+      issues,
+      preview,
     })
   })
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 
 // ⚠️ กุญแจนี้มีสิทธิ์สูงสุด ห้ามใช้ในส่วนที่เป็น Client-side (Browser)
 // ใช้ได้เฉพาะใน API Routes หรือ Server Components เท่านั้น
@@ -9,7 +10,7 @@ if (!supabaseServiceKey) {
   console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY is missing! API calls might fail.')
 }
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || '', {
+export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey || '', {
   auth: {
     autoRefreshToken: false,
     persistSession: false

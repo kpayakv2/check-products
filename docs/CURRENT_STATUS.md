@@ -18,6 +18,37 @@
 
 ---
 
+## ✅ Session 11 ต.ค. 2569 — ตรวจสอบระบบ API, สัญญาประเภท (Types), และเอกสารทั้ง 5 ชั้น (API Audit & SSOT Strategy)
+
+### 1) ตรวจสอบความถูกต้องและสอดคล้องของ API ทั้ง 5 ชั้น (103 รายการ ข้าม 8 มิติ)
+- **ครอบคลุม 103 รายการ:** ชั้นที่ 1 FastAPI (24 endpoints), ชั้นที่ 2 Next.js Route Handlers (25 routes), ชั้นที่ 3 Supabase Edge Functions & WS (10 รายการ), ชั้นที่ 4 Client-side PostgREST Direct Calls (44 queries), และชั้นที่ 5 Documentation Claims (16 phantom endpoints / claims ที่อ้างในเอกสาร)
+- **ผลการตรวจ 8 มิติ:** ตรวจสอบครบทุกมิติ (URL Path, Boundary Contract, HTTP Method, Runtime Errors, Dead Code, Payload Typing, Latent Failures/RLS, Documentation) ไม่มีช่องว่างค้างคา (0 pending cells ใน `matrix.md`)
+- **สรุปข้อค้นพบ 31 ข้อ (`findings.md`):** ครอบคลุม P0 (2), P1 (7), P2 (12), P3 (10) ได้รับคำตัดสินจากผู้ใช้ครบถ้วน 100%
+  - **F-001 (P0):** `INTERNAL_API_SECRET` fallback 'dev-secret-do-not-use-in-prod' ปล่อยไว้ (ยังไม่แก้)
+  - **F-002 (P0 → P2):** FastAPI ผูก `0.0.0.0` ไว้ตามเดิมเพื่อรองรับ LAN และปรับปรุงกฎข้อ 7 ใน `AGENTS.md` ให้สอดคล้อง
+  - **ลบโค้ดตายและ endpoint ที่เลิกใช้:** FastAPI 3 endpoints (`/api/v1/health`, `/api/v1/status`, `/api/v1/taxonomy/recheck`), Edge Functions 2 ตัว (`batch-classify`, `storage-processor`), script ตัวอย่าง dead samples 2 ไฟล์
+  - **แก้ไข API Routes และ Silent Failures:** ป้องกัน Silent 200/204 บน Edge Cases ใน `recheck`, `resolve`, `history` และย้าย query ของ `StorageImport.tsx` เข้า Route Handler ฝั่งเซิร์ฟเวอร์
+  - **ทำความสะอาด `DatabaseService`:** ลบ method เขียนทั้งหมด (20 methods) และ read ที่ไม่ได้ใช้ (7 methods) คงเหลือเฉพาะ method ที่ UI เรียกอ่านจริงที่มี RLS เปิด
+
+### 2) ข้อตกลงสถาปัตยกรรม Type กลาง: Two-Pillar Single Source of Truth ([ADR 0004](adr/0004-two-pillar-single-source-of-truth-types.md))
+- **เสาที่ 1 (Database Schema):** PostgreSQL DB (`127.0.0.1:54325`) เป็นแหล่งความจริงเดียว → สร้าง `types/database.types.ts` อัตโนมัติผ่าน `supabase gen types typescript`
+- **เสาที่ 2 (AI Service Contracts):** Pydantic Models ใน FastAPI (`127.0.0.1:8000`) เป็นแหล่งความจริงเดียว → สร้าง `types/fastapi.types.ts` อัตโนมัติผ่าน `openapi-typescript`
+- **กำจัด Type ซ้ำซ้อน:** เลิกนิยาม Type อิสระกระจัดกระจาย 11 จุดใน 25 ไฟล์ นำมารวมศูนย์ใต้โฟลเดอร์ `taxonomy-app/types/`
+- **สคริปต์กลาง:** เพิ่ม `npm run gen:types` ใน `taxonomy-app/package.json` สำหรับรัน on-demand เมื่อ schema หรือ Pydantic เปลี่ยนแปลง
+
+### 3) วางแผนและจัดทำตั๋วงานแก้ไข (Implementation Work Packages)
+- จัดกลุ่มข้อค้นพบ 30 ข้อ (ไม่รวม F-001) ออกเป็น 8 ตั๋วงานแบบ Vertical Slice ใน [`.scratch/api-fix-implementation/`](../.scratch/api-fix-implementation/map.md):
+  1. `01-pkg1-type-ssot-infrastructure.md` (SSOT Type Setup & Generation Scripts) — บล็อกโดย: ไม่มี
+  2. `02-pkg2-fastapi-dead-code-error-handling.md` (ลบ dead endpoints, sanitize error tracebacks, แก้ Pydantic models) — บล็อกโดย: ไม่มี
+  3. `03-pkg3-edge-functions-sample-cleanup.md` (ลบ dead Edge Functions & sample scripts) — บล็อกโดย: ไม่มี
+  4. `04-pkg4-databaseservice-dead-code-removal.md` (ลบ 20 write methods & 7 dead read methods) — บล็อกโดย: 01
+  5. `05-pkg5-nextjs-routes-boundary-fixes.md` (แก้ silent failures, เพิ่ม route history, แก้ payload boundaries) — บล็อกโดย: 01, 04
+  6. `06-pkg6-storage-bucket-setup.md` (เพิ่ม migration สำหรับ uploads storage bucket) — บล็อกโดย: ไม่มี
+  7. `07-pkg7-automated-tests-active-routes.md` (เพิ่ม integration tests สำหรับ active endpoints) — บล็อกโดย: 02, 05
+  8. `08-pkg8-documentation-rewrite.md` (ปรับปรุงเอกสาร API และลบ phantom claims ทั้งหมด) — บล็อกโดย: 02, 03, 05
+
+---
+
 ## ✅ Session 10-11 ต.ค. 2569 — จับคู่สินค้าซ้ำ + ปิดงาน accessibility
 
 ### 1) การสแกนหาสินค้าซ้ำในสตอกจับผิดเป็นส่วนใหญ่ (แก้แล้ว บางส่วน)
@@ -31,7 +62,9 @@
 - **เส้นทาง import ใช้กฎแล้ว (11 ต.ค.):** `/import-dedup` ติด `identityVerdict` ให้ทุกคู่ (`annotate_identity`) และ `classifyDedupBucket` ใช้ตัดสิน — ทิ้ง ("มีในสตอกแล้ว") ได้ต่อเมื่อคะแนน ≥0.95 **และ**กฎยืนยันว่าซ้ำ · กฎว่าคนละสินค้า → "ของใหม่" ทุกช่วงคะแนน · นอกนั้นส่งให้คน (วัดบนไฟล์ทดสอบ 405 รายการ: ทิ้งผิด 3 จาก 37, ก้ำกึ่งที่ไม่ควรให้คนดู 77 จาก 147) · `/file-dedup` ไม่แก้ เพราะผู้เรียกเดียวคือ Edge Function ที่ไม่มี Edge Runtime รันอยู่ในเครื่องเลย
 - **ข้อมูลไฟล์ทดสอบ 405 รายการแก้แล้ว:** ย้ายสินค้า 80 รายการที่กฎว่าคนละสินค้าไป "ของใหม่" (`scripts/reroute_import_batch_by_rule.py`, ย้อนได้ด้วย `--revert`): 3 รายการที่ถูกทิ้งผิดกลับมา (`เก้าอี้เตี้ย 366` · `กะละมัง 004 58` · `กล่องแช่4401`) + 77 ออกจากคิวก้ำกึ่ง → ของใหม่ 301 · ก้ำกึ่ง 70 · มีในสตอกแล้ว 34 · คืน `ขันน้ำลายไทย 8 CM สีเงิน` เป็น `approved` (เคยถูกกด merge ผิดในหน้า Verify) ด้วย `scripts/undo_wrong_merge.py`
 - **รอบสอง — คนตัดสิน 481 รายการ (11 ต.ค.):** สินค้านำเข้าก้ำกึ่ง 70 รายการ **เป็นของที่มีในสตอกแล้วจริง 66 (94%)** · คู่ในสตอกที่กฎเงียบ 411 คู่: ตัวเดียวกัน 87 · คนละตัว 303 · ไม่แน่ใจ 21 · **ต่ำกว่า 0.90 ไม่มีของซ้ำเลย (0 จาก 115)**, 0.90–0.95 ซ้ำ 8%, ≥0.95 ซ้ำ 41% · ชุดวัดผลแช่แข็ง `tests/fixtures/dedup_human_labels_v2.json` ลง DB ด้วย `scripts/apply_human_dedup_labels_r2.py` แล้ว: ไฟล์ 405 รายการเหลือ ของใหม่ 303 · มีในสตอกแล้ว 100 · ก้ำกึ่ง 2 · `reviewed=true` 474 แถว (103 + 68 + 303) ทุกแถวมีคนตัดสิน
-- **ยังค้าง:** (ก) **87 คู่ที่คนบอก "ตัวเดียวกัน" ยังไม่ได้รวม** — ต้องเลือกฝั่งที่เก็บที่หน้าตรวจซ้ำ (ไม่เขียนอัตโนมัติ เพราะรวม = ถอดสินค้าออกจากสตอก) · (ข) ตอบ "ไม่แน่ใจ" 21 คู่ + 2 สินค้านำเข้า · (ค) ปุ่ม "รวม" ในหน้า Verify ไม่เตือนเมื่อกฎว่าคนละสินค้า — ไม่ได้ทำ เพราะนโยบายใหม่ไม่ให้คู่นั้นเดินไปถึงปุ่มอีกแล้ว · (ง) ข้อเสนอ: ยกเกณฑ์คะแนนการสแกนเป็น 0.90 จะตัดคิวทิ้งได้ราว 115 คู่ที่ไม่เคยเป็นของซ้ำ (ยังไม่ได้เปลี่ยน)
+- **ผู้ใช้รวมสินค้าในหน้าตรวจซ้ำแล้ว 89 คู่ (11 ต.ค.)** (merge 76 · keep_both 13) — แต่หน้านั้นแสดงแต่ชื่อ: **35 จาก 76 การรวมบาร์โค้ดต่างกัน** (22 คู่ต่างทั้งราคา) ยังไม่คืน · จำนวน 89 มาจาก เกณฑ์ 90% + เพดาน limit 100 + ตัวกรอง ML ที่ซ่อนคู่ (ตอนนี้สแกน 90% เจอ 250 คู่ ML ซ่อน 225) · resolve route สร้างแถวซ้อน 31 คู่ (ทิศคู่สลับ) · ตั๋วอยู่ที่ `.scratch/dedup-evidence-and-ml-filter/`
+- **ยังค้าง:** (ก) ตั๋ว 01-03 ใน `.scratch/dedup-evidence-and-ml-filter/` (หลักฐานราคา/บาร์โค้ด · ตัวกรอง ML ซ่อนของซ้ำ · แถวซ้อน) · (ข) ตอบ "ไม่แน่ใจ" 21 คู่ + 2 สินค้านำเข้า (อ่านจากราคา/บาร์โค้ดแล้ว: 18 น่าจะคนละตัว · 4 น่าจะตัวเดียวกัน · ตะกร้าวงรีตัดสินไม่ได้ — ยังไม่ได้ลง DB) · (ค) ข้อเสนอ: ยกเกณฑ์คะแนนการสแกนเป็น 0.90 (ผู้ใช้ใช้ 90% แล้ว)
+- **ตั๋ว 03 (แถวซ้อน) — ตกลงแบบกับผู้ใช้ครบแล้ว ยังไม่ลงมือ (11 ต.ค. บ่าย):** สาเหตุจริงไม่ใช่ "หน้าจอส่งทิศสลับ" — route เรียงไอดีอยู่แล้ว แต่แถวเก่าที่ `build_similarity_training_data.py` เขียนไม่ได้เรียง (~940 แถว) · ทั้ง 31 คู่ = แถว `cosine` ที่คนตัดสิน + แถว `legacy_embedding_scan` ค้าง · ⚠️ **ห้ามรัน `build_similarity_training_data.py` จนกว่าจะแก้** — มันลบทุกแถวของ algorithm นั้น รวมคำตัดสินของคน 391 แถว · คำตัดสิน 9 ข้อ + ลำดับลงมือ อยู่ท้ายไฟล์ตั๋ว 03 · คำศัพท์ใหม่ **คู่สินค้า**/**คำเดาของเครื่อง** ใน `CONTEXT.md` · [ADR 0003](adr/0003-unordered-product-pairs.md)
 
 ### 2) ปิดงาน WCAG 2.2 AA ส่วนที่ค้าง
 - แก้ตัวอักษร <12px **13 จุด** (รวม `text-[9px]` ของ keycap และ `error.tsx` 4 ไฟล์ที่ contrast ตกด้วย) · `animate-pulse` ที่ไม่มี `motion-safe:` 6 จุด · ข้อความอธิบายขั้นตอนใน `DeduplicationTab` ที่โผล่เฉพาะตอน hover (ตอนนี้แสดงตลอด) · หน้า `/products` ตอนโหลดเลื่อนแนวนอนได้ที่ 375px (วงกลมเบลอ `w-96` ไม่ถูกตัด → เพิ่ม `overflow-hidden`)
@@ -605,3 +638,60 @@ migration ที่ apply ลง local DB แล้วและ commit แล้
 - **Embedding Model:** `paraphrase-multilingual-MiniLM-L12-v2` (384-dim)
 - **Model File:** `feedback_model.joblib` (root dir ของ Backend)
 - **LAN Access:** http://192.168.1.80:3000
+
+---
+
+## 🎯 Completed Session (11 ต.ค. 2569) — API, Payload & Documentation Overhaul (Tickets 01–08)
+
+ดำเนินการตาม [ADR 0004](adr/0004-two-pillar-single-source-of-truth-types.md) และปิดข้อค้นพบทั้งหมด 29 ข้อ (จาก 30 ข้อใน `findings.md` โดย F-001 ผู้ใช้ตัดสินใจปล่อยไว้) ครอบคลุม 8 Packages ใน [`.scratch/api-fix-implementation/`](../.scratch/api-fix-implementation/map.md):
+
+### 1. Type SSOT Infrastructure (ADR 0004 — Ticket 01)
+- สร้างสคริปต์อัตโนมัติ `taxonomy-app/scripts/gen-types.js` ดึง Type จาก 2 เสาหลัก:
+  - **Pillar 1:** `types/database.types.ts` ดึงสดจาก PostgreSQL schema (`127.0.0.1:54325`)
+  - **Pillar 2:** `types/fastapi.types.ts` ดึงสดจาก FastAPI OpenAPI schema (`127.0.0.1:8000`)
+- จัดตั้ง `taxonomy-app/types/index.ts` เป็น Single Source of Truth รวมของแอปพลิเคชัน
+- Refactor 25 ไฟล์ทั่วทั้ง frontend เพื่อ import types กลางแทน local interfaces
+
+### 2. FastAPI Dead Code & Error Handling Sanitization (Ticket 02)
+- ลบ 8 legacy dead endpoints: `/api/v1/match/single`, `/api/v1/match/batch`, `/api/v1/upload/csv`, `/api/v1/config` (GET/POST), `/api/v1/jobs/{id}`, `/api/v1/jobs`, `/api/v1/results/{id}`
+- ลบไฟล์ dead modules: `src/api/routers/jobs.py`, `src/api/custom_websockets.py`, `src/api/routers/match.py`, `src/api/services/background_jobs.py`
+- ลบ WebSocket `/ws` และ event publishers ทั้งหมด
+- ปรับปรุง root `GET /` ใน `api_server.py` ลบ `/web` (404) และแสดง endpoints ที่ใช้งานจริง
+- Sanitize error handling ใน 14 endpoints ของ FastAPI ไม่ให้ส่ง `str(e)` ดิบผ่าน 500 detail (ใช้ `logger.exception` และส่ง generic detail แทน)
+- ปรับ Pydantic models ให้เป็น `snake_case` พร้อม Field aliases และ properties เพื่อรองรับ frontend และ backend ร่วมกันอย่างสมบูรณ์
+
+### 3. Supabase Edge Functions & Dead Samples Cleanup (Ticket 03)
+- ลบทั้งโฟลเดอร์ `taxonomy-app/supabase/functions/` (ทั้ง 3 ฟังก์ชัน: `generate-embeddings-local`, `hybrid-classification-local`, `product-deduplication`)
+- ลบ dead scripts: `taxonomy-app/utils/api.ts`, `taxonomy-app/test_functions.js`, `taxonomy-app/scripts/test-api.js`
+- อัปเดต `taxonomy-app/supabase/config.toml` ปิด `[edge_runtime]` และลบ block functions เก่า
+- อัปเดต `taxonomy-app/data/README_DATASET.md` ตัวอย่างโค้ดให้ตรงกับ FastAPI และ Supabase จริง
+
+### 4. DatabaseService Dead Code Removal (Ticket 04)
+- ลบ 20 write methods และ 7 read methods ที่เป็น dead code ใน `taxonomy-app/utils/supabase.ts`
+- กำจัด unused local types และกำหนด generic `<Database>` ให้กับ Supabase client
+
+### 5. Next.js API Routes & Boundary Fixes (Ticket 05)
+- เพิ่ม `'/api/recheck'` ใน `GATED_READ_PATHS` ของ `middleware.ts`
+- ลบ dead routes: `app/api/products/route.ts`, `app/api/similarity/[id]/route.ts`, dead GET handlers ใน `taxonomy/route.ts` และ `synonyms/route.ts`
+- เพิ่ม Zod validation ใน active routes ทั้งหมด
+- ตรวจสอบ row update count ใน `POST /api/similarity/resolve` (คืน 404 เมื่อไม่พบสินค้า)
+- ปรับปรุง response envelope `{ success: true, data: ..., error?: ... }` สม่ำเสมอทุก route
+- ปรับ `StorageImport.tsx` ให้เรียกผ่าน `/api/import/history` แทน PostgREST ตรง
+
+### 6. Supabase Storage Bucket Setup (Ticket 06)
+- สร้าง migration `20261011000000_create_uploads_storage_bucket.sql` สร้าง bucket `uploads` ขนาด 50MB
+- รัน migration ลงในฐานข้อมูล local PostgreSQL (`54325`) เรียบร้อย
+- ยืนยันด้วย integration test `tests/integration/test_storage_connection.py` ผ่าน 100%
+
+### 7. Automated Integration Tests for Active Routes (Ticket 07)
+- อัปเดต `tests/integration/test_api_client.py` ให้ทดสอบ active endpoints: `GET /`, `GET /api/v1/health`, `POST /api/v1/clean`, `POST /api/v1/match/scan-internal`, `GET /docs`
+- อัปเดต `tests/integration/test_taxonomy_import.py` ให้ทดสอบ active `POST /api/v1/match/import-dedup`
+- สร้าง Jest integration tests: `__tests__/api/similarity-resolve.test.ts` และ `__tests__/api/keyword-rules-delete.test.ts` ผ่านครบ 100%
+
+### 8. Documentation Rewrite & Alignment (Ticket 08)
+- อัปเดต `AGENTS.md` กฎเหล็กข้อ 7 อนุญาตให้ FastAPI bind `0.0.0.0` สำหรับ LAN
+- Rewrite `docs/api/API_ARCHITECTURE.md` ให้สะท้อนสถาปัตยกรรมจริง 5 ชั้น ไร้ Edge Functions
+- Rewrite `docs/api/api-reference.md` เป็น Single Source of Truth สมบูรณ์
+- ลบ `docs/api/quick-reference.md` และย้าย `API_CORRECTION.md`, `analyze-capabilities.md` เข้า `docs/archive_docs/`
+- อัปเดต `taxonomy-app/app/README.md` และ `taxonomy-app/README.md` แสดง 14 active routes (19 handlers) ครบถ้วน
+

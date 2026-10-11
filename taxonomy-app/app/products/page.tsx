@@ -469,7 +469,7 @@ export default function ProductsPage() {
                      </div>
                   </section>
 
-                  {PENDING_REVIEW_STATUSES.includes(selectedProduct.status) && (
+                  {Boolean(selectedProduct.status && PENDING_REVIEW_STATUSES.includes(selectedProduct.status as any)) && (
                     <section className="p-8 bg-amber-50 rounded-2xl border border-amber-200 space-y-4">
                        <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">รอการตรวจ</p>
                        <p className="text-sm font-medium text-slate-700 thai-text leading-relaxed">

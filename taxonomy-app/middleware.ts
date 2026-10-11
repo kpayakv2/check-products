@@ -15,7 +15,7 @@ const UNGATED_API_PATHS = new Set(['/api/unlock', '/api/lock'])
 
 // Reads that go through the service role and therefore bypass RLS. A GET here
 // hands out exactly the rows the anon key is denied, so it needs the session too.
-const GATED_READ_PATHS = new Set(['/api/settings', '/api/import/history', '/api/pos-export'])
+const GATED_READ_PATHS = new Set(['/api/settings', '/api/import/history', '/api/pos-export', '/api/recheck'])
 
 // หน้าเว็บที่ต้องเข้าได้เสมอแม้ยังไม่ปลดล็อก — มีแค่หน้ากรอกรหัสเอง
 // ไม่งั้นคนที่ยังไม่ปลดล็อกจะโดนเด้งกลับมา /unlock วนลูปไม่รู้จบ

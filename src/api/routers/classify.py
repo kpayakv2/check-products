@@ -287,7 +287,7 @@ async def classify_category(request: CategoryRequest):
         raise
     except Exception as e:
         logger.exception("Category classification failed")
-        raise HTTPException(status_code=500, detail=f"Classification failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Classification failed")
 
 
 @router.post("/batch", response_model=BatchCategoryResponse)
@@ -339,4 +339,4 @@ async def classify_batch(request: BatchCategoryRequest):
         raise
     except Exception as e:
         logger.exception("Batch classification failed")
-        raise HTTPException(status_code=500, detail=f"Batch classification failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Batch classification failed")

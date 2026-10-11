@@ -27,7 +27,7 @@ describe('middleware', () => {
     expect(response.status).toBe(200)
   })
 
-  it.each(['/api/settings', '/api/import/history'])(
+  it.each(['/api/settings', '/api/import/history', '/api/recheck'])(
     'กั้น GET %s ที่อ่านผ่าน service role ข้าม RLS',
     async (path) => {
       const response = await middleware(request(path))

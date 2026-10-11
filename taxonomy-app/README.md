@@ -167,28 +167,35 @@
 - Mobile-first Approach
 - Touch-friendly Interface
 
-## 🔧 API Endpoints
+## 🔧 API Endpoints (Next.js Layer 2 Routes)
 
-### Taxonomy
-- `GET /api/taxonomy` - ดึงข้อมูล Taxonomy Tree
-- `POST /api/taxonomy` - สร้างหมวดหมู่ใหม่
+ทุก Route มีการปกป้องด้วย `middleware.ts` ตรวจสอบ Token คุกกี้ (ยกเว้น `/api/unlock`)
+
+### System & Auth
+- `POST /api/unlock` - ยืนยันรหัสผ่านสำนักงานและออกคุกกี้ Session
+- `POST /api/lock` - ลบคุกกี้ Session เพื่อล็อกระบบ
+- `GET /api/settings` - ดึงการตั้งค่าระบบ (`system_settings`)
+- `POST /api/settings` - บันทึกการตั้งค่าระบบ
+
+### Taxonomy & Synonyms (Admin Writes)
+- `POST /api/taxonomy` - สร้างหมวดหมู่ใหม่ (`taxonomy_nodes`)
 - `PUT /api/taxonomy/[id]` - แก้ไขหมวดหมู่
 - `DELETE /api/taxonomy/[id]` - ลบหมวดหมู่
+- `POST /api/synonyms` - สร้างชุดคำพ้องใหม่ (`synonym_lemmas` / `terms`)
+- `PUT /api/synonyms/[id]` - แก้ไขคำพ้อง
+- `DELETE /api/synonyms/[id]` - ลบคำพ้อง
 
-### Synonyms
-- `GET /api/synonyms` - ดึงข้อมูล Synonyms
-- `POST /api/synonyms` - สร้าง Synonym ใหม่
-- `PUT /api/synonyms/[id]` - แก้ไข Synonym
-- `DELETE /api/synonyms/[id]` - ลบ Synonym
+### Rules & Quality
+- `DELETE /api/keyword-rules/[id]` - ลบกฎ Keyword Rule อย่างปลอดภัย
+- `POST /api/similarity/resolve` - สะสางคู่สินค้าซ้ำ (Action: merge / keep_both)
+- `GET /api/recheck` - ดึงรายการสินค้าสำหรับตรวจซ้ำ
+- `POST /api/recheck` - ยืนยันการตรวจซ้ำหมวดหมู่สินค้า
+- `POST /api/verify` - ยืนยันหมวดหมู่สินค้าและส่ง feedback ให้ AI
 
-### Products
-- `GET /api/products` - ดึงข้อมูลสินค้า
-- `POST /api/products` - สร้างสินค้าใหม่
-- `POST /api/products/[id]/review` - ตรวจสอบสินค้า
-
-### Similarity
-- `GET /api/similarity/[id]` - ดึงข้อมูลสินค้าที่คล้ายกัน
-- `POST /api/similarity/[id]` - สร้างการจับคู่ใหม่
+### Import & Export
+- `GET /api/import/history` - ดึงประวัติการนำเข้าไฟล์จากตาราง `imports`
+- `POST /api/import/commit` - บันทึกชุดสินค้านำเข้าเข้าสู่ฐานข้อมูล
+- `POST /api/pos-export` - Export รายการสินค้าที่อนุมัติแล้วในรูปแบบ POS
 
 ## 🔒 Security
 

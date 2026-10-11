@@ -32,7 +32,7 @@ async def learn_from_verification(request: LearnVerifyRequest):
         raise
     except Exception as e:
         logger.exception("Auto-learning failed")
-        raise HTTPException(status_code=500, detail=f"Auto-learning failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Auto-learning failed")
 
 @router.post("/retrain")
 async def trigger_ml_retraining():
@@ -59,7 +59,7 @@ async def trigger_ml_retraining():
         raise
     except Exception as e:
         logger.exception("ML Retraining failed")
-        raise HTTPException(status_code=500, detail=f"ML Retraining failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="ML Retraining failed")
 
 @router.get("/status")
 async def get_ml_status():
@@ -128,7 +128,7 @@ async def get_ml_status():
         raise
     except Exception as e:
         logger.exception("Failed to fetch ML status")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to fetch ML status")
 
 @router.get("/history")
 async def get_ml_training_history(limit: int = 10):
@@ -148,4 +148,4 @@ async def get_ml_training_history(limit: int = 10):
         raise
     except Exception as e:
         logger.exception("Failed to fetch ML training history")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to fetch ML training history")

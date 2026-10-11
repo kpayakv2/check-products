@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { DatabaseService } from '@/utils/supabase'
 import { FOCUS_RING } from '@/components/ui/Modal'
+import type { KeywordRule } from '@/types'
 
 interface RegexRule {
   id: string
@@ -39,17 +40,6 @@ interface RegexRule {
   test_cases: string[]
 }
 
-interface KeywordRule {
-  id: string
-  name: string
-  description: string
-  keywords: string[]
-  category_id: string
-  match_type: 'contains' | 'exact' | 'fuzzy'
-  priority: number
-  confidence_score: number
-  is_active: boolean
-}
 
 interface SystemSettings {
   search: {

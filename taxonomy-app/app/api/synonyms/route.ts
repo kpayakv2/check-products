@@ -1,23 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { DatabaseService } from '@/utils/supabase'
+import { z } from 'zod'
 import { createRow, insertRows } from '@/utils/admin-db'
 import { withErrorHandling } from '@/utils/error-handler'
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const categoryId = searchParams.get('category_id')
+const CreateSynonymTermSchema = z.object({
+  term: z.string().min(1, 'คำพ้องต้องไม่ว่าง'),
+  is_primary: z.boolean().optional(),
+  confidence_score: z.number().min(0).max(1).optional(),
+  source: z.string().optional(),
+  language: z.string().optional(),
+})
 
-    const synonyms = await DatabaseService.getSynonyms(categoryId || undefined)
-    return NextResponse.json({ success: true, data: synonyms })
-  } catch (error) {
-    console.error('Error fetching synonyms:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch synonyms' },
-      { status: 500 }
-    )
-  }
-}
+const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+
+const CreateSynonymSchema = z.object({
+  name_th: z.string().min(1).optional(),
+  name: z.string().min(1).optional(),
+  code: z.string().optional(),
+  description: z.string().nullable().optional(),
+  category_id: z.string().regex(UUID_REGEX, 'category_id ต้องเป็น UUID').nullable().optional(),
+  terms: z.array(CreateSynonymTermSchema).min(1, 'ต้องมีคำพ้องอย่างน้อย 1 คำ'),
+}).refine((data) => Boolean(data.name_th || data.name), {
+  message: 'ต้องมีชื่อ synonym (name_th หรือ name)',
+  path: ['name_th'],
+})
 
 /**
  * POST /api/synonyms
@@ -30,26 +36,36 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async () => {
-    const body = await request.json()
-    const { name, name_th, code, description, category_id, terms } = body
-    const lemmaName = name_th || name
-
-    if (!lemmaName || !Array.isArray(terms) || terms.length === 0) {
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'ต้องมีชื่อ synonym และคำพ้องอย่างน้อย 1 คำ' },
+        { success: false, error: 'Invalid JSON body' },
         { status: 400 }
       )
     }
 
+    const validation = CreateSynonymSchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { success: false, error: 'ต้องมีชื่อ synonym และคำพ้องอย่างน้อย 1 คำ', details: validation.error.issues },
+        { status: 400 }
+      )
+    }
+
+    const { name, name_th, code, description, category_id, terms } = validation.data
+    const lemmaName = name_th || name!
+
     const synonym = await createRow<{ id: string }>('synonym_lemmas', {
       code: code || `SYN-${Date.now().toString(36).toUpperCase()}`,
       name_th: lemmaName,
-      description,
-      category_id,
+      description: description ?? null,
+      category_id: category_id ?? null,
       is_active: true
     })
 
-    const savedTerms = await insertRows('synonym_terms', terms.map((term: Record<string, unknown>) => ({
+    const savedTerms = await insertRows('synonym_terms', terms.map((term) => ({
       lemma_id: synonym.id,
       term: term.term,
       is_primary: term.is_primary ?? false,

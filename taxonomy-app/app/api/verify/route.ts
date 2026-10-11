@@ -127,7 +127,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           { status: 404 }
         )
       }
-      return NextResponse.json({ success: true, action })
+      return NextResponse.json({ success: true, data: { action }, action })
     }
 
     const finalCategoryId = category_id as string
@@ -158,6 +158,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const learned = await learnFromDecision(product.name_th, finalCategoryId)
 
-    return NextResponse.json({ success: true, action, category_id: finalCategoryId, learned })
+    return NextResponse.json({
+      success: true,
+      data: {
+        action,
+        category_id: finalCategoryId,
+        learned,
+      },
+      action,
+      category_id: finalCategoryId,
+      learned,
+    })
   })
 }

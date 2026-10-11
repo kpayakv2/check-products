@@ -13,19 +13,8 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { supabase } from '@/utils/supabase'
 import { FOCUS_RING } from '@/components/ui/Modal'
+import type { KeywordRule } from '@/types'
 
-interface KeywordRule {
-  id: string
-  code: string
-  name: string
-  keywords: string[]
-  category_id: string
-  match_type: string
-  created_at: string
-  taxonomy_nodes?: {
-    name_th: string
-  }
-}
 
 export default function AutoLearnTab() {
   const [rules, setRules] = useState<KeywordRule[]>([])
@@ -167,7 +156,7 @@ export default function AutoLearnTab() {
                   <div className="flex justify-between items-start mb-6">
                     <div className="min-w-0">
                       <span className="px-3 py-1 bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold rounded-full uppercase tracking-wider">
-                        Learned {new Date(rule.created_at).toLocaleDateString('th-TH')}
+                        Learned {rule.created_at ? new Date(rule.created_at).toLocaleDateString('th-TH') : '-'}
                       </span>
                       <h3 className="text-xl font-black text-slate-900 mt-3 tracking-tight truncate thai-text">
                         {rule.taxonomy_nodes?.name_th || 'ไม่ระบุหมวดหมู่'}
